@@ -86,7 +86,7 @@ tasks.withType(AbstractArchiveTask).configureEach {
 }
 
 def archiveTextSuffixes = [
-        '.cfg', '.html', '.info', '.java', '.json', '.mcmeta', '.md',
+        '.cfg', '.css', '.html', '.info', '.java', '.js', '.json', '.mcmeta', '.md',
         '.properties', '.txt', '.xml'
 ]
 def archiveTextPatterns = archiveTextSuffixes.collect { "**/*${it}".toString() }
@@ -532,6 +532,8 @@ tasks.register('verifyReleaseArtifacts') {
                         throw new GradleException("Forbidden auxiliary archive entry: ${entry.name}")
                     if (!entry.directory) {
                         String content = new String(archive.getInputStream(entry).bytes, StandardCharsets.ISO_8859_1).toLowerCase(Locale.ROOT)
+                        if (archiveTextSuffixes.any { lower.endsWith(it) } && content.indexOf('\r') >= 0)
+                            throw new GradleException("Non-portable archive line endings in ${artifactName}: ${entry.name}")
                         if (content.find(/[a-z]:[\\\\\/]users[\\\\\/]|d:[\\\\\/]skysgrassslabs|ghp_[a-z0-9]{30,}|github_pat_[a-z0-9_]{40,}/))
                             throw new GradleException("Local path or credential in ${artifactName}: ${entry.name}")
                     }

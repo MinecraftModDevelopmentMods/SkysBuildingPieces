@@ -6,6 +6,12 @@ import java.nio.file.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RepositoryTest {
+    @Test void documentationSupportFilesUsePortableLineEndings() throws Exception {
+        String build=new String(Files.readAllBytes(Paths.get("build.gradle")),StandardCharsets.UTF_8);
+        assertTrue(build.contains("'.css'"));
+        assertTrue(build.contains("'.js'"));
+        assertTrue(build.contains("Non-portable archive line endings"));
+    }
     @Test void localContextIsIgnoredAndNotTracked() throws Exception {
         for(String path:new String[]{"AGENTS.md","agent-notes/evidence.json",".codex/local.json",".claude/settings.json","run/world/level.dat","build/libs/temporary.jar"}) {
             Process p=new ProcessBuilder("git","check-ignore","-q",path).start();assertEquals(0,p.waitFor(),path);
