@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=Плита: %s
+pieces.skysbuildingpieces.vertical_slab=Вертикальная плита: %s
+pieces.skysbuildingpieces.horizontal_step=Четверть блока: %s
+pieces.skysbuildingpieces.vertical_step=Вертикальная четверть: %s
+pieces.skysbuildingpieces.step=Четверть блока: %s
+pieces.skysbuildingpieces.corner=Уголок: %s
+pieces.skysbuildingpieces.stairs=Ступеньки: %s
+pieces.skysbuildingpieces.wall=Ограда: %s
+pieces.skysbuildingpieces.pane=Панель: %s
+item.skysbuildingpieces.template_slab.name=Шаблон: горизонтальная плита
+item.skysbuildingpieces.template_vertical_slab.name=Шаблон: вертикальная плита
+item.skysbuildingpieces.template_step.name=Шаблон: четверть блока
+item.skysbuildingpieces.template_corner.name=Шаблон: уголок
+item.skysbuildingpieces.template_stairs.name=Шаблон: ступеньки
+item.skysbuildingpieces.template_wall.name=Шаблон: ограда
+item.skysbuildingpieces.template_pane.name=Шаблон: панель

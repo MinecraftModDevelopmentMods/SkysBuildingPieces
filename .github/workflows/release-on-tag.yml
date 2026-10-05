@@ -1,0 +1,26 @@
+name: Validate beta tag
+on:
+  push:
+    tags: ['0.2.*']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: |
+          test "${GITHUB_REF_NAME}" = "0.2.0.110021"
+          echo 'Tag validation only. Publication is disabled for this beta.'
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version: '8.0.502+7'
+      - run: echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: microsoft
+          java-version: '17'
+      - run: |
+          chmod +x ./gradlew
+          ./gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums --no-daemon --stacktrace

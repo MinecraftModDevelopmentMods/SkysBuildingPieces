@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=%s Stufe
+pieces.skysbuildingpieces.vertical_slab=%s senkrechte Stufe
+pieces.skysbuildingpieces.horizontal_step=%s Viertelblock
+pieces.skysbuildingpieces.vertical_step=%s senkrechter Viertelblock
+pieces.skysbuildingpieces.step=%s Viertelblock
+pieces.skysbuildingpieces.corner=%s Eckstück
+pieces.skysbuildingpieces.stairs=%s Treppe
+pieces.skysbuildingpieces.wall=%s Mauer
+pieces.skysbuildingpieces.pane=%s Scheibe
+item.skysbuildingpieces.template_slab.name=Waagerechte Stufe Schablone
+item.skysbuildingpieces.template_vertical_slab.name=Senkrechte Stufe Schablone
+item.skysbuildingpieces.template_step.name=Viertelblock Schablone
+item.skysbuildingpieces.template_corner.name=Eckstück Schablone
+item.skysbuildingpieces.template_stairs.name=Treppe Schablone
+item.skysbuildingpieces.template_wall.name=Mauer Schablone
+item.skysbuildingpieces.template_pane.name=Scheibe Schablone

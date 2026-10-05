@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=%s Slab
+pieces.skysbuildingpieces.vertical_slab=%s Vertical Slab
+pieces.skysbuildingpieces.horizontal_step=%s Step
+pieces.skysbuildingpieces.vertical_step=%s Vertical Step
+pieces.skysbuildingpieces.step=%s Step
+pieces.skysbuildingpieces.corner=%s Corner
+pieces.skysbuildingpieces.stairs=%s Stairs
+pieces.skysbuildingpieces.wall=%s Wall
+pieces.skysbuildingpieces.pane=%s Pane
+item.skysbuildingpieces.template_slab.name=Horizontal Slab Template
+item.skysbuildingpieces.template_vertical_slab.name=Vertical Slab Template
+item.skysbuildingpieces.template_step.name=Step Template
+item.skysbuildingpieces.template_corner.name=Corner Template
+item.skysbuildingpieces.template_stairs.name=Stairs Template
+item.skysbuildingpieces.template_wall.name=Wall Template
+item.skysbuildingpieces.template_pane.name=Pane Template

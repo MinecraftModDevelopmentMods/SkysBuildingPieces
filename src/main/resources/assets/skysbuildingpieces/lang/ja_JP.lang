@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=%sのハーフブロック
+pieces.skysbuildingpieces.vertical_slab=%sの縦ハーフブロック
+pieces.skysbuildingpieces.horizontal_step=%sの四分の一ブロック
+pieces.skysbuildingpieces.vertical_step=%sの縦四分の一ブロック
+pieces.skysbuildingpieces.step=%sの四分の一ブロック
+pieces.skysbuildingpieces.corner=%sの角ブロック
+pieces.skysbuildingpieces.stairs=%sの階段
+pieces.skysbuildingpieces.wall=%sの塀
+pieces.skysbuildingpieces.pane=%sの板
+item.skysbuildingpieces.template_slab.name=横ハーフブロック用型紙
+item.skysbuildingpieces.template_vertical_slab.name=縦ハーフブロック用型紙
+item.skysbuildingpieces.template_step.name=四分の一ブロック用型紙
+item.skysbuildingpieces.template_corner.name=角ブロック用型紙
+item.skysbuildingpieces.template_stairs.name=階段用型紙
+item.skysbuildingpieces.template_wall.name=塀用型紙
+item.skysbuildingpieces.template_pane.name=板用型紙

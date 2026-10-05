@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=Losa de %s
+pieces.skysbuildingpieces.vertical_slab=Losa vertical de %s
+pieces.skysbuildingpieces.horizontal_step=Cuarto de bloque de %s
+pieces.skysbuildingpieces.vertical_step=Cuarto vertical de %s
+pieces.skysbuildingpieces.step=Cuarto de bloque de %s
+pieces.skysbuildingpieces.corner=Esquina de %s
+pieces.skysbuildingpieces.stairs=Escaleras de %s
+pieces.skysbuildingpieces.wall=Muro de %s
+pieces.skysbuildingpieces.pane=Panel de %s
+item.skysbuildingpieces.template_slab.name=Plantilla de losa horizontal
+item.skysbuildingpieces.template_vertical_slab.name=Plantilla de losa vertical
+item.skysbuildingpieces.template_step.name=Plantilla de cuarto de bloque
+item.skysbuildingpieces.template_corner.name=Plantilla de esquina
+item.skysbuildingpieces.template_stairs.name=Plantilla de escaleras
+item.skysbuildingpieces.template_wall.name=Plantilla de muro
+item.skysbuildingpieces.template_pane.name=Plantilla de panel

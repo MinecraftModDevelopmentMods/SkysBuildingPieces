@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=Dalle de %s
+pieces.skysbuildingpieces.vertical_slab=Dalle verticale de %s
+pieces.skysbuildingpieces.horizontal_step=Quart de bloc de %s
+pieces.skysbuildingpieces.vertical_step=Quart vertical de %s
+pieces.skysbuildingpieces.step=Quart de bloc de %s
+pieces.skysbuildingpieces.corner=Coin de %s
+pieces.skysbuildingpieces.stairs=Escalier de %s
+pieces.skysbuildingpieces.wall=Muret de %s
+pieces.skysbuildingpieces.pane=Vitre de %s
+item.skysbuildingpieces.template_slab.name=Gabarit de dalle horizontale
+item.skysbuildingpieces.template_vertical_slab.name=Gabarit de dalle verticale
+item.skysbuildingpieces.template_step.name=Gabarit de quart de bloc
+item.skysbuildingpieces.template_corner.name=Gabarit de coin
+item.skysbuildingpieces.template_stairs.name=Gabarit de escalier
+item.skysbuildingpieces.template_wall.name=Gabarit de muret
+item.skysbuildingpieces.template_pane.name=Gabarit de vitre

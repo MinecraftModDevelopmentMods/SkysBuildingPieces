@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=Laje de %s
+pieces.skysbuildingpieces.vertical_slab=Laje vertical de %s
+pieces.skysbuildingpieces.horizontal_step=Quarto de bloco de %s
+pieces.skysbuildingpieces.vertical_step=Quarto vertical de %s
+pieces.skysbuildingpieces.step=Quarto de bloco de %s
+pieces.skysbuildingpieces.corner=Canto de %s
+pieces.skysbuildingpieces.stairs=Escadas de %s
+pieces.skysbuildingpieces.wall=Muro de %s
+pieces.skysbuildingpieces.pane=Painel de %s
+item.skysbuildingpieces.template_slab.name=Molde de laje horizontal
+item.skysbuildingpieces.template_vertical_slab.name=Molde de laje vertical
+item.skysbuildingpieces.template_step.name=Molde de quarto de bloco
+item.skysbuildingpieces.template_corner.name=Molde de canto
+item.skysbuildingpieces.template_stairs.name=Molde de escadas
+item.skysbuildingpieces.template_wall.name=Molde de muro
+item.skysbuildingpieces.template_pane.name=Molde de painel
