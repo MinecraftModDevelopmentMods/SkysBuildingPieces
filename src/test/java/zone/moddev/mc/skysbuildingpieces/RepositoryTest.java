@@ -6,6 +6,11 @@ import java.nio.file.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RepositoryTest {
+    @Test void runtimeHarnessDoesNotClaimTheNormalMinecraftPort() throws Exception {
+        String build=new String(Files.readAllBytes(Paths.get("build.gradle")),StandardCharsets.UTF_8);
+        assertTrue(build.contains("server-ip=127.0.0.1"));
+        assertTrue(build.contains("server-port=0"));
+    }
     @Test void documentationSupportFilesUsePortableLineEndings() throws Exception {
         String build=new String(Files.readAllBytes(Paths.get("build.gradle")),StandardCharsets.UTF_8);
         assertTrue(build.contains("'.css'"));
