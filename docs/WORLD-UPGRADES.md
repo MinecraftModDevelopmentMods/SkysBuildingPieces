@@ -34,9 +34,15 @@ to perform migration.
 Saved contents of sealed item containers are recovered without opening them.
 Their container identity, seal and unrelated custom data are retained.
 
-This release does not provide a complete replacement for BuildingBricks.
-Uncovered biome materials, excluded soil slabs and tools may still require it. Do not
-remove it from Sylvester or another mixed modpack on the basis of this beta.
+Ordinary dirt vertical slabs have separate recovery progress. Adding this
+version to an already visited world converts those remaining slabs without
+counting the earlier chunk visits again.
+
+This release is not a universal replacement for BuildingBricks. Removing it
+requires a complete audit of the particular world, matching material add-ons,
+and a tested backup. Uncovered materials, shapes and tools may still need it.
+Never confirm Forge's missing-content warning for an entry that still has saved
+blocks or items without a proven recovery path.
 
 Sky's Grass Slabs remains responsible for its own content. This mod does not
 change its IDs, configuration, generation, saved state or migration markers.

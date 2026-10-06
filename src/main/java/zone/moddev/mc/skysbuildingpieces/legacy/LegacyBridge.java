@@ -103,7 +103,8 @@ public final class LegacyBridge {
         NBTTagCompound coverage=level.getCompoundTag("skysbuildingpieces_coverage");
         Set<String> pendingModules=new LinkedHashSet<String>();
         for(String module:Catalogue.INSTANCE.modules.keySet())if(coverage.getInteger(module)<1)pendingModules.add(module);
-        if(pendingModules.isEmpty())return;
+        boolean pendingDirt=coverage.getInteger("dirt_vertical_slabs")<1;
+        if(pendingModules.isEmpty() && !pendingDirt)return;
         NBTTagList tiles=level.getTagList("TileEntities",10),sections=level.getTagList("Sections",10);
         Map<Integer,NBTTagCompound> materialAt=new HashMap<Integer,NBTTagCompound>();
         for(int i=0;i<tiles.tagCount();i++) {NBTTagCompound te=tiles.getCompoundTagAt(i);int index=(te.getInteger("x")&15)|((te.getInteger("z")&15)<<4)|(te.getInteger("y")<<8);materialAt.put(index,te);}
@@ -128,7 +129,8 @@ public final class LegacyBridge {
                 NBTTagCompound te=materialAt.get(key);
                 String material=te==null ? "" : te.getString("material");
                 String module=Catalogue.INSTANCE.moduleFor(LegacyMapping.material(material));
-                if(module!=null && !pendingModules.contains(module))continue;
+                boolean dirtVertical=registry.equals("buildingbricks:dirt_vertical_slab");
+                if(dirtVertical ? !pendingDirt : module!=null && !pendingModules.contains(module))continue;
                 Shape shape=LegacyMapping.shape(registry,nibble(data,i));
                 IBlockState target=resolve(registry,LegacyMapping.material(material),shape,LegacyMapping.orientation(shape,nibble(data,i)));
                 if(target!=null)decisions.add(new Conversion(section,i,target,te,module));
@@ -147,9 +149,11 @@ public final class LegacyBridge {
         NBTTagList retained=new NBTTagList();for(int i=0;i<tiles.tagCount();i++)if(!removed.contains(tiles.getCompoundTagAt(i)))retained.appendTag(tiles.getCompoundTagAt(i));level.setTag("TileEntities",retained);
         NBTTagCompound deltas=new NBTTagCompound();
         for(String module:pendingModules){coverage.setInteger(module,1);deltas.setLong(module,0);}
+        if(pendingDirt)coverage.setInteger("dirt_vertical_slabs",1);
         for(Conversion conversion:decisions)deltas.setLong(conversion.module,deltas.getLong(conversion.module)+1);
         coverage.setTag("retained_tiles",retainedTileData);level.setTag("skysbuildingpieces_coverage",coverage);
         if(pendingModules.contains("vanilla"))root.setLong("skysbuildingpieces_delta",deltas.getLong("vanilla"));
+        else if(deltas.getLong("vanilla")>0)root.setLong("skysbuildingpieces_additional_vanilla_delta",deltas.getLong("vanilla"));
         deltas.removeTag("vanilla");
         if(!deltas.hasNoTags())root.setTag("skysbuildingpieces_module_delta",deltas);
     }

@@ -2512,5 +2512,14 @@
     "materials": [
       "minecraft:snow"
     ]
+  },
+  {
+    "id": "dirt_vertical_slab_00",
+    "group": "dirt",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:dirt"
+    ]
   }
 ]

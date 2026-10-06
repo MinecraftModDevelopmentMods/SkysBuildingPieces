@@ -9,7 +9,7 @@ public final class LegacyMapping {
     public static boolean owned(String registry) {
         if(!registry.startsWith("buildingbricks:")) return false;
         String path=registry.substring(15);
-        if(path.equals("grass_slab") || path.equals("turf_slab") || path.equals("dirt_slab") || path.equals("dirt_vertical_slab") || path.equals("grass_vertical_slab")) return false;
+        if(path.equals("grass_slab") || path.equals("turf_slab") || path.equals("dirt_slab") || path.equals("grass_vertical_slab")) return false;
         return path.endsWith("_slab") || path.endsWith("_step") || path.endsWith("_corner") || path.endsWith("_stairs") || path.endsWith("_wall") || path.endsWith("_pane");
     }
     public static Shape shape(String registry,int meta) {
@@ -34,6 +34,6 @@ public final class LegacyMapping {
     public static boolean enabled(boolean installed,boolean force) { return !installed || force; }
     public static boolean allowedMaterial(String material,Shape shape) {
         Catalogue.MaterialDef def=Catalogue.INSTANCE.materials.get(material(material));
-        return def!=null && !(def.soil() && (shape==Shape.SLAB || shape==Shape.VERTICAL_SLAB));
+        return def!=null && Catalogue.supportsShape(def,shape);
     }
 }

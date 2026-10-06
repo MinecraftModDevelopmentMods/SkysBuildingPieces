@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0.110021
+
+- Added a piece lookup interface for Terrain Smoother and shared grass rules
+  when the updated Grass Slabs mod is installed. The core still works alone.
+- Added ordinary dirt vertical slabs.
+- Replaced cutting templates with ordinary shaped recipes for every material.
+- Kept native recipes and added one-for-one slab rotation in the crafting grid.
+- Old beta templates are hidden and can be recycled into paper.
+- Added recovery for legacy dirt vertical slabs, including already visited chunks.
+- Kept existing palette assignments and migration history unchanged.
+
 ## 0.2.0.110021
 
 - Added support for material add-ons using the existing cutting templates.

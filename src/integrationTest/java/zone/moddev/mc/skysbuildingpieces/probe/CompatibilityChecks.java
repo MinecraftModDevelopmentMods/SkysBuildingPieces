@@ -83,7 +83,7 @@ public final class CompatibilityChecks {
         System.out.println("BUILDING_PIECES_GRASS_COEXISTENCE_PASS force="+grassForce);
         // Explicit bridge recipe is available without enabling world replacement.
         net.minecraft.inventory.InventoryCrafting grid=new net.minecraft.inventory.InventoryCrafting(new net.minecraft.inventory.Container(){public boolean canInteractWith(net.minecraft.entity.player.EntityPlayer p){return true;}},3,3);
-        grid.setInventorySlotContents(0,new ItemStack(Pieces.TEMPLATES.get("step")));grid.setInventorySlotContents(1,legacy(1));CuttingRecipe recipe=new CuttingRecipe("step");
+        grid.setInventorySlotContents(0,legacy(1));LegacyPieceRecipe recipe=new LegacyPieceRecipe();
         require(recipe.matches(grid,world),"explicit bridge recipe");identity(recipe.getCraftingResult(grid),1,true);
         if(convert) {
             NBTTagCompound chunk=new NBTTagCompound(),level=new NBTTagCompound(),coverage=new NBTTagCompound();chunk.setTag("Level",level);coverage.setInteger("vanilla",1);coverage.setInteger("later_addon",0);level.setTag("skysbuildingpieces_coverage",coverage);

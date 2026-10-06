@@ -12,7 +12,7 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 public final class ClientProxy extends CommonProxy {
     public void preInit() {
         registerModels("skysbuildingpieces");
-        for(java.util.Map.Entry<String,Item> e:Pieces.TEMPLATES.entrySet())ModelLoader.setCustomModelResourceLocation(e.getValue(),0,new ModelResourceLocation("skysbuildingpieces:template_"+e.getKey(),"inventory"));
+        for(java.util.Map.Entry<String,Item> e:Pieces.RETIRED_TEMPLATES.entrySet())ModelLoader.setCustomModelResourceLocation(e.getValue(),0,new ModelResourceLocation("skysbuildingpieces:template_"+e.getKey(),"inventory"));
     }
     public void registerModels(String namespace) {
         for(PieceBlock b:Pieces.BLOCKS.values()) {

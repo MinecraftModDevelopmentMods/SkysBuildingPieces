@@ -59,9 +59,9 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.2.0.110021.jar
-            build/libs/SkysBuildingPieces-0.2.0.110021-sources.jar
-            build/libs/SkysBuildingPieces-0.2.0.110021-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.0.110021.jar
+            build/libs/SkysBuildingPieces-0.3.0.110021-sources.jar
+            build/libs/SkysBuildingPieces-0.3.0.110021-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 

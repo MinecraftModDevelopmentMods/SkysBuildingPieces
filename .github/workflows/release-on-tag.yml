@@ -1,7 +1,7 @@
 name: Validate beta tag
 on:
   push:
-    tags: ['0.2.*']
+    tags: ['0.3.*']
 permissions:
   contents: read
 jobs:
@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - run: |
-          test "${GITHUB_REF_NAME}" = "0.2.0.110021"
+          test "${GITHUB_REF_NAME}" = "0.3.0.110021"
           echo 'Tag validation only. Publication is disabled for this beta.'
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
         with:

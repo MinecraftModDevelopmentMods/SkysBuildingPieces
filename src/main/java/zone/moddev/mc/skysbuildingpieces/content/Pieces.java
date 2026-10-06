@@ -11,7 +11,9 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 
 public final class Pieces {
     public static final Map<String,PieceBlock> BLOCKS=new LinkedHashMap<String,PieceBlock>();
-    public static final Map<String,Item> TEMPLATES=new LinkedHashMap<String,Item>();
+    // Earlier betas may have saved these IDs. They are hidden, cannot be made,
+    // and have no cutting behaviour; a one-item recipe recycles them to paper.
+    public static final Map<String,Item> RETIRED_TEMPLATES=new LinkedHashMap<String,Item>();
     // Enable the full catalogue only after the compact loader and migration gates pass.
     public static final boolean COMPACT = false;
     public static boolean initialized;
@@ -20,9 +22,8 @@ public final class Pieces {
         initialized=true;
         for(String name:new String[]{"slab","vertical_slab","step","corner","stairs","wall","pane"}) {
             Item item=new Item().setMaxStackSize(1).setUnlocalizedName("skysbuildingpieces.template_"+name)
-                .setCreativeTab(net.minecraft.creativetab.CreativeTabs.BUILDING_BLOCKS)
                 .setRegistryName("skysbuildingpieces","template_"+name);
-            GameRegistry.register(item);TEMPLATES.put(name,item);
+            GameRegistry.register(item);RETIRED_TEMPLATES.put(name,item);
         }
     }
     public static void registerModule(Catalogue.Module module) {
@@ -50,7 +51,7 @@ public final class Pieces {
     public static IBlockState state(String material,Shape shape,int orientation) {
         if(shape==Shape.STEP) {shape=orientation>=8?Shape.VERTICAL_STEP:Shape.HORIZONTAL_STEP;orientation=orientation>=8?orientation&3:orientation;}
         Catalogue.MaterialDef def=Catalogue.INSTANCE.materials.get(material);
-        if(def==null || def.soil() && (shape==Shape.SLAB||shape==Shape.VERTICAL_SLAB)) return null;
+        if(def==null || !Catalogue.supportsShape(def,shape)) return null;
         IBlockState nativeState=nativeState(def,shape.name().toLowerCase(Locale.ROOT));
         if(nativeState!=null) {
             if(shape==Shape.SLAB) return nativeState.getBlock().getStateFromMeta(nativeState.getBlock().getMetaFromState(nativeState) | (orientation==0 ? 8 : 0));

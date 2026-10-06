@@ -53,7 +53,7 @@ public final class WorldAuditProbe {
                 WorldServer world=server.worldServerForDimension(0);long blocks=0,items=0;
                 if(LegacyBridge.active()) {
                     LegacyBridge.report(world);PiecesWorldState state=PiecesWorldState.get(world);blocks=state.blocks;items=state.items;
-                    if(blocks!=6062)throw new AssertionError("Qualified vanilla conversion count: "+blocks+" instead of 6062");
+                    if(blocks!=6072)throw new AssertionError("Qualified vanilla conversion count: "+blocks+" instead of 6072");
                     if(items!=1170)throw new AssertionError("Qualified encountered inventory count: "+items+" instead of 1170");
                     if(net.minecraftforge.fml.common.Loader.isModLoaded("skysbuildingpiecesbop")) {
                         PiecesWorldState.Totals bop=state.modules.get("biomesoplenty");

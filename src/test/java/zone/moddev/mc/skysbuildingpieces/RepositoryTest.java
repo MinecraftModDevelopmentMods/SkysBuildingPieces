@@ -29,7 +29,7 @@ class RepositoryTest {
     @Test void branchWorkflowsUseExactArtifactsAndCannotPublish() throws Exception {
         String ci=new String(Files.readAllBytes(Paths.get(".github/workflows/ci.yml")),StandardCharsets.UTF_8);
         assertTrue(ci.contains("master-1.10.2"));assertTrue(ci.contains("if-no-files-found: error"));
-        for(String classifier:new String[]{"","-sources","-javadoc"})assertTrue(ci.contains("SkysBuildingPieces-0.2.0.110021"+classifier+".jar"));
+        for(String classifier:new String[]{"","-sources","-javadoc"})assertTrue(ci.contains("SkysBuildingPieces-0.3.0.110021"+classifier+".jar"));
         String tags=new String(Files.readAllBytes(Paths.get(".github/workflows/release-on-tag.yml")),StandardCharsets.UTF_8);
         assertTrue(tags.contains("verifyReleaseArtifacts"));assertFalse(tags.contains("secrets."));assertFalse(tags.contains("gh release"));assertFalse(tags.contains("publishRelease"));
     }

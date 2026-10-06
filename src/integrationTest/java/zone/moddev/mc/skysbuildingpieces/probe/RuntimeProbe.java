@@ -30,9 +30,11 @@ public final class RuntimeProbe {
     private boolean ran;
     @Mod.EventHandler public void pre(FMLPreInitializationEvent e) {
         String phase=System.getProperty("skysbuildingpieces.integrationPhase","");
-        if(!net.minecraftforge.fml.common.Loader.isModLoaded("buildingbricks") && !phase.startsWith("legacy-") && !phase.startsWith("client")) {
+        if(!net.minecraftforge.fml.common.Loader.isModLoaded("buildingbricks") && !phase.startsWith("legacy-") && !phase.startsWith("client") && !phase.startsWith("sylvester")) {
             legacy=new Block(Material.ROCK).setRegistryName("buildingbricks","rock_step");GameRegistry.register(legacy);
             GameRegistry.register(new ItemBlock(legacy).setRegistryName(legacy.getRegistryName()));
+            Block dirt=new Block(Material.GROUND).setRegistryName("buildingbricks","dirt_vertical_slab");GameRegistry.register(dirt);
+            GameRegistry.register(new ItemBlock(dirt).setRegistryName(dirt.getRegistryName()));
         } else legacy=Block.getBlockFromName("buildingbricks:rock_step");
         MinecraftForge.EVENT_BUS.register(this);
         proxy.init();
@@ -52,6 +54,7 @@ public final class RuntimeProbe {
                 server.initiateShutdown();return;
             }
             GameplayChecks.run(world);
+            if(!phase.startsWith("client"))DirtCoverageChecks.run(world);
             if(net.minecraftforge.fml.common.Loader.isModLoaded("skysbuildingpiecesbop")&&!phase.startsWith("client"))
                 Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks").getMethod("run",WorldServer.class).invoke(null,world);
             if(phase.startsWith("client-")) {
@@ -92,17 +95,6 @@ public final class RuntimeProbe {
                 else {world.setBlockState(p,state,2);require(world.getBlockState(p).equals(state),"real storage");}
             }
             require(Pieces.BLOCKS.size()==Catalogue.INSTANCE.palettes.size(),"production budget");
-            for(String template:Pieces.TEMPLATES.keySet()) {
-                net.minecraft.inventory.InventoryCrafting grid=new net.minecraft.inventory.InventoryCrafting(new net.minecraft.inventory.Container(){public boolean canInteractWith(net.minecraft.entity.player.EntityPlayer p){return true;}},3,3);
-                ItemStack tool=new ItemStack(Pieces.TEMPLATES.get(template));NBTTagCompound custom=new NBTTagCompound();custom.setString("label","Original template");tool.setTagCompound(custom);grid.setInventorySlotContents(0,tool);
-                int needed=template.equals("stairs")||template.equals("wall")||template.equals("pane")?6:1;
-                String mat=template.equals("pane")?"minecraft:ice":"minecraft:stone";
-                for(int input=1;input<=needed;input++)grid.setInventorySlotContents(input,Pieces.stack(Pieces.nativeState(Catalogue.INSTANCE.materials.get(mat),"full"),1));
-                CuttingRecipe recipe=new CuttingRecipe(template);require(recipe.matches(grid,world),"cutting recipe " + template);
-                int count=template.equals("slab")||template.equals("vertical_slab")?2:template.equals("step")?4:template.equals("corner")?8:template.equals("stairs")?4:template.equals("wall")?6:16;
-                require(recipe.getCraftingResult(grid).stackSize==count,"cutting quantity " + template);
-                require(ItemStack.areItemStacksEqual(tool,recipe.getRemainingItems(grid)[0]),"exact template remainder");
-            }
             NBTTagCompound bad=new NBTTagCompound();bad.setString("id","buildingbricks:rock_step");bad.setByte("Count",(byte)3);NBTTagCompound unknown=new NBTTagCompound();unknown.setString("material","missing:unknown");bad.setTag("tag",unknown);
             NBTTagCompound before=bad.copy();boolean stopped=false;try{LegacyBridge.prepareStack(bad);}catch(LegacyBridge.RecoveryAbort expected){stopped=true;}require(stopped&&before.equals(bad),"unknown absent content stops unchanged");
             NBTTagCompound crate=new NBTTagCompound();crate.setString("id","minecraft:chest");crate.setByte("Count",(byte)1);

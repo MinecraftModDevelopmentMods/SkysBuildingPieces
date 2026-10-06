@@ -38,6 +38,10 @@ public final class MigrationEvents {
         if(n.hasKey("skysbuildingpieces_delta")) {
             PiecesWorldState s=PiecesWorldState.get(e.getWorld());s.blocks+=n.getLong("skysbuildingpieces_delta");s.chunks++;s.markDirty();n.removeTag("skysbuildingpieces_delta");
         }
+        if(n.hasKey("skysbuildingpieces_additional_vanilla_delta")) {
+            // New coverage in an already counted chunk adds conversions, not a second chunk visit.
+            PiecesWorldState s=PiecesWorldState.get(e.getWorld());s.blocks+=n.getLong("skysbuildingpieces_additional_vanilla_delta");s.markDirty();n.removeTag("skysbuildingpieces_additional_vanilla_delta");
+        }
         if(n.hasKey("skysbuildingpieces_module_delta",10)) {
             PiecesWorldState s=PiecesWorldState.get(e.getWorld());NBTTagCompound deltas=n.getCompoundTag("skysbuildingpieces_module_delta");
             for(String module:deltas.getKeySet())s.addChunk(module,deltas.getLong(module));

@@ -1,37 +1,56 @@
-# Pieces and templates
+# Pieces and recipes
 
-Use vanilla full blocks and reusable templates to cut building pieces. Materials
-that already have a matching Minecraft piece use that existing block and item.
+Use matching full blocks to craft building pieces. No template or tool is
+needed. Existing Minecraft pieces keep their native items and recipes; the
+BOP add-on follows the same patterns for its materials.
 
-Seven paper and stick patterns make templates for horizontal slabs, vertical
-slabs, steps, corners, stairs, walls and panes. Each recipe makes one template.
-The pattern and the template picture suggest its shape.
+`X` is one matching full block, `H` is one matching slab, `Q` is one matching
+step, and `.` is empty. Slabs and steps may be horizontal or vertical, but do
+not mix the two item types in one recipe.
+Patterns can be moved within the crafting grid; diagonal and stair patterns
+also work mirrored. Each occupied slot consumes one item, not the whole stack.
 
-Use these patterns in a crafting table. `P` is paper, `S` is a stick, and `.`
-is an empty slot. Each pattern makes one reusable template.
+| Piece | Top row | Middle row | Bottom row | Output |
+| --- | --- | --- | --- | --- |
+| Horizontal slab | `XXX` | `...` | `...` | 6 slabs |
+| Vertical slab | `X..` | `X..` | `X..` | 6 vertical slabs |
+| Step | `H..` | `.H.` | `...` | 4 steps |
+| Soil step | `X..` | `.X.` | `...` | 8 steps |
+| Corner | `QQ.` | `...` | `...` | 4 corners |
+| Stairs | `X..` | `XX.` | `XXX` | 4 stairs |
+| Wall | `XX.` | `XX.` | `XX.` | 6 walls |
+| Pane | `XXX` | `XXX` | `...` | 16 panes |
 
-| Template | Top row | Middle row | Bottom row |
-| --- | --- | --- | --- |
-| Horizontal slab | `PPP` | `SSS` | `...` |
-| Vertical slab | `PS.` | `PS.` | `PS.` |
-| Step | `PP.` | `SS.` | `...` |
-| Corner | `P..` | `S..` | `...` |
-| Stairs | `P..` | `PP.` | `SSS` |
-| Wall | `.P.` | `PPP` | `SSS` |
-| Pane | `SPS` | `SPS` | `SPS` |
+Walls use two columns so their recipe does not overlap glass panes or nether
+brick fences. Native cobblestone walls, slabs, stairs and glass panes keep
+their usual recipes. Only supported shapes are available; there are no wooden
+walls or horizontal soil slabs.
 
-One full block and a template make two slabs, four steps or eight corners.
-Six matching full blocks and a stairs template make four stairs. A wall
-template and six full blocks make six walls; a pane template makes sixteen
-panes. The template is returned unchanged, including custom item data.
+A single horizontal slab in the grid becomes one matching vertical slab,
+and a single vertical slab becomes one horizontal slab. This also makes the
+ordinary stone slab available without changing vanilla's three-stone recipe,
+which still produces smooth stone slabs. Snow slabs, decorative sandstone slabs
+and mossy/cracked/chiseled stone brick slabs also use this route: their full-block
+rows already belong to vanilla recipes.
 
-Put each of the six input blocks in a separate crafting slot. Smooth stone
-has no obtainable full block item in Minecraft 1.10.2, so use its ordinary
-stone slabs instead; these recipes produce half the usual quantity.
+For decorative sandstone and mossy/cracked/chiseled stone brick stairs, use six
+matching vertical slabs in the stair pattern to make four stairs. Their full-block
+stair patterns still produce vanilla's ordinary sandstone or stone brick stairs.
 
-A matching template can also convert a supported BuildingBricks item into
-its Sky or vanilla equivalent. This is an explicit crafting choice and works
-even when automatic replacement is disabled.
+Horizontal and vertical step items can also be rotated one for one. Either
+kind can be cut into corners. Soil steps use full dirt, coarse dirt, podzol,
+mycelium or grass blocks because their horizontal slabs are outside this mod.
+
+Smooth stone has no obtainable full block item in Minecraft 1.10.2. Use
+vanilla smooth stone slabs for its vertical slabs, stairs and walls; the output
+is half the normal full-block quantity. Its steps and corners follow the
+normal slab and step recipes.
+
+Put a supported old BuildingBricks piece in the grid by itself to convert one
+item into its equivalent. The material and custom item data are preserved.
+Automatic world recovery remains independent of crafting. Templates saved
+by earlier betas are hidden and no longer cut pieces; craft one by itself to
+recycle it into one paper while keeping its custom data.
 
 Sky slab items can be placed horizontally or vertically. Click the centre of
 a block face to place a slab against that face. Click near an edge to place it
@@ -46,9 +65,16 @@ Sneak while placing a step to turn it vertically. Matching pieces can combine
 into a supported larger shape or the original full block. Unlike materials
 do not combine. Some unions have no supported shape and cannot combine.
 
-Grass shapes use biome colours. Covered or dark grass can become the matching
-dirt shape. Plants need a complete upper supporting face. Nearby snow gives
+Grass shapes use biome colours and spread to ordinary dirt and matching dirt
+pieces. Covered or dark grass becomes the matching dirt shape, retaining its
+orientation. Grass pieces keep their grass-block support as dirt. With Grass
+Slabs 1.1 installed, spreading also works across its slabs and turf.
+Plants and bonemeal need a complete upper supporting face. Nearby snow gives
 soil and grass pieces a visual snow cap without changing their collision.
 
-Horizontal and vertical soil or grass slabs, turf, path slabs and wooden
-walls are deliberately outside this mod. No new terrain is generated.
+Three ordinary dirt blocks in a column make six dirt vertical slabs.
+Place them in any of the four directions; complementary halves combine
+into a vanilla dirt block.
+
+Horizontal soil slabs, vertical grass or other soil slabs, turf, path slabs and
+wooden walls are outside this mod. No new terrain is generated.

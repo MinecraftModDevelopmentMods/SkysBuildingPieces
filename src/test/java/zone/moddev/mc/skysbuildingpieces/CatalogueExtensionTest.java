@@ -15,7 +15,7 @@ class CatalogueExtensionTest {
     @Test void modulesAreIndependentAndDefinitionsImmutable() {
         Catalogue c=new Catalogue();JsonArray input=materials();
         Catalogue.Module m=c.registerModule("example","examplepieces",input,palettes(),1);
-        assertEquals(234,c.modules.get("vanilla").palettes.size());assertEquals(235,c.palettes.size());
+        assertEquals(235,c.modules.get("vanilla").palettes.size());assertEquals(236,c.palettes.size());
         assertEquals("examplepieces:wood_corner_00",m.palettes.get(0).registryId());
         assertEquals("example",c.moduleFor("example:wood"));
         input.get(0).getAsJsonObject().addProperty("flammability",20);
@@ -27,7 +27,7 @@ class CatalogueExtensionTest {
     @Test void duplicateLateAndInvalidContributionsFailAtomically() {
         Catalogue c=new Catalogue();JsonArray bad=palettes();bad.get(0).getAsJsonObject().getAsJsonArray("materials").add(new JsonPrimitive("example:missing"));
         assertThrows(IllegalArgumentException.class,()->c.registerModule("example","examplepieces",materials(),bad,1));
-        assertEquals(102,c.materials.size());assertEquals(234,c.palettes.size());
+        assertEquals(102,c.materials.size());assertEquals(235,c.palettes.size());
         c.registerModule("example","examplepieces",materials(),palettes(),1);
         assertThrows(IllegalArgumentException.class,()->c.registerModule("example","another",materials(),palettes(),1));
         c.freeze();assertThrows(IllegalStateException.class,()->c.registerModule("later","laterpieces",materials(),palettes(),1));
@@ -37,6 +37,6 @@ class CatalogueExtensionTest {
         assertThrows(IllegalArgumentException.class,()->c.registerModule("example","examplepieces",materials(),doubled,1));
         JsonArray repeated=palettes();repeated.get(0).getAsJsonObject().getAsJsonArray("materials").add(new JsonPrimitive("example:wood"));
         assertThrows(IllegalArgumentException.class,()->c.registerModule("example","examplepieces",materials(),repeated,1));
-        assertEquals(234,c.palettes.size());
+        assertEquals(235,c.palettes.size());
     }
 }

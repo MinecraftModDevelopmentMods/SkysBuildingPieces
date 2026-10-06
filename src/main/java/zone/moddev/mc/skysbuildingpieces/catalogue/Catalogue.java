@@ -20,7 +20,7 @@ public final class Catalogue {
     public Catalogue() {
         Module core = registerModule("vanilla", "skysbuildingpieces", read(Catalogue.class, ROOT + "materials.json"),
                 read(Catalogue.class, ROOT + "palettes.json"), 255);
-        if (core.palettes.size() != 234 || core.palettes.size() + 1 > 256)
+        if (core.palettes.size() != 235 || core.palettes.size() + 1 > 256)
             throw new IllegalStateException("Core block budget exceeded");
     }
 
@@ -50,7 +50,7 @@ public final class Catalogue {
                 MaterialDef definition = additions.get(id);
                 if (definition == null || !definition.group.equals(palette.group) ||
                         !shapes.add(id + "/" + palette.shape) ||
-                        definition.soil() && (palette.shape == Shape.SLAB || palette.shape == Shape.VERTICAL_SLAB))
+                        !supportsShape(definition, palette.shape))
                     throw new IllegalArgumentException("Invalid palette material: " + id);
             }
             addedPalettes.add(palette);
@@ -65,6 +65,10 @@ public final class Catalogue {
     }
 
     public synchronized void freeze() { frozen = true; }
+    public static boolean supportsShape(MaterialDef definition, Shape shape) {
+        return !definition.soil() || !(shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB) ||
+                shape == Shape.VERTICAL_SLAB && definition.id.equals("minecraft:dirt");
+    }
     public String moduleFor(String material) {
         MaterialDef definition = materials.get(material);
         return definition == null ? null : definition.module;

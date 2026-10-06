@@ -44,7 +44,7 @@ class ResourceTest {
             }
         }
     }
-    @Test void templateModelsAreDistinct() throws Exception {
+    @Test void retiredTemplateModelsRemainAvailableForOldSaves() throws Exception {
         Set<String> models=new HashSet<String>();for(String t:Arrays.asList("slab","vertical_slab","step","corner","stairs","wall","pane"))assertTrue(models.add(new String(Files.readAllBytes(ROOT.resolve("models/item/template_"+t+".json")),StandardCharsets.UTF_8)));
     }
     private static JsonObject json(Path p)throws Exception {return new JsonParser().parse(new String(Files.readAllBytes(p),StandardCharsets.UTF_8)).getAsJsonObject();}

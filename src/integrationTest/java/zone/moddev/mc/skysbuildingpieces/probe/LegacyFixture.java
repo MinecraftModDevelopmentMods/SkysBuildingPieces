@@ -25,38 +25,40 @@ public final class LegacyFixture {
         boolean source=phase.equals("legacy-source"),converted=phase.equals("legacy-converted")||phase.equals("legacy-reload")||phase.equals("legacy-disabled-after");
         if(source) {
             require(!LegacyBridge.active(),"source must leave old content alone");
-            for(int i=0;i<22;i++) {
+            for(int i=0;i<26;i++) {
                 int family=i<16?0:i-15,meta=i<16?i:family==1?3:0;
-                Block old=Block.getBlockFromName("buildingbricks:"+IDS[family]);require(old!=null,"real legacy block "+IDS[family]);
+                String legacyId=i<22?IDS[family]:"dirt_vertical_slab";String material=i<22?MATERIALS[family]:"minecraft:dirt";if(i>=22)meta=i-22;
+                Block old=Block.getBlockFromName("buildingbricks:"+legacyId);require(old!=null,"real legacy block "+legacyId);
                 world.setBlockState(pos(i),old.getStateFromMeta(meta),2);
-                TileEntity tile=world.getTileEntity(pos(i));require(tile!=null,"real material tile "+IDS[family]);
-                NBTTagCompound n=tile.writeToNBT(new NBTTagCompound());n.setString("material",MATERIALS[family]);n.setString("fixture_note","material identity, not item damage");tile.readFromNBT(n);tile.markDirty();
+                TileEntity tile=world.getTileEntity(pos(i));require(tile!=null,"real material tile "+legacyId);
+                NBTTagCompound n=tile.writeToNBT(new NBTTagCompound());n.setString("material",material);n.setString("fixture_note","material identity, not item damage");tile.readFromNBT(n);tile.markDirty();
             }
-            world.setBlockState(pos(24),Blocks.CHEST.getDefaultState(),2);
-            TileEntityChest chest=(TileEntityChest)world.getTileEntity(pos(24));chest.setInventorySlotContents(0,legacyStack("rock_step","minecraft:stone",23));
+            world.setBlockState(pos(32),Blocks.CHEST.getDefaultState(),2);
+            TileEntityChest chest=(TileEntityChest)world.getTileEntity(pos(32));chest.setInventorySlotContents(0,legacyStack("rock_step","minecraft:stone",23));
             chest.setInventorySlotContents(1,legacyStack("wood_corner","minecraft:planks_oak",7));
             world.spawnEntity(new EntityItem(world,804,72,804,legacyStack("rock_step","minecraft:stone",5)));
         } else {
-            for(int i=0;i<22;i++) {
+            for(int i=0;i<26;i++) {
                 int family=i<16?0:i-15,meta=i<16?i:family==1?3:0;
                 IBlockState state=world.getBlockState(pos(i));
+                String legacyId=i<22?IDS[family]:"dirt_vertical_slab";String material=i<22?MATERIALS[family]:"minecraft:dirt";if(i>=22)meta=i-22;
                 if(converted) {
-                    Shape shape=LegacyMapping.shape("buildingbricks:"+IDS[family],meta);
-                    IBlockState expected=Pieces.state(MATERIALS[family],shape,LegacyMapping.orientation(shape,meta));
+                    Shape shape=LegacyMapping.shape("buildingbricks:"+legacyId,meta);
+                    IBlockState expected=Pieces.state(material,shape,LegacyMapping.orientation(shape,meta));
                     require(state.equals(expected),"converted identity and geometry "+i+" "+state+" != "+expected);
                     require(world.getTileEntity(pos(i))==null,"no remaining material tile "+i);
                 } else {
-                    require(state.getBlock().getRegistryName().toString().equals("buildingbricks:"+IDS[family]),"default coexistence block "+i);
-                    TileEntity tile=world.getTileEntity(pos(i));require(tile!=null&&tile.writeToNBT(new NBTTagCompound()).getString("material").equals(MATERIALS[family]),"default material identity");
+                    require(state.getBlock().getRegistryName().toString().equals("buildingbricks:"+legacyId),"default coexistence block "+i);
+                    TileEntity tile=world.getTileEntity(pos(i));require(tile!=null&&tile.writeToNBT(new NBTTagCompound()).getString("material").equals(material),"default material identity");
                 }
             }
-            TileEntityChest chest=(TileEntityChest)world.getTileEntity(pos(24));ItemStack stack=chest.getStackInSlot(0);
+            TileEntityChest chest=(TileEntityChest)world.getTileEntity(pos(32));ItemStack stack=chest.getStackInSlot(0);
             require(stack!=null&&stack.stackSize==23&&stack.getTagCompound().getString("custom_label").equals("NBT survives"),"container count and custom NBT");
             require(stack.getItem().getRegistryName().getResourceDomain().equals(converted?"skysbuildingpieces":"buildingbricks"),"container identity");
             NBTTagCompound saved=new NBTTagCompound();world.getChunkFromBlockCoords(pos(0)).getWorld().getMapStorage().saveAllData();
-            if(converted) {PiecesWorldState state=PiecesWorldState.get(world);require(state.blocks==22,"block counter "+state.blocks);require(state.items==35,"item counter "+state.items);}
+            if(converted) {PiecesWorldState state=PiecesWorldState.get(world);require(state.blocks==26,"block counter "+state.blocks);require(state.items==35,"item counter "+state.items);}
         }
-        Properties result=new Properties();result.setProperty("phase",phase);result.setProperty("forced",Boolean.toString(SkysBuildingPieces.forceReplace));result.setProperty("blocks","22");
+        Properties result=new Properties();result.setProperty("phase",phase);result.setProperty("forced",Boolean.toString(SkysBuildingPieces.forceReplace));result.setProperty("blocks","26");
         try(OutputStream out=new FileOutputStream(new File(world.getSaveHandler().getWorldDirectory(),phase+".properties"))){result.store(out,"Disposable fixture verification");}
         System.out.println("BUILDING_PIECES_LEGACY_PASS "+phase);
     }

@@ -15,8 +15,10 @@ Before relying on the beta in a modpack, check:
   combinations should succeed, consuming the right number of items.
 - Put full blocks above and beside pieces. Exposed internal faces should
   remain visible; glass and ice should retain their transparency.
-- Craft each template, then cut several materials. Check the output amounts
-  and that a renamed template is returned with its name and other data intact.
+- Craft several materials using the patterns in the gameplay guide. Check
+  quantities, slab rotation, steps and corners, and unchanged native recipes.
+- If upgrading an earlier beta, recycle a saved template into paper. New
+  templates should not appear in creative inventory or crafting results.
 - Check grass colours in several biomes, nearby snow, covered grass becoming
   dirt, plant support, breaking drops and Silk Touch.
 - Check wall and pane connections and stair corners, including their collision.
@@ -24,6 +26,7 @@ Before relying on the beta in a modpack, check:
   backup enable it, restart, and check converted blocks, containers and item
   entities. Save and reload, then inspect the migration report.
 
-Do not remove BuildingBricks from a mixed world such as Sylvester yet. This
-beta covers vanilla building materials only; BOP materials, excluded soil
-slabs and other unsupported content still need their original mod.
+Check ordinary dirt vertical slabs in all four directions and combine matching
+halves into dirt. When testing removal of BuildingBricks, use a fresh backup
+and audit all remaining content first. BOP materials need the matching add-on;
+unsupported shapes and tools still need their original mod.

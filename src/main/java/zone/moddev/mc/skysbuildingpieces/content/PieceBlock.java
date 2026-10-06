@@ -16,7 +16,7 @@ import net.minecraftforge.common.IPlantable;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 
 /** Metadata palettes with derived visuals; no tile entities or saved composites. */
-public final class PieceBlock extends Block {
+public final class PieceBlock extends Block implements IGrowable {
     public static final PropertyInteger META=PropertyInteger.create("meta",0,15);
     public static final PropertyInteger CONNECTIONS=PropertyInteger.create("connections",0,15);
     public static final PropertyEnum<BlockStairs.EnumShape> STAIR_SHAPE=BlockStairs.SHAPE;
@@ -26,7 +26,7 @@ public final class PieceBlock extends Block {
         super(materialFor(palette));this.palette=palette;CONSTRUCTING.remove();
         setRegistryName(palette.namespace,palette.id);setUnlocalizedName(palette.namespace+"."+palette.id);
         setCreativeTab(net.minecraft.creativetab.CreativeTabs.BUILDING_BLOCKS);useNeighborBrightness=true;
-        setLightOpacity(0);setTickRandomly(palette.group.equals("grass"));
+        setLightOpacity(0);setTickRandomly(palette.group.equals("grass") || palette.group.equals("dirt"));
         slipperiness=(palette.group.equals("ice") || palette.group.equals("packed_ice")) ? 0.98f : 0.6f;
         IBlockState initial=blockState.getBaseState().withProperty(META,0);
         if(initial.getPropertyKeys().contains(BlockGrass.SNOWY))initial=initial.withProperty(BlockGrass.SNOWY,false);
@@ -168,10 +168,13 @@ public final class PieceBlock extends Block {
         for(int slot=0;slot<palette.materials.size();slot++) list.add(new ItemStack(item,1,slot*palette.shape.states));
     }
     public void updateTick(World w,BlockPos p,IBlockState s,Random rand) {
-        if(w.isRemote || !definition(s).type.equals("grass"))return;
-        IBlockState above=w.getBlockState(p.up());
-        if(w.getLightFromNeighbors(p.up())<4 && above.getLightOpacity(w,p.up())>2 || above.isOpaqueCube()) {
-            IBlockState dirt=Pieces.state("minecraft:dirt",palette.shape,orientation(s));if(dirt!=null)w.setBlockState(p,dirt,3);
-        }
+        GrassLifecycle.tick(w,p,s,rand);
+    }
+    public void onBlockAdded(World w,BlockPos p,IBlockState s) { GrassLifecycle.repairSupport(w,p,s); }
+    public void neighborChanged(IBlockState s,World w,BlockPos p,Block changed) { GrassLifecycle.repairSupport(w,p,s); }
+    public boolean canGrow(World w,BlockPos p,IBlockState s,boolean client) { return GrassLifecycle.grass(s) && Geometry.completeTop(mask(s)); }
+    public boolean canUseBonemeal(World w,Random rand,BlockPos p,IBlockState s) { return canGrow(w,p,s,w.isRemote); }
+    public void grow(World w,Random rand,BlockPos p,IBlockState s) {
+        if(canGrow(w,p,s,w.isRemote))Blocks.GRASS.grow(w,rand,p,Blocks.GRASS.getDefaultState());
     }
 }

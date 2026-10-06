@@ -49,6 +49,14 @@ public final class GameplayChecks {
             require(vertical.getItem().onItemUse(vertical,player,world,p,EnumHand.MAIN_HAND,face,x,.25f,z)==EnumActionResult.SUCCESS&&world.getBlockState(p).getBlock()==Blocks.GLASS&&vertical.stackSize==1,"vertical slab internal boundary "+o);
         }
         // Unlike materials must not replace an occupied piece.
+        for(int o=0;o<4;o++) {
+            IBlockState dirt=Pieces.state("minecraft:dirt",Shape.VERTICAL_SLAB,o);world.setBlockState(p,dirt,2);
+            world.setBlockState(p.north(),Blocks.SNOW_LAYER.getDefaultState(),2);
+            require(dirt.getBlock().getActualState(dirt,world,p).getValue(BlockGrass.SNOWY),"vertical dirt snow cap "+o);world.setBlockToAir(p.north());
+            ItemStack vertical=Pieces.stack(dirt,2);EnumFacing face=new EnumFacing[]{EnumFacing.NORTH,EnumFacing.EAST,EnumFacing.SOUTH,EnumFacing.WEST}[o];
+            float x=face.getAxis()==EnumFacing.Axis.X?.5f:.25f,z=face.getAxis()==EnumFacing.Axis.Z?.5f:.25f;
+            require(vertical.getItem().onItemUse(vertical,player,world,p,EnumHand.MAIN_HAND,face,x,.25f,z)==EnumActionResult.SUCCESS&&world.getBlockState(p).equals(Blocks.DIRT.getDefaultState())&&vertical.stackSize==1,"vertical dirt full-block combination "+o);
+        }
         IBlockState original=Pieces.state("minecraft:glass",Shape.SLAB,1);world.setBlockState(p,original,2);world.setBlockState(p.up(),Blocks.STONE.getDefaultState(),2);
         ItemStack other=Pieces.stack(Pieces.state("minecraft:ice",Shape.SLAB,0),2);
         other.getItem().onItemUse(other,player,world,p,EnumHand.MAIN_HAND,EnumFacing.UP,.25f,.75f,.25f);
@@ -66,7 +74,7 @@ public final class GameplayChecks {
         require(grass.getBlock().getActualState(grass,world,p).getValue(BlockGrass.SNOWY),"adjacent snow visual");
         world.setBlockToAir(p.north());require(!grass.getBlock().getActualState(grass,world,p).getValue(BlockGrass.SNOWY),"snow visual clears");
         world.setBlockToAir(p);System.out.println("BUILDING_PIECES_GAMEPLAY_PASS "+placed+" palettes");
-        crafting(world);
+        RecipeChecks.run(world);
         materialPhysics(world,p,player);
     }
     private static void slabPlacement(WorldServer world,BlockPos p,EntityPlayerMP player) {
@@ -137,32 +145,6 @@ public final class GameplayChecks {
     }
     private static net.minecraft.inventory.InventoryCrafting grid() {
         return new net.minecraft.inventory.InventoryCrafting(new net.minecraft.inventory.Container(){public boolean canInteractWith(net.minecraft.entity.player.EntityPlayer p){return true;}},3,3);
-    }
-    private static void crafting(WorldServer world) {
-        int checked=0;
-        for(Catalogue.MaterialDef material:Catalogue.INSTANCE.materials.values())for(String name:Pieces.TEMPLATES.keySet()) {
-            Shape shape=name.equals("step")?Shape.HORIZONTAL_STEP:Shape.named(name);
-            IBlockState state=Pieces.state(material.id,shape,shape==Shape.SLAB?1:0);
-            ItemStack full=Pieces.stack(Pieces.nativeState(material,"full"),1);boolean half=full==null;
-            if(half)full=Pieces.stack(Pieces.nativeState(material,"slab"),1);
-            require(full!=null,"obtainable material "+material.id);
-            net.minecraft.inventory.InventoryCrafting grid=grid();ItemStack template=new ItemStack(Pieces.TEMPLATES.get(name));
-            NBTTagCompound n=new NBTTagCompound();n.setString("custom_label","Original template");n.setLong("custom_number",1234567890123L);template.setTagCompound(n);
-            grid.setInventorySlotContents(0,template);
-            int input=shape==Shape.STAIRS||shape==Shape.WALL||shape==Shape.PANE?6:1;
-            for(int i=1;i<=input;i++)grid.setInventorySlotContents(i,full.copy());
-            CuttingRecipe recipe=new CuttingRecipe(name);
-            require(recipe.matches(grid,world)==(state!=null),"catalogue recipe coverage "+material.id+" "+name);
-            if(state!=null) {
-                int yield=shape==Shape.SLAB||shape==Shape.VERTICAL_SLAB?2:shape==Shape.HORIZONTAL_STEP?4:shape==Shape.CORNER?8:shape==Shape.STAIRS?4:shape==Shape.WALL?6:16;
-                if(half)yield/=2;
-                require(ItemStack.areItemStacksEqual(Pieces.stack(state,yield),recipe.getCraftingResult(grid)),"exact recipe result "+material.id+" "+name);
-                require(ItemStack.areItemStacksEqual(template,recipe.getRemainingItems(grid)[0]),"exact template NBT");
-                require(recipe.getRemainingItems(grid)[1]==null,"material is consumed");checked++;
-            }
-            grid.setInventorySlotContents(8,new ItemStack(net.minecraft.init.Items.APPLE));require(!recipe.matches(grid,world),"extra ingredient rejection");
-        }
-        System.out.println("BUILDING_PIECES_CRAFTING_PASS "+checked);
     }
     private static void materialPhysics(WorldServer world,BlockPos p,EntityPlayerMP player) {
         for(PieceBlock b:Pieces.BLOCKS.values())for(int slot=0;slot<b.palette.materials.size();slot++)for(int o=0;o<b.palette.shape.states;o++) {

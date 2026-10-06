@@ -24,6 +24,8 @@ public final class ClientProbe extends ProbeProxy {
         }
         ran=true;
         try {
+            for(net.minecraft.item.Item retired:Pieces.RETIRED_TEMPLATES.values())
+                if(retired.getCreativeTab()!=null)throw new AssertionError("Retired template appears in creative inventory");
             int checked=0;
             for(PieceBlock block:Pieces.BLOCKS.values())for(IBlockState state:block.getBlockState().getValidStates()) {
                 if(state.getValue(PieceBlock.META)/block.palette.shape.states>=block.palette.materials.size())continue;
@@ -33,7 +35,19 @@ public final class ClientProbe extends ProbeProxy {
                     if(quad.getSprite().getIconName().contains("missingno"))throw new AssertionError("Missing sprite "+state);
                 checked++;
             }
-            try(PrintWriter out=new PrintWriter(new File(mc.mcDataDir,"building-pieces-client-pass.txt"),"UTF-8")){out.println("baked_states="+checked);}
+            int recoveryModels=0;
+            for(String name:new String[]{"skysgrassslabs:grass_slab","skysgrassslabs:dirt_slab","skysgrassslabs:path_slab","skysgrassslabs:turf","buildingbricks:grass_slab","buildingbricks:dirt_slab","buildingbrickscompatvanilla:grass_slab"}) {
+                net.minecraft.block.Block block=net.minecraft.block.Block.getBlockFromName(name);
+                if(block==null)continue;
+                for(IBlockState state:block.getBlockState().getValidStates()) {
+                    IBakedModel model=mc.getBlockRendererDispatcher().getModelForState(state);
+                    if(model==mc.getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel())throw new AssertionError("Missing recovery model "+state);
+                    for(EnumFacing face:new EnumFacing[]{null,EnumFacing.DOWN,EnumFacing.UP,EnumFacing.NORTH,EnumFacing.SOUTH,EnumFacing.WEST,EnumFacing.EAST})for(BakedQuad quad:model.getQuads(state,face,0))
+                        if(quad.getSprite().getIconName().contains("missingno"))throw new AssertionError("Missing recovery sprite "+state);
+                    recoveryModels++;
+                }
+            }
+            try(PrintWriter out=new PrintWriter(new File(mc.mcDataDir,"building-pieces-client-pass.txt"),"UTF-8")){out.println("baked_states="+checked);out.println("recovery_models="+recoveryModels);}
             System.out.println("BUILDING_PIECES_CLIENT_PASS "+checked);
             if(System.getProperty("skysbuildingpieces.integrationPhase").equals("client"))mc.shutdown();
             else {startedWorld=true;mc.launchIntegratedServer("building-pieces-world","Building Pieces Test",new net.minecraft.world.WorldSettings(4815162342L,net.minecraft.world.GameType.CREATIVE,true,false,net.minecraft.world.WorldType.FLAT));}
