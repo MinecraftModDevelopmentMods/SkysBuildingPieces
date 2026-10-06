@@ -44,10 +44,12 @@ public final class WorldAuditProbe {
     @SubscribeEvent public void tick(TickEvent.ServerTickEvent e) {
         if(e.phase!=TickEvent.Phase.END)return;
         try {
-            for(int i=0;i<8&&next<chunks.size();i++) {
+            for(int i=0;i<4&&next<chunks.size();i++) {
                 int[] point=chunks.get(next++);WorldServer world=server.worldServerForDimension(point[0]);
                 Chunk chunk=world.getChunkFromChunkCoords(point[1],point[2]);world.getChunkProvider().unload(chunk);
             }
+            // A whole-world scan must not outrun the legacy asynchronous save queue.
+            if(next%256==0||next==chunks.size())net.minecraft.world.storage.ThreadedFileIOBase.getThreadedIOInstance().waitForFinish();
             if(next%2048==0)System.out.println("BUILDING_PIECES_WORLD_AUDIT_PROGRESS "+next+" / "+chunks.size());
             if(next==chunks.size()) {
                 WorldServer world=server.worldServerForDimension(0);long blocks=0,items=0;
