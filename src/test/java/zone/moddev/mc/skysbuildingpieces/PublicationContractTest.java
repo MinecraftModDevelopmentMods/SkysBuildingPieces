@@ -9,8 +9,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class PublicationContractTest {
     @Test void publicationNeedsThisModsMetadataAndExplicitApproval() throws Exception {
         String properties = text("gradle.properties");
-        assertTrue(properties.contains("release_enabled=false"));
-        assertTrue(properties.contains("curseforge_project_id=\n"));
+        java.util.Properties metadata = new java.util.Properties();
+        metadata.load(new java.io.StringReader(properties));
+        String projectId = metadata.getProperty("curseforge_project_id", "");
+        assertTrue(metadata.getProperty("release_enabled").matches("true|false"));
+        if (!projectId.matches("[1-9][0-9]*"))
+            assertEquals("false", metadata.getProperty("release_enabled"));
+        assertNotEquals("1677588", projectId);
         assertTrue(properties.contains("release_repository=MinecraftModDevelopmentMods/SkysBuildingPieces"));
         String workflow = text(".github/workflows/deploy-release.yml");
         assertTrue(workflow.contains("confirm_live_publication"));
@@ -30,6 +35,8 @@ class PublicationContractTest {
         assertTrue(release.contains("lines.size() != 3"));
         assertTrue(release.contains("!checked.add"));
         assertTrue(release.contains("verifyPreparedReleaseArtifacts"));
+        assertTrue(release.contains("collect { it.toString() }"));
+        assertTrue(release.contains("verifyReleaseBundleContract"));
         String ci = text(".github/workflows/ci.yml");
         assertTrue(ci.contains("  push:"));
         assertTrue(ci.contains("  pull_request:"));

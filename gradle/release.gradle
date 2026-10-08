@@ -4,27 +4,56 @@ import java.security.MessageDigest
 // Publish only a checksum-verified bundle built by the release workflow.
 def preparedReleaseDir = providers.gradleProperty('preparedReleaseDir')
 def releaseEnabled = providers.gradleProperty('release_enabled').getOrElse('false') == 'true'
+def verifyPreparedBundle = { File prepared ->
+    List<String> filenames = releaseFiles.get().collect { it.toString() }
+    Set<String> expected = (filenames + ['SHA256SUMS', 'CHANGELOG.md']) as Set<String>
+    Set<String> actual = prepared.listFiles()?.findAll { it.isFile() }*.name as Set<String>
+    if (actual != expected) throw new GradleException('The prepared bundle has missing or unexpected files')
+    def lines = new File(prepared, 'SHA256SUMS').readLines('UTF-8')
+    if (lines.size() != 3) throw new GradleException('The prepared bundle needs exactly three checksums')
+    Set<String> checked = [] as Set<String>
+    lines.each { line ->
+        def match = line =~ /^([0-9A-Fa-f]{64})  ([A-Za-z0-9._-]+)$/
+        if (!match.matches() || !filenames.contains(match[0][2]) || !checked.add(match[0][2]))
+            throw new GradleException('Invalid or repeated prepared checksum')
+        String hash = MessageDigest.getInstance('SHA-256').digest(
+                Files.readAllBytes(new File(prepared, match[0][2]).toPath())).encodeHex().toString()
+        if (!hash.equalsIgnoreCase(match[0][1])) throw new GradleException('Prepared artifact checksum mismatch')
+    }
+}
 tasks.register('verifyPreparedReleaseArtifacts') {
     group = 'verification'
     doLast {
         if (!preparedReleaseDir.isPresent()) throw new GradleException('preparedReleaseDir is required')
-        File prepared = file(preparedReleaseDir.get())
-        Set<String> expected = (releaseFiles.get() + ['SHA256SUMS', 'CHANGELOG.md']) as Set<String>
-        Set<String> actual = prepared.listFiles()?.findAll { it.isFile() }*.name as Set<String>
-        if (actual != expected) throw new GradleException('The prepared bundle has missing or unexpected files')
-        def lines = new File(prepared, 'SHA256SUMS').readLines('UTF-8')
-        if (lines.size() != 3) throw new GradleException('The prepared bundle needs exactly three checksums')
-        Set<String> checked = [] as Set<String>
-        lines.each { line ->
-            def match = line =~ /^([0-9A-Fa-f]{64})  ([A-Za-z0-9._-]+)$/
-            if (!match.matches() || !releaseFiles.get().contains(match[0][2]) || !checked.add(match[0][2]))
-                throw new GradleException('Invalid or repeated prepared checksum')
-            String hash = MessageDigest.getInstance('SHA-256').digest(
-                    Files.readAllBytes(new File(prepared, match[0][2]).toPath())).encodeHex().toString()
-            if (!hash.equalsIgnoreCase(match[0][1])) throw new GradleException('Prepared artifact checksum mismatch')
-        }
+        verifyPreparedBundle(file(preparedReleaseDir.get()))
     }
 }
+tasks.register('verifyReleaseBundleContract') {
+    group = 'verification'
+    dependsOn tasks.named('writeReleaseChecksums')
+    doLast {
+        File bundle = layout.buildDirectory.dir('release-bundle-test').get().asFile
+        List<String> filenames = releaseFiles.get().collect { it.toString() }
+        copy {
+            from layout.buildDirectory.dir('libs')
+            include filenames
+            into bundle
+        }
+        copy { from 'CHANGELOG.md', layout.buildDirectory.file('release/SHA256SUMS'); into bundle }
+        verifyPreparedBundle(bundle)
+        // The same validator must reject a changed jar, even if its name is right.
+        copy { from new File(bundle, filenames[1]); into bundle; rename { filenames[0] } }
+        boolean rejected = false
+        try {
+            verifyPreparedBundle(bundle)
+        } catch (GradleException expected) {
+            if (!expected.message.contains('Prepared artifact checksum mismatch')) throw expected
+            rejected = true
+        }
+        if (!rejected) throw new GradleException('Changed release bundle was accepted')
+    }
+}
+tasks.named('check') { dependsOn 'verifyReleaseBundleContract' }
 def mavenUploadUrl = providers.environmentVariable('MAVEN_UPLOAD_URL')
 publishing {
     publications {
