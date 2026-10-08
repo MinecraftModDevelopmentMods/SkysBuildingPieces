@@ -1,0 +1,25 @@
+name: Validate release tag
+on:
+  push:
+    tags: ['*.*.*.*']
+permissions:
+  actions: read
+  contents: read
+jobs:
+  validate:
+    name: Validate tag without publication
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Validate version and prior artifact audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          test "$GITHUB_REF_NAME" = "$version"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.110021$ ]]
+          checks="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100" --jq '[.check_runs[] | select(.name == "Build, test, and audit" and .conclusion == "success")] | length')"
+          test "$checks" -gt 0
+          echo "verifyReleaseArtifacts passed in CI. This tag check publishes nothing."

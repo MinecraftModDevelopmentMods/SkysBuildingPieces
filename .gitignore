@@ -1,0 +1,79 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+.eclipse
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+.gradle-verify-cache
+
+# other
+eclipse
+run
+run-*
+run-data
+logs
+crash-reports
+test-results
+test-output
+test-reports
+evidence
+release
+dist
+mcmodsrepo
+
+# Local logs, diagnostics, temporary files, and secrets
+*.log
+*.log.*
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.jfr
+*.hprof
+*.dmp
+hs_err_pid*
+replay_pid*
+.env
+.env.*
+!.env.example
+secret.json
+
+# Local development context at any depth. Player and modpack documentation
+# belongs in README.md and docs/ so it remains available after cloning.
+AGENT.md
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+agent-notes/
+agent_notes/
+.codex/
+.claude/
+.cursor/
+.vscode/
+.continue/
+.windsurf/
+.roo/
+.kilocode/
+.aider*
+*.code-workspace
+.github/copilot-instructions.md
+.github/instructions/
+*agent-handover*.md
+
+# Files from Forge MDK
+forge*changelog.txt
+/README.txt

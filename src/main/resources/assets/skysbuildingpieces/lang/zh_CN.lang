@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=%s台阶
+pieces.skysbuildingpieces.vertical_slab=%s竖直台阶
+pieces.skysbuildingpieces.horizontal_step=%s四分之一方块
+pieces.skysbuildingpieces.vertical_step=%s竖直四分之一方块
+pieces.skysbuildingpieces.step=%s四分之一方块
+pieces.skysbuildingpieces.corner=%s角块
+pieces.skysbuildingpieces.stairs=%s楼梯
+pieces.skysbuildingpieces.wall=%s墙
+pieces.skysbuildingpieces.pane=%s板
+item.skysbuildingpieces.template_slab.name=横台阶模板
+item.skysbuildingpieces.template_vertical_slab.name=竖直台阶模板
+item.skysbuildingpieces.template_step.name=四分之一方块模板
+item.skysbuildingpieces.template_corner.name=角块模板
+item.skysbuildingpieces.template_stairs.name=楼梯模板
+item.skysbuildingpieces.template_wall.name=墙模板
+item.skysbuildingpieces.template_pane.name=板模板

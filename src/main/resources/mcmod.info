@@ -1,0 +1,4 @@
+[
+  {"modid":"${modid}","name":"${name}","description":"${description}",
+   "version":"${version}","mcversion":"${mcversion}","authorList":["SkyBlade1978"]}
+]

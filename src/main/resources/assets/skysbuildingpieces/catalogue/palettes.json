@@ -1,0 +1,2525 @@
+[
+  {
+    "id": "rock_slab_00",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:chiseled_red_sandstone",
+      "minecraft:chiseled_sandstone",
+      "minecraft:coal_block",
+      "minecraft:end_bricks",
+      "minecraft:end_stone",
+      "minecraft:hardened_clay",
+      "minecraft:lapis_block",
+      "minecraft:mossy_cobblestone"
+    ]
+  },
+  {
+    "id": "rock_slab_01",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:netherrack",
+      "minecraft:obsidian",
+      "minecraft:prismarine_bricks",
+      "minecraft:prismarine_dark",
+      "minecraft:prismarine_rough",
+      "minecraft:purpur_pillar",
+      "minecraft:smooth_red_sandstone",
+      "minecraft:smooth_sandstone"
+    ]
+  },
+  {
+    "id": "rock_slab_02",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:stained_hardened_clay_white",
+      "minecraft:stained_hardened_clay_orange",
+      "minecraft:stained_hardened_clay_magenta",
+      "minecraft:stained_hardened_clay_light_blue",
+      "minecraft:stained_hardened_clay_yellow",
+      "minecraft:stained_hardened_clay_lime",
+      "minecraft:stained_hardened_clay_pink",
+      "minecraft:stained_hardened_clay_gray"
+    ]
+  },
+  {
+    "id": "rock_slab_03",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:stained_hardened_clay_silver",
+      "minecraft:stained_hardened_clay_cyan",
+      "minecraft:stained_hardened_clay_purple",
+      "minecraft:stained_hardened_clay_blue",
+      "minecraft:stained_hardened_clay_brown",
+      "minecraft:stained_hardened_clay_green",
+      "minecraft:stained_hardened_clay_red",
+      "minecraft:stained_hardened_clay_black"
+    ]
+  },
+  {
+    "id": "rock_slab_04",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:stone",
+      "minecraft:andesite",
+      "minecraft:andesite_smooth",
+      "minecraft:diorite",
+      "minecraft:diorite_smooth",
+      "minecraft:granite",
+      "minecraft:granite_smooth",
+      "minecraft:stonebrick_carved"
+    ]
+  },
+  {
+    "id": "rock_slab_05",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:stonebrick_cracked",
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_00",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:bricks",
+      "minecraft:chiseled_red_sandstone",
+      "minecraft:chiseled_sandstone",
+      "minecraft:coal_block"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_01",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:cobblestone",
+      "minecraft:end_bricks",
+      "minecraft:end_stone",
+      "minecraft:hardened_clay"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_02",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:lapis_block",
+      "minecraft:mossy_cobblestone",
+      "minecraft:nether_brick",
+      "minecraft:netherrack"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_03",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:obsidian",
+      "minecraft:prismarine_bricks",
+      "minecraft:prismarine_dark",
+      "minecraft:prismarine_rough"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_04",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:purpur_block",
+      "minecraft:purpur_pillar",
+      "minecraft:quartz_block",
+      "minecraft:red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_05",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:sandstone",
+      "minecraft:smooth_red_sandstone",
+      "minecraft:smooth_sandstone",
+      "minecraft:stained_hardened_clay_white"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_06",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_orange",
+      "minecraft:stained_hardened_clay_magenta",
+      "minecraft:stained_hardened_clay_light_blue",
+      "minecraft:stained_hardened_clay_yellow"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_07",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_lime",
+      "minecraft:stained_hardened_clay_pink",
+      "minecraft:stained_hardened_clay_gray",
+      "minecraft:stained_hardened_clay_silver"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_08",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_cyan",
+      "minecraft:stained_hardened_clay_purple",
+      "minecraft:stained_hardened_clay_blue",
+      "minecraft:stained_hardened_clay_brown"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_09",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_green",
+      "minecraft:stained_hardened_clay_red",
+      "minecraft:stained_hardened_clay_black",
+      "minecraft:stone"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_10",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stone_slab",
+      "minecraft:andesite",
+      "minecraft:andesite_smooth",
+      "minecraft:diorite"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_11",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:diorite_smooth",
+      "minecraft:granite",
+      "minecraft:granite_smooth",
+      "minecraft:stonebrick"
+    ]
+  },
+  {
+    "id": "rock_vertical_slab_12",
+    "group": "rock",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stonebrick_carved",
+      "minecraft:stonebrick_cracked",
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_00",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:bricks",
+      "minecraft:chiseled_red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_01",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:chiseled_sandstone",
+      "minecraft:coal_block"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_02",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:cobblestone",
+      "minecraft:end_bricks"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_03",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:end_stone",
+      "minecraft:hardened_clay"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_04",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:lapis_block",
+      "minecraft:mossy_cobblestone"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_05",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:nether_brick",
+      "minecraft:netherrack"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_06",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:obsidian",
+      "minecraft:prismarine_bricks"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_07",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:prismarine_dark",
+      "minecraft:prismarine_rough"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_08",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:purpur_block",
+      "minecraft:purpur_pillar"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_09",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:quartz_block",
+      "minecraft:red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_10",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:sandstone",
+      "minecraft:smooth_red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_11",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:smooth_sandstone",
+      "minecraft:stained_hardened_clay_white"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_12",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_orange",
+      "minecraft:stained_hardened_clay_magenta"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_13",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_light_blue",
+      "minecraft:stained_hardened_clay_yellow"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_14",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_lime",
+      "minecraft:stained_hardened_clay_pink"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_15",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_gray",
+      "minecraft:stained_hardened_clay_silver"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_16",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_cyan",
+      "minecraft:stained_hardened_clay_purple"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_17",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_blue",
+      "minecraft:stained_hardened_clay_brown"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_18",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_green",
+      "minecraft:stained_hardened_clay_red"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_19",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_black",
+      "minecraft:stone"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_20",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stone_slab",
+      "minecraft:andesite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_21",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:andesite_smooth",
+      "minecraft:diorite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_22",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:diorite_smooth",
+      "minecraft:granite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_23",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:granite_smooth",
+      "minecraft:stonebrick"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_24",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stonebrick_carved",
+      "minecraft:stonebrick_cracked"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_25",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_00",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:bricks",
+      "minecraft:chiseled_red_sandstone",
+      "minecraft:chiseled_sandstone",
+      "minecraft:coal_block"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_01",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:cobblestone",
+      "minecraft:end_bricks",
+      "minecraft:end_stone",
+      "minecraft:hardened_clay"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_02",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:lapis_block",
+      "minecraft:mossy_cobblestone",
+      "minecraft:nether_brick",
+      "minecraft:netherrack"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_03",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:obsidian",
+      "minecraft:prismarine_bricks",
+      "minecraft:prismarine_dark",
+      "minecraft:prismarine_rough"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_04",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:purpur_block",
+      "minecraft:purpur_pillar",
+      "minecraft:quartz_block",
+      "minecraft:red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_05",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:sandstone",
+      "minecraft:smooth_red_sandstone",
+      "minecraft:smooth_sandstone",
+      "minecraft:stained_hardened_clay_white"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_06",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_orange",
+      "minecraft:stained_hardened_clay_magenta",
+      "minecraft:stained_hardened_clay_light_blue",
+      "minecraft:stained_hardened_clay_yellow"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_07",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_lime",
+      "minecraft:stained_hardened_clay_pink",
+      "minecraft:stained_hardened_clay_gray",
+      "minecraft:stained_hardened_clay_silver"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_08",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_cyan",
+      "minecraft:stained_hardened_clay_purple",
+      "minecraft:stained_hardened_clay_blue",
+      "minecraft:stained_hardened_clay_brown"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_09",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_hardened_clay_green",
+      "minecraft:stained_hardened_clay_red",
+      "minecraft:stained_hardened_clay_black",
+      "minecraft:stone"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_10",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stone_slab",
+      "minecraft:andesite",
+      "minecraft:andesite_smooth",
+      "minecraft:diorite"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_11",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:diorite_smooth",
+      "minecraft:granite",
+      "minecraft:granite_smooth",
+      "minecraft:stonebrick"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_12",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stonebrick_carved",
+      "minecraft:stonebrick_cracked",
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "rock_corner_00",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:bricks",
+      "minecraft:chiseled_red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_corner_01",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:chiseled_sandstone",
+      "minecraft:coal_block"
+    ]
+  },
+  {
+    "id": "rock_corner_02",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:cobblestone",
+      "minecraft:end_bricks"
+    ]
+  },
+  {
+    "id": "rock_corner_03",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:end_stone",
+      "minecraft:hardened_clay"
+    ]
+  },
+  {
+    "id": "rock_corner_04",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:lapis_block",
+      "minecraft:mossy_cobblestone"
+    ]
+  },
+  {
+    "id": "rock_corner_05",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:nether_brick",
+      "minecraft:netherrack"
+    ]
+  },
+  {
+    "id": "rock_corner_06",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:obsidian",
+      "minecraft:prismarine_bricks"
+    ]
+  },
+  {
+    "id": "rock_corner_07",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:prismarine_dark",
+      "minecraft:prismarine_rough"
+    ]
+  },
+  {
+    "id": "rock_corner_08",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:purpur_block",
+      "minecraft:purpur_pillar"
+    ]
+  },
+  {
+    "id": "rock_corner_09",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:quartz_block",
+      "minecraft:red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_corner_10",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:sandstone",
+      "minecraft:smooth_red_sandstone"
+    ]
+  },
+  {
+    "id": "rock_corner_11",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:smooth_sandstone",
+      "minecraft:stained_hardened_clay_white"
+    ]
+  },
+  {
+    "id": "rock_corner_12",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_orange",
+      "minecraft:stained_hardened_clay_magenta"
+    ]
+  },
+  {
+    "id": "rock_corner_13",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_light_blue",
+      "minecraft:stained_hardened_clay_yellow"
+    ]
+  },
+  {
+    "id": "rock_corner_14",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_lime",
+      "minecraft:stained_hardened_clay_pink"
+    ]
+  },
+  {
+    "id": "rock_corner_15",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_gray",
+      "minecraft:stained_hardened_clay_silver"
+    ]
+  },
+  {
+    "id": "rock_corner_16",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_cyan",
+      "minecraft:stained_hardened_clay_purple"
+    ]
+  },
+  {
+    "id": "rock_corner_17",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_blue",
+      "minecraft:stained_hardened_clay_brown"
+    ]
+  },
+  {
+    "id": "rock_corner_18",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_green",
+      "minecraft:stained_hardened_clay_red"
+    ]
+  },
+  {
+    "id": "rock_corner_19",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_black",
+      "minecraft:stone"
+    ]
+  },
+  {
+    "id": "rock_corner_20",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stone_slab",
+      "minecraft:andesite"
+    ]
+  },
+  {
+    "id": "rock_corner_21",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:andesite_smooth",
+      "minecraft:diorite"
+    ]
+  },
+  {
+    "id": "rock_corner_22",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:diorite_smooth",
+      "minecraft:granite"
+    ]
+  },
+  {
+    "id": "rock_corner_23",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:granite_smooth",
+      "minecraft:stonebrick"
+    ]
+  },
+  {
+    "id": "rock_corner_24",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stonebrick_carved",
+      "minecraft:stonebrick_cracked"
+    ]
+  },
+  {
+    "id": "rock_corner_25",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "rock_stairs_00",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:chiseled_red_sandstone",
+      "minecraft:chiseled_sandstone"
+    ]
+  },
+  {
+    "id": "rock_stairs_01",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:coal_block",
+      "minecraft:end_bricks"
+    ]
+  },
+  {
+    "id": "rock_stairs_02",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:end_stone",
+      "minecraft:hardened_clay"
+    ]
+  },
+  {
+    "id": "rock_stairs_03",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:lapis_block",
+      "minecraft:mossy_cobblestone"
+    ]
+  },
+  {
+    "id": "rock_stairs_04",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:netherrack",
+      "minecraft:obsidian"
+    ]
+  },
+  {
+    "id": "rock_stairs_05",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:prismarine_bricks",
+      "minecraft:prismarine_dark"
+    ]
+  },
+  {
+    "id": "rock_stairs_06",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:prismarine_rough",
+      "minecraft:purpur_pillar"
+    ]
+  },
+  {
+    "id": "rock_stairs_07",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:smooth_red_sandstone",
+      "minecraft:smooth_sandstone"
+    ]
+  },
+  {
+    "id": "rock_stairs_08",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_white",
+      "minecraft:stained_hardened_clay_orange"
+    ]
+  },
+  {
+    "id": "rock_stairs_09",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_magenta",
+      "minecraft:stained_hardened_clay_light_blue"
+    ]
+  },
+  {
+    "id": "rock_stairs_10",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_yellow",
+      "minecraft:stained_hardened_clay_lime"
+    ]
+  },
+  {
+    "id": "rock_stairs_11",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_pink",
+      "minecraft:stained_hardened_clay_gray"
+    ]
+  },
+  {
+    "id": "rock_stairs_12",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_silver",
+      "minecraft:stained_hardened_clay_cyan"
+    ]
+  },
+  {
+    "id": "rock_stairs_13",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_purple",
+      "minecraft:stained_hardened_clay_blue"
+    ]
+  },
+  {
+    "id": "rock_stairs_14",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_brown",
+      "minecraft:stained_hardened_clay_green"
+    ]
+  },
+  {
+    "id": "rock_stairs_15",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_hardened_clay_red",
+      "minecraft:stained_hardened_clay_black"
+    ]
+  },
+  {
+    "id": "rock_stairs_16",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stone",
+      "minecraft:stone_slab"
+    ]
+  },
+  {
+    "id": "rock_stairs_17",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:andesite",
+      "minecraft:andesite_smooth"
+    ]
+  },
+  {
+    "id": "rock_stairs_18",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:diorite",
+      "minecraft:diorite_smooth"
+    ]
+  },
+  {
+    "id": "rock_stairs_19",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:granite",
+      "minecraft:granite_smooth"
+    ]
+  },
+  {
+    "id": "rock_stairs_20",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stonebrick_carved",
+      "minecraft:stonebrick_cracked"
+    ]
+  },
+  {
+    "id": "rock_stairs_21",
+    "group": "rock",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "rock_wall_00",
+    "group": "rock",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:bricks",
+      "minecraft:chiseled_red_sandstone",
+      "minecraft:chiseled_sandstone",
+      "minecraft:coal_block",
+      "minecraft:end_bricks",
+      "minecraft:end_stone",
+      "minecraft:hardened_clay",
+      "minecraft:lapis_block",
+      "minecraft:nether_brick",
+      "minecraft:netherrack",
+      "minecraft:obsidian",
+      "minecraft:prismarine_bricks",
+      "minecraft:prismarine_dark",
+      "minecraft:prismarine_rough",
+      "minecraft:purpur_block",
+      "minecraft:purpur_pillar"
+    ]
+  },
+  {
+    "id": "rock_wall_01",
+    "group": "rock",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:quartz_block",
+      "minecraft:red_sandstone",
+      "minecraft:sandstone",
+      "minecraft:smooth_red_sandstone",
+      "minecraft:smooth_sandstone",
+      "minecraft:stained_hardened_clay_white",
+      "minecraft:stained_hardened_clay_orange",
+      "minecraft:stained_hardened_clay_magenta",
+      "minecraft:stained_hardened_clay_light_blue",
+      "minecraft:stained_hardened_clay_yellow",
+      "minecraft:stained_hardened_clay_lime",
+      "minecraft:stained_hardened_clay_pink",
+      "minecraft:stained_hardened_clay_gray",
+      "minecraft:stained_hardened_clay_silver",
+      "minecraft:stained_hardened_clay_cyan",
+      "minecraft:stained_hardened_clay_purple"
+    ]
+  },
+  {
+    "id": "rock_wall_02",
+    "group": "rock",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:stained_hardened_clay_blue",
+      "minecraft:stained_hardened_clay_brown",
+      "minecraft:stained_hardened_clay_green",
+      "minecraft:stained_hardened_clay_red",
+      "minecraft:stained_hardened_clay_black",
+      "minecraft:stone",
+      "minecraft:stone_slab",
+      "minecraft:andesite",
+      "minecraft:andesite_smooth",
+      "minecraft:diorite",
+      "minecraft:diorite_smooth",
+      "minecraft:granite",
+      "minecraft:granite_smooth",
+      "minecraft:stonebrick",
+      "minecraft:stonebrick_carved",
+      "minecraft:stonebrick_cracked"
+    ]
+  },
+  {
+    "id": "rock_wall_03",
+    "group": "rock",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:stonebrick_mossy"
+    ]
+  },
+  {
+    "id": "metal_slab_00",
+    "group": "metal",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block",
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "metal_vertical_slab_00",
+    "group": "metal",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block",
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "metal_horizontal_step_00",
+    "group": "metal",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block"
+    ]
+  },
+  {
+    "id": "metal_horizontal_step_01",
+    "group": "metal",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "metal_vertical_step_00",
+    "group": "metal",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block",
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "metal_corner_00",
+    "group": "metal",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block"
+    ]
+  },
+  {
+    "id": "metal_corner_01",
+    "group": "metal",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "metal_stairs_00",
+    "group": "metal",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block"
+    ]
+  },
+  {
+    "id": "metal_stairs_01",
+    "group": "metal",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "metal_wall_00",
+    "group": "metal",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:diamond_block",
+      "minecraft:emerald_block",
+      "minecraft:gold_block",
+      "minecraft:iron_block"
+    ]
+  },
+  {
+    "id": "wood_vertical_slab_00",
+    "group": "wood",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:planks_acacia",
+      "minecraft:planks_birch",
+      "minecraft:planks_dark_oak",
+      "minecraft:planks_jungle"
+    ]
+  },
+  {
+    "id": "wood_vertical_slab_01",
+    "group": "wood",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:planks_oak",
+      "minecraft:planks_spruce"
+    ]
+  },
+  {
+    "id": "wood_horizontal_step_00",
+    "group": "wood",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:planks_acacia",
+      "minecraft:planks_birch"
+    ]
+  },
+  {
+    "id": "wood_horizontal_step_01",
+    "group": "wood",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:planks_dark_oak",
+      "minecraft:planks_jungle"
+    ]
+  },
+  {
+    "id": "wood_horizontal_step_02",
+    "group": "wood",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:planks_oak",
+      "minecraft:planks_spruce"
+    ]
+  },
+  {
+    "id": "wood_vertical_step_00",
+    "group": "wood",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:planks_acacia",
+      "minecraft:planks_birch",
+      "minecraft:planks_dark_oak",
+      "minecraft:planks_jungle"
+    ]
+  },
+  {
+    "id": "wood_vertical_step_01",
+    "group": "wood",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:planks_oak",
+      "minecraft:planks_spruce"
+    ]
+  },
+  {
+    "id": "wood_corner_00",
+    "group": "wood",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:planks_acacia",
+      "minecraft:planks_birch"
+    ]
+  },
+  {
+    "id": "wood_corner_01",
+    "group": "wood",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:planks_dark_oak",
+      "minecraft:planks_jungle"
+    ]
+  },
+  {
+    "id": "wood_corner_02",
+    "group": "wood",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:planks_oak",
+      "minecraft:planks_spruce"
+    ]
+  },
+  {
+    "id": "dirt_horizontal_step_00",
+    "group": "dirt",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:dirt",
+      "minecraft:dirt_coarse"
+    ]
+  },
+  {
+    "id": "dirt_horizontal_step_01",
+    "group": "dirt",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:dirt_mycelium",
+      "minecraft:dirt_podzol"
+    ]
+  },
+  {
+    "id": "dirt_vertical_step_00",
+    "group": "dirt",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:dirt",
+      "minecraft:dirt_coarse",
+      "minecraft:dirt_mycelium",
+      "minecraft:dirt_podzol"
+    ]
+  },
+  {
+    "id": "dirt_corner_00",
+    "group": "dirt",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:dirt",
+      "minecraft:dirt_coarse"
+    ]
+  },
+  {
+    "id": "dirt_corner_01",
+    "group": "dirt",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:dirt_mycelium",
+      "minecraft:dirt_podzol"
+    ]
+  },
+  {
+    "id": "dirt_stairs_00",
+    "group": "dirt",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:dirt",
+      "minecraft:dirt_coarse"
+    ]
+  },
+  {
+    "id": "dirt_stairs_01",
+    "group": "dirt",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:dirt_mycelium",
+      "minecraft:dirt_podzol"
+    ]
+  },
+  {
+    "id": "cloth_slab_00",
+    "group": "cloth",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:wool_white",
+      "minecraft:wool_orange",
+      "minecraft:wool_magenta",
+      "minecraft:wool_light_blue",
+      "minecraft:wool_yellow",
+      "minecraft:wool_lime",
+      "minecraft:wool_pink",
+      "minecraft:wool_gray"
+    ]
+  },
+  {
+    "id": "cloth_slab_01",
+    "group": "cloth",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:wool_silver",
+      "minecraft:wool_cyan",
+      "minecraft:wool_purple",
+      "minecraft:wool_blue",
+      "minecraft:wool_brown",
+      "minecraft:wool_green",
+      "minecraft:wool_red",
+      "minecraft:wool_black"
+    ]
+  },
+  {
+    "id": "cloth_vertical_slab_00",
+    "group": "cloth",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_white",
+      "minecraft:wool_orange",
+      "minecraft:wool_magenta",
+      "minecraft:wool_light_blue"
+    ]
+  },
+  {
+    "id": "cloth_vertical_slab_01",
+    "group": "cloth",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_yellow",
+      "minecraft:wool_lime",
+      "minecraft:wool_pink",
+      "minecraft:wool_gray"
+    ]
+  },
+  {
+    "id": "cloth_vertical_slab_02",
+    "group": "cloth",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_silver",
+      "minecraft:wool_cyan",
+      "minecraft:wool_purple",
+      "minecraft:wool_blue"
+    ]
+  },
+  {
+    "id": "cloth_vertical_slab_03",
+    "group": "cloth",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_brown",
+      "minecraft:wool_green",
+      "minecraft:wool_red",
+      "minecraft:wool_black"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_00",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_white",
+      "minecraft:wool_orange"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_01",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_magenta",
+      "minecraft:wool_light_blue"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_02",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_yellow",
+      "minecraft:wool_lime"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_03",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_pink",
+      "minecraft:wool_gray"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_04",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_silver",
+      "minecraft:wool_cyan"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_05",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_purple",
+      "minecraft:wool_blue"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_06",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_brown",
+      "minecraft:wool_green"
+    ]
+  },
+  {
+    "id": "cloth_horizontal_step_07",
+    "group": "cloth",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_red",
+      "minecraft:wool_black"
+    ]
+  },
+  {
+    "id": "cloth_vertical_step_00",
+    "group": "cloth",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_white",
+      "minecraft:wool_orange",
+      "minecraft:wool_magenta",
+      "minecraft:wool_light_blue"
+    ]
+  },
+  {
+    "id": "cloth_vertical_step_01",
+    "group": "cloth",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_yellow",
+      "minecraft:wool_lime",
+      "minecraft:wool_pink",
+      "minecraft:wool_gray"
+    ]
+  },
+  {
+    "id": "cloth_vertical_step_02",
+    "group": "cloth",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_silver",
+      "minecraft:wool_cyan",
+      "minecraft:wool_purple",
+      "minecraft:wool_blue"
+    ]
+  },
+  {
+    "id": "cloth_vertical_step_03",
+    "group": "cloth",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:wool_brown",
+      "minecraft:wool_green",
+      "minecraft:wool_red",
+      "minecraft:wool_black"
+    ]
+  },
+  {
+    "id": "cloth_corner_00",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_white",
+      "minecraft:wool_orange"
+    ]
+  },
+  {
+    "id": "cloth_corner_01",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_magenta",
+      "minecraft:wool_light_blue"
+    ]
+  },
+  {
+    "id": "cloth_corner_02",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_yellow",
+      "minecraft:wool_lime"
+    ]
+  },
+  {
+    "id": "cloth_corner_03",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_pink",
+      "minecraft:wool_gray"
+    ]
+  },
+  {
+    "id": "cloth_corner_04",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_silver",
+      "minecraft:wool_cyan"
+    ]
+  },
+  {
+    "id": "cloth_corner_05",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_purple",
+      "minecraft:wool_blue"
+    ]
+  },
+  {
+    "id": "cloth_corner_06",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_brown",
+      "minecraft:wool_green"
+    ]
+  },
+  {
+    "id": "cloth_corner_07",
+    "group": "cloth",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_red",
+      "minecraft:wool_black"
+    ]
+  },
+  {
+    "id": "cloth_stairs_00",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_white",
+      "minecraft:wool_orange"
+    ]
+  },
+  {
+    "id": "cloth_stairs_01",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_magenta",
+      "minecraft:wool_light_blue"
+    ]
+  },
+  {
+    "id": "cloth_stairs_02",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_yellow",
+      "minecraft:wool_lime"
+    ]
+  },
+  {
+    "id": "cloth_stairs_03",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_pink",
+      "minecraft:wool_gray"
+    ]
+  },
+  {
+    "id": "cloth_stairs_04",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_silver",
+      "minecraft:wool_cyan"
+    ]
+  },
+  {
+    "id": "cloth_stairs_05",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_purple",
+      "minecraft:wool_blue"
+    ]
+  },
+  {
+    "id": "cloth_stairs_06",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_brown",
+      "minecraft:wool_green"
+    ]
+  },
+  {
+    "id": "cloth_stairs_07",
+    "group": "cloth",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:wool_red",
+      "minecraft:wool_black"
+    ]
+  },
+  {
+    "id": "grass_step_00",
+    "group": "grass",
+    "shape": "step",
+    "states": 12,
+    "materials": [
+      "minecraft:grass"
+    ]
+  },
+  {
+    "id": "grass_corner_00",
+    "group": "grass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:grass"
+    ]
+  },
+  {
+    "id": "grass_stairs_00",
+    "group": "grass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:grass"
+    ]
+  },
+  {
+    "id": "clear_glass_slab_00",
+    "group": "clear_glass",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:glass"
+    ]
+  },
+  {
+    "id": "clear_glass_vertical_slab_00",
+    "group": "clear_glass",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:glass"
+    ]
+  },
+  {
+    "id": "clear_glass_step_00",
+    "group": "clear_glass",
+    "shape": "step",
+    "states": 12,
+    "materials": [
+      "minecraft:glass"
+    ]
+  },
+  {
+    "id": "clear_glass_corner_00",
+    "group": "clear_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:glass"
+    ]
+  },
+  {
+    "id": "clear_glass_stairs_00",
+    "group": "clear_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:glass"
+    ]
+  },
+  {
+    "id": "clear_glass_wall_00",
+    "group": "clear_glass",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:glass"
+    ]
+  },
+  {
+    "id": "stained_glass_slab_00",
+    "group": "stained_glass",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange",
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue",
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime",
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray"
+    ]
+  },
+  {
+    "id": "stained_glass_slab_01",
+    "group": "stained_glass",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan",
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue",
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green",
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_slab_00",
+    "group": "stained_glass",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange",
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_slab_01",
+    "group": "stained_glass",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime",
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_slab_02",
+    "group": "stained_glass",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan",
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_slab_03",
+    "group": "stained_glass",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green",
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_00",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_01",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_02",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_03",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_04",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_05",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_06",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green"
+    ]
+  },
+  {
+    "id": "stained_glass_horizontal_step_07",
+    "group": "stained_glass",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_step_00",
+    "group": "stained_glass",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange",
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_step_01",
+    "group": "stained_glass",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime",
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_step_02",
+    "group": "stained_glass",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan",
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_vertical_step_03",
+    "group": "stained_glass",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green",
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_00",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_01",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_02",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_03",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_04",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_05",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_06",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green"
+    ]
+  },
+  {
+    "id": "stained_glass_corner_07",
+    "group": "stained_glass",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_00",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_01",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_02",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_03",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_04",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_05",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_06",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green"
+    ]
+  },
+  {
+    "id": "stained_glass_stairs_07",
+    "group": "stained_glass",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "stained_glass_wall_00",
+    "group": "stained_glass",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:stained_glass_white",
+      "minecraft:stained_glass_orange",
+      "minecraft:stained_glass_magenta",
+      "minecraft:stained_glass_light_blue",
+      "minecraft:stained_glass_yellow",
+      "minecraft:stained_glass_lime",
+      "minecraft:stained_glass_pink",
+      "minecraft:stained_glass_gray",
+      "minecraft:stained_glass_silver",
+      "minecraft:stained_glass_cyan",
+      "minecraft:stained_glass_purple",
+      "minecraft:stained_glass_blue",
+      "minecraft:stained_glass_brown",
+      "minecraft:stained_glass_green",
+      "minecraft:stained_glass_red",
+      "minecraft:stained_glass_black"
+    ]
+  },
+  {
+    "id": "ice_slab_00",
+    "group": "ice",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "ice_vertical_slab_00",
+    "group": "ice",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "ice_step_00",
+    "group": "ice",
+    "shape": "step",
+    "states": 12,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "ice_corner_00",
+    "group": "ice",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "ice_stairs_00",
+    "group": "ice",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "ice_wall_00",
+    "group": "ice",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "ice_pane_00",
+    "group": "ice",
+    "shape": "pane",
+    "states": 1,
+    "materials": [
+      "minecraft:ice"
+    ]
+  },
+  {
+    "id": "packed_ice_slab_00",
+    "group": "packed_ice",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "packed_ice_vertical_slab_00",
+    "group": "packed_ice",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "packed_ice_step_00",
+    "group": "packed_ice",
+    "shape": "step",
+    "states": 12,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "packed_ice_corner_00",
+    "group": "packed_ice",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "packed_ice_stairs_00",
+    "group": "packed_ice",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "packed_ice_wall_00",
+    "group": "packed_ice",
+    "shape": "wall",
+    "states": 1,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "packed_ice_pane_00",
+    "group": "packed_ice",
+    "shape": "pane",
+    "states": 1,
+    "materials": [
+      "minecraft:packed_ice"
+    ]
+  },
+  {
+    "id": "snow_slab_00",
+    "group": "snow",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:snow"
+    ]
+  },
+  {
+    "id": "snow_vertical_slab_00",
+    "group": "snow",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:snow"
+    ]
+  },
+  {
+    "id": "snow_step_00",
+    "group": "snow",
+    "shape": "step",
+    "states": 12,
+    "materials": [
+      "minecraft:snow"
+    ]
+  },
+  {
+    "id": "snow_corner_00",
+    "group": "snow",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:snow"
+    ]
+  },
+  {
+    "id": "snow_stairs_00",
+    "group": "snow",
+    "shape": "stairs",
+    "states": 8,
+    "materials": [
+      "minecraft:snow"
+    ]
+  },
+  {
+    "id": "dirt_vertical_slab_00",
+    "group": "dirt",
+    "shape": "vertical_slab",
+    "states": 4,
+    "materials": [
+      "minecraft:dirt"
+    ]
+  }
+]

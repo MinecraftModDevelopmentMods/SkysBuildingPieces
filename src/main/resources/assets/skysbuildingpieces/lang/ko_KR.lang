@@ -1,0 +1,16 @@
+pieces.skysbuildingpieces.slab=%s 반 블록
+pieces.skysbuildingpieces.vertical_slab=%s 세로 반 블록
+pieces.skysbuildingpieces.horizontal_step=%s 사분의 일 블록
+pieces.skysbuildingpieces.vertical_step=%s 세로 사분의 일 블록
+pieces.skysbuildingpieces.step=%s 사분의 일 블록
+pieces.skysbuildingpieces.corner=%s 모서리
+pieces.skysbuildingpieces.stairs=%s 계단
+pieces.skysbuildingpieces.wall=%s 담장
+pieces.skysbuildingpieces.pane=%s 판
+item.skysbuildingpieces.template_slab.name=가로 반 블록 틀
+item.skysbuildingpieces.template_vertical_slab.name=세로 반 블록 틀
+item.skysbuildingpieces.template_step.name=사분의 일 블록 틀
+item.skysbuildingpieces.template_corner.name=모서리 틀
+item.skysbuildingpieces.template_stairs.name=계단 틀
+item.skysbuildingpieces.template_wall.name=담장 틀
+item.skysbuildingpieces.template_pane.name=판 틀
