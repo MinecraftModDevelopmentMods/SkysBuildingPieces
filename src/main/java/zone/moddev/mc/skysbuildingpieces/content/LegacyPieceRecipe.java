@@ -28,6 +28,11 @@ public final class LegacyPieceRecipe implements IRecipe {
         if (source == null) return null;
         ItemStack target;
         if (Pieces.RETIRED_TEMPLATES.containsValue(source.getItem())) target = new ItemStack(Items.PAPER);
+        else if(source.getItem() instanceof PieceItem&&((PieceItem)source.getItem()).piece.palette.shape==Shape.VERTICAL_SLAB&&
+                ((PieceItem)source.getItem()).piece.palette.material(source.getMetadata()).equals("minecraft:dirt")) {
+            target=Pieces.slabDrop("minecraft:dirt",Pieces.state("minecraft:dirt",Shape.VERTICAL_SLAB,0));
+            if(ItemStack.areItemsEqual(source,target))return null;
+        }
         else {
             String id = source.getItem().getRegistryName().toString();
             if (!LegacyMapping.owned(id) || !source.hasTagCompound()) return null;
@@ -35,6 +40,7 @@ public final class LegacyPieceRecipe implements IRecipe {
             Shape shape = LegacyMapping.shape(id, 0);
             if (!Catalogue.INSTANCE.materials.containsKey(material) || !LegacyMapping.allowedMaterial(material, shape)) return null;
             target = Pieces.stack(Pieces.state(material, shape, shape == Shape.SLAB ? 1 : 0), 1);
+            if(shape==Shape.VERTICAL_SLAB&&target!=null)target=Pieces.slabDrop(material,Pieces.state(material,shape,0));
         }
         if (target == null) return null;
         NBTTagCompound preserved = source.writeToNBT(new NBTTagCompound());

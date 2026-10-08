@@ -1,0 +1,89 @@
+import java.nio.file.Files
+import java.security.MessageDigest
+
+// Publish only a checksum-verified bundle built by the release workflow.
+def preparedReleaseDir = providers.gradleProperty('preparedReleaseDir')
+def releaseEnabled = providers.gradleProperty('release_enabled').getOrElse('false') == 'true'
+tasks.register('verifyPreparedReleaseArtifacts') {
+    group = 'verification'
+    doLast {
+        if (!preparedReleaseDir.isPresent()) throw new GradleException('preparedReleaseDir is required')
+        File prepared = file(preparedReleaseDir.get())
+        Set<String> expected = (releaseFiles.get() + ['SHA256SUMS', 'CHANGELOG.md']) as Set<String>
+        Set<String> actual = prepared.listFiles()?.findAll { it.isFile() }*.name as Set<String>
+        if (actual != expected) throw new GradleException('The prepared bundle has missing or unexpected files')
+        def lines = new File(prepared, 'SHA256SUMS').readLines('UTF-8')
+        if (lines.size() != 3) throw new GradleException('The prepared bundle needs exactly three checksums')
+        Set<String> checked = [] as Set<String>
+        lines.each { line ->
+            def match = line =~ /^([0-9A-Fa-f]{64})  ([A-Za-z0-9._-]+)$/
+            if (!match.matches() || !releaseFiles.get().contains(match[0][2]) || !checked.add(match[0][2]))
+                throw new GradleException('Invalid or repeated prepared checksum')
+            String hash = MessageDigest.getInstance('SHA-256').digest(
+                    Files.readAllBytes(new File(prepared, match[0][2]).toPath())).encodeHex().toString()
+            if (!hash.equalsIgnoreCase(match[0][1])) throw new GradleException('Prepared artifact checksum mismatch')
+        }
+    }
+}
+def mavenUploadUrl = providers.environmentVariable('MAVEN_UPLOAD_URL')
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifactId = base.archivesName.get()
+            if (preparedReleaseDir.isPresent()) {
+                releaseFiles.get().eachWithIndex { filename, index ->
+                    artifact(file("${preparedReleaseDir.get()}/${filename}")) {
+                        extension = 'jar'
+                        if (index == 1) classifier = 'sources'
+                        if (index == 2) classifier = 'javadoc'
+                    }
+                }
+            } else {
+                artifact releaseJar
+                artifact tasks.named('sourcesJar')
+                artifact tasks.named('javadocJar')
+            }
+            pom {
+                name = project.mod_name
+                description = project.mod_description
+                url = 'https://github.com/' + project.release_repository
+                licenses {
+                    license {
+                        name = 'GNU Lesser General Public License, Version 2.1'
+                        url = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/' + project.release_repository + '.git'
+                    url = 'https://github.com/' + project.release_repository
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'release'
+            url = mavenUploadUrl.isPresent() ? uri(mavenUploadUrl.get())
+                    : layout.buildDirectory.dir('forbidden-local-release').get().asFile.toURI()
+            credentials {
+                username = providers.environmentVariable('MAVEN_UPLOAD_USERNAME').orNull ?: ''
+                password = providers.environmentVariable('MAVEN_UPLOAD_PASSWORD').orNull ?: ''
+            }
+        }
+    }
+}
+tasks.register('validateMavenReleaseCredentials') {
+    group = 'publishing'
+    doLast {
+        if (!releaseEnabled || !(project.curseforge_project_id ==~ /[1-9][0-9]*/))
+            throw new GradleException('Publication is disabled until this mod has its own CurseForge project')
+        if (!mavenUploadUrl.isPresent() || !mavenUploadUrl.get().startsWith('https://') ||
+                !providers.environmentVariable('MAVEN_UPLOAD_USERNAME').isPresent() ||
+                !providers.environmentVariable('MAVEN_UPLOAD_PASSWORD').isPresent())
+            throw new GradleException('A remote HTTPS Maven repository and upload credentials are required')
+    }
+}
+tasks.withType(PublishToMavenRepository).configureEach {
+    dependsOn tasks.named('validateMavenReleaseCredentials')
+    dependsOn tasks.named('verifyPreparedReleaseArtifacts')
+}

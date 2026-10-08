@@ -20,12 +20,28 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 public final class RecipeChecks {
     public static void run(WorldServer world) {
         preflight(world);
+        int recombined=0;
+        for(SlabRecombinationRecipe recipe:SlabRecombinationRecipe.recipes())for(int size:new int[]{2,3}) {
+            InventoryCrafting grid=grid(size);grid.setInventorySlotContents(size,recipe.slab.copy());grid.setInventorySlotContents(size+1,recipe.slab.copy());
+            require(recipe.matches(grid,world),"matching horizontal slabs recombine");assertManager(grid,world,recipe.full,"slab recombination "+recipe.slab);recombined++;
+            grid.setInventorySlotContents(size+1,new ItemStack(Items.APPLE));require(!recipe.matches(grid,world),"unlike slab material rejected");
+            grid=grid(size);grid.setInventorySlotContents(0,recipe.slab.copy());grid.setInventorySlotContents(size,recipe.slab.copy());
+            require(!recipe.matches(grid,world),"vertical pair is reserved for native recipes");
+        }
+        System.out.println("BUILDING_PIECES_RECOMBINATION_PASS checks="+recombined);
         int variants = 0;
         Set<String> covered = new HashSet<String>();
         for (CuttingRecipe recipe : CuttingRecipe.recipes()) {
             ItemStack expected = recipe.getRecipeOutput();
             require(expected != null && expected.stackSize > 0, "visible recipe output");
+            if(recipe.shape==Shape.VERTICAL_SLAB)require(Pieces.state(recipe.material,Shape.SLAB,1)==null,"no avoidable vertical slab recipe");
             covered.add(recipe.material + "/" + recipe.shape);
+            if(recipe.shape==Shape.SLAB&&recipe.pattern==CraftingPattern.ROTATE) {
+                InventoryCrafting saved=grid(2);ItemStack old=recipe.ingredient.copy();NBTTagCompound tag=new NBTTagCompound();tag.setString("custom_label","Saved vertical slab");old.setTagCompound(tag);saved.setInventorySlotContents(3,old);
+                ItemStack result=expected.copy();result.setTagCompound(tag.copy());
+                require(ItemStack.areItemStacksEqual(result,recipe.getCraftingResult(saved)),"saved vertical slab conversion retains NBT");
+                assertManager(saved,world,result,"saved vertical slab NBT");
+            }
             for (int size : new int[]{2, 3}) {
                 if (recipe.pattern.width() > size || recipe.pattern.height() > size) continue;
                 for (int x = 0; x <= size - recipe.pattern.width(); x++)
@@ -61,6 +77,8 @@ public final class RecipeChecks {
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values())
             for (Shape shape : new Shape[]{Shape.SLAB, Shape.VERTICAL_SLAB, Shape.HORIZONTAL_STEP, Shape.VERTICAL_STEP, Shape.CORNER, Shape.STAIRS, Shape.WALL, Shape.PANE}) {
                 if (Pieces.state(material.id, shape, shape == Shape.SLAB ? 1 : 0) == null) continue;
+                if(shape==Shape.VERTICAL_SLAB&&Pieces.state(material.id,Shape.SLAB,1)!=null)continue;
+                if(shape==Shape.VERTICAL_SLAB&&material.id.equals("minecraft:dirt")&&Item.getByNameOrId("skysgrassslabs:dirt_slab")!=null)continue;
                 if (material.block(shape.name().toLowerCase(java.util.Locale.ROOT)) != null) continue;
                 if (shape == Shape.VERTICAL_STEP && ItemStack.areItemsEqual(
                         Pieces.stack(Pieces.state(material.id, Shape.HORIZONTAL_STEP, 0), 1),

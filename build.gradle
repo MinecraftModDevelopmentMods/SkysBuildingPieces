@@ -569,7 +569,11 @@ tasks.register('writeReleaseChecksums') {
     }
 }
 
-// Publication is intentionally unavailable until this project has its own repository metadata.
+ext.releaseFiles = releaseFiles
+ext.releaseJar = releaseJar
+apply from: 'gradle/release.gradle'
+
+// Keep the old entry point disabled until publication is configured.
 tasks.register('publishRelease') {
     doLast { throw new GradleException('Publication is disabled for the local beta.') }
 }

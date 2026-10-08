@@ -14,7 +14,7 @@ import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
-/** Runs before block storage and item/TE deserialization. Fail closed on unknown absent content. */
+/** Recovers saved pieces before blocks and items load; stops if no safe replacement exists. */
 public final class LegacyBridge {
     public static volatile boolean ready;
     private static final Map<Integer,String> savedIds=new HashMap<Integer,String>();

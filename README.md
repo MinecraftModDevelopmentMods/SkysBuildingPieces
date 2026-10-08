@@ -20,6 +20,9 @@ and Gradle 9.6.1 under Java 17.
 The mod adds 235 building block IDs and one hidden recovery holder: 236 in
 total. Fixed metadata palettes keep material and orientation assignments
 consistent between installations. Existing vanilla pieces are reused.
+Supported regular slab items place horizontally or vertically, including oak.
+Vertical slabs drop regular slabs and do not have separate creative entries.
+Only ordinary dirt needs a separate recipe when no horizontal slab is available.
 
 The optional Biomes O Plenty add-on provides pieces for its woods, stones and
 gem blocks. It uses the same crafting patterns and replacement setting, with separate
@@ -30,6 +33,8 @@ Core and BOP together use 302 block IDs. Existing palette slots remain unchanged
 
 See [pieces and recipes](docs/GAMEPLAY.md), [configuration](docs/CONFIGURATION.md),
 [existing worlds](docs/WORLD-UPGRADES.md) and [trying the beta](docs/TRYING-THE-BETA.md).
+
+[Release preparation](docs/RELEASING.md) covers the CI checks and publication safeguards.
 
 Licensed under LGPL-2.1-only. Adapted BuildingBricks definitions and geometry
 retain the MIT notice in BUILDINGBRICKS-MIT.txt.

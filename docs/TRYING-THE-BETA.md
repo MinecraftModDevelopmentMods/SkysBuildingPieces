@@ -8,7 +8,7 @@ Before relying on the beta in a modpack, check:
 
 - Place slabs, steps and corners in every direction, including upside down
   and vertical placements. Sneaking turns steps vertically.
-- With a Sky slab such as glass or wool, click the centre and edges of each
+- With a slab such as oak, glass or wool, click the centre and edges of each
   block face. The same slab item should place horizontally or vertically,
   and matching halves should combine into the full block.
 - Join matching pieces and try unlike materials. Only supported matching
@@ -16,7 +16,9 @@ Before relying on the beta in a modpack, check:
 - Put full blocks above and beside pieces. Exposed internal faces should
   remain visible; glass and ice should retain their transparency.
 - Craft several materials using the patterns in the gameplay guide. Check
-  quantities, slab rotation, steps and corners, and unchanged native recipes.
+  quantities, steps and corners, missing slab variants and unchanged native recipes.
+- Break vertical slabs with ordinary and Silk Touch tools, then try pick-block.
+  Each should return the regular slab; vertical items should be hidden in creative.
 - If upgrading an earlier beta, recycle a saved template into paper. New
   templates should not appear in creative inventory or crafting results.
 - Check grass colours in several biomes, nearby snow, covered grass becoming

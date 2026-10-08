@@ -7,7 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Version-one extension for fixed material catalogues. Call during add-on pre-initialization. */
+/** Version 1 catalogue API. Register an add-on during pre-initialization. */
 public final class BuildingPiecesApi {
     public static final int VERSION = 1;
     private BuildingPiecesApi() { }

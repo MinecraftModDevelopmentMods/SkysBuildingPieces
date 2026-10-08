@@ -33,7 +33,10 @@ jobs:
           java-version: '8.0.502+7'
 
       - name: Pin production Java
-        run: echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+        run: |
+          echo "SGS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "STS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
 
       - name: Install Java 17 for Gradle
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -44,13 +47,19 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
+
       - name: Make the wrapper executable
         run: chmod +x ./gradlew
 
       - name: Build, test, and audit release artifacts
         run: >-
-          ./gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
-          verifyEclipseProductionClasspath --no-daemon --stacktrace
+          ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
+          verifyEclipseProductionClasspath  --no-daemon --stacktrace
+
+      - name: Replay artifact checks offline
+        run: >-
+          ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums
+           --offline --no-daemon --stacktrace
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

@@ -13,7 +13,8 @@ also work mirrored. Each occupied slot consumes one item, not the whole stack.
 | Piece | Top row | Middle row | Bottom row | Output |
 | --- | --- | --- | --- | --- |
 | Horizontal slab | `XXX` | `...` | `...` | 6 slabs |
-| Vertical slab | `X..` | `X..` | `X..` | 6 vertical slabs |
+| Dirt vertical slab | `X..` | `X..` | `X..` | 6 dirt vertical slabs |
+| Missing slab variant | `X..` | `.X.` | `...` | 4 slabs |
 | Step | `H..` | `.H.` | `...` | 4 steps |
 | Soil step | `X..` | `.X.` | `...` | 8 steps |
 | Corner | `QQ.` | `...` | `...` | 4 corners |
@@ -26,15 +27,21 @@ brick fences. Native cobblestone walls, slabs, stairs and glass panes keep
 their usual recipes. Only supported shapes are available; there are no wooden
 walls or horizontal soil slabs.
 
-A single horizontal slab in the grid becomes one matching vertical slab,
-and a single vertical slab becomes one horizontal slab. This also makes the
-ordinary stone slab available without changing vanilla's three-stone recipe,
-which still produces smooth stone slabs. Snow slabs, decorative sandstone slabs
-and mossy/cracked/chiseled stone brick slabs also use this route: their full-block
-rows already belong to vanilla recipes.
+There is no separate vertical slab recipe when a regular slab exists. The same
+item places either way. Old vertical slab items can be crafted back into regular
+slabs one for one, retaining custom item data.
+
+Two matching regular slabs side by side make their matching full block. This
+also applies to supported BOP materials. A vertical pair keeps any existing
+native decorative-block recipe. Smooth stone has no obtainable full block item
+in this Minecraft version and therefore has no recombination recipe.
+
+For raw stone, snow, decorative sandstone and mossy/cracked/chiseled stone brick
+slabs, use two full blocks diagonally to make four slabs. Their full-block rows
+already belong to native recipes, which remain unchanged.
 
 For decorative sandstone and mossy/cracked/chiseled stone brick stairs, use six
-matching vertical slabs in the stair pattern to make four stairs. Their full-block
+matching regular slabs in the stair pattern to make four stairs. Their full-block
 stair patterns still produce vanilla's ordinary sandstone or stone brick stairs.
 
 Horizontal and vertical step items can also be rotated one for one. Either
@@ -42,7 +49,7 @@ kind can be cut into corners. Soil steps use full dirt, coarse dirt, podzol,
 mycelium or grass blocks because their horizontal slabs are outside this mod.
 
 Smooth stone has no obtainable full block item in Minecraft 1.10.2. Use
-vanilla smooth stone slabs for its vertical slabs, stairs and walls; the output
+vanilla smooth stone slabs for its stairs and walls; the output
 is half the normal full-block quantity. Its steps and corners follow the
 normal slab and step recipes.
 
@@ -56,10 +63,13 @@ Sky slab items can be placed horizontally or vertically. Click the centre of
 a block face to place a slab against that face. Click near an edge to place it
 along that edge instead: the top of a block can hold a vertical slab, and the
 top or bottom edge of a side face can hold a horizontal slab. Sneaking does not
-change slab placement. Vertical slab items always stay vertical.
+change slab placement. Old vertical slab items follow these same rules when
+their regular slab exists.
 
-Existing vanilla slab items keep their usual placement rules, or the rules
-provided by BuildingBricks while it is installed.
+Supported vanilla and BOP slab items use these placement rules too. While
+BuildingBricks is installed, it continues handling its native slab placement.
+Vertical slab items are hidden from creative inventory. Breaking, Silk Touch
+and pick-block return the regular slab, with the material's usual drop rules.
 
 Sneak while placing a step to turn it vertically. Matching pieces can combine
 into a supported larger shape or the original full block. Unlike materials
@@ -72,9 +82,12 @@ Slabs 1.1 installed, spreading also works across its slabs and turf.
 Plants and bonemeal need a complete upper supporting face. Nearby snow gives
 soil and grass pieces a visual snow cap without changing their collision.
 
-Three ordinary dirt blocks in a column make six dirt vertical slabs.
+Without Grass Slabs, three ordinary dirt blocks in a column make six dirt vertical slabs.
 Place them in any of the four directions; complementary halves combine
 into a vanilla dirt block.
+With Grass Slabs installed, its regular dirt slab can also be placed vertically
+and is returned when a dirt vertical slab is broken. Without Grass Slabs, the
+dirt-only vertical item and recipe remain available; it stays hidden in creative.
 
 Horizontal soil slabs, vertical grass or other soil slabs, turf, path slabs and
 wooden walls are outside this mod. No new terrain is generated.

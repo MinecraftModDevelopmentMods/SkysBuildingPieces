@@ -36,6 +36,16 @@ public final class CuttingRecipe extends ShapedRecipes {
 
     public static List<CuttingRecipe> recipes() { return Collections.unmodifiableList(REGISTERED); }
 
+    @Override public ItemStack getCraftingResult(net.minecraft.inventory.InventoryCrafting grid) {
+        ItemStack result=super.getCraftingResult(grid);
+        if(pattern==CraftingPattern.ROTATE&&shape==Shape.SLAB)
+            for(int slot=0;slot<grid.getSizeInventory();slot++) {
+                ItemStack input=grid.getStackInSlot(slot);
+                if(input!=null&&input.hasTagCompound()){result.setTagCompound(input.getTagCompound().copy());break;}
+            }
+        return result;
+    }
+
     public static void register() {
         RecipeSorter.register("skysbuildingpieces:cutting", CuttingRecipe.class,
                 RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
@@ -45,14 +55,14 @@ public final class CuttingRecipe extends ShapedRecipes {
             if (half) full = Pieces.stack(Pieces.nativeState(material, "slab"), 1);
             if (full == null) throw new IllegalStateException("No obtainable crafting material: " + material.id);
 
-            // Native wildcard recipes consume several decorative variants,
-            // and snow's horizontal row already makes snow layers. Preserve
-            // those results: the distinct Sky slabs remain reachable by rotation.
-            if (material.block("slab") == null && !CraftingPattern.rotateOnlySlab(material.id))
-                add(material, Shape.SLAB, CraftingPattern.SLAB, full, half);
-            add(material, Shape.VERTICAL_SLAB, CraftingPattern.VERTICAL_SLAB, full, half);
+            // Keep native row recipes (including snow layers and wildcard
+            // decorative cuts). A diagonal pair provides the missing slab variants.
+            if (material.block("slab") == null)
+                add(material, Shape.SLAB, CraftingPattern.rotateOnlySlab(material.id)?CraftingPattern.STEP:CraftingPattern.SLAB, full, half);
             ItemStack horizontal = Pieces.stack(Pieces.state(material.id, Shape.SLAB, 1), 1);
             ItemStack vertical = Pieces.stack(Pieces.state(material.id, Shape.VERTICAL_SLAB, 0), 1);
+            if(horizontal==null&&vertical!=null&&!(material.id.equals("minecraft:dirt")&&net.minecraft.item.Item.getByNameOrId("skysgrassslabs:dirt_slab")!=null))
+                add(material,Shape.VERTICAL_SLAB,CraftingPattern.VERTICAL_SLAB,full,half);
             // Cutting half blocks avoids native full-block diagonal recipes
             // such as BOP's bamboo recovery. Diagonals also avoid vanilla's
             // two-slab chiseled sandstone and stone-brick recipes.
@@ -71,17 +81,17 @@ public final class CuttingRecipe extends ShapedRecipes {
                 if (CraftingPattern.wildcardNativeCuts(material.id)) {
                     // Six halves make four three-quarter stairs without changing
                     // vanilla's full-block wildcard stair recipes.
-                    add(material, Shape.STAIRS, CraftingPattern.STAIRS, vertical, false);
+                    add(material, Shape.STAIRS, CraftingPattern.STAIRS, horizontal, false);
                 } else add(material, Shape.STAIRS, CraftingPattern.STAIRS, full, half);
             }
             if (material.block("wall") == null) add(material, Shape.WALL, CraftingPattern.WALL, full, half);
             if (material.block("pane") == null) add(material, Shape.PANE, CraftingPattern.PANE, full, half);
 
             if (horizontal != null && vertical != null) {
-                register(material.id, Shape.VERTICAL_SLAB, CraftingPattern.ROTATE, horizontal, vertical);
                 register(material.id, Shape.SLAB, CraftingPattern.ROTATE, vertical, horizontal);
             }
         }
+        SlabRecombinationRecipe.register();
         LegacyPieceRecipe.register();
     }
 

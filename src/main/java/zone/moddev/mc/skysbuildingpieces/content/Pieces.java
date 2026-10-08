@@ -14,7 +14,7 @@ public final class Pieces {
     // Earlier betas may have saved these IDs. They are hidden, cannot be made,
     // and have no cutting behaviour; a one-item recipe recycles them to paper.
     public static final Map<String,Item> RETIRED_TEMPLATES=new LinkedHashMap<String,Item>();
-    // Enable the full catalogue only after the compact loader and migration gates pass.
+    // The compact catalogue is used only by the migration test fixture.
     public static final boolean COMPACT = false;
     public static boolean initialized;
     public static void register() {
@@ -66,6 +66,15 @@ public final class Pieces {
             if(block.palette.materials.contains(material)) return block.getStateFromMeta(block.palette.meta(material,mapped));
         }
         return null;
+    }
+    static ItemStack slabDrop(String material,IBlockState fallback) {
+        IBlockState horizontal=state(material,Shape.SLAB,1);
+        if(horizontal!=null)return stack(horizontal,1);
+        if(material.equals("minecraft:dirt")) {
+            Item dirt=Item.getByNameOrId("skysgrassslabs:dirt_slab");
+            if(dirt!=null)return new ItemStack(dirt,1,0);
+        }
+        return stack(fallback,1);
     }
     public static ItemStack stack(IBlockState state,int count) {
         if(state==null) return null;

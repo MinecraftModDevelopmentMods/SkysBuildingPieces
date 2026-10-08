@@ -29,7 +29,7 @@ public final class SkysBuildingPieces {
         GameRegistry.register(HOLDER);GameRegistry.register(new ItemBlock(HOLDER).setRegistryName(HOLDER.getRegistryName()));
         MinecraftForge.EVENT_BUS.register(new MigrationEvents());proxy.preInit();
     }
-    @Mod.EventHandler public void init(FMLInitializationEvent event) { zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.freeze();zone.moddev.mc.skysbuildingpieces.content.GrassLifecycle.initialize();zone.moddev.mc.skysbuildingpieces.content.CuttingRecipe.register();LegacyBridge.ready=true;proxy.init(); }
+    @Mod.EventHandler public void init(FMLInitializationEvent event) { zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.freeze();zone.moddev.mc.skysbuildingpieces.content.GrassLifecycle.initialize();zone.moddev.mc.skysbuildingpieces.content.CuttingRecipe.register();zone.moddev.mc.skysbuildingpieces.content.NativeSlabPlacement.initialize();LegacyBridge.ready=true;proxy.init(); }
     @Mod.EventHandler public void beforeServer(FMLServerAboutToStartEvent event) { LegacyBridge.start(event.getServer()); }
     @Mod.EventHandler public void afterServer(FMLServerStoppedEvent event) { LegacyBridge.stop(); }
     @Mod.EventHandler public void mappings(FMLMissingMappingsEvent event) {
@@ -37,7 +37,7 @@ public final class SkysBuildingPieces {
             // Forge 1.10 cannot map many generic IDs to one registered object.
             // IGNORE reserves the old numeric slot; the validated raw loader
             // hooks recover its material before Forge can deserialize it as air.
-            // Unknown covered material/shape pairs fail closed in those hooks.
+            // Those hooks stop loading if a piece has no safe replacement.
             m.ignore();
         }
     }

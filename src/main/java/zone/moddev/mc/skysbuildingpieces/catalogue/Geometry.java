@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.catalogue;
 
-/** Occupancy of eight half-block cells; pure and exhaustively testable. */
+/** Describes which of the eight half-block cells a piece occupies. */
 public final class Geometry {
     private Geometry() { }
     public static int mask(Shape shape, int orientation) {

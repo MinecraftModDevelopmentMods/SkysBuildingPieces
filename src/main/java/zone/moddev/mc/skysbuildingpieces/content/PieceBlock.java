@@ -157,14 +157,16 @@ public final class PieceBlock extends Block implements IGrowable {
     }
     public List<ItemStack> getDrops(IBlockAccess w,BlockPos p,IBlockState s,int fortune) {
         String drop=definition(s).normalDrop();if(drop.isEmpty())return Collections.emptyList();
-        ItemStack stack=Pieces.stack(Pieces.state(drop,palette.shape,orientation(s)),1);
+        IBlockState dropped=Pieces.state(drop,palette.shape,orientation(s));
+        ItemStack stack=palette.shape==Shape.VERTICAL_SLAB?Pieces.slabDrop(drop,dropped):Pieces.stack(dropped,1);
         return stack==null ? Collections.<ItemStack>emptyList() : Collections.singletonList(stack);
     }
-    protected ItemStack getSilkTouchDrop(IBlockState s) { return Pieces.stack(s,1); }
+    protected ItemStack getSilkTouchDrop(IBlockState s) { return palette.shape==Shape.VERTICAL_SLAB?Pieces.slabDrop(definition(s).id,s):Pieces.stack(s,1); }
     public boolean canSilkHarvest(World w,BlockPos p,IBlockState s,EntityPlayer player) { return true; }
     public int damageDropped(IBlockState s) { return canonicalMeta(s); }
-    public ItemStack getPickBlock(IBlockState s,RayTraceResult hit,World w,BlockPos p,EntityPlayer player) { return Pieces.stack(s,1); }
+    public ItemStack getPickBlock(IBlockState s,RayTraceResult hit,World w,BlockPos p,EntityPlayer player) { return palette.shape==Shape.VERTICAL_SLAB?Pieces.slabDrop(definition(s).id,s):Pieces.stack(s,1); }
     public void getSubBlocks(Item item,net.minecraft.creativetab.CreativeTabs tab,List<ItemStack> list) {
+        if(palette.shape==Shape.VERTICAL_SLAB)return;
         for(int slot=0;slot<palette.materials.size();slot++) list.add(new ItemStack(item,1,slot*palette.shape.states));
     }
     public void updateTick(World w,BlockPos p,IBlockState s,Random rand) {

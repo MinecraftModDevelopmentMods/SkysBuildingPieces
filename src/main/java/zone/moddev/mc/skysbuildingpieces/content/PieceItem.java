@@ -25,19 +25,25 @@ public final class PieceItem extends ItemBlock {
     public EnumActionResult onItemUse(ItemStack stack,EntityPlayer player,World w,BlockPos p,EnumHand hand,EnumFacing face,float x,float y,float z) {
         if(stack==null || stack.stackSize==0)return EnumActionResult.FAIL;
         String mat=piece.palette.material(stack.getMetadata());
+        Shape shape=piece.palette.shape;
+        if(shape==Shape.VERTICAL_SLAB && Pieces.state(mat,Shape.SLAB,1)!=null)shape=Shape.SLAB;
+        return place(stack,player,w,p,hand,face,x,y,z,mat,shape);
+    }
+    static EnumActionResult place(ItemStack stack,EntityPlayer player,World w,BlockPos p,EnumHand hand,EnumFacing face,float x,float y,float z,String mat,Shape shape) {
+        if(stack==null || stack.stackSize<=0)return EnumActionResult.FAIL;
         float targetX=x,targetY=y,targetZ=z;
         IBlockState old=w.getBlockState(p);
         if(!old.getBlock().isReplaceable(w,p)) {
-            if(combine(w,p,old,mat,player,stack,face,x,y,z))return EnumActionResult.SUCCESS;
+            if(combine(w,p,old,mat,shape,player,stack,face,x,y,z))return EnumActionResult.SUCCESS;
             p=p.offset(face);old=w.getBlockState(p);
             // Subsequent combination checks use coordinates in the destination,
             // not the block that was clicked (its boundary is the opposite one).
             targetX-=face.getFrontOffsetX();targetY-=face.getFrontOffsetY();targetZ-=face.getFrontOffsetZ();
         }
         if(!player.canPlayerEdit(p,face,stack))return EnumActionResult.FAIL;
-        if(!old.getBlock().isReplaceable(w,p))return combine(w,p,old,mat,player,stack,face,targetX,targetY,targetZ)?EnumActionResult.SUCCESS:EnumActionResult.FAIL;
-        int rot=closest(x,z);int orientation;Shape placedShape=piece.palette.shape;
-        switch(piece.palette.shape) {
+        if(!old.getBlock().isReplaceable(w,p))return combine(w,p,old,mat,shape,player,stack,face,targetX,targetY,targetZ)?EnumActionResult.SUCCESS:EnumActionResult.FAIL;
+        int rot=closest(x,z);int orientation;Shape placedShape=shape;
+        switch(shape) {
             case SLAB:
                 EnumFacing slabSide=SlabPlacement.side(face,x,y,z);
                 placedShape=SlabPlacement.shape(slabSide);orientation=SlabPlacement.orientation(slabSide);break;
@@ -50,7 +56,7 @@ public final class PieceItem extends ItemBlock {
             default: orientation=0;
         }
         IBlockState target=Pieces.state(mat,placedShape,orientation);
-        if(piece.palette.shape==Shape.HORIZONTAL_STEP && player.isSneaking())target=Pieces.state(mat,Shape.VERTICAL_STEP,corner(x,z));
+        if(shape==Shape.HORIZONTAL_STEP && player.isSneaking())target=Pieces.state(mat,Shape.VERTICAL_STEP,corner(x,z));
         // World placement checks the block's default bounding box. Collision
         // must instead use this exact palette orientation and derived shape.
         if(target==null || !w.canBlockBePlaced(target.getBlock(),p,true,face,player,stack)||!safe(w,p,target))return EnumActionResult.FAIL;
@@ -58,17 +64,27 @@ public final class PieceItem extends ItemBlock {
         target.getBlock().onBlockPlacedBy(w,p,target,player,stack);finish(w,p,target,player,stack);return EnumActionResult.SUCCESS;
     }
     public boolean canPlaceBlockOnSide(World w,BlockPos p,EnumFacing side,EntityPlayer player,ItemStack s) { return player.canPlayerEdit(p,side,s); }
-    private boolean combine(World w,BlockPos p,IBlockState old,String material,EntityPlayer player,ItemStack stack,EnumFacing face,float x,float y,float z) {
-        if(!(old.getBlock() instanceof PieceBlock) || !player.canPlayerEdit(p,face,stack))return false;
-        PieceBlock other=(PieceBlock)old.getBlock();
-        if(!other.definition(old).id.equals(material) || other.palette.shape==Shape.WALL||other.palette.shape==Shape.PANE || piece.palette.shape==Shape.WALL||piece.palette.shape==Shape.PANE)return false;
+    private static boolean combine(World w,BlockPos p,IBlockState old,String material,Shape shape,EntityPlayer player,ItemStack stack,EnumFacing face,float x,float y,float z) {
+        if(!player.canPlayerEdit(p,face,stack)||shape==Shape.WALL||shape==Shape.PANE)return false;
+        int oldMask;
+        if(old.getBlock() instanceof PieceBlock) {
+            PieceBlock other=(PieceBlock)old.getBlock();
+            if(!other.definition(old).id.equals(material)||other.palette.shape==Shape.WALL||other.palette.shape==Shape.PANE)return false;
+            oldMask=other.mask(old);
+        } else {
+            IBlockState nativeSlab=Pieces.nativeState(Catalogue.INSTANCE.materials.get(material),"slab");
+            if(nativeSlab==null||!(old.getBlock() instanceof net.minecraft.block.BlockSlab)||old.getBlock()!=nativeSlab.getBlock()||
+                    !old.withProperty(net.minecraft.block.BlockSlab.HALF,net.minecraft.block.BlockSlab.EnumBlockHalf.BOTTOM)
+                    .equals(nativeSlab.withProperty(net.minecraft.block.BlockSlab.HALF,net.minecraft.block.BlockSlab.EnumBlockHalf.BOTTOM)))return false;
+            oldMask=Geometry.mask(Shape.SLAB,old.getValue(net.minecraft.block.BlockSlab.HALF)==net.minecraft.block.BlockSlab.EnumBlockHalf.TOP?0:1);
+        }
         // On an internal half-block face, select the empty side of the face,
         // including DOWN/WEST/NORTH clicks exactly on the 0.5 boundary.
         float epsilon=.0001f;
-        int oldMask=other.mask(old),pick=(x+face.getFrontOffsetX()*epsilon>=.5f?1:0)|(z+face.getFrontOffsetZ()*epsilon>=.5f?2:0)|(y+face.getFrontOffsetY()*epsilon>=.5f?4:0);
+        int pick=(x+face.getFrontOffsetX()*epsilon>=.5f?1:0)|(z+face.getFrontOffsetZ()*epsilon>=.5f?2:0)|(y+face.getFrontOffsetY()*epsilon>=.5f?4:0);
         IBlockState result=null;
-        boolean slab=piece.palette.shape==Shape.SLAB||piece.palette.shape==Shape.VERTICAL_SLAB;
-        Shape[] additions=slab?new Shape[]{Shape.SLAB,Shape.VERTICAL_SLAB}:new Shape[]{piece.palette.shape};
+        boolean slab=shape==Shape.SLAB||shape==Shape.VERTICAL_SLAB;
+        Shape[] additions=slab?new Shape[]{Shape.SLAB,Shape.VERTICAL_SLAB}:new Shape[]{shape};
         search: for(Shape addition:additions)for(int orientation=0;orientation<addition.states;orientation++) {
             int add=Geometry.mask(addition,orientation);
             if((add & 1<<pick)==0 || (add&oldMask)!=0)continue;

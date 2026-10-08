@@ -25,7 +25,11 @@ public final class GameplayChecks {
             world.setBlockToAir(p);player.setSneaking(false);
             EnumActionResult result=item.getItem().onItemUse(item,player,world,p,EnumHand.MAIN_HAND,EnumFacing.UP,.25f,.1f,.25f);
             require(result==EnumActionResult.SUCCESS&&item.stackSize==1,"own placement and consumption "+b.getRegistryName());
-            IBlockState state=world.getBlockState(p);require(state.getBlock()==b,"own placement bypasses legacy catalogue");
+            IBlockState state=world.getBlockState(p);
+            if(b.palette.shape==Shape.VERTICAL_SLAB&&Pieces.state(b.palette.materials.get(0),Shape.SLAB,1)!=null) {
+                require(state.equals(Pieces.state(b.palette.materials.get(0),Shape.SLAB,1)),"saved vertical item uses regular slab placement");
+                state=b.getStateFromMeta(0);world.setBlockState(p,state,2);
+            }else require(state.getBlock()==b,"own placement bypasses legacy catalogue");
             require(world.getTileEntity(p)==null,"pieces never need tiles");
             List<AxisAlignedBB> boxes=b.boxes(b.getActualState(state,world,p));require(!boxes.isEmpty(),"collision boxes");
             Catalogue.MaterialDef definition=b.definition(state);IBlockState nativeFull=Pieces.nativeState(definition,"full");
@@ -62,6 +66,7 @@ public final class GameplayChecks {
         other.getItem().onItemUse(other,player,world,p,EnumHand.MAIN_HAND,EnumFacing.UP,.25f,.75f,.25f);
         require(world.getBlockState(p).equals(original)&&other.stackSize==2,"unlike combination rejected unchanged");
         slabPlacement(world,p,player);
+        nativeSlabs(world,p,player);
         world.setBlockState(p.up(),Blocks.STONE.getDefaultState(),2);
         // Grass shapes decay to dirt without changing their octant geometry.
         for(Shape shape:new Shape[]{Shape.HORIZONTAL_STEP,Shape.VERTICAL_STEP,Shape.CORNER,Shape.STAIRS})for(int o=0;o<shape.states;o++) {
@@ -153,10 +158,17 @@ public final class GameplayChecks {
             IBlockState nativeFull=Pieces.nativeState(def,"full");int actualFire=b.getFlammability(world,p,EnumFacing.UP),actualSpread=b.getFireSpreadSpeed(world,p,EnumFacing.UP);
             world.setBlockState(p,nativeFull,2);require(actualFire==nativeFull.getBlock().getFlammability(world,p,EnumFacing.UP),"native flammability "+def.id+" actual="+actualFire+" expected="+nativeFull.getBlock().getFlammability(world,p,EnumFacing.UP));
             require(actualSpread==nativeFull.getBlock().getFireSpreadSpeed(world,p,EnumFacing.UP),"native fire spread");world.setBlockState(p,state,2);
-            require(b.getPickBlock(state,null,world,p,player).getItem()==Item.getItemFromBlock(b),"Silk/pick identity");
+            require(ItemStack.areItemStacksEqual(b.getPickBlock(state,null,world,p,player),expectedDrop(def.id,b,state)),"pick identity follows regular slab");
+            try {
+                java.lang.reflect.Method silk;
+                try { silk=PieceBlock.class.getDeclaredMethod("getSilkTouchDrop",IBlockState.class); }
+                catch(NoSuchMethodException packaged) { silk=PieceBlock.class.getDeclaredMethod("func_180643_i",IBlockState.class); }
+                silk.setAccessible(true);
+                require(ItemStack.areItemStacksEqual((ItemStack)silk.invoke(b,state),expectedDrop(def.id,b,state)),"Silk Touch follows regular slab");
+            }catch(ReflectiveOperationException failure){throw new AssertionError(failure);}
             List<ItemStack> drops=b.getDrops(world,p,state,0);
             if(def.normalDrop().isEmpty())require(drops.isEmpty(),"fragile material normal drops");
-            else require(drops.size()==1&&ItemStack.areItemStacksEqual(drops.get(0),Pieces.stack(Pieces.state(def.normalDrop(),b.palette.shape,o),1)),"material drop and metadata");
+            else require(drops.size()==1&&ItemStack.areItemStacksEqual(drops.get(0),expectedDrop(def.normalDrop(),b,Pieces.state(def.normalDrop(),b.palette.shape,o))),"material drop and metadata");
             if(def.soil())for(Block plant:new Block[]{Blocks.TALLGRASS,Blocks.SAPLING,Blocks.RED_MUSHROOM}) {
                 IBlockState full=Pieces.nativeState(def,"full");
                 boolean nativeSupport=full.getBlock().canSustainPlant(full,world,p,EnumFacing.UP,(net.minecraftforge.common.IPlantable)plant);
@@ -164,6 +176,71 @@ public final class GameplayChecks {
             }
         }
         world.setBlockToAir(p);System.out.println("BUILDING_PIECES_MATERIAL_PHYSICS_PASS");
+    }
+    private static ItemStack expectedDrop(String material,PieceBlock block,IBlockState state) {
+        if(block.palette.shape==Shape.VERTICAL_SLAB) {
+            IBlockState horizontal=Pieces.state(material,Shape.SLAB,1);
+            if(horizontal!=null)return Pieces.stack(horizontal,1);
+            Item dirt=Item.getByNameOrId("skysgrassslabs:dirt_slab");
+            if(material.equals("minecraft:dirt")&&dirt!=null)return new ItemStack(dirt,1,0);
+        }
+        return Pieces.stack(state,1);
+    }
+    private static void nativeSlabs(WorldServer world,BlockPos p,EntityPlayerMP player) {
+        int checked=0;
+        for(PieceBlock block:Pieces.BLOCKS.values())if(block.palette.shape==Shape.VERTICAL_SLAB) {
+            List<ItemStack> creative=new ArrayList<>();
+            block.getSubBlocks(Item.getItemFromBlock(block),net.minecraft.creativetab.CreativeTabs.BUILDING_BLOCKS,creative);
+            require(creative.isEmpty(),"vertical slabs absent from creative tab");
+        }
+        Item dirt=Item.getByNameOrId("skysgrassslabs:dirt_slab");
+        if(dirt!=null)for(EnumFacing occupied:EnumFacing.HORIZONTALS) {
+            clearAround(world,p);world.setBlockState(p.down(),Blocks.STONE.getDefaultState(),2);
+            ItemStack stack=new ItemStack(dirt,2,0);
+            float x=occupied==EnumFacing.WEST?.1f:occupied==EnumFacing.EAST?.9f:.5f;
+            float z=occupied==EnumFacing.NORTH?.1f:occupied==EnumFacing.SOUTH?.9f:.5f;
+            require(stack.onItemUse(player,world,p.down(),EnumHand.MAIN_HAND,EnumFacing.UP,x,1,z)==EnumActionResult.SUCCESS&&
+                    world.getBlockState(p).equals(Pieces.state("minecraft:dirt",Shape.VERTICAL_SLAB,occupied.getHorizontalIndex()))&&stack.stackSize==1,"regular dirt slab places vertically");
+            ++checked;
+        }
+        clearAround(world,p);world.setBlockState(p.down(),Blocks.STONE.getDefaultState(),2);
+        ItemStack oak=new ItemStack(Blocks.WOODEN_SLAB,2,0);
+        PlacementVeto veto=new PlacementVeto();net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(veto);
+        try {
+            require(oak.onItemUse(player,world,p.down(),EnumHand.MAIN_HAND,EnumFacing.UP,.1f,1,.5f)!=EnumActionResult.SUCCESS&&
+                    veto.seen&&world.isAirBlock(p)&&oak.stackSize==2,"Forge placement protection rolls back the exact native slab placement");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);}
+        clearAround(world,p);world.setBlockState(p,Blocks.TRAPDOOR.getDefaultState(),2);
+        player.setHeldItem(EnumHand.MAIN_HAND,oak);player.setSneaking(false);
+        require(player.interactionManager.processRightClickBlock(player,world,oak,EnumHand.MAIN_HAND,p,EnumFacing.UP,.1f,1,.5f)==EnumActionResult.SUCCESS&&
+                world.isAirBlock(p.up())&&oak.stackSize==2&&world.getBlockState(p).getValue(BlockTrapDoor.OPEN),"block activation takes priority and happens exactly once");
+        player.setHeldItem(EnumHand.MAIN_HAND,null);
+        if(net.minecraftforge.fml.common.Loader.isModLoaded("buildingbricks"))return;
+        for(Catalogue.MaterialDef material:Catalogue.INSTANCE.materials.values()) {
+            if(Pieces.state(material.id,Shape.VERTICAL_SLAB,0)==null)continue;
+            IBlockState nativeSlab=Pieces.nativeState(material,"slab");
+            if(nativeSlab==null)continue;
+            for(EnumHand hand:EnumHand.values())for(EnumFacing occupied:EnumFacing.values()) {
+                clearAround(world,p);BlockPos anchor=p.down();world.setBlockState(anchor,Blocks.STONE.getDefaultState(),2);
+                float x=occupied==EnumFacing.WEST?.1f:occupied==EnumFacing.EAST?.9f:.5f;
+                float z=occupied==EnumFacing.NORTH?.1f:occupied==EnumFacing.SOUTH?.9f:.5f;
+                EnumFacing face=occupied==EnumFacing.UP?EnumFacing.DOWN:EnumFacing.UP;
+                if(face==EnumFacing.DOWN){anchor=p.up();world.setBlockState(anchor,Blocks.STONE.getDefaultState(),2);}
+                ItemStack stack=Pieces.stack(nativeSlab,3);net.minecraft.nbt.NBTTagCompound tag=new net.minecraft.nbt.NBTTagCompound();tag.setString("custom_label","Preserved slab");stack.setTagCompound(tag);
+                require(stack.onItemUse(player,world,anchor,hand,face,x,face==EnumFacing.UP?1:0,z)==EnumActionResult.SUCCESS,"native slab hook returns success "+material.id);
+                require(world.getBlockState(p).equals(Pieces.state(material.id,slabShape(occupied),slabOrientation(occupied))),"native slab selects six orientations "+material.id);
+                require(stack.stackSize==2&&tag.equals(stack.getTagCompound()),"native hook consumes once and preserves NBT");
+                require(stack.onItemUse(player,world,p,hand,occupied.getOpposite(),.5f,.5f,.5f)==EnumActionResult.SUCCESS,"native slab combines");
+                require(world.getBlockState(p).equals(Pieces.nativeState(material,"full"))&&stack.stackSize==1,"native combination makes exact full material");
+                ++checked;
+            }
+        }
+        clearAround(world,p);player.setSneaking(false);
+        System.out.println("BUILDING_PIECES_NATIVE_SLABS_PASS cases="+checked+" creative=hidden drops=regular");
+    }
+    public static final class PlacementVeto {
+        boolean seen;
+        @net.minecraftforge.fml.common.eventhandler.SubscribeEvent public void place(net.minecraftforge.event.world.BlockEvent.PlaceEvent event){seen=true;event.setCanceled(true);}
     }
     private static void require(boolean value,String message){if(!value)throw new AssertionError(message);}
 }
