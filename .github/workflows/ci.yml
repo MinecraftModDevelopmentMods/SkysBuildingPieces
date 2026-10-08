@@ -58,8 +58,7 @@ jobs:
 
       - name: Replay artifact checks offline
         run: >-
-          ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums
-           --offline --no-daemon --stacktrace
+          ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

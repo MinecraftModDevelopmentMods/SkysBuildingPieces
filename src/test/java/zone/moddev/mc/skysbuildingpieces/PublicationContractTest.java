@@ -36,6 +36,7 @@ class PublicationContractTest {
         assertTrue(ci.contains("if-no-files-found: error"));
         assertTrue(ci.contains("integrationTest"));
         assertTrue(ci.contains("--offline"));
+        assertFalse(ci.contains("\n           --offline"));
     }
     private String text(String path) throws Exception {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8).replace("\r\n", "\n");
