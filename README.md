@@ -1,9 +1,12 @@
 # Sky's Building Pieces
 
+Piece names use the material itself: Gold Wall and Oak Step, rather than the
+full block's name followed by the shape. All 18 languages have matching material labels.
+
 Building pieces for Minecraft 1.10.2, made from vanilla materials with ordinary
 crafting recipes. No templates or tools are needed. The mod does not generate terrain.
 
-Version 0.3.0.110021 is a beta for testing. Back up existing worlds before
+Version 0.3.6.110021 is a beta for testing. Back up existing worlds before
 trying it. Do not remove BuildingBricks from a world that still needs its
 other materials, shapes or tools.
 
@@ -21,6 +24,8 @@ The mod adds 235 building block IDs and one hidden recovery holder: 236 in
 total. Fixed metadata palettes keep material and orientation assignments
 consistent between installations. Existing vanilla pieces are reused.
 Supported regular slab items place horizontally or vertically, including oak.
+Find the pieces in the Sky's Building Pieces creative tab, alongside the
+vanilla slab, stair, wall and pane items reused by the catalogue.
 Vertical slabs drop regular slabs and do not have separate creative entries.
 Only ordinary dirt needs a separate recipe when no horizontal slab is available.
 
@@ -38,3 +43,8 @@ See [pieces and recipes](docs/GAMEPLAY.md), [configuration](docs/CONFIGURATION.m
 
 Licensed under LGPL-2.1-only. Adapted BuildingBricks definitions and geometry
 retain the MIT notice in BUILDINGBRICKS-MIT.txt.
+
+All custom walls have lower connecting panels and raised posts at ends, corners
+and junctions. A block or torch above keeps its supporting post. Selection follows
+the visible wall; the wall still prevents jumping over it.
+If using the BOP add-on, update its jar too so its wall models match this version.

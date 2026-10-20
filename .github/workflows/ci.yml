@@ -1,19 +1,19 @@
-name: Sky's Building Pieces 1.10 CI
+name: Sky's Building Pieces CI
 
 on:
   push:
     branches:
-      - master-1.10.2
+      - 'master-*'
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.10.2
+      - 'master-*'
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.10-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -26,23 +26,38 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Install Java 8 toolchain
+      - name: Read target build metadata
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          value() { sed -n "s/^$1=//p" gradle.properties; }
+          toolchain="$(value java_toolchain_version)"
+          selector="$(value java_setup_version)"
+          echo "java_setup_version=${selector:-$toolchain}" >> "$GITHUB_OUTPUT"
+          echo "java_version=$(value java_version)" >> "$GITHUB_OUTPUT"
+          echo "minecraft_version=$(value minecraft_version)" >> "$GITHUB_OUTPUT"
+          echo "gradle_java_version=$(value gradle_java_version)" >> "$GITHUB_OUTPUT"
+          echo "artifact_prefix=SkysBuildingPieces-$(value mod_version)" >> "$GITHUB_OUTPUT"
+
+      - name: Install target Java toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '8.0.502+7'
+          java-version: ${{ steps.target.outputs.java_setup_version }}
 
       - name: Pin production Java
+        if: steps.target.outputs.java_version == '8'
         run: |
           echo "SGS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
           echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
           echo "STS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
 
-      - name: Install Java 17 for Gradle
+      - name: Install Java for Gradle
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: microsoft
-          java-version: '17'
+          java-version: ${{ steps.target.outputs.gradle_java_version }}
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
@@ -63,13 +78,13 @@ jobs:
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.10.2-${{ github.sha }}
+          name: SkysBuildingPieces-${{ steps.target.outputs.minecraft_version }}-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.0.110021.jar
-            build/libs/SkysBuildingPieces-0.3.0.110021-sources.jar
-            build/libs/SkysBuildingPieces-0.3.0.110021-javadoc.jar
+            build/libs/${{ steps.target.outputs.artifact_prefix }}.jar
+            build/libs/${{ steps.target.outputs.artifact_prefix }}-sources.jar
+            build/libs/${{ steps.target.outputs.artifact_prefix }}-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -77,7 +92,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.10.2-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-${{ steps.target.outputs.minecraft_version }}-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

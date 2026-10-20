@@ -6,6 +6,14 @@ creative world; use a separate copy when trying an existing world.
 
 Before relying on the beta in a modpack, check:
 
+- Check names such as Gold Wall, Gold Stairs and Oak Step. Switch the game
+  language and check translated piece names too. Renamed items keep their custom names.
+- Check gold, packed ice and the other wall materials in straight runs, corners
+  and junctions. The panels should be lower than the posts. Add and remove a
+  block or torch above the middle of a run, then check selection and collision.
+- Open the Sky's Building Pieces creative tab. Check its name and stair icon,
+  regular slab entries and the reused vanilla pieces. Separate vertical slabs,
+  old templates and recovery items should not appear.
 - Place slabs, steps and corners in every direction, including upside down
   and vertical placements. Sneaking turns steps vertically.
 - With a slab such as oak, glass or wool, click the centre and edges of each
@@ -24,6 +32,19 @@ Before relying on the beta in a modpack, check:
 - Check grass colours in several biomes, nearby snow, covered grass becoming
   dirt, plant support, breaking drops and Silk Touch.
 - Check wall and pane connections and stair corners, including their collision.
+- Place clear and stained-glass walls in rows, corners and junctions. The
+  straight sections should have no posts; ends, corners and junctions should.
+  Extend and break a row, then add and remove a block above its middle. Check
+  the shape updates without dark internal sheets. Try different colours
+  together and check that their boundary is still visible.
+- Make longer rows of clear glass and each stained-glass colour. Matching
+  sections should join without repeated vertical borders. Check the tops too,
+  then break and replace a middle block. Posts, open ends and colour changes
+  should retain their borders, and individual blocks should remain selectable.
+- Put ordinary and redstone torches on isolated walls and straight runs.
+  Check that glass walls form a supporting post and return to their previous
+  shape when the torch is removed. Aim at post shoulders and connections;
+  the selection outline should follow the model without enclosing empty space.
 - With BuildingBricks present, first leave replacement disabled. On a second
   backup enable it, restart, and check converted blocks, containers and item
   entities. Save and reload, then inspect the migration report.

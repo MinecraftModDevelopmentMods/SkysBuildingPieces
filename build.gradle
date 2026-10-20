@@ -228,6 +228,18 @@ dependencies {
 }
 
 def integrationTestClasses = layout.buildDirectory.dir('integration-test-mod/classes')
+tasks.register('generateWallModels', JavaExec) {
+    group = 'build setup'
+    description = 'Regenerates wall exterior models from their shared collision profile.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'zone.moddev.mc.skysbuildingpieces.GenerateWallModels'
+    workingDir = project.projectDir
+    if (providers.gradleProperty('wallAssetRoot').isPresent()) {
+        args(providers.gradleProperty('wallAssetNamespace').get(), providers.gradleProperty('wallAssetRoot').get())
+    }
+}
+
 def compileIntegrationTestMod = tasks.register('compileIntegrationTestMod', JavaCompile) {
     group = 'verification'
     dependsOn tasks.named('classes')
@@ -349,6 +361,20 @@ tasks.register('integrationClientProcess', JavaExec) {
     doLast {
         if (!new File(integrationRunDirectory.get().asFile, 'building-pieces-client-pass.txt').isFile())
             throw new GradleException('Client did not complete resource baking')
+    }
+}
+
+tasks.register('integrationPresentationProcess', JavaExec) {
+    group = 'verification'
+    dependsOn prepareIntegrationTest
+    workingDir integrationRunDirectory
+    systemProperty 'skysbuildingpieces.integrationPhase', 'client-presentation'
+    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
+    configureFromForgeRun(delegate, 'runClient')
+    doLast {
+        File directory = integrationRunDirectory.get().asFile
+        if (!new File(directory, 'screenshots/glass-walls.png').isFile())
+            throw new GradleException('Glass-wall gallery screenshot is missing')
     }
 }
 

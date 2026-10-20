@@ -21,45 +21,98 @@ public final class SlabRecombinationRecipe implements IRecipe {
     private static final List<SlabRecombinationRecipe> RECIPES = new ArrayList<>();
     public final ItemStack slab, full;
     private final Block block;
+
     public SlabRecombinationRecipe(IBlockState slab, ItemStack full) {
         this.block = slab.getBlock();
         this.slab = Pieces.stack(slab, 1);
         this.full = full.copy();
     }
-    public static List<SlabRecombinationRecipe> recipes() { return Collections.unmodifiableList(RECIPES); }
+
+    public static List<SlabRecombinationRecipe> recipes() {
+        return Collections.unmodifiableList(RECIPES);
+    }
+
     public static void register() {
         RecipeSorter.register("skysbuildingpieces:slab_recombination", SlabRecombinationRecipe.class,
                 RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
+
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
             IBlockState state = Pieces.state(material.id, Shape.SLAB, 1);
             ItemStack full = Pieces.stack(Pieces.nativeState(material, "full"), 1);
+
             // Smooth stone has no obtainable full-block item in this target.
-            if (state == null || full == null || full.getItem() == null) continue;
+            if (state == null || full == null || full.getItem() == null) {
+                continue;
+            }
+
             SlabRecombinationRecipe recipe = new SlabRecombinationRecipe(state, full);
-            RECIPES.add(recipe); GameRegistry.addRecipe(recipe);
+
+            RECIPES.add(recipe);
+            GameRegistry.addRecipe(recipe);
         }
     }
+
     private boolean same(ItemStack input) {
-        if (input == null || input.getItem() != slab.getItem()) return false;
+        if (input == null || input.getItem() != slab.getItem()) {
+            return false;
+        }
+
         int damage = input.getItemDamage();
-        if(damage<0||damage>15)return false;
+
+        if (damage < 0 || damage > 15) {
+            return false;
+        }
         if (block instanceof PieceBlock) {
             PieceBlock piece = (PieceBlock) block;
-            try { return piece.canonicalMeta(piece.getStateFromMeta(damage)) == slab.getItemDamage(); }
-            catch (IllegalArgumentException unusedSlot) { return false; }
+
+            try {
+                return piece.canonicalMeta(piece.getStateFromMeta(damage)) == slab.getItemDamage();
+            } catch (IllegalArgumentException unusedSlot) {
+                return false;
+            }
         }
+
         return block instanceof BlockSlab ? (damage & 7) == slab.getItemDamage() : damage == slab.getItemDamage();
     }
-    @Override public boolean matches(InventoryCrafting grid, World world) {
-        int first = -1, second = -1;
-        for (int i = 0; i < grid.getSizeInventory(); i++) if (grid.getStackInSlot(i) != null) {
-            if (!same(grid.getStackInSlot(i)) || second != -1) return false;
-            if (first == -1) first = i; else second = i;
+
+    @Override
+    public boolean matches(InventoryCrafting grid, World world) {
+        int first = -1;
+        int second = -1;
+
+        for (int slotIndex = 0; slotIndex < grid.getSizeInventory(); slotIndex++) {
+            if (grid.getStackInSlot(slotIndex) != null) {
+                if (!same(grid.getStackInSlot(slotIndex)) || second != -1) {
+                    return false;
+                }
+                if (first == -1) {
+                    first = slotIndex;
+                } else {
+                    second = slotIndex;
+                }
+            }
         }
+
         return second == first + 1 && first >= 0 && first / grid.getWidth() == second / grid.getWidth();
     }
-    @Override public ItemStack getCraftingResult(InventoryCrafting grid) { return full.copy(); }
-    @Override public ItemStack getRecipeOutput() { return full.copy(); }
-    @Override public int getRecipeSize() { return 2; }
-    @Override public ItemStack[] getRemainingItems(InventoryCrafting grid) { return new ItemStack[grid.getSizeInventory()]; }
+
+    @Override
+    public ItemStack getCraftingResult(InventoryCrafting grid) {
+        return full.copy();
+    }
+
+    @Override
+    public ItemStack getRecipeOutput() {
+        return full.copy();
+    }
+
+    @Override
+    public int getRecipeSize() {
+        return 2;
+    }
+
+    @Override
+    public ItemStack[] getRemainingItems(InventoryCrafting grid) {
+        return new ItemStack[grid.getSizeInventory()];
+    }
 }
