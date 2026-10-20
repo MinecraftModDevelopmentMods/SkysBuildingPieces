@@ -1,5 +1,9 @@
 # Pieces and recipes
 
+The Sky's Building Pieces creative tab contains the mod's pieces and the
+vanilla slab, stair, wall and pane items it reuses. Vertical slab items and old
+templates stay hidden; use the regular slab for either placement direction.
+
 Use matching full blocks to craft building pieces. No template or tool is
 needed. Existing Minecraft pieces keep their native items and recipes; the
 BOP add-on follows the same patterns for its materials.
@@ -26,6 +30,17 @@ Walls use two columns so their recipe does not overlap glass panes or nether
 brick fences. Native cobblestone walls, slabs, stairs and glass panes keep
 their usual recipes. Only supported shapes are available; there are no wooden
 walls or horizontal soil slabs.
+
+Walls form continuous straight runs, with posts at the ends, corners
+and junctions. A block above also keeps a supporting post. Extending or breaking
+the wall updates its shape automatically.
+Torches and redstone torches can sit on top of walls, including straight runs.
+A wall forms a supporting post beneath the torch. Its selection outline
+follows the post and connections rather than filling the gaps between them.
+Matching clear or stained-glass walls also join without a repeated border
+between blocks. Borders remain at posts, exposed ends and colour changes.
+The blocks can still be placed, selected and broken individually; no extra
+mod or texture pack is needed.
 
 There is no separate vertical slab recipe when a regular slab exists. The same
 item places either way. Old vertical slab items can be crafted back into regular

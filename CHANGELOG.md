@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.3.6.110021
+
+- Shortened piece names, including Gold Wall, Gold Stairs and Oak Step.
+- Tidied material names and word order across all 18 languages.
+- Kept recipes, registry IDs, metadata and world migration unchanged.
+
+## 0.3.5.110021
+
+- Gave all custom walls lower panels and raised posts, including gold and packed ice.
+- Kept posts at ends, corners, junctions and beneath blocks or torches above.
+- Matched selection and collision shapes to the wall profile and removed internal faces.
+- Kept existing materials, registry IDs, recipes and saved palette assignments unchanged.
+- Updated the BOP add-on wall models to use the same profile.
+
+## 0.3.4.110021
+
+- Matching clear and stained-glass walls now join without a repeated border
+  between blocks. Posts, exposed ends and colour changes keep their borders.
+- Each wall block can still be placed, selected and broken separately.
+
+## 0.3.3.110021
+
+- Torches and redstone torches can now be placed on top of walls. Glass walls
+  form a supporting post when needed.
+- The glass-wall selection outline now follows the post and connections
+  rather than drawing a large box around the empty space between them.
+
+## 0.3.2.110021
+
+- Glass walls now form continuous straight runs, with posts at ends, corners
+  and junctions instead of on every block. Posts also support blocks above.
+- Wall selection and collision follow the changing post shape.
+
+## 0.3.1.110021
+
+- Added a Sky's Building Pieces creative tab, including the vanilla pieces
+  used by the mod. Vertical slabs and old templates remain hidden.
+- Gave glass walls raised posts and lower, narrower connections.
+- Removed the internal glass faces that made connected walls look dark and
+  overlapping. Different glass colours keep their visible boundary.
+
 ## 0.3.0.110021
 
 - Added a piece lookup interface for Terrain Smoother and shared grass rules
