@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.3.6.112021
+
+- Shortened piece names, including Gold Wall, Gold Stairs and Oak Step.
+- Tidied material names and word order across all 18 languages.
+- Kept recipes, registry IDs, metadata and world migration unchanged.
+
+## 0.3.5.112021
+
+- Gave all custom walls lower panels and raised posts, including gold and packed ice.
+- Kept posts at ends, corners, junctions and beneath blocks or torches above.
+- Matched selection and collision shapes to the wall profile and removed internal faces.
+- Kept existing materials, registry IDs, recipes and saved palette assignments unchanged.
+- Updated the BOP add-on wall models to use the same profile.
+
+## 0.3.4.112021
+
+- Added a Sky's Building Pieces creative tab, including the vanilla pieces the mod reuses.
+- Made clear and stained glass walls continuous where the material and colour match.
+  Borders remain at posts, exposed ends and colour changes.
+- Added raised posts at wall ends, corners, junctions and beneath blocks above.
+  Straight glass runs have lower panels without a post in every block.
+- Matched glass-wall selection outlines to the panels and posts, and removed
+  hidden internal glass faces.
+- Allowed ordinary and redstone torches on walls.
+- Kept existing pieces, palette assignments, recipes and world recovery unchanged.
+
+## 0.3.0.112021
+
+- Kept separate recovery progress for removed BOP decorations supplied by the add-on.
+- Added Minecraft 1.12.2 support with the existing IDs, palettes and save state.
+- Kept native crafting recipes intact when other material mods are installed.
+- Recovered supported legacy stacks before containers read them, including
+  furniture inventories with their own saved-data layout.
+
 ## 0.3.0.110021
 
 - Added a piece lookup interface for Terrain Smoother and shared grass rules
