@@ -13,3 +13,13 @@ Turning the option off stops further replacements, not previous conversions.
 
 This mod has no world generation setting. It does not change Sky's Grass Slabs
 configuration, generation or migration progress.
+
+## Block-ID budget for modpacks
+
+Building Pieces uses 236 block IDs: 235 building blocks and one hidden recovery
+holder. Materials share fixed metadata palettes so they don't each need a
+separate block ID for every shape and orientation. Saved palette assignments
+do not change between installations.
+
+The matching Biomes O Plenty add-on uses another 66 IDs, for 302 combined.
+These totals exclude blocks already registered by Minecraft and Biomes O Plenty.
