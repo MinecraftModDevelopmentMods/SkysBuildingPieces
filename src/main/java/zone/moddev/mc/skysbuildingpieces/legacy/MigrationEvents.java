@@ -21,95 +21,285 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 
 public final class MigrationEvents {
     private int ticks;
-    private final java.util.Queue<Chunk> pending=new java.util.concurrent.ConcurrentLinkedQueue<Chunk>();
-    private final Map<Chunk,NBTTagCompound> coverage=Collections.synchronizedMap(new WeakHashMap<Chunk,NBTTagCompound>());
-    @SubscribeEvent public void load(ChunkDataEvent.Load e) {
-        if(e.getWorld().isRemote)return;
-        NBTTagCompound n=e.getData(),level=n.getCompoundTag("Level");
-        // Turning replacement off must retain existing module markers, while
-        // leaving previously unvisited chunks entirely unmarked.
-        if(level.hasKey("skysbuildingpieces_coverage",10))coverage.put(e.getChunk(),level.getCompoundTag("skysbuildingpieces_coverage").copy());
-        if(!LegacyBridge.active())return;
-        if(!coverage.containsKey(e.getChunk()))coverage.put(e.getChunk(),new NBTTagCompound());
-        // Raw recovery changes the compound before constructing the Chunk.
-        // That constructor does not know it must persist the recovered data.
-        // Mark storage dirty explicitly, without any neighbour notifications.
-        e.getChunk().setChunkModified();
-        if(n.hasKey("skysbuildingpieces_delta")) {
-            PiecesWorldState s=PiecesWorldState.get(e.getWorld());s.blocks+=n.getLong("skysbuildingpieces_delta");s.chunks++;s.markDirty();n.removeTag("skysbuildingpieces_delta");
+    private final java.util.Queue<Chunk> pending = new java.util.concurrent.ConcurrentLinkedQueue<Chunk>();
+    private final Map<Chunk, NBTTagCompound> coverage = Collections
+            .synchronizedMap(new WeakHashMap<Chunk, NBTTagCompound>());
+
+    @SubscribeEvent
+    public void load(ChunkDataEvent.Load event) {
+        if (event.getWorld().isRemote) {
+            return;
         }
-        if(n.hasKey("skysbuildingpieces_additional_vanilla_delta")) {
+
+        NBTTagCompound legacyTileData = event.getData();
+        NBTTagCompound level = legacyTileData.getCompoundTag("Level");
+
+        // Turning replacement off must retain existing module markers, while leaving previously unvisited chunks
+        // entirely unmarked.
+        if (level.hasKey("skysbuildingpieces_coverage", 10)) {
+            coverage.put(event.getChunk(), level.getCompoundTag("skysbuildingpieces_coverage").copy());
+        }
+        if (legacyTileData.hasKey("skysbuildingpieces_retired_delta")) {
+            PiecesWorldState state = PiecesWorldState.get(event.getWorld());
+
+            state.addChunk(HistoricalFullBlocks.MODULE, legacyTileData.getLong("skysbuildingpieces_retired_delta"));
+            state.markDirty();
+            legacyTileData.removeTag("skysbuildingpieces_retired_delta");
+            event.getChunk().markDirty();
+        }
+        if (legacyTileData.hasKey("skysbuildingpieces_historical_delta", 10)) {
+            PiecesWorldState state = PiecesWorldState.get(event.getWorld());
+            NBTTagCompound deltas = legacyTileData.getCompoundTag("skysbuildingpieces_historical_delta");
+
+            for (String module : deltas.getKeySet()) {
+                state.addChunk(module, deltas.getLong(module));
+            }
+
+            state.markDirty();
+            legacyTileData.removeTag("skysbuildingpieces_historical_delta");
+            event.getChunk().markDirty();
+        }
+        if (!LegacyBridge.active()) {
+            return;
+        }
+        if (!coverage.containsKey(event.getChunk())) {
+            coverage.put(event.getChunk(), new NBTTagCompound());
+        }
+
+        // Raw recovery changes the compound before constructing the Chunk. That constructor does not know it must
+        // persist the recovered data. Mark storage dirty explicitly, without any neighbour notifications.
+        event.getChunk().markDirty();
+
+        if (legacyTileData.hasKey("skysbuildingpieces_delta")) {
+            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld());
+
+            worldState.blocks += legacyTileData.getLong("skysbuildingpieces_delta");
+            worldState.chunks++;
+            worldState.markDirty();
+            legacyTileData.removeTag("skysbuildingpieces_delta");
+        }
+        if (legacyTileData.hasKey("skysbuildingpieces_additional_vanilla_delta")) {
             // New coverage in an already counted chunk adds conversions, not a second chunk visit.
-            PiecesWorldState s=PiecesWorldState.get(e.getWorld());s.blocks+=n.getLong("skysbuildingpieces_additional_vanilla_delta");s.markDirty();n.removeTag("skysbuildingpieces_additional_vanilla_delta");
+            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld());
+
+            worldState.blocks += legacyTileData.getLong("skysbuildingpieces_additional_vanilla_delta");
+            worldState.markDirty();
+            legacyTileData.removeTag("skysbuildingpieces_additional_vanilla_delta");
         }
-        if(n.hasKey("skysbuildingpieces_module_delta",10)) {
-            PiecesWorldState s=PiecesWorldState.get(e.getWorld());NBTTagCompound deltas=n.getCompoundTag("skysbuildingpieces_module_delta");
-            for(String module:deltas.getKeySet())s.addChunk(module,deltas.getLong(module));
-            s.markDirty();n.removeTag("skysbuildingpieces_module_delta");
+        if (legacyTileData.hasKey("skysbuildingpieces_module_delta", 10)) {
+            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld());
+            NBTTagCompound deltas = legacyTileData.getCompoundTag("skysbuildingpieces_module_delta");
+
+            for (String module : deltas.getKeySet()) {
+                worldState.addChunk(module, deltas.getLong(module));
+            }
+
+            worldState.markDirty();
+            legacyTileData.removeTag("skysbuildingpieces_module_delta");
         }
-        pending.add(e.getChunk());
-        LegacyBridge.report(e.getWorld());
+
+        pending.add(event.getChunk());
+        LegacyBridge.report(event.getWorld());
     }
-    @SubscribeEvent public void tick(net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent e) {
-        if(e.phase!=net.minecraftforge.fml.common.gameevent.TickEvent.Phase.END || !LegacyBridge.active())return;
-        for(int count=0;count<8;count++) {Chunk chunk=pending.poll();if(chunk==null)break;
-            for(TileEntity tile:new ArrayList<TileEntity>(chunk.getTileEntityMap().values())) {
+
+    @SubscribeEvent
+    public void tick(net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent event) {
+        if (event.phase != net.minecraftforge.fml.common.gameevent.TickEvent.Phase.END
+                || !LegacyBridge.recoveryActive()) {
+            return;
+        }
+        for (int count = 0; count < 8; count++) {
+            Chunk chunk = pending.poll();
+
+            if (chunk == null) {
+                break;
+            }
+            for (TileEntity tile : new ArrayList<TileEntity>(chunk.getTileEntityMap().values())) {
                 // Unopened loot containers must not have their loot generated by migration.
-                NBTTagCompound raw=tile.writeToNBT(new NBTTagCompound());if(raw.hasKey("LootTable",8))continue;
+                NBTTagCompound raw = tile.writeToNBT(new NBTTagCompound());
+
+                if (raw.hasKey("LootTable", 8)) {
+                    continue;
+                }
+
                 containers(tile);
             }
         }
-        if(++ticks%100==0 && LegacyBridge.hasPendingReport()) {
-            net.minecraft.server.MinecraftServer server=net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
-            if(server!=null)LegacyBridge.report(server.worldServerForDimension(0));
+        if (++ticks % 100 == 0 && LegacyBridge.hasPendingReport()) {
+            net.minecraft.server.MinecraftServer server = net.minecraftforge.fml.common.FMLCommonHandler.instance()
+                    .getMinecraftServerInstance();
+
+            if (server != null) {
+                LegacyBridge.report(server.getWorld(0));
+            }
         }
     }
-    @SubscribeEvent public void unload(WorldEvent.Unload e) {
-        if(e.getWorld().isRemote)return;
-        if(LegacyBridge.active() && LegacyBridge.hasPendingReport())LegacyBridge.report(e.getWorld());
-        pending.removeIf(c->c.getWorld()==e.getWorld());
-        synchronized(coverage){coverage.keySet().removeIf(c->c.getWorld()==e.getWorld());}
-    }
-    @SubscribeEvent public void save(ChunkDataEvent.Save e) {
-        NBTTagCompound c=coverage.get(e.getChunk());if(c!=null)e.getData().getCompoundTag("Level").setTag("skysbuildingpieces_coverage",c.copy());
-    }
-    @SubscribeEvent public void placed(BlockEvent.PlaceEvent e) {
-        if(e.getWorld().isRemote || !LegacyBridge.active())return;
-        BlockPos p=e.getPos();IBlockState old=e.getWorld().getBlockState(p);
-        String id=old.getBlock().getRegistryName().toString();if(!LegacyMapping.owned(id))return;
-        TileEntity tile=e.getWorld().getTileEntity(p);if(tile==null)return;
-        NBTTagCompound n=tile.writeToNBT(new NBTTagCompound());Shape shape=LegacyMapping.shape(id,old.getBlock().getMetaFromState(old));
-        IBlockState target=LegacyBridge.resolve(id,LegacyMapping.material(n.getString("material")),shape,LegacyMapping.orientation(shape,old.getBlock().getMetaFromState(old)));
-        if(target!=null && e.getWorld().setBlockState(p,target,3)) {
-            Chunk chunk=e.getWorld().getChunkFromBlockCoords(p);
-            NBTTagCompound c=coverage.get(chunk);if(c==null){c=new NBTTagCompound();coverage.put(chunk,c);}
-            NBTTagList retained=c.getTagList("retained_tiles",10);retained.appendTag(n.copy());c.setTag("retained_tiles",retained);
-            PiecesWorldState s=PiecesWorldState.get(e.getWorld());s.addBlocks(Catalogue.INSTANCE.moduleFor(LegacyMapping.material(n.getString("material"))),1);s.markDirty();
+
+    @SubscribeEvent
+    public void unload(WorldEvent.Unload event) {
+        if (event.getWorld().isRemote) {
+            return;
+        }
+        if (LegacyBridge.recoveryActive() && LegacyBridge.hasPendingReport()) {
+            LegacyBridge.report(event.getWorld());
+        }
+
+        pending.removeIf(chunk -> chunk.getWorld() == event.getWorld());
+
+        synchronized (coverage) {
+            coverage.keySet().removeIf(chunk -> chunk.getWorld() == event.getWorld());
         }
     }
-    @SubscribeEvent public void entity(EntityJoinWorldEvent e) {
-        if(e.getWorld().isRemote || !LegacyBridge.active())return;
-        Entity entity=e.getEntity();
-        if(entity instanceof EntityPlayer) {EntityPlayer p=(EntityPlayer)entity;inventory(p.inventory);inventory(p.getInventoryEnderChest());}
-        if(entity instanceof EntityItem) {EntityItem item=(EntityItem)entity;item.setEntityItemStack(convert(item.getEntityItem(),e.getWorld()));}
-        if(entity instanceof EntityItemFrame){EntityItemFrame f=(EntityItemFrame)entity;f.setDisplayedItem(convert(f.getDisplayedItem(),e.getWorld()));}
-        if(entity instanceof IInventory)inventory((IInventory)entity);
+
+    @SubscribeEvent
+    public void save(ChunkDataEvent.Save event) {
+        NBTTagCompound chunkCoverage = coverage.get(event.getChunk());
+
+        if (chunkCoverage != null) {
+            event.getData().getCompoundTag("Level").setTag("skysbuildingpieces_coverage", chunkCoverage.copy());
+        }
     }
-    @SubscribeEvent public void player(PlayerEvent.LoadFromFile e) { if(LegacyBridge.active()) {inventory(e.getEntityPlayer().inventory);inventory(e.getEntityPlayer().getInventoryEnderChest());} }
-    private static void inventory(IInventory inv) {for(int i=0;i<inv.getSizeInventory();i++){ItemStack old=inv.getStackInSlot(i),updated=convert(old,null);if(updated!=old){inv.setInventorySlotContents(i,updated);inv.markDirty();}}}
+
+    @SubscribeEvent
+    public void placed(BlockEvent.PlaceEvent event) {
+        if (event.getWorld().isRemote || !LegacyBridge.active()) {
+            return;
+        }
+
+        BlockPos position = event.getPos();
+        IBlockState existingState = event.getWorld().getBlockState(position);
+        String registryId = existingState.getBlock().getRegistryName().toString();
+
+        if (!LegacyMapping.owned(registryId)) {
+            return;
+        }
+
+        TileEntity tile = event.getWorld().getTileEntity(position);
+
+        if (tile == null) {
+            return;
+        }
+
+        NBTTagCompound legacyTileData = tile.writeToNBT(new NBTTagCompound());
+        Shape shape = LegacyMapping.shape(registryId, existingState.getBlock().getMetaFromState(existingState));
+        IBlockState target = LegacyBridge.resolve(registryId,
+                LegacyMapping.material(legacyTileData.getString("material")), shape,
+                LegacyMapping.orientation(shape, existingState.getBlock().getMetaFromState(existingState)));
+
+        if (target != null && event.getWorld().setBlockState(position, target, 3)) {
+            Chunk chunk = event.getWorld().getChunk(position);
+            NBTTagCompound chunkCoverage = coverage.get(chunk);
+
+            if (chunkCoverage == null) {
+                chunkCoverage = new NBTTagCompound();
+                coverage.put(chunk, chunkCoverage);
+            }
+
+            NBTTagList retained = chunkCoverage.getTagList("retained_tiles", 10);
+
+            retained.appendTag(legacyTileData.copy());
+            chunkCoverage.setTag("retained_tiles", retained);
+
+            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld());
+
+            worldState.addBlocks(
+                    Catalogue.INSTANCE.moduleFor(LegacyMapping.material(legacyTileData.getString("material"))), 1);
+            worldState.markDirty();
+        }
+    }
+
+    @SubscribeEvent
+    public void entity(EntityJoinWorldEvent event) {
+        if (event.getWorld().isRemote || !LegacyBridge.recoveryActive()) {
+            return;
+        }
+
+        Entity entity = event.getEntity();
+
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) entity;
+
+            inventory(player.inventory);
+            inventory(player.getInventoryEnderChest());
+        }
+        if (entity instanceof EntityItem) {
+            EntityItem item = (EntityItem) entity;
+
+            item.setItem(convert(item.getItem(), event.getWorld()));
+        }
+        if (entity instanceof EntityItemFrame) {
+            EntityItemFrame itemFrame = (EntityItemFrame) entity;
+
+            itemFrame.setDisplayedItem(convert(itemFrame.getDisplayedItem(), event.getWorld()));
+        }
+        if (entity instanceof IInventory) {
+            inventory((IInventory) entity);
+        }
+    }
+
+    @SubscribeEvent
+    public void player(PlayerEvent.LoadFromFile event) {
+        if (LegacyBridge.recoveryActive()) {
+            inventory(event.getEntityPlayer().inventory);
+            inventory(event.getEntityPlayer().getInventoryEnderChest());
+        }
+    }
+
+    private static void inventory(IInventory inventory) {
+        for (int slotIndex = 0; slotIndex < inventory.getSizeInventory(); slotIndex++) {
+            ItemStack legacyStack = inventory.getStackInSlot(slotIndex);
+            ItemStack updated = convert(legacyStack, null);
+
+            if (updated != legacyStack) {
+                inventory.setInventorySlotContents(slotIndex, updated);
+                inventory.markDirty();
+            }
+        }
+    }
+
     private static void containers(TileEntity tile) {
-        if(tile instanceof IInventory)inventory((IInventory)tile);
-        Set<IItemHandler> handled=Collections.newSetFromMap(new IdentityHashMap<IItemHandler,Boolean>());
-        for(EnumFacing face:new EnumFacing[]{null,EnumFacing.DOWN,EnumFacing.UP,EnumFacing.NORTH,EnumFacing.SOUTH,EnumFacing.EAST,EnumFacing.WEST})if(tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,face)) {
-            IItemHandler handler=tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,face);
-            if(handler instanceof IItemHandlerModifiable && handled.add(handler))for(int slot=0;slot<handler.getSlots();slot++){ItemStack old=handler.getStackInSlot(slot),updated=convert(old,tile.getWorld());if(updated!=old){((IItemHandlerModifiable)handler).setStackInSlot(slot,updated);tile.markDirty();}}
+        if (tile instanceof IInventory) {
+            inventory((IInventory) tile);
+        }
+
+        Set<IItemHandler> handled = Collections.newSetFromMap(new IdentityHashMap<IItemHandler, Boolean>());
+
+        for (EnumFacing face : new EnumFacing[] { null, EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH,
+                EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST }) {
+            if (tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face)) {
+                IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face);
+
+                if (handler instanceof IItemHandlerModifiable && handled.add(handler)) {
+                    for (int slot = 0; slot < handler.getSlots(); slot++) {
+                        ItemStack legacyStack = handler.getStackInSlot(slot);
+                        ItemStack updated = convert(legacyStack, tile.getWorld());
+
+                        if (updated != legacyStack) {
+                            ((IItemHandlerModifiable) handler).setStackInSlot(slot, updated);
+                            tile.markDirty();
+                        }
+                    }
+                }
+            }
         }
     }
-    public static ItemStack convert(ItemStack old,net.minecraft.world.World world) {
-        if(old==null || !LegacyBridge.active())return old;
-        NBTTagCompound before=old.writeToNBT(new NBTTagCompound()),n=before.copy();LegacyBridge.prepareStack(n);
-        if(n.equals(before))return old;
-        ItemStack updated=ItemStack.loadItemStackFromNBT(n);
+
+    public static ItemStack convert(ItemStack legacyStack, net.minecraft.world.World world) {
+        if (legacyStack == null || legacyStack.isEmpty() || !LegacyBridge.recoveryActive()) {
+            return legacyStack;
+        }
+
+        NBTTagCompound before = legacyStack.writeToNBT(new NBTTagCompound());
+        NBTTagCompound legacyTileData = before.copy();
+
+        LegacyBridge.prepareStack(legacyTileData);
+
+        if (legacyTileData.equals(before)) {
+            return legacyStack;
+        }
+
+        ItemStack updated = new ItemStack(legacyTileData);
+
         return updated;
     }
 }

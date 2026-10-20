@@ -8,25 +8,41 @@ public final class SlabPlacement {
     private static final double EDGE = .22f;
 
     /** The half of the destination block occupied by a slab. */
-    public static EnumFacing side(EnumFacing face, float x, float y, float z) {
-        if (centre(face, x, y, z)) return face.getOpposite();
-        if (face.getAxis() == EnumFacing.Axis.Y) {
-            if (x >= z) return x < 1 - (double) z ? EnumFacing.NORTH : EnumFacing.EAST;
-            return x >= 1 - (double) z ? EnumFacing.SOUTH : EnumFacing.WEST;
+    public static EnumFacing side(EnumFacing face, float hitX, float hitY, float hitZ) {
+        if (centre(face, hitX, hitY, hitZ)) {
+            return face.getOpposite();
         }
-        double right = right(face, x, z);
-        if (right >= y) return right < 1 - (double) y ? EnumFacing.DOWN : face.rotateY();
-        return right >= 1 - (double) y ? EnumFacing.UP : face.rotateYCCW();
+        if (face.getAxis() == EnumFacing.Axis.Y) {
+            if (hitX >= hitZ) {
+                return hitX < 1 - (double) hitZ ? EnumFacing.NORTH : EnumFacing.EAST;
+            }
+
+            return hitX >= 1 - (double) hitZ ? EnumFacing.SOUTH : EnumFacing.WEST;
+        }
+
+        double right = right(face, hitX, hitZ);
+
+        if (right >= hitY) {
+            return right < 1 - (double) hitY ? EnumFacing.DOWN : face.rotateY();
+        }
+
+        return right >= 1 - (double) hitY ? EnumFacing.UP : face.rotateYCCW();
     }
 
     /** Explicit vertical-slab items stay vertical, including clicks near a side edge. */
-    public static EnumFacing verticalSide(EnumFacing face, float x, float y, float z) {
+    public static EnumFacing verticalSide(EnumFacing face, float hitX, float hitY, float hitZ) {
         if (face.getAxis() == EnumFacing.Axis.Y) {
-            if (x >= z) return x < 1 - (double) z ? EnumFacing.NORTH : EnumFacing.EAST;
-            return x >= 1 - (double) z ? EnumFacing.SOUTH : EnumFacing.WEST;
+            if (hitX >= hitZ) {
+                return hitX < 1 - (double) hitZ ? EnumFacing.NORTH : EnumFacing.EAST;
+            }
+
+            return hitX >= 1 - (double) hitZ ? EnumFacing.SOUTH : EnumFacing.WEST;
         }
-        if (centre(face, x, y, z)) return face.getOpposite();
-        return right(face, x, z) >= y ? face.rotateY() : face.rotateYCCW();
+        if (centre(face, hitX, hitY, hitZ)) {
+            return face.getOpposite();
+        }
+
+        return right(face, hitX, hitZ) >= hitY ? face.rotateY() : face.rotateYCCW();
     }
 
     public static Shape shape(EnumFacing side) {
@@ -37,18 +53,24 @@ public final class SlabPlacement {
         return side == EnumFacing.UP ? 0 : side == EnumFacing.DOWN ? 1 : side.getHorizontalIndex();
     }
 
-    private static boolean centre(EnumFacing face, float x, float y, float z) {
-        double right = right(face, x, z), up = face.getAxis() == EnumFacing.Axis.Y ? z : y;
-        return right >= EDGE && right <= 1 - EDGE && up >= EDGE && up <= 1 - EDGE;
+    private static boolean centre(EnumFacing face, float hitX, float hitY, float hitZ) {
+        double right = right(face, hitX, hitZ);
+        double verticalHit = face.getAxis() == EnumFacing.Axis.Y ? hitZ : hitY;
+
+        return right >= EDGE && right <= 1 - EDGE && verticalHit >= EDGE && verticalHit <= 1 - EDGE;
     }
 
-    private static double right(EnumFacing face, float x, float z) {
+    private static double right(EnumFacing face, float hitX, float hitZ) {
         switch (face.getAxis()) {
-            case X: return face == EnumFacing.EAST ? z : 1 - (double) z;
-            case Y: return face == EnumFacing.UP ? 1 - (double) x : x;
-            default: return face == EnumFacing.SOUTH ? 1 - (double) x : x;
+            case X:
+                return face == EnumFacing.EAST ? hitZ : 1 - (double) hitZ;
+            case Y:
+                return face == EnumFacing.UP ? 1 - (double) hitX : hitX;
+            default:
+                return face == EnumFacing.SOUTH ? 1 - (double) hitX : hitX;
         }
     }
 
-    private SlabPlacement() { }
+    private SlabPlacement() {
+    }
 }

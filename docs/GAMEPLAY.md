@@ -1,5 +1,16 @@
 # Pieces and recipes
 
+Find the pieces in the Sky's Building Pieces creative tab. It includes the
+vanilla pieces reused by the catalogue. Separate vertical slab items, old
+templates and recovery holders stay hidden.
+
+All custom walls have lower connecting panels and raised posts.
+Straight runs do not need a post in every block; ends, corners, junctions and
+blocks above keep their supporting posts. Matching glass panels look continuous,
+with borders at posts, exposed ends and colour changes. Selection outlines follow
+the visible glass, while wall collision still prevents jumping over it.
+Ordinary and redstone torches can be placed on walls.
+
 Use matching full blocks to craft building pieces. No template or tool is
 needed. Existing Minecraft pieces keep their native items and recipes; the
 BOP add-on follows the same patterns for its materials.
@@ -48,7 +59,7 @@ Horizontal and vertical step items can also be rotated one for one. Either
 kind can be cut into corners. Soil steps use full dirt, coarse dirt, podzol,
 mycelium or grass blocks because their horizontal slabs are outside this mod.
 
-Smooth stone has no obtainable full block item in Minecraft 1.10.2. Use
+Smooth stone has no obtainable full block item in Minecraft 1.12.2. Use
 vanilla smooth stone slabs for its stairs and walls; the output
 is half the normal full-block quantity. Its steps and corners follow the
 normal slab and step recipes.

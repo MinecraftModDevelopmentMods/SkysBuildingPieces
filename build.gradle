@@ -114,14 +114,14 @@ minecraft {
     }
 }
 
-// Forge 1.10 discovers a development mod from one classes/resources root.
-def forge10DevelopmentOutput = layout.buildDirectory.dir('forge10-development/main')
+// Forge 1.12 discovers a development mod from one classes/resources root.
+def forge12DevelopmentOutput = layout.buildDirectory.dir('forge12-development/main')
 def syncForge10DevelopmentResources = tasks.register('syncForge10DevelopmentResources', Sync) {
     group = 'ide'
     dependsOn tasks.named('classes')
     from tasks.named('compileJava', JavaCompile).flatMap { it.destinationDirectory }
     from sourceSets.main.output.resourcesDir
-    into forge10DevelopmentOutput
+    into forge12DevelopmentOutput
 }
 tasks.configureEach {
     if (name in ['runClient', 'runServer', 'runTestClient', 'runTestServer']) {
@@ -132,7 +132,7 @@ tasks.configureEach {
                     tasks.named('compileJava', JavaCompile).get().destinationDirectory.get().asFile,
                     sourceSets.main.output.resourcesDir
             ] as Set<File>
-            classpath = files(forge10DevelopmentOutput, classpath.filter {
+            classpath = files(forge12DevelopmentOutput, classpath.filter {
                 !splitMainOutputs.contains(it)
             })
         }
@@ -173,7 +173,7 @@ def configureFromForgeRun = { JavaExec process, String runTaskName ->
                     tasks.named('compileJava', JavaCompile).get().destinationDirectory.get().asFile,
                     sourceSets.main.output.resourcesDir
             ] as Set<File>
-            run.setClasspath(files(forge10DevelopmentOutput, run.classpath.filter {
+            run.setClasspath(files(forge12DevelopmentOutput, run.classpath.filter {
                 !splitMainOutputs.contains(it)
             }))
             if (pinnedJava8.isPresent()) run.executable = javaToolchains.launcherFor(exactJava8Spec).get().executablePath.asFile.path
@@ -225,6 +225,18 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
+}
+
+tasks.register('generateWallModels', JavaExec) {
+    group = 'build setup'
+    description = 'Regenerates wall exterior models from their shared collision profile.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'zone.moddev.mc.skysbuildingpieces.GenerateWallModels'
+    workingDir = project.projectDir
+    if (providers.gradleProperty('wallAssetRoot').isPresent()) {
+        args(providers.gradleProperty('wallAssetNamespace').get(), providers.gradleProperty('wallAssetRoot').get())
+    }
 }
 
 def integrationTestClasses = layout.buildDirectory.dir('integration-test-mod/classes')
@@ -427,12 +439,12 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.10.2' || project.forge_version != '12.18.3.2511' ||
-                project.mapping_channel != 'stable' || project.mapping_version != '29-1.10.2' ||
+        if (project.minecraft_version != '1.12.2' || project.forge_version != '14.23.5.2859' ||
+                project.mapping_channel != 'stable' || project.mapping_version != '39-1.12' ||
                 project.loader_name != 'forge' || project.loader_code != '1' ||
                 project.java_version != '8' || project.java_toolchain_version != '8.0.502+7' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 1.10.2 release metadata')
+            throw new GradleException('Unexpected 1.12.2 release metadata')
         }
     }
 }
@@ -496,11 +508,11 @@ tasks.register('verifyReleaseArtifacts') {
         }
 
         List<String> localeFiles = [
-                'de_AT.lang', 'de_AU.lang', 'de_DE.lang',
-                'en_CA.lang', 'en_EN.lang', 'en_GB.lang', 'en_PT.lang', 'en_US.lang',
-                'es_ES.lang', 'es_MX.lang', 'fr_CA.lang', 'fr_FR.lang',
-                'ja_JP.lang', 'ko_KR.lang', 'pt_BR.lang', 'pt_PT.lang',
-                'ru_RU.lang', 'zh_CN.lang'
+                'de_at.lang', 'de_au.lang', 'de_de.lang',
+                'en_ca.lang', 'en_en.lang', 'en_gb.lang', 'en_pt.lang', 'en_us.lang',
+                'es_es.lang', 'es_mx.lang', 'fr_ca.lang', 'fr_fr.lang',
+                'ja_jp.lang', 'ko_kr.lang', 'pt_br.lang', 'pt_pt.lang',
+                'ru_ru.lang', 'zh_cn.lang'
         ]
         releaseFiles.get()[0..1].each { artifactName ->
             ZipFile localizedZip = new ZipFile(new File(libs, artifactName))
@@ -624,6 +636,10 @@ tasks.register('isolateEclipseProductionRuns') {
             File launch = file(name)
             if (!launch.isFile()) throw new GradleException("ForgeGradle did not generate ${name}")
             String contents = launch.getText('UTF-8')
+            // Eclipse needs a literal version, not ForgeGradle's unresolved token.
+            contents = contents.replace(
+                    'key="MC_VERSION" value="${MC_VERSION}"',
+                    "key=\"MC_VERSION\" value=\"${project.minecraft_version}\"")
             boolean production = name in ['runClient.launch', 'runServer.launch']
             if (production && !contents.contains('org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE')) {
                 contents = contents.replace('</launchConfiguration>',
@@ -666,6 +682,15 @@ tasks.register('verifyEclipseProductionClasspath') {
         def parsed = new JsonSlurper().parseText(metadata.getText('UTF-8'))
         if (parsed[0].version != project.mod_version || parsed[0].mcversion != project.minecraft_version) {
             throw new GradleException('Eclipse output contains incorrect mcmod.info')
+        }
+        ['runClient.launch', 'runServer.launch', 'runTestClient.launch', 'runTestServer.launch'].each { name ->
+            String contents = file(name).getText('UTF-8')
+            if (contents.contains('${MC_VERSION}')) {
+                throw new GradleException("${name} retains ForgeGradle's unresolved MC_VERSION token")
+            }
+            if (!contents.contains("key=\"MC_VERSION\" value=\"${project.minecraft_version}\"")) {
+                throw new GradleException("${name} does not define literal MC_VERSION=${project.minecraft_version}")
+            }
         }
         ['runClient.launch', 'runServer.launch'].each { name ->
             String contents = file(name).getText('UTF-8').replace('\\', '/')

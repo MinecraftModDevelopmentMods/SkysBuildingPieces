@@ -4,7 +4,7 @@ Catalogue API version 1 remains supported. Register add-on catalogues during
 pre-initialization as before; permanent palette slots must never be reassigned.
 
 Building Pieces 0.3 also provides `BuildingPiecesApi.bottomPiece(material,
-TerrainShape, direction)` after pre-initialization. It returns an existing block
+TerrainShape, direction)` during initialization, after the block registry event. It returns an existing block
 state or `null` when that material has no such piece. It registers nothing.
 Shapes are `SLAB`, `STEP` and `CORNER`. Directions are north, east, south and
 west; corners use those directions for NW, NE, SE and SW respectively.

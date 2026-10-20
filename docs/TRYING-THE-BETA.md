@@ -1,11 +1,25 @@
 # Trying the beta
 
-Install the main jar in a Minecraft 1.10.2 Forge 12.18.3.2511 instance using
+Install the main jar in a Minecraft 1.12.2 Forge 14.23.5.2859 instance using
 Java 8. The sources and Javadoc jars are not game mods. Start with a new
 creative world; use a separate copy when trying an existing world.
 
 Before relying on the beta in a modpack, check:
 
+- Check names such as Gold Wall, Gold Stairs and Oak Step. Switch the game
+  language and check translated piece names too. Renamed items keep their custom names.
+- Check gold, packed ice and the other wall materials in straight runs, corners
+  and junctions. The panels should be lower than the posts. Add and remove a
+  block or torch above the middle of a run, then check selection and collision.
+- Open the Sky's Building Pieces creative tab. Reused vanilla pieces such as
+  oak slabs should appear once, without separate vertical slabs or old templates.
+- Build clear and stained glass walls in straight runs, corners and junctions.
+  Matching panels should look continuous; exposed ends, posts and colour changes
+  should keep their borders. Add and remove a block above a straight run to check
+  that its supporting post appears and disappears.
+- Aim at the lower glass panels and taller posts. Selection should follow their
+  shape. Place ordinary and redstone torches on the walls, then remove the wall
+  beneath them to check that the torches drop.
 - Place slabs, steps and corners in every direction, including upside down
   and vertical placements. Sneaking turns steps vertically.
 - With a slab such as oak, glass or wool, click the centre and edges of each

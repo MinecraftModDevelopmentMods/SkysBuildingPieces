@@ -19,7 +19,11 @@ jobs:
           set -euo pipefail
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
           test "$GITHUB_REF_NAME" = "$version"
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.110021$ ]]
+          minecraft="$(sed -n 's/^minecraft_version=//p' gradle.properties)"
+          loader="$(sed -n 's/^loader_code=//p' gradle.properties)"
+          IFS=. read -r major minor patch <<<"$minecraft"
+          printf -v suffix '%s%02d%02d%s' "$major" "$((10#$minor))" "$((10#${patch:-0}))" "$loader"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.${suffix}$ ]]
           checks="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100" --jq '[.check_runs[] | select(.name == "Build, test, and audit" and .conclusion == "success")] | length')"
           test "$checks" -gt 0
           echo "verifyReleaseArtifacts passed in CI. This tag check publishes nothing."
