@@ -1,50 +1,68 @@
 # Sky's Building Pieces
 
-Piece names use the material itself: Gold Wall and Oak Step, rather than the
-full block's name followed by the shape. All 18 languages have matching material labels.
+Sky's Building Pieces gives familiar Minecraft materials more shapes to build
+with: slabs, steps, corners, stairs, walls and ice panes. Add narrow trims,
+fill awkward corners or build a glass wall without using full blocks everywhere.
 
-Building pieces for Minecraft 1.10.2, made from vanilla materials with ordinary
-crafting recipes. No templates or tools are needed. The mod does not generate terrain.
+The mod uses vanilla materials and reuses existing Minecraft pieces where they
+already fit. It doesn't generate terrain.
 
-Version 0.3.6.110021 is a beta for testing. Back up existing worlds before
-trying it. Do not remove BuildingBricks from a world that still needs its
-other materials, shapes or tools.
+## Building with the pieces
 
-The new crafting recipes are intended for packs without BuildingBricks.
-Keeping both mods installed can introduce competing recipes.
+- Use the same slab item for horizontal and vertical placement. Click the centre
+  of a face to place against it, or near an edge to place along that edge.
+  Breaking a vertical slab returns the regular slab.
+- Sneak while placing a step to turn it vertically. Steps are quarter-block
+  pieces; corners are eighth-block pieces.
+- Matching pieces can join into supported larger shapes or a full block.
+  Different materials don't combine.
+- Find the pieces, including the vanilla items the mod reuses, in the
+  **Sky's Building Pieces** creative tab.
 
-Ordinary dirt vertical slabs are included. Horizontal soil slabs, other vertical
-soil or grass slabs, turf and path slabs are not included. Sky's Grass Slabs
-remains independent.
+Walls have lower panels with posts at ends, corners and junctions. A torch or
+block above keeps a supporting post. Matching glass walls form a continuous
+run, with borders at posts, exposed ends and colour changes.
 
-Requires Forge 12.18.3.2511 and Java 8. Development uses ForgeGradle 7.0.34
-and Gradle 9.6.1 under Java 17.
+Dirt and grass steps and corners are included too. Grass follows biome colours,
+spreads and decays much like vanilla grass. Plants need a complete upper face.
 
-The mod adds 235 building block IDs and one hidden recovery holder: 236 in
-total. Fixed metadata palettes keep material and orientation assignments
-consistent between installations. Existing vanilla pieces are reused.
-Supported regular slab items place horizontally or vertically, including oak.
-Find the pieces in the Sky's Building Pieces creative tab, alongside the
-vanilla slab, stair, wall and pane items reused by the catalogue.
-Vertical slabs drop regular slabs and do not have separate creative entries.
-Only ordinary dirt needs a separate recipe when no horizontal slab is available.
+## Crafting
 
-The optional Biomes O Plenty add-on provides pieces for its woods, stones and
-gem blocks. It uses the same crafting patterns and replacement setting, with separate
-migration progress. Install the matching add-on and Biomes O Plenty on both
-the client and server. The core does not require either one.
+Craft pieces from matching full blocks, slabs and steps. For example, three
+full blocks in a row make six slabs, and two matching slabs placed diagonally
+make four steps. Existing vanilla recipes stay available.
 
-Core and BOP together use 302 block IDs. Existing palette slots remain unchanged.
+The [recipe and placement guide](docs/GAMEPLAY.md) has the full patterns,
+quantities and exceptions, including the separate dirt vertical slab recipe
+when Grass Slabs isn't installed.
 
-See [pieces and recipes](docs/GAMEPLAY.md), [configuration](docs/CONFIGURATION.md),
-[existing worlds](docs/WORLD-UPGRADES.md) and [trying the beta](docs/TRYING-THE-BETA.md).
+## Installation and other Sky mods
 
-[Release preparation](docs/RELEASING.md) covers the CI checks and publication safeguards.
+For **Minecraft 1.10.2**, use **Forge 12.18.3.2511** and **Java 8**.
+No other mod is required. Put the main jar in `mods` on both the client and
+server.
 
-Licensed under LGPL-2.1-only. Adapted BuildingBricks definitions and geometry
-retain the MIT notice in BUILDINGBRICKS-MIT.txt.
+You can also add:
 
-All custom walls have lower connecting panels and raised posts at ends, corners
-and junctions. A block or torch above keeps its supporting post. Selection follows
-the visible wall; the wall still prevents jumping over it.
-If using the BOP add-on, update its jar too so its wall models match this version.
+- [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
+  version 1.1 or later for horizontal dirt and grass slabs, paths and turf.
+- [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
+  for pieces made from BOP woods, stones and gem blocks.
+- [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)
+  to use suitable pieces on newly generated slopes and cave floors.
+
+Building Pieces doesn't add wooden walls, horizontal soil slabs, turf or path
+slabs.
+
+## Existing worlds
+
+Back up your world before changing mods. Recovery covers supported older
+building pieces, not every block or item another mod might have added.
+
+Read [existing worlds](docs/WORLD-UPGRADES.md) for the upgrade steps and limits,
+or [configuration and modpack notes](docs/CONFIGURATION.md) for settings and
+block-ID usage. Release history is in the [changelog](CHANGELOG.md).
+
+## Licence
+
+[LGPL-2.1-only](LICENSE), with third-party MIT portions credited in [NOTICE](NOTICE).
