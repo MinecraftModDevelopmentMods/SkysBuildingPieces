@@ -12,8 +12,9 @@ The MMD release workflow uses the organisation's `CURSEFORGE_TOKEN`,
 It requires a passing CI build and explicit confirmation of live publication.
 Enter the full release version and choose the CurseForge release level.
 
-The first 0.3 releases are betas. Select `beta` for CurseForge and confirm live
-publication after the branch's checks have passed.
+Select the agreed CurseForge release level and confirm live publication after
+the branch's checks have passed. A successful upload may still need CurseForge
+approval before the file appears for players.
 
 The workflow resolves the Minecraft branch from the version, rebuilds the exact
 commit, and checks one immutable artifact bundle. It validates or creates the tag,

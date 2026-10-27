@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "meta=0": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_0"
+    },
+    "meta=1": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_1"
+    },
+    "meta=2": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_2"
+    },
+    "meta=3": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_3"
+    },
+    "meta=4": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_4"
+    },
+    "meta=5": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_5"
+    },
+    "meta=6": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_6"
+    },
+    "meta=7": {
+      "model": "skysbuildingpiecesmineralogy:quartzite_corner_7"
+    },
+    "meta=8": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_0"
+    },
+    "meta=9": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_1"
+    },
+    "meta=10": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_2"
+    },
+    "meta=11": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_3"
+    },
+    "meta=12": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_4"
+    },
+    "meta=13": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_5"
+    },
+    "meta=14": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_6"
+    },
+    "meta=15": {
+      "model": "skysbuildingpiecesmineralogy:rhyolite_corner_7"
+    }
+  }
+}

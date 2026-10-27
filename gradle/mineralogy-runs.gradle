@@ -1,0 +1,295 @@
+import java.security.MessageDigest
+import java.nio.file.Files
+
+// These are optional development mods, never compile or production dependencies.
+def runtimeLock = new Properties()
+file('gradle/mineralogy-runtime.properties').withInputStream { runtimeLock.load(it) }
+def runtimeSources = ['mineralogy', 'orespawn'].collectEntries { mod ->
+    File siblingJar = file(runtimeLock.getProperty(mod + '.path'))
+    File retainedJar = file('.gradle/qualification-dependencies/' + siblingJar.name)
+    // Sibling builds can change during other work. A retained copy still has to
+    // pass the same checksum check before it can enter a development profile.
+    [(mod): file(providers.gradleProperty(mod + 'RuntimeJar')
+            .getOrElse((retainedJar.isFile() ? retainedJar : siblingJar).path))]
+}
+def extraMods = project.ext.mineralogyProfileAdditionalMods
+def gameDirectory = layout.projectDirectory.dir(
+        providers.gradleProperty('mineralogyRunDirectory').getOrElse('run-mineralogy'))
+
+def configureVerification = project.ext.configureMineralogyVerificationRun
+
+// Legacy release jars declare SRG access rules. The mapped development game needs
+// their MCP names before launch; the original optional jars remain untouched.
+configurations { mineralogyDevelopmentMappings }
+repositories {
+    maven {
+        name = 'MineralogyDevelopmentMappings'
+        url = 'https://maven.minecraftforge.net/'
+        metadataSources { artifact() }
+        content { includeModule('de.oceanlabs.mcp', 'mcp_stable') }
+    }
+}
+dependencies {
+    mineralogyDevelopmentMappings "de.oceanlabs.mcp:mcp_stable:${project.mapping_version}@zip"
+}
+if (runtimeSources.values().every { it.isFile() }) {
+    Map<String, String> mappedMembers = [:]
+    new java.util.zip.ZipFile(configurations.mineralogyDevelopmentMappings.singleFile).withCloseable { mappings ->
+        ['fields.csv', 'methods.csv'].each { name ->
+            mappings.getInputStream(mappings.getEntry(name)).withCloseable { input ->
+                input.getText('UTF-8').readLines().drop(1).each { row ->
+                    String[] columns = row.split(',', 3)
+                    mappedMembers[columns[0]] = columns[1]
+                }
+            }
+        }
+    }
+    List<String> rules = []
+    runtimeSources.each { mod, source ->
+        new java.util.jar.JarFile(source).withCloseable { archive ->
+            String declared = archive.manifest?.mainAttributes?.getValue('FMLAT')
+            declared?.tokenize()?.each { name ->
+                def entry = archive.getJarEntry('META-INF/' + name)
+                if (entry == null) throw new GradleException("Missing ${mod} access rules: ${name}")
+                archive.getInputStream(entry).withCloseable { input ->
+                    String mapped = input.getText('UTF-8').replaceAll(/\b(?:func|field)_\d+_[A-Za-z_]+\b/) { member ->
+                        if (!mappedMembers.containsKey(member)) throw new GradleException("Unmapped optional access rule: ${member}")
+                        mappedMembers[member]
+                    }
+                    rules.add(mapped)
+                }
+            }
+        }
+    }
+    File accessRules = file('.gradle/mineralogy-runtime/access-transformers.cfg')
+    accessRules.parentFile.mkdirs()
+    accessRules.setText(rules.join('\n') + '\n', 'UTF-8')
+    minecraft.accessTransformers.from(accessRules)
+}
+def developmentLogging = file('gradle/development-log4j2.xml').toURI().toString()
+
+
+def installRuntimeMods = {
+    runtimeSources.each { mod, source ->
+        if (!source.isFile()) {
+            throw new GradleException("Missing optional ${mod} jar: ${source}. Set -P${mod}RuntimeJar=<jar>.")
+        }
+        String expected = runtimeLock.getProperty(mod + '.sha256')
+        String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
+                .encodeHex().toString()
+        if (!(expected ==~ /(?i)[a-f0-9]{64}/) || !actual.equalsIgnoreCase(expected)) {
+            throw new GradleException("The optional ${mod} jar does not match gradle/mineralogy-runtime.properties")
+        }
+    }
+
+    File mods = new File(gameDirectory.asFile, 'mods')
+    Set<String> managedNames = runtimeSources.values()*.name as Set<String>
+    fileTree(mods).matching { include '*.jar' }.each { candidate ->
+        String name = candidate.name.toLowerCase(Locale.ROOT)
+        if ((name.startsWith('mineralogy-') || name.startsWith('orespawn-')) &&
+                !managedNames.contains(candidate.name)) {
+            throw new GradleException("Remove the older optional mod from this profile first: ${candidate}")
+        }
+        if (name.contains('integration-test') || name.contains('-probe')) {
+            throw new GradleException("The ordinary Mineralogy profile must not contain test mods: ${candidate}")
+        }
+    }
+    // Copy only the declared jars. Never sync or clear a player's mods, config or saves.
+    copy {
+        from runtimeSources.values(), extraMods
+        into mods
+    }
+}
+
+def prepareMineralogyDevelopmentRun = tasks.register('prepareMineralogyDevelopmentRun') {
+    group = 'ide'
+    description = 'Checks and installs the optional Mineralogy/OreSpawn jars in the separate game folder.'
+    doLast { installRuntimeMods() }
+}
+
+def prepareAvailableMineralogyDevelopmentRun = tasks.register('prepareAvailableMineralogyDevelopmentRun') {
+    group = 'ide'
+    description = 'Prepares the Eclipse profile when the optional development jars are available.'
+    onlyIf {
+        boolean available = runtimeSources.values().every { it.isFile() }
+        if (!available) {
+            logger.lifecycle('Mineralogy profiles generated; supply the optional jars before using them. See docs/BUILDING.md.')
+        }
+        available
+    }
+    doLast { installRuntimeMods() }
+}
+
+// Reuse the target's normal launcher, mappings, assets and merged production output.
+tasks.register('runMineralogyClient', JavaExec) {
+    group = 'forgegradle runs'
+    description = 'Runs a separate client with Mineralogy and OreSpawn installed.'
+    dependsOn prepareMineralogyDevelopmentRun
+    workingDir gameDirectory
+    systemProperty 'log4j.configurationFile', developmentLogging
+    configureVerification(delegate, 'runClient')
+}
+tasks.register('runMineralogyServer', JavaExec) {
+    group = 'forgegradle runs'
+    description = 'Runs a separate server with Mineralogy and OreSpawn installed.'
+    dependsOn prepareMineralogyDevelopmentRun
+    workingDir gameDirectory
+    systemProperty 'log4j.configurationFile', developmentLogging
+    args '--nogui'
+    configureVerification(delegate, 'runServer')
+}
+
+def generateMineralogyEclipseRuns = tasks.register('generateMineralogyEclipseRuns') {
+    group = 'ide'
+    dependsOn tasks.named('isolateEclipseProductionRuns')
+    doLast {
+        ['Client', 'Server'].each { side ->
+            File source = file("run${side}.launch")
+            if (!source.isFile()) throw new GradleException('Generate the ordinary Eclipse launches first')
+            def xml = new groovy.xml.XmlParser(false, false).parse(source)
+            xml.stringAttribute.find {
+                it.@key == 'org.eclipse.jdt.launching.WORKING_DIRECTORY'
+            }.@value = gameDirectory.asFile.absolutePath
+            def vmArguments = xml.stringAttribute.find {
+                it.@key == 'org.eclipse.jdt.launching.VM_ARGUMENTS'
+            }
+            vmArguments.@value = vmArguments.@value.toString() + ' -Dlog4j.configurationFile=' + developmentLogging
+            file("runMineralogy${side}.launch").setText(groovy.xml.XmlUtil.serialize(xml).replace('\r\n', '\n'), 'UTF-8')
+        }
+    }
+}
+tasks.named('genEclipseRuns') {
+    finalizedBy prepareAvailableMineralogyDevelopmentRun, generateMineralogyEclipseRuns
+}
+
+tasks.named('verifyEclipseProductionClasspath') {
+    doLast {
+        ['runMineralogyClient.launch', 'runMineralogyServer.launch'].each { name ->
+            File launch = file(name)
+            def xml = new groovy.xml.XmlSlurper().parse(launch)
+            String workingDirectory = xml.stringAttribute.find {
+                it.@key.text() == 'org.eclipse.jdt.launching.WORKING_DIRECTORY'
+            }.@value.text()
+            String contents = launch.getText('UTF-8').replace('\\', '/')
+            if (file(workingDirectory).canonicalFile != gameDirectory.asFile.canonicalFile ||
+                    !contents.contains('org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE') ||
+                    contents.contains('bin/test') || contents.contains('src/test') || contents.contains('junit-')) {
+                throw new GradleException("Mineralogy launch is not isolated from ordinary runs and tests: ${name}")
+            }
+        }
+    }
+}
+
+tasks.register('verifyMineralogyDevelopmentProfile') {
+    group = 'verification'
+    dependsOn prepareMineralogyDevelopmentRun, tasks.named('verifyEclipseProductionClasspath')
+    doLast {
+        File mods = new File(gameDirectory.asFile, 'mods')
+        Set<String> expected = (runtimeSources.values() + extraMods.files)*.name as Set<String>
+        Set<String> actual = fileTree(mods).matching { include '*.jar' }.files*.name as Set<String>
+        if (actual != expected) {
+            throw new GradleException("The reference Mineralogy profile has unexpected jars: ${actual - expected}")
+        }
+    }
+}
+
+// Verification uses another directory. Probes never enter the manual Eclipse profile.
+def probeId = project.ext.mineralogyProfileProbeId
+def verificationDirectory = layout.buildDirectory.dir('mineralogy-integration-run')
+def prepareMineralogyIntegrationTest = tasks.register('prepareMineralogyIntegrationTest') {
+    group = 'verification'
+    dependsOn prepareMineralogyDevelopmentRun, tasks.named('integrationTestModJar')
+    doLast {
+        File directory = verificationDirectory.get().asFile
+        File expected = new File(layout.buildDirectory.get().asFile, 'mineralogy-integration-run')
+        if (directory.canonicalFile != expected.canonicalFile) {
+            throw new GradleException('Refusing to clear a Mineralogy verification directory outside the build output')
+        }
+        project.delete(directory)
+        if (providers.gradleProperty('testNativeSlabs').getOrElse('true') == 'false') {
+            File configDirectory = new File(directory, 'config')
+            configDirectory.mkdirs()
+            new File(configDirectory, 'mineralogy.cfg').setText(
+                    'options {\n    B:GENERATE_ROCKSLAB=false\n}\n', 'UTF-8')
+        }
+        copy {
+            from new File(gameDirectory.asFile, 'mods')
+            from tasks.named('integrationTestModJar', Jar).flatMap { it.archiveFile }
+            into new File(directory, 'mods')
+        }
+        new File(directory, 'eula.txt').setText('eula=true\n', 'UTF-8')
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each { name ->
+            new File(directory, name).setText('[]\n', 'UTF-8')
+        }
+        new File(directory, 'server.properties').setText('''\
+level-name=world
+level-seed=4815162342
+level-type=default
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+generate-structures=false
+spawn-animals=false
+spawn-monsters=false
+spawn-protection=0
+max-tick-time=120000
+'''.replace('level-type=default',
+                probeId == 'skysterrainsmootherbop' ? 'level-type=BIOMESOP' : 'level-type=default'), 'UTF-8')
+    }
+}
+
+def fresh = tasks.register('integrationMineralogyFreshProcess', JavaExec) {
+    group = 'verification'
+    dependsOn prepareMineralogyIntegrationTest
+    workingDir verificationDirectory
+    systemProperty probeId + '.integrationPhase', 'fresh'
+    systemProperty 'log4j.configurationFile', developmentLogging
+    systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
+    systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
+    configureVerification(delegate, 'runServer')
+}
+def reload = tasks.register('integrationMineralogyReloadProcess', JavaExec) {
+    group = 'verification'
+    dependsOn fresh
+    workingDir verificationDirectory
+    systemProperty probeId + '.integrationPhase', 'reload'
+    systemProperty 'log4j.configurationFile', developmentLogging
+    systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
+    systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
+    configureVerification(delegate, 'runServer')
+}
+
+tasks.register('integrationMineralogyTest') {
+    group = 'verification'
+    dependsOn reload
+    doLast {
+        File directory = verificationDirectory.get().asFile
+        File marker = new File(directory, "world/${probeId}-integration.properties")
+        Properties evidence = new Properties()
+        if (!marker.isFile()) throw new GradleException('Mineralogy integration marker is missing')
+        marker.withInputStream { evidence.load(it) }
+        if (evidence.getProperty('fresh_complete') != 'true' || evidence.getProperty('reload_complete') != 'true') {
+            throw new GradleException('Mineralogy fresh/reload verification did not complete')
+        }
+        if (!fileTree(new File(directory, 'crash-reports')).isEmpty()) {
+            throw new GradleException('Mineralogy verification produced a crash report')
+        }
+    }
+}
+
+tasks.register('integrationMineralogyClientProcess', JavaExec) {
+    group = 'verification'
+    dependsOn prepareMineralogyIntegrationTest
+    workingDir verificationDirectory
+    systemProperty probeId + '.integrationPhase', 'client'
+    systemProperty 'log4j.configurationFile', developmentLogging
+    systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
+    systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
+    configureVerification(delegate, 'runClient')
+    doLast {
+        String marker = 'building-pieces-client-pass.txt'
+        if (!new File(verificationDirectory.get().asFile, marker).isFile()) {
+            throw new GradleException('The Mineralogy client did not complete resource verification')
+        }
+    }
+}

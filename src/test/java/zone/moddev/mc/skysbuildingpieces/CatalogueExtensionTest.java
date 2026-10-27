@@ -24,8 +24,8 @@ class CatalogueExtensionTest {
         JsonArray input = materials();
         Catalogue.Module catalogueModule = catalogue.registerModule("example", "examplepieces", input, palettes(), 1);
 
-        assertEquals(235, catalogue.modules.get("vanilla").palettes.size());
-        assertEquals(236, catalogue.palettes.size());
+        assertEquals(237, catalogue.modules.get("vanilla").palettes.size());
+        assertEquals(238, catalogue.palettes.size());
         assertEquals("examplepieces:wood_corner_00", catalogueModule.palettes.get(0).registryId());
         assertEquals("example", catalogue.moduleFor("example:wood"));
         input.get(0).getAsJsonObject().addProperty("flammability", 20);
@@ -43,8 +43,8 @@ class CatalogueExtensionTest {
         bad.get(0).getAsJsonObject().getAsJsonArray("materials").add(new JsonPrimitive("example:missing"));
         assertThrows(IllegalArgumentException.class,
                 () -> catalogue.registerModule("example", "examplepieces", materials(), bad, 1));
-        assertEquals(102, catalogue.materials.size());
-        assertEquals(235, catalogue.palettes.size());
+        assertEquals(103, catalogue.materials.size());
+        assertEquals(237, catalogue.palettes.size());
         catalogue.registerModule("example", "examplepieces", materials(), palettes(), 1);
         assertThrows(IllegalArgumentException.class,
                 () -> catalogue.registerModule("example", "another", materials(), palettes(), 1));
@@ -67,6 +67,6 @@ class CatalogueExtensionTest {
         repeated.get(0).getAsJsonObject().getAsJsonArray("materials").add(new JsonPrimitive("example:wood"));
         assertThrows(IllegalArgumentException.class,
                 () -> catalogue.registerModule("example", "examplepieces", materials(), repeated, 1));
-        assertEquals(235, catalogue.palettes.size());
+        assertEquals(237, catalogue.palettes.size());
     }
 }

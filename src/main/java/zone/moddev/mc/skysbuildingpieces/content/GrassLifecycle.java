@@ -70,7 +70,7 @@ public final class GrassLifecycle {
     }
 
     public static void repairSupport(World world, BlockPos pos, IBlockState state) {
-        if (!world.isRemote && grass(state) && world.isBlockLoaded(pos.down())
+        if (!world.isRemote && grass(state) && coversSupport(state) && world.isBlockLoaded(pos.down())
                 && world.getBlockState(pos.down()).getBlock() == Blocks.GRASS) {
             world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 2);
         }
@@ -115,7 +115,7 @@ public final class GrassLifecycle {
             for (int attempt = 0; attempt < 4; ++attempt) {
                 BlockPos target = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
 
-                if (!target.equals(pos.down()) && viableTarget(world, target)) {
+                if ((!target.equals(pos.down()) || !coversSupport(state)) && viableTarget(world, target)) {
                     IBlockState dirt = world.getBlockState(target);
 
                     world.setBlockState(target,
@@ -155,7 +155,16 @@ public final class GrassLifecycle {
         boolean dirt = counterpart(state, true) != null
                 || state.getBlock() == Blocks.DIRT && state.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT;
 
-        return dirt && !grass(cover) && world.getLightFromNeighbors(pos.up()) >= 4
+        // Exposed ground may regrow, but a covered dirt piece keeps its existing growth restriction.
+        return dirt && (!grass(cover) || state.getBlock() == Blocks.DIRT && !coversSupport(cover))
+                && world.getLightFromNeighbors(pos.up()) >= 4
                 && cover.getLightOpacity(world, pos.up()) <= 2;
+    }
+
+    private static boolean coversSupport(IBlockState state) {
+        PieceBlock piece = (PieceBlock) state.getBlock();
+        int cells = piece.mask(state);
+        // Project both height layers onto the ground, retaining holes beside steps and corners.
+        return ((cells | cells >> 4) & 15) == 15;
     }
 }

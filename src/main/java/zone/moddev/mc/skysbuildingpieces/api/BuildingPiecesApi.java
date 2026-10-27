@@ -40,14 +40,20 @@ public final class BuildingPiecesApi {
     /** Reads materials.json and palettes.json from the contributor's assets catalogue. */
     public static Catalogue.Module registerCatalogue(String module, String namespace, int maximumBlocks,
             Class<?> anchor) {
+        String root = "/assets/" + namespace + "/catalogue/";
+        return registerCatalogue(module, namespace, maximumBlocks,
+                Catalogue.read(anchor, root + "materials.json"), Catalogue.read(anchor, root + "palettes.json"));
+    }
+
+    /** Register resolved definitions, for example when a native mod disables its slab forms. */
+    public static Catalogue.Module registerCatalogue(String module, String namespace, int maximumBlocks,
+            com.google.gson.JsonArray materials, com.google.gson.JsonArray palettes) {
         if (!Pieces.initialized) {
             throw new IllegalStateException("The core must pre-initialize before its add-ons");
         }
 
-        String root = "/assets/" + namespace + "/catalogue/";
         Catalogue.Module contribution = Catalogue.INSTANCE.registerModule(module, namespace,
-                Catalogue.read(anchor, root + "materials.json"), Catalogue.read(anchor, root + "palettes.json"),
-                maximumBlocks);
+                materials, palettes, maximumBlocks);
 
         Pieces.registerModule(contribution);
         SkysBuildingPieces.proxy.registerModels(namespace);

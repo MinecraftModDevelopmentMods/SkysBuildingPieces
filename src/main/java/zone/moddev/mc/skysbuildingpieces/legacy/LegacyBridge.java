@@ -106,6 +106,9 @@ public final class LegacyBridge {
     }
 
     public static void prepareStack(NBTTagCompound stack) {
+        if (ready) {
+            zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(stack);
+        }
         if (!active()) {
             return;
         }
@@ -201,6 +204,9 @@ public final class LegacyBridge {
     }
 
     public static void prepareChunk(World world, NBTTagCompound root) {
+        if (ready) {
+            zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(root.getCompoundTag("Level"));
+        }
         if (!active()) {
             return;
         }

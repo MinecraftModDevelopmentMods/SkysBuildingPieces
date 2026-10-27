@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "meta=0": {
+      "model": "skysbuildingpiecesmineralogy:limestone_vertical_step_0"
+    },
+    "meta=1": {
+      "model": "skysbuildingpiecesmineralogy:limestone_vertical_step_1"
+    },
+    "meta=2": {
+      "model": "skysbuildingpiecesmineralogy:limestone_vertical_step_2"
+    },
+    "meta=3": {
+      "model": "skysbuildingpiecesmineralogy:limestone_vertical_step_3"
+    },
+    "meta=4": {
+      "model": "skysbuildingpiecesmineralogy:marble_vertical_step_0"
+    },
+    "meta=5": {
+      "model": "skysbuildingpiecesmineralogy:marble_vertical_step_1"
+    },
+    "meta=6": {
+      "model": "skysbuildingpiecesmineralogy:marble_vertical_step_2"
+    },
+    "meta=7": {
+      "model": "skysbuildingpiecesmineralogy:marble_vertical_step_3"
+    },
+    "meta=8": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_vertical_step_0"
+    },
+    "meta=9": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_vertical_step_1"
+    },
+    "meta=10": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_vertical_step_2"
+    },
+    "meta=11": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_vertical_step_3"
+    },
+    "meta=12": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_vertical_step_0"
+    },
+    "meta=13": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_vertical_step_1"
+    },
+    "meta=14": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_vertical_step_2"
+    },
+    "meta=15": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_vertical_step_3"
+    }
+  }
+}

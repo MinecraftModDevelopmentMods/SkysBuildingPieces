@@ -227,6 +227,15 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
 }
 
+tasks.register('alignSoilModels', JavaExec) {
+    group = 'build setup'
+    description = 'Aligns grass and snow fringes with the exposed top of each soil piece.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'zone.moddev.mc.skysbuildingpieces.AlignSoilModels'
+    workingDir = project.projectDir
+}
+
 def integrationTestClasses = layout.buildDirectory.dir('integration-test-mod/classes')
 tasks.register('generateWallModels', JavaExec) {
     group = 'build setup'
@@ -286,6 +295,9 @@ def prepareIntegrationTest = tasks.register('prepareIntegrationTest') {
             into mods
         }
         new File(runDirectory, 'eula.txt').setText('eula=true\n', 'UTF-8')
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each { name ->
+            new File(runDirectory, name).setText('[]\n', 'UTF-8')
+        }
         new File(runDirectory, 'server.properties').setText('''\
 level-name=world
 level-seed=skys-building-pieces-integration
@@ -599,6 +611,7 @@ ext.releaseFiles = releaseFiles
 ext.releaseJar = releaseJar
 apply from: 'gradle/release.gradle'
 
+
 // Keep the old entry point disabled until publication is configured.
 tasks.register('publishRelease') {
     doLast { throw new GradleException('Publication is disabled for the local beta.') }
@@ -706,3 +719,10 @@ tasks.register('verifyEclipseProductionClasspath') {
 tasks.named('check') {
     dependsOn tasks.named('verifyReleaseMetadata')
 }
+
+// Optional native mods stay in a separate development folder and never enter the published jar.
+ext.configureMineralogyVerificationRun = configureFromForgeRun
+ext.mineralogyProfileProbeId = 'skysbuildingpieces'
+ext.mineralogyProfileAdditionalMods = files()
+apply from: 'gradle/mineralogy-runs.gradle'
+apply from: 'gradle/mineralogy-fixtures.gradle'

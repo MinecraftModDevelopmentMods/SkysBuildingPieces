@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.7.110021
+
+- Use a shovel to turn dirt and grass steps and corners into matching path
+  pieces. Their shape and direction stay the same, with the top lowered by
+  one pixel.
+- Flattening a grass step or corner also turns ordinary grass directly beneath
+  it into a path. Both changes use one shovel action and one durability point.
+- Grass steps and corners keep their grass and snow fringes, and leave exposed
+  grass visible underneath.
+- Stack two matching corners in the crafting grid to make a step, or two steps
+  to make a slab. The same recipes work with supported add-on materials.
+- Mineralogy's 27 natural rocks now get steps and corners automatically when
+  Mineralogy is installed. Its existing slabs are used when rebuilding pieces.
+  No separate Mineralogy piece add-on is needed.
+- Saves made with the earlier Mineralogy piece add-on keep their materials,
+  orientations and item data when moving to the built-in support.
+
 ## 0.3.6.110021
 
 - Shortened piece names, including Gold Wall, Gold Stairs and Oak Step.

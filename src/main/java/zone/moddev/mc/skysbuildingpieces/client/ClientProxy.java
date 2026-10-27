@@ -52,7 +52,8 @@ public final class ClientProxy extends CommonProxy {
 
                 ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(pieceBlock), meta,
                         new ModelResourceLocation(
-                                namespace + ":"
+                                (pieceBlock.palette.module.equals("mineralogy")
+                                        ? zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.ASSETS : namespace) + ":"
                                         + new net.minecraft.util.ResourceLocation(
                                                 pieceBlock.palette.materials.get(slot)).getResourcePath()
                                         + "_" + pieceBlock.palette.shape.name().toLowerCase(java.util.Locale.ROOT),

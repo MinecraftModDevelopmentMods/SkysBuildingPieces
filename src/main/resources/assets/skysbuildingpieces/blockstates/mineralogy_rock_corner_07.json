@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "meta=0": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_0"
+    },
+    "meta=1": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_1"
+    },
+    "meta=2": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_2"
+    },
+    "meta=3": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_3"
+    },
+    "meta=4": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_4"
+    },
+    "meta=5": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_5"
+    },
+    "meta=6": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_6"
+    },
+    "meta=7": {
+      "model": "skysbuildingpiecesmineralogy:novaculite_corner_7"
+    },
+    "meta=8": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_0"
+    },
+    "meta=9": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_1"
+    },
+    "meta=10": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_2"
+    },
+    "meta=11": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_3"
+    },
+    "meta=12": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_4"
+    },
+    "meta=13": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_5"
+    },
+    "meta=14": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_6"
+    },
+    "meta=15": {
+      "model": "skysbuildingpiecesmineralogy:pegmatite_corner_7"
+    }
+  }
+}

@@ -2,7 +2,8 @@ package zone.moddev.mc.skysbuildingpieces.content;
 
 /** Stable patterns and quantities, independent of Minecraft initialization. */
 public enum CraftingPattern {
-    SLAB(6, "XXX"), VERTICAL_SLAB(6, "X", "X", "X"), STEP(4, "X ", " X"), SOIL_STEP(8, "X ", " X"), CORNER(4, "XX"),
+    SLAB(6, "XXX"), VERTICAL_SLAB(6, "X", "X", "X"), STEP(4, "X ", " X"), SOIL_STEP(8, "X ", " X"),
+    ROCK_STEP(12, "X  ", " X ", "  X"), CORNER(4, "XX"),
     STAIRS(4, "X  ", "XX ", "XXX"), WALL(6, "XX", "XX", "XX"), PANE(16, "XXX", "XXX"), ROTATE(1, "X");
 
     private final int output;

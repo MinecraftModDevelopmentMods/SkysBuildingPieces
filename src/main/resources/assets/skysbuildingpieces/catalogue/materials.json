@@ -1666,5 +1666,21 @@
       }
     },
     "group": "cloth"
+  },
+  {
+    "name": "Path",
+    "id": "minecraft:grass_path",
+    "type": "path",
+    "group": "path",
+    "hardness": 0.65,
+    "normalHarvest": "minecraft:dirt",
+    "textures": {
+      "top": "minecraft:blocks/grass_path_top",
+      "side": "minecraft:blocks/grass_path_side",
+      "bottom": "minecraft:blocks/dirt"
+    },
+    "blocks": {
+      "full": "minecraft:grass_path"
+    }
   }
 ]
