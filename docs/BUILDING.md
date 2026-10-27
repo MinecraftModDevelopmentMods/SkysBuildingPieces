@@ -25,5 +25,7 @@ bundled with Building Pieces. Normal builds and CI work without them.
 `integrationMineralogyTest` runs the optional fresh-world and reload checks.
 
 The former-add-on migration fixture also uses a matching Terrain Smoother
-development jar. Build that project first when running `prepareMineralogyFixture`.
-It is not needed for ordinary builds or game launches.
+development jar. Build that project first, then run
+`gradlew -PenableMineralogyFixtures=true prepareMineralogyFixture`.
+The same option enables `prepareLegacyMineralogyWorld`. These fixtures are
+opt-in and are not needed for ordinary builds or game launches.
