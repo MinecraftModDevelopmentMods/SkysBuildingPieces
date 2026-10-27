@@ -58,6 +58,11 @@ public final class Pieces {
     }
 
     public static IBlockState nativeState(Catalogue.MaterialDef material, String shape) {
+        if (material.id.equals("minecraft:grass_path") && shape.equals("slab")) {
+            // Path slabs remain owned by Grass Slabs, which is optional here.
+            Block pathSlab = Block.REGISTRY.getObject(new ResourceLocation("skysgrassslabs", "path_slab"));
+            return pathSlab == null || pathSlab == net.minecraft.init.Blocks.AIR ? null : pathSlab.getDefaultState();
+        }
         JsonElement value = material.block(shape);
 
         if (value == null) {
@@ -94,8 +99,7 @@ public final class Pieces {
 
         if (nativeState != null) {
             if (shape == Shape.SLAB) {
-                return nativeState.getBlock().getStateFromMeta(
-                        nativeState.getBlock().getMetaFromState(nativeState) | (orientation == 0 ? 8 : 0));
+                return NativeSlabState.orient(nativeState, orientation);
             }
             if (shape == Shape.STAIRS) {
                 return nativeState.getBlock().getStateFromMeta(orientation & 7);
@@ -150,6 +154,12 @@ public final class Pieces {
                         : block instanceof net.minecraft.block.BlockSlab ? block.damageDropped(state)
                                 : block.getMetaFromState(state);
         Item item = Item.getItemFromBlock(block);
+
+        // Facing is a placed state, not an item variant. Mineralogy's six-way
+        // slabs, for example, use one ordinary item regardless of orientation.
+        if (item != null && !item.getHasSubtypes()) {
+            meta = 0;
+        }
 
         return item == null ? null : new ItemStack(item, count, meta);
     }

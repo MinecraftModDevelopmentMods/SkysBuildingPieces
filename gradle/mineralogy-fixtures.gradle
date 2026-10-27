@@ -1,0 +1,49 @@
+// Build-only checks for the former add-on's save format and real generated slopes.
+// Neither these classes nor Terrain Smoother enter ordinary content-mod runs.
+def smoother = file('../../SkysTerrainSmoother110/SkysTerrainSmoother')
+def smootherJar = new File(smoother,
+        'build/libs-dev/SkysTerrainSmoother-0.1.0.110021-deobf.jar')
+def fixtureClasses = layout.buildDirectory.dir('mineralogy-fixture/classes')
+def compileFixture = tasks.register('compileMineralogyFixture', JavaCompile) {
+    group = 'verification'
+    dependsOn tasks.named('classes')
+    source fileTree('src/mineralogyTest/java')
+    source fileTree('src/integrationTest/java') { exclude '**/RuntimeProbe.java' }
+    classpath = files(sourceSets.main.output, sourceSets.main.compileClasspath, smootherJar)
+    destinationDirectory = fixtureClasses
+    options.encoding = 'UTF-8'
+    doFirst {
+        if (!smootherJar.isFile()) throw new GradleException('Build the matching Terrain Smoother development jar first.')
+    }
+}
+def fixtureJar = tasks.register('mineralogyFixtureJar', Jar) {
+    group = 'verification'
+    dependsOn compileFixture
+    archiveFileName = 'skysbuildingpieces-mineralogy-runtime-test.jar'
+    destinationDirectory = layout.buildDirectory.dir('mineralogy-fixture')
+    from fixtureClasses
+}
+def packagedFixture = renamer.classes(fixtureJar) {
+    map.from minecraft.dependency.toSrgFile
+    libraries.from tasks.named('jar', Jar).flatMap { it.archiveFile }
+    libraries.from sourceSets.main.compileClasspath
+    libraries.from smootherJar
+    output = layout.buildDirectory.file('mineralogy-fixture/skysbuildingpieces-mineralogy-runtime-test-reobf.jar')
+}
+tasks.register('prepareMineralogyFixture') {
+    group = 'verification'
+    dependsOn packagedFixture
+}
+
+tasks.register('prepareLegacyMineralogyWorld', JavaExec) {
+    group = 'verification'
+    dependsOn compileFixture
+    classpath = files(fixtureClasses, sourceSets.main.runtimeClasspath)
+    mainClass = 'zone.moddev.mc.skysbuildingpieces.mineralogytest.FixtureTool'
+    doFirst {
+        if (!providers.gradleProperty('legacyMineralogyFixture').isPresent()) {
+            throw new GradleException('Supply a marked disposable world copy with -PlegacyMineralogyFixture=<path>.')
+        }
+        args providers.gradleProperty('legacyMineralogyFixture').get(), project.minecraft_version.toString()
+    }
+}

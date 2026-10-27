@@ -16,9 +16,9 @@ import zone.moddev.mc.skysbuildingpieces.legacy.*;
         name = "Sky's Building Pieces",
         version = SkysBuildingPieces.VERSION,
         acceptedMinecraftVersions = "[1.10.2]",
-        dependencies = "after:skysgrassslabs@[1.1.0.110021,);before:buildingbricks")
+        dependencies = "after:skysgrassslabs@[1.1.0.110021,);after:mineralogy;before:buildingbricks")
 public final class SkysBuildingPieces {
-    public static final String ID = "skysbuildingpieces", VERSION = "0.3.6.110021";
+    public static final String ID = "skysbuildingpieces", VERSION = "0.3.7.110021";
     public static boolean forceReplace;
     public static Block HOLDER;
     @SidedProxy(
@@ -39,10 +39,15 @@ public final class SkysBuildingPieces {
         }
 
         Pieces.register();
+        zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.register();
+        if (zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.modules.containsKey("mineralogy")) {
+            event.getModLog().info("Mineralogy building pieces enabled: 27 rocks in 35 fixed palettes.");
+        }
         HOLDER = new Block(Material.ROCK).setBlockUnbreakable().setRegistryName(ID, "legacy_piece_holder");
         GameRegistry.register(HOLDER);
         GameRegistry.register(new ItemBlock(HOLDER).setRegistryName(HOLDER.getRegistryName()));
         MinecraftForge.EVENT_BUS.register(new MigrationEvents());
+        MinecraftForge.EVENT_BUS.register(new zone.moddev.mc.skysbuildingpieces.content.PathPieces());
         proxy.preInit();
     }
 
@@ -69,6 +74,16 @@ public final class SkysBuildingPieces {
     @Mod.EventHandler
     public void mappings(FMLMissingMappingsEvent event) {
         for (FMLMissingMappingsEvent.MissingMapping mapping : event.getAll()) {
+            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
+                    .formerBlock(mapping.name.toString());
+            if (formerPiece != null) {
+                if (mapping.type == GameRegistry.Type.BLOCK) {
+                    mapping.remap(formerPiece);
+                } else if (mapping.type == GameRegistry.Type.ITEM) {
+                    mapping.remap(net.minecraft.item.Item.getItemFromBlock(formerPiece));
+                }
+                continue;
+            }
             if (LegacyMapping.owned(mapping.name.toString())) {
                 // Forge 1.10 cannot map many generic IDs to one registered object. IGNORE reserves the old numeric
                 // slot; the validated raw loader hooks recover its material before Forge can deserialize it as air.

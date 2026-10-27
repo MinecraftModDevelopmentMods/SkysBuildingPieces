@@ -68,6 +68,10 @@ public final class CuttingRecipe extends ShapedRecipes {
                 "after:minecraft:shaped");
 
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
+            if (material.type.equals("path")) {
+                // Make paths in place with a shovel, rather than adding another cutting recipe.
+                continue;
+            }
             ItemStack full = Pieces.stack(Pieces.nativeState(material, "full"), 1);
             boolean half = full == null;
 
@@ -95,13 +99,17 @@ public final class CuttingRecipe extends ShapedRecipes {
             }
             // Cutting half blocks avoids native full-block diagonal recipes such as BOP's bamboo recovery. Diagonals
             // also avoid vanilla's two-slab chiseled sandstone and stone-brick recipes.
-            if (horizontal != null) {
+            if (horizontal != null && !material.fullBlockStepRecipe()) {
                 add(material, Shape.HORIZONTAL_STEP, CraftingPattern.STEP, horizontal, false);
             }
-            if (vertical != null) {
+            if (vertical != null && !material.fullBlockStepRecipe()) {
                 add(material, Shape.HORIZONTAL_STEP, CraftingPattern.STEP, vertical, false);
             }
-            if (material.soil()) {
+            if (material.fullBlockStepRecipe()) {
+                // Mineralogy already uses shapeless pairs for slab and rock conversion.
+                // Three diagonal full blocks avoid those recipes without changing their yields.
+                add(material, Shape.HORIZONTAL_STEP, CraftingPattern.ROCK_STEP, full, half);
+            } else if (material.soil()) {
                 add(material, Shape.HORIZONTAL_STEP, CraftingPattern.SOIL_STEP, full, half);
             }
 
@@ -140,6 +148,7 @@ public final class CuttingRecipe extends ShapedRecipes {
         }
 
         SlabRecombinationRecipe.register();
+        PieceRecombinationRecipe.register();
         LegacyPieceRecipe.register();
     }
 

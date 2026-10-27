@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CatalogueTest {
     @Test
     void ordinaryVerticalDirtHasItsOwnAppendOnlyPalette() {
-        Catalogue.Palette palette = Catalogue.INSTANCE.palettes.get(Catalogue.INSTANCE.palettes.size() - 1);
+        Catalogue.Palette palette = Catalogue.INSTANCE.palettes.get(234);
 
         assertEquals("dirt_vertical_slab_00", palette.id);
         assertEquals(Shape.VERTICAL_SLAB, palette.shape);
@@ -38,7 +38,7 @@ class CatalogueTest {
             sha.append(String.format("%02X", b));
         }
 
-        assertEquals("4E1884F8B5B050650B34EB836CB7C2B3789305B0E281C21D187BE76D33089E12", sha.toString());
+        assertEquals("7B3B193A6806DC17FD315A58E0ED8802A692404CE6D6422D52E8D954A5C6802E", sha.toString());
 
         com.google.gson.JsonArray all = new com.google.gson.JsonParser()
                 .parse(new String(bytes, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonArray();
@@ -75,9 +75,9 @@ class CatalogueTest {
     void permanentCatalogueAndBudget() {
         Catalogue catalogue = Catalogue.INSTANCE;
 
-        assertEquals(102, catalogue.materials.size());
-        assertEquals(235, catalogue.palettes.size());
-        assertEquals(236, catalogue.palettes.size() + 1);
+        assertEquals(103, catalogue.materials.size());
+        assertEquals(237, catalogue.palettes.size());
+        assertEquals(238, catalogue.palettes.size() + 1);
         assertTrue(catalogue.palettes.size() + 1 <= 256);
 
         Set<String> coverage = new HashSet<String>();
