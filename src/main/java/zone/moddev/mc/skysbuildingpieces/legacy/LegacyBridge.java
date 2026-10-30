@@ -112,6 +112,9 @@ public final class LegacyBridge {
     }
 
     public static void prepareStack(NBTTagCompound stack) {
+        if (ready) {
+            zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(stack);
+        }
         if (!ready) {
             return;
         }
@@ -217,6 +220,9 @@ public final class LegacyBridge {
     }
 
     public static void prepareChunk(World world, NBTTagCompound root) {
+        if (ready) {
+            zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(root.getCompoundTag("Level"));
+        }
         if (ready) {
             // Some containers reject missing item IDs before constructing an ItemStack. Recover saved stacks before
             // those serializers run, including inventories with names other than vanilla's Items.

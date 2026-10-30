@@ -33,6 +33,7 @@ class PublicationContractTest {
         assertTrue(workflow.contains("Build, test, and audit"));
         assertTrue(workflow.contains("sha256sum --check SHA256SUMS"));
         assertTrue(workflow.contains("publishMavenJavaPublicationToReleaseRepository"));
+        assertTrue(workflow.contains("curseforge-retry-attempts: 1"));
         assertFalse(workflow.contains("1677588"));
         assertTrue(workflow.indexOf("  publish_maven:") < workflow.indexOf("  publish_curseforge:"));
         assertTrue(workflow.indexOf("  publish_curseforge:") < workflow.indexOf("  publish_github:"));

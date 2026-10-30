@@ -15,9 +15,9 @@ import zone.moddev.mc.skysbuildingpieces.legacy.*;
         name = "Sky's Building Pieces",
         version = SkysBuildingPieces.VERSION,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "after:skysgrassslabs@[1.1.0.112021,);after:basemetals;after:mineralogy;before:buildingbricks")
+        dependencies = "after:skysgrassslabs@[1.1.1.112021,);after:basemetals;after:mineralogy;before:buildingbricks")
 public final class SkysBuildingPieces {
-    public static final String ID = "skysbuildingpieces", VERSION = "0.3.6.112021";
+    public static final String ID = "skysbuildingpieces", VERSION = "0.3.7.112021";
     public static boolean forceReplace;
     public static Block HOLDER;
     @SidedProxy(
@@ -38,8 +38,13 @@ public final class SkysBuildingPieces {
         }
 
         Pieces.register();
+        zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.register();
+        if (zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.modules.containsKey("mineralogy")) {
+            event.getModLog().info("Mineralogy building pieces enabled: 27 rocks in 35 fixed palettes.");
+        }
         HOLDER = new Block(Material.ROCK).setBlockUnbreakable().setRegistryName(ID, "legacy_piece_holder");
         MinecraftForge.EVENT_BUS.register(new MigrationEvents());
+        MinecraftForge.EVENT_BUS.register(new zone.moddev.mc.skysbuildingpieces.content.PathPieces());
         proxy.preInit();
     }
 

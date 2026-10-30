@@ -158,6 +158,20 @@ public final class GameplayChecks {
         }
 
         world.setBlockToAir(position.up());
+        // This also runs without Grass Slabs installed: finer shapes must not expose a dirt patch.
+        for (Shape shape : new Shape[] { Shape.HORIZONTAL_STEP, Shape.VERTICAL_STEP, Shape.CORNER, Shape.STAIRS }) {
+            for (int orientation = 0; orientation < shape.states; orientation++) {
+                world.setBlockToAir(position);
+                world.setBlockState(position.down(), Blocks.GRASS.getDefaultState(), 2);
+                IBlockState grassPiece = Pieces.state("minecraft:grass", shape, orientation);
+                world.setBlockState(position, grassPiece, 2);
+                GrassLifecycle.repairSupport(world, position, grassPiece);
+                int cells = ((PieceBlock) grassPiece.getBlock()).mask(grassPiece);
+                boolean fullFootprint = ((cells | cells >> 4) & 15) == 15;
+                require(world.getBlockState(position.down()).getBlock() == (fullFootprint ? Blocks.DIRT : Blocks.GRASS),
+                        "exposed grass support " + shape + " / " + orientation);
+            }
+        }
         world.setBlockState(position.north(), Blocks.SNOW_LAYER.getDefaultState(), 2);
 
         IBlockState grass = Pieces.state("minecraft:grass", Shape.CORNER, 0);
@@ -371,8 +385,10 @@ public final class GameplayChecks {
                         }
 
                         silk.setAccessible(true);
+                        IBlockState silkState = materialDefinition.type.equals("path")
+                                ? Pieces.state("minecraft:dirt", pieceBlock.palette.shape, orientation) : state;
                         require(ItemStack.areItemStacksEqual((ItemStack) silk.invoke(pieceBlock, state),
-                                expectedDrop(materialDefinition.id, pieceBlock, state)),
+                                expectedDrop(materialDefinition.id, pieceBlock, silkState)),
                                 "Silk Touch follows regular slab");
                     } catch (ReflectiveOperationException failure) {
                         throw new AssertionError(failure);

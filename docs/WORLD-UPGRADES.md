@@ -1,5 +1,11 @@
 # Existing worlds
 
+The separate Mineralogy piece add-on from the earlier local tests is no longer
+needed. Use Building Pieces with Mineralogy instead. Its test-save piece IDs
+are recovered automatically, including item stacks in chunks opened after the
+first upgrade save. Counts, metadata, names and other item data are retained.
+Do not load the old add-on jar alongside the new core.
+
 Test this beta on a disposable copy, never the only copy of a world.
 
 BuildingBricks 1.10.2-2.0.13 stores many pieces using generic block IDs and

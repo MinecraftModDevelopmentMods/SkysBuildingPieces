@@ -1,0 +1,623 @@
+[
+  {
+    "id": "mineralogy:amphibolite",
+    "name": "Amphibolite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/amphibolite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:amphibolite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:amphibolite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:andesite",
+    "name": "Andesite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/andesite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:andesite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:andesite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:basalt",
+    "name": "Basalt",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/basalt",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:basalt",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:basalt_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:basaltic_glass",
+    "name": "Basaltic Glass",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/basaltic_glass",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:basaltic_glass",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:basaltic_glass_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:conglomerate",
+    "name": "Conglomerate",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/conglomerate",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:conglomerate",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:conglomerate_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:diabase",
+    "name": "Diabase",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/diabase",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:diabase",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:diabase_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:diorite",
+    "name": "Diorite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/diorite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:diorite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:diorite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:dolomite",
+    "name": "Dolomite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/dolomite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:dolomite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:dolomite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:gabbro",
+    "name": "Gabbro",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/gabbro",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:gabbro",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:gabbro_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:gneiss",
+    "name": "Gneiss",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/gneiss",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:gneiss",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:gneiss_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:granite",
+    "name": "Granite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/granite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:granite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:granite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:hornfels",
+    "name": "Hornfels",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/hornfels",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:hornfels",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:hornfels_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:limestone",
+    "name": "Limestone",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/limestone",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:limestone",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:limestone_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:marble",
+    "name": "Marble",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/marble",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:marble",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:marble_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:novaculite",
+    "name": "Novaculite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/novaculite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:novaculite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:novaculite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:pegmatite",
+    "name": "Pegmatite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/pegmatite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:pegmatite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:pegmatite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:peridotite",
+    "name": "Peridotite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/peridotite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:peridotite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:peridotite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:phyllite",
+    "name": "Phyllite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/phyllite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:phyllite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:phyllite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:quartzite",
+    "name": "Quartzite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/quartzite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:quartzite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:quartzite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:rhyolite",
+    "name": "Rhyolite",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/rhyolite",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:rhyolite",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:rhyolite_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:rock_salt",
+    "name": "Rock Salt",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/rock_salt",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:rock_salt",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:rock_salt_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:schist",
+    "name": "Schist",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/schist",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:schist",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:schist_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:scoria",
+    "name": "Scoria",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/scoria",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:scoria",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:scoria_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:shale",
+    "name": "Shale",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/shale",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:shale",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:shale_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:siltstone",
+    "name": "Siltstone",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/siltstone",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:siltstone",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:siltstone_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:slate",
+    "name": "Slate",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/slate",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:slate",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:slate_slab",
+        "meta": 1
+      }
+    }
+  },
+  {
+    "id": "mineralogy:tuff",
+    "name": "Tuff",
+    "type": "rock",
+    "group": "rock",
+    "hardness": 1.5,
+    "resistance": 10,
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "fullBlockStepRecipe": true,
+    "textures": "mineralogy:blocks/tuff",
+    "blocks": {
+      "full": {
+        "id": "mineralogy:tuff",
+        "meta": 0
+      },
+      "slab": {
+        "id": "mineralogy:tuff_slab",
+        "meta": 1
+      }
+    }
+  }
+]

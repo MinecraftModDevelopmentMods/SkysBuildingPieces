@@ -21,7 +21,7 @@ public final class Catalogue {
         Module core = registerModule("vanilla", "skysbuildingpieces", read(Catalogue.class, ROOT + "materials.json"),
                 read(Catalogue.class, ROOT + "palettes.json"), 255);
 
-        if (core.palettes.size() != 235 || core.palettes.size() + 1 > 256) {
+        if (core.palettes.size() != 237 || core.palettes.size() + 1 > 256) {
             throw new IllegalStateException("Core block budget exceeded");
         }
     }
@@ -37,7 +37,8 @@ public final class Catalogue {
             throw new IllegalArgumentException("Invalid or duplicate catalogue module: " + module);
         }
         for (Module existing : modules.values()) {
-            if (existing.namespace.equals(namespace)) {
+            if (existing.namespace.equals(namespace)
+                    && !("mineralogy".equals(module) && "skysbuildingpieces".equals(namespace))) {
                 throw new IllegalArgumentException("Duplicate catalogue namespace: " + namespace);
             }
         }
@@ -61,6 +62,16 @@ public final class Catalogue {
 
         for (JsonElement element : paletteData) {
             Palette palette = new Palette(module, namespace, element.getAsJsonObject());
+
+            if ("mineralogy".equals(module) && "skysbuildingpieces".equals(namespace)
+                    && !palette.id.startsWith("mineralogy_")) {
+                throw new IllegalArgumentException("Built-in rock palettes need their mineralogy_ prefix");
+            }
+            for (Palette existing : registeredPalettes) {
+                if (existing.registryId().equals(palette.registryId())) {
+                    throw new IllegalArgumentException("Duplicate palette ID: " + palette.registryId());
+                }
+            }
 
             if (!registryIds.add(palette.id) || palette.materials.isEmpty()
                     || palette.materials.size() * palette.shape.states > 16) {
@@ -185,6 +196,11 @@ public final class Catalogue {
 
         public boolean soil() {
             return type.equals("dirt") || type.equals("grass");
+        }
+
+        /** Some native mods already use every two-slab arrangement for full-block recovery. */
+        public boolean fullBlockStepRecipe() {
+            return json.has("fullBlockStepRecipe") && json.get("fullBlockStepRecipe").getAsBoolean();
         }
 
         public String normalDrop() {

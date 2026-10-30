@@ -41,6 +41,12 @@ public final class RegistryEvents {
     @SubscribeEvent
     public static void missingBlocks(RegistryEvent.MissingMappings<Block> event) {
         for (RegistryEvent.MissingMappings.Mapping<Block> mapping : event.getAllMappings()) {
+            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
+                    .formerBlock(mapping.key.toString());
+            if (formerPiece != null) {
+                mapping.remap(formerPiece);
+                continue;
+            }
             if (LegacyMapping.owned(mapping.key.toString())) {
                 mapping.ignore();
             }
@@ -50,6 +56,12 @@ public final class RegistryEvents {
     @SubscribeEvent
     public static void missingItems(RegistryEvent.MissingMappings<Item> event) {
         for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getAllMappings()) {
+            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
+                    .formerBlock(mapping.key.toString());
+            if (formerPiece != null) {
+                mapping.remap(Item.getItemFromBlock(formerPiece));
+                continue;
+            }
             if (LegacyMapping.owned(mapping.key.toString())) {
                 mapping.ignore();
             }

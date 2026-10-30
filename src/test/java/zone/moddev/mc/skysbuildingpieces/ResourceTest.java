@@ -128,6 +128,30 @@ class ResourceTest {
         }
     }
 
+    @Test
+    void bottomGrassAndSnowPiecesKeepTheirSideFringe() throws Exception {
+        for (String shape : Arrays.asList("step", "corner")) {
+            for (int orientation = 4; orientation < 8; orientation++) {
+                for (String weather : Arrays.asList("dry", "snow")) {
+                    String name = "grass_" + shape + "_" + orientation + "_" + weather;
+                    JsonObject model = json(ROOT.resolve("models/block/" + name + ".json"));
+
+                    for (JsonElement element : model.getAsJsonArray("elements")) {
+                        JsonObject faces = element.getAsJsonObject().getAsJsonObject("faces");
+                        for (String side : Arrays.asList("north", "south", "west", "east")) {
+                            if (!faces.has(side)) {
+                                continue;
+                            }
+                            JsonArray uv = faces.getAsJsonObject(side).getAsJsonArray("uv");
+                            assertEquals(0, uv.get(1).getAsInt(), name + " / " + side + " fringe");
+                            assertEquals(8, uv.get(3).getAsInt(), name + " / " + side + " pixel scale");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private static JsonObject json(Path path) throws Exception {
         return new JsonParser().parse(new String(Files.readAllBytes(path), StandardCharsets.UTF_8)).getAsJsonObject();
     }

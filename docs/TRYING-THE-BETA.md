@@ -1,5 +1,11 @@
 # Trying the beta
 
+For Mineralogy, use the core jar with Mineralogy and its OreSpawn dependency.
+Do not install the separate Mineralogy piece add-on from the earlier tests.
+The generated `runMineralogyClient` Eclipse profile loads the native mods in
+a separate development folder. Check rock textures, all step and corner
+orientations, cutting recipes and rebuilding to the native slab.
+
 Install the main jar in a Minecraft 1.12.2 Forge 14.23.5.2859 instance using
 Java 8. The sources and Javadoc jars are not game mods. Start with a new
 creative world; use a separate copy when trying an existing world.
@@ -37,6 +43,8 @@ Before relying on the beta in a modpack, check:
   templates should not appear in creative inventory or crafting results.
 - Check grass colours in several biomes, nearby snow, covered grass becoming
   dirt, plant support, breaking drops and Silk Touch.
+- Use a shovel on a grass step or corner above ordinary grass. Both should
+  become paths, with one durability point used. Check after saving and reloading.
 - Check wall and pane connections and stair corners, including their collision.
 - With BuildingBricks present, first leave replacement disabled. On a second
   backup enable it, restart, and check converted blocks, containers and item
