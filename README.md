@@ -34,6 +34,10 @@ it into a path, using the same shovel action.
 
 ## Crafting
 
+Recipes appear in the recipe book as you collect their ingredients. Crafting a
+piece also reveals its next cuts and recombination recipes while the table is
+still open.
+
 Craft pieces from matching full blocks, slabs and steps. For example, three
 full blocks in a row make six slabs, and two matching slabs placed diagonally
 make four steps. Existing vanilla recipes stay available.

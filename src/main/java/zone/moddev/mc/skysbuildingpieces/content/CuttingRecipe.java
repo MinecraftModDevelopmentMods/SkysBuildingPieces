@@ -23,7 +23,7 @@ public final class CuttingRecipe extends ShapedRecipes {
 
     private CuttingRecipe(String material, Shape shape, CraftingPattern pattern, ItemStack ingredient,
             ItemStack output) {
-        super("skysbuildingpieces", pattern.width(), pattern.height(), inputs(pattern, ingredient), output);
+        super("skysbuildingpieces/" + shape.name() + "/" + pattern.name(), pattern.width(), pattern.height(), inputs(pattern, ingredient), output);
         this.material = material;
         this.shape = shape;
         this.pattern = pattern;

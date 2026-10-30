@@ -20,8 +20,8 @@ public final class PieceRecombinationRecipe extends ShapedRecipes {
     private final ItemStack ingredient;
 
     private PieceRecombinationRecipe(IBlockState input, ItemStack output) {
-        super("skysbuildingpieces", 1, 2, NonNullList.from(Ingredient.EMPTY,
-                Ingredient.fromStacks(Pieces.stack(input, 1)), Ingredient.fromStacks(Pieces.stack(input, 1))),
+        super("skysbuildingpieces/recombine/" + ((PieceBlock) input.getBlock()).palette.shape.name(), 1, 2, NonNullList.from(Ingredient.EMPTY,
+                PieceIngredients.fromState(input), PieceIngredients.fromState(input)),
                 output.copy());
         inputBlock = (PieceBlock) input.getBlock();
         ingredient = Pieces.stack(input, 1);

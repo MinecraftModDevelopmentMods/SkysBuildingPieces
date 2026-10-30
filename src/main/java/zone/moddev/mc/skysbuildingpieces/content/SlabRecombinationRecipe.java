@@ -116,8 +116,14 @@ public final class SlabRecombinationRecipe extends IForgeRegistryEntry.Impl<IRec
     }
 
     @Override
+    public String getGroup() {
+        return "skysbuildingpieces/slab_recombination";
+    }
+
+    @Override
     public NonNullList<Ingredient> getIngredients() {
-        return NonNullList.from(Ingredient.EMPTY, Ingredient.fromStacks(slab), Ingredient.fromStacks(slab));
+        Ingredient input = PieceIngredients.fromState(block.getStateFromMeta(slab.getMetadata()));
+        return NonNullList.from(Ingredient.EMPTY, input, input);
     }
 
     @Override

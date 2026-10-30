@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.112021
+
+- Added the missing recipe-book unlocks for crafting and rebuilding pieces.
+- Made the next recipes appear while the crafting table is still open.
+- Keep recipe previews on the normal item model, including saved orientation variants.
+
 ## 0.3.7.112021
 
 - Use a shovel to turn ordinary dirt and grass steps and corners into paths.
