@@ -1,5 +1,12 @@
 # Pieces and recipes
 
+Mineralogy rock steps and corners are included automatically when Mineralogy
+is installed. Three matching full rocks diagonally across the crafting grid
+make twelve steps; two steps side by side make four corners. Vertical pairs
+rebuild corners into steps and steps into Mineralogy's existing slabs.
+Disabled native slab types are not used by recipes or smoothing. The rock
+steps and corners remain craftable from full blocks.
+
 Find the pieces in the Sky's Building Pieces creative tab. It includes the
 vanilla pieces reused by the catalogue. Separate vertical slab items, old
 templates and recovery holders stay hidden.
@@ -47,6 +54,17 @@ also applies to supported BOP materials. A vertical pair keeps any existing
 native decorative-block recipe. Smooth stone has no obtainable full block item
 in this Minecraft version and therefore has no recombination recipe.
 
+To rebuild larger pieces, put two matching corners one above the other to make
+one step. Two matching steps in a column make one slab. This works in either
+crafting grid and also covers the Building Pieces BOP add-on's materials.
+Keep each pair the same material and item type; saved placement orientations
+do not matter. Side-by-side steps still make four corners, and diagonal slabs
+still make four steps.
+
+Dirt and grass steps return the matching Grass Slabs item when that mod is
+installed. Without it, ordinary dirt steps return the existing dirt vertical
+slab. No new slabs are added for soil materials without a matching slab.
+
 For raw stone, snow, decorative sandstone and mossy/cracked/chiseled stone brick
 slabs, use two full blocks diagonally to make four slabs. Their full-block rows
 already belong to native recipes, which remain unchanged.
@@ -88,10 +106,21 @@ do not combine. Some unions have no supported shape and cannot combine.
 
 Grass shapes use biome colours and spread to ordinary dirt and matching dirt
 pieces. Covered or dark grass becomes the matching dirt shape, retaining its
-orientation. Grass pieces keep their grass-block support as dirt. With Grass
-Slabs 1.1 installed, spreading also works across its slabs and turf.
+orientation. Steps and corners leave exposed ground grassy; pieces covering
+the whole footprint keep dirt underneath. With Grass
+Slabs 1.1.1.112021 or later installed, spreading also works across its slabs and turf.
 Plants and bonemeal need a complete upper supporting face. Nearby snow gives
 soil and grass pieces a visual snow cap without changing their collision.
+
+Use a compatible shovel on an uncovered ordinary dirt or grass step or corner
+to make a path. The piece keeps its shape and orientation; only its exposed
+top drops by one pixel. Each use costs one durability, except in creative mode.
+Flattening a grass piece also turns an ordinary grass block directly beneath
+it into a path. Both changes use that same durability point. Other supporting
+blocks stay as they are.
+Paths drop matching dirt pieces, even with Silk Touch. A solid block above a
+path turns it back into the matching dirt shape. Coarse dirt, podzol and
+mycelium are not converted. Grass Slabs still provides the full-width path slabs.
 
 Without Grass Slabs, three ordinary dirt blocks in a column make six dirt vertical slabs.
 Place them in any of the four directions; complementary halves combine

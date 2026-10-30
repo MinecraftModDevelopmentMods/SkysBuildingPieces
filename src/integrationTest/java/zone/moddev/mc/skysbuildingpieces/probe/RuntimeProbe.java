@@ -92,6 +92,12 @@ public final class RuntimeProbe {
             if (phase == null) {
                 throw new AssertionError("Unconfigured runtime probe");
             }
+            if (phase.equals("path-upgrade")) {
+                PathChecks.savedPieces(world, true);
+                System.out.println("BUILDING_PIECES_PATH_UPGRADE_PASS");
+                server.initiateShutdown();
+                return;
+            }
             if (phase.startsWith("sylvester")) {
                 new WorldAuditProbe(world, phase.equals("sylvester-reload"));
                 return;
@@ -111,6 +117,9 @@ public final class RuntimeProbe {
 
             rawStoredInventory(world);
             GameplayChecks.run(world);
+            PathChecks.run(world);
+            SharedGrassChecks.run(world);
+            MineralogyChecks.run();
 
             if (!phase.startsWith("client")) {
                 DirtCoverageChecks.run(world);

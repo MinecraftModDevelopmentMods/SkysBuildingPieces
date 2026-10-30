@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.7.112021
+
+- Use a shovel to turn ordinary dirt and grass steps and corners into paths.
+  They keep their orientation, with the top lowered by one pixel.
+- Flattening a grass step or corner also turns the grass block beneath it into
+  a path, using the shovel once for both changes.
+- Grass steps and corners keep their grass and snow edges, with grass left
+  visible beneath partial pieces.
+- Rebuild two corners into one step and two steps into one slab by stacking
+  them in the crafting grid. Matching BOP pieces work the same way.
+- Mineralogy rock steps and corners are now included when Mineralogy is
+  installed. They rebuild into its native slabs; no separate add-on is needed.
+  Saves made with the earlier test add-on keep their pieces and item data.
+- When Grass Slabs is installed, use 1.1.1.112021 or later for shared grass
+  behaviour. Building Pieces still works on its own.
+
 ## 0.3.6.112021
 
 - Shortened piece names, including Gold Wall, Gold Stairs and Oak Step.

@@ -1,0 +1,187 @@
+import java.nio.file.Files
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+import groovy.json.JsonSlurper
+
+// This is a development and test dependency. Building Pieces still runs alone.
+def lock = new Properties()
+file('gradle/grass-slabs-release.properties').withInputStream { lock.load(it) }
+def configureVerification = project.ext.configureMineralogyVerificationRun
+if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.version}" ||
+        !(lock.sha256 ==~ /[A-F0-9]{64}/)) {
+    throw new GradleException('The released Grass Slabs dependency needs its public version and checksum')
+}
+
+configurations { grassSlabsPublishedRelease { transitive = false } }
+dependencies { grassSlabsPublishedRelease lock.coordinate }
+def publishedJar = providers.provider { configurations.grassSlabsPublishedRelease.singleFile }
+def developmentJar = layout.projectDirectory.file(
+        ".gradle/released-content/SkysGrassSlabs-${lock.version}-deobf.jar")
+def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
+    group = 'verification'
+    description = 'Checks the exact public Grass Slabs jar used by the optional development profile.'
+    inputs.file publishedJar
+    inputs.file 'gradle/grass-slabs-release.properties'
+    doLast {
+        File source = publishedJar.get()
+        String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
+                .encodeHex().toString().toUpperCase(Locale.ROOT)
+        if (actual != lock.sha256) {
+            throw new GradleException('The public Grass Slabs jar does not match its release checksum')
+        }
+        new ZipFile(source).withCloseable { archive ->
+            def metadata = new JsonSlurper().parseText(
+                    archive.getInputStream(archive.getEntry('mcmod.info')).getText('UTF-8'))
+            if (metadata[0].modid != 'skysgrassslabs' || metadata[0].version != lock.version) {
+                throw new GradleException('The public Grass Slabs jar has unexpected mod metadata')
+            }
+        }
+    }
+}
+
+def mapRelease = renamer.classes('deobfuscateGrassSlabsRelease') {
+    dependsOn verifyRelease
+    input.set(layout.file(publishedJar))
+    map.from minecraft.dependency.toSrgFile
+    reverse.set(true)
+    libraries.from sourceSets.main.compileClasspath
+    output.set(developmentJar)
+}
+ext.publishedGrassSlabsJar = publishedJar
+
+def manualDirectory = layout.projectDirectory.dir('run-grass-slabs')
+def prepareManual = tasks.register('prepareGrassSlabsDevelopmentRun') {
+    group = 'ide'
+    dependsOn mapRelease
+    doLast {
+        File mods = new File(manualDirectory.asFile, 'mods')
+        Set<File> unexpected = fileTree(mods).matching { include '*.jar' }.files.findAll {
+            it.name != developmentJar.asFile.name
+        } as Set<File>
+        if (!unexpected.isEmpty()) {
+            throw new GradleException("The Grass Slabs development profile contains unexpected mods: ${unexpected}")
+        }
+        copy { from developmentJar; into mods }
+    }
+}
+
+['Client', 'Server'].each { side ->
+    tasks.register('runGrassSlabs' + side, JavaExec) {
+        group = 'forgegradle runs'
+        description = "Runs a separate ${side.toLowerCase(Locale.ROOT)} with released Grass Slabs."
+        dependsOn prepareManual
+        workingDir manualDirectory
+        systemProperty 'log4j.configurationFile', file('gradle/development-log4j2.xml').toURI().toString()
+        if (side == 'Server') args '--nogui'
+        configureVerification(delegate, 'run' + side)
+    }
+}
+
+def generateLaunches = tasks.register('generateGrassSlabsEclipseRuns') {
+    group = 'ide'
+    dependsOn tasks.named('isolateEclipseProductionRuns'), prepareManual
+    doLast {
+        ['Client', 'Server'].each { side ->
+            def xml = new groovy.xml.XmlParser(false, false).parse(file("run${side}.launch"))
+            xml.stringAttribute.find {
+                it.@key == 'org.eclipse.jdt.launching.WORKING_DIRECTORY'
+            }.@value = manualDirectory.asFile.absolutePath
+            file("runGrassSlabs${side}.launch").setText(
+                    groovy.xml.XmlUtil.serialize(xml).replace('\r\n', '\n'), 'UTF-8')
+        }
+    }
+}
+tasks.named('genEclipseRuns') { finalizedBy generateLaunches }
+tasks.named('verifyEclipseProductionClasspath') {
+    dependsOn generateLaunches
+    doLast {
+        ['Client', 'Server'].each { side ->
+            String launch = file("runGrassSlabs${side}.launch").getText('UTF-8').replace('\\', '/')
+            if (!launch.contains(manualDirectory.asFile.absolutePath.replace('\\', '/')) ||
+                    !launch.contains('org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE') ||
+                    launch.contains('bin/test') || launch.contains('integration-test') ||
+                    launch.contains('${MC_VERSION}')) {
+                throw new GradleException("The Grass Slabs ${side} launch is not isolated")
+            }
+        }
+    }
+}
+
+def runtime = layout.buildDirectory.dir('grass-slabs-integration-run')
+def prepareTest = tasks.register('prepareGrassSlabsIntegrationTest') {
+    group = 'verification'
+    dependsOn mapRelease, tasks.named('integrationTestModJar')
+    doLast {
+        File directory = runtime.get().asFile
+        if (directory.canonicalFile != new File(layout.buildDirectory.get().asFile,
+                'grass-slabs-integration-run').canonicalFile) {
+            throw new GradleException('Refusing to clear a verification directory outside the build output')
+        }
+        project.delete(directory)
+        copy {
+            from developmentJar
+            from tasks.named('integrationTestModJar', Jar).flatMap { it.archiveFile }
+            into new File(directory, 'mods')
+        }
+        new File(directory, 'eula.txt').setText('eula=true\n', 'UTF-8')
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
+            new File(directory, it).setText('[]\n', 'UTF-8')
+        }
+        new File(directory, 'server.properties').setText('''\
+level-name=world
+level-seed=4815162342
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+generate-structures=false
+spawn-animals=false
+spawn-monsters=false
+spawn-protection=0
+max-tick-time=120000
+''', 'UTF-8')
+    }
+}
+
+def fresh = tasks.register('integrationGrassSlabsFreshProcess', JavaExec) {
+    group = 'verification'
+    dependsOn prepareTest
+    workingDir runtime
+    systemProperty 'skysbuildingpieces.integrationPhase', 'fresh'
+    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
+    configureVerification(delegate, 'runServer')
+}
+def reload = tasks.register('integrationGrassSlabsReloadProcess', JavaExec) {
+    group = 'verification'
+    dependsOn fresh
+    workingDir runtime
+    systemProperty 'skysbuildingpieces.integrationPhase', 'reload'
+    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
+    configureVerification(delegate, 'runServer')
+}
+tasks.register('integrationGrassSlabsTest') {
+    group = 'verification'
+    dependsOn reload
+    doLast {
+        File directory = runtime.get().asFile
+        Properties marker = new Properties()
+        new File(directory, 'world/skysbuildingpieces-integration.properties').withInputStream { marker.load(it) }
+        if (marker.fresh_complete != 'true' || marker.reload_complete != 'true' ||
+                !fileTree(new File(directory, 'crash-reports')).isEmpty()) {
+            throw new GradleException('The released Grass Slabs integration did not complete cleanly')
+        }
+    }
+}
+tasks.register('integrationGrassSlabsClientProcess', JavaExec) {
+    group = 'verification'
+    dependsOn prepareTest
+    workingDir runtime
+    systemProperty 'skysbuildingpieces.integrationPhase', 'client'
+    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
+    configureVerification(delegate, 'runClient')
+    doLast {
+        if (!new File(runtime.get().asFile, 'building-pieces-client-pass.txt').isFile()) {
+            throw new GradleException('The released Grass Slabs client did not complete model checks')
+        }
+    }
+}
+tasks.named('check') { dependsOn tasks.named('integrationGrassSlabsTest') }

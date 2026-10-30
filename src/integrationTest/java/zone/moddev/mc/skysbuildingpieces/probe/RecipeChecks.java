@@ -20,6 +20,7 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 public final class RecipeChecks {
     public static void run(WorldServer world) {
         preflight(world);
+        RecombinationChecks.run(world);
 
         int recombined = 0;
 
@@ -137,6 +138,11 @@ public final class RecipeChecks {
             }
         }
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
+            if (material.type.equals("path")) {
+                require(CuttingRecipe.recipes().stream().noneMatch(recipe -> recipe.material.equals(material.id)),
+                        "paths are obtained with a shovel, not a cutting recipe");
+                continue;
+            }
             for (Shape shape : new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB, Shape.HORIZONTAL_STEP,
                     Shape.VERTICAL_STEP, Shape.CORNER, Shape.STAIRS, Shape.WALL, Shape.PANE }) {
                 if (Pieces.state(material.id, shape, shape == Shape.SLAB ? 1 : 0) == null) {

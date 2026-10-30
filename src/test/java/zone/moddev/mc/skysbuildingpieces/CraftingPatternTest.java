@@ -25,6 +25,8 @@ class CraftingPatternTest {
         assertEquals(4, CraftingPattern.STEP.yield(false));
         assertEquals(2, CraftingPattern.SOIL_STEP.ingredients());
         assertEquals(8, CraftingPattern.SOIL_STEP.yield(false));
+        assertEquals(3, CraftingPattern.ROCK_STEP.ingredients());
+        assertEquals(12, CraftingPattern.ROCK_STEP.yield(false));
         assertTrue(CraftingPattern.STEP.occupied(0, 0));
         assertTrue(CraftingPattern.STEP.occupied(1, 1));
         assertFalse(CraftingPattern.STEP.occupied(1, 0));

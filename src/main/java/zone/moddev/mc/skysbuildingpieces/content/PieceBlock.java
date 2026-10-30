@@ -20,8 +20,16 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 public final class PieceBlock extends Block implements IGrowable {
     public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
     public static final PropertyInteger CONNECTIONS = PropertyInteger.create("connections", 0, 15);
+    public static final PropertyBool LOWERED_SUPPORT = PropertyBool.create("lowered_support");
     public static final PropertyEnum<BlockStairs.EnumShape> STAIR_SHAPE = BlockStairs.SHAPE;
     private static final ThreadLocal<Catalogue.Palette> CONSTRUCTING = new ThreadLocal<Catalogue.Palette>();
+    private static final Material PATH_MATERIAL = new Material(net.minecraft.block.material.MapColor.DIRT) {
+        @Override
+        public boolean isSolid() {
+            // Vanilla paths check the material above them, rather than its partial footprint.
+            return false;
+        }
+    };
     public final Catalogue.Palette palette;
 
     public PieceBlock(Catalogue.Palette palette) {
@@ -50,6 +58,9 @@ public final class PieceBlock extends Block implements IGrowable {
         if (initial.getPropertyKeys().contains(STAIR_SHAPE)) {
             initial = initial.withProperty(STAIR_SHAPE, BlockStairs.EnumShape.STRAIGHT);
         }
+        if (initial.getPropertyKeys().contains(LOWERED_SUPPORT)) {
+            initial = initial.withProperty(LOWERED_SUPPORT, false);
+        }
 
         setDefaultState(initial);
     }
@@ -67,6 +78,9 @@ public final class PieceBlock extends Block implements IGrowable {
         }
         if (materialGroup.equals("wood")) {
             return Material.WOOD;
+        }
+        if (materialGroup.equals("path")) {
+            return PATH_MATERIAL;
         }
         if (materialGroup.equals("dirt")) {
             return Material.GROUND;
@@ -103,6 +117,10 @@ public final class PieceBlock extends Block implements IGrowable {
         List<IProperty<?>> properties = new ArrayList<IProperty<?>>();
 
         properties.add(META);
+
+        if (palette.group.equals("path")) {
+            properties.add(LOWERED_SUPPORT);
+        }
 
         if (palette.group.equals("grass") || palette.group.equals("dirt")) {
             properties.add(BlockGrass.SNOWY);
@@ -161,7 +179,7 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     public boolean isSideSolid(IBlockState blockState, IBlockAccess blockAccess, BlockPos position, EnumFacing side) {
-        return palette.shape != Shape.WALL && palette.shape != Shape.PANE
+        return !palette.group.equals("path") && palette.shape != Shape.WALL && palette.shape != Shape.PANE
                 && Geometry.completeFace(mask(blockState), side.getIndex());
     }
 
@@ -239,7 +257,7 @@ public final class PieceBlock extends Block implements IGrowable {
 
         return materialType.equals("rock") || materialType.equals("metal") ? "pickaxe"
                 : materialType.equals("wood") ? "axe"
-                        : materialType.equals("dirt") || materialType.equals("grass") || materialType.equals("snow")
+                        : materialType.equals("dirt") || materialType.equals("grass") || materialType.equals("path") || materialType.equals("snow")
                                 ? "shovel"
                                 : null;
     }
@@ -328,8 +346,13 @@ public final class PieceBlock extends Block implements IGrowable {
                     double cellMinimumZ = ((cellIndex >> 1) & 1) * .5;
                     double cellMinimumY = ((cellIndex >> 2) & 1) * .5;
 
-                    boxes.add(new AxisAlignedBB(cellMinimumX, cellMinimumY, cellMinimumZ, cellMinimumX + .5,
-                            cellMinimumY + .5, cellMinimumZ + .5));
+                    boolean exposedTop = cellIndex >= 4 || (occupiedCells & (1 << (cellIndex + 4))) == 0;
+                    double loweredTop = palette.group.equals("path") && exposedTop ? 1.0 / 16.0 : 0;
+                    // Extend only the base to meet a lowered vanilla path, keeping the walking surface in place.
+                    double loweredBase = palette.group.equals("path") && cellMinimumY == 0
+                            && blockState.getValue(LOWERED_SUPPORT) ? 1.0 / 16.0 : 0;
+                    boxes.add(new AxisAlignedBB(cellMinimumX, cellMinimumY - loweredBase, cellMinimumZ, cellMinimumX + .5,
+                            cellMinimumY + .5 - loweredTop, cellMinimumZ + .5));
                 }
             }
         }
@@ -420,6 +443,11 @@ public final class PieceBlock extends Block implements IGrowable {
         if (blockState.getPropertyKeys().contains(BlockWall.UP)) {
             blockState = blockState.withProperty(BlockWall.UP,
                     (connections != 5 && connections != 10) || !blockAccess.isAirBlock(position.up()));
+        }
+
+        if (blockState.getPropertyKeys().contains(LOWERED_SUPPORT)) {
+            blockState = blockState.withProperty(LOWERED_SUPPORT,
+                    blockAccess.getBlockState(position.down()).getBlock() == Blocks.GRASS_PATH);
         }
 
         return blockState;
@@ -529,12 +557,15 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     protected ItemStack getSilkTouchDrop(IBlockState blockState) {
+        if (palette.group.equals("path")) {
+            return Pieces.stack(PathPieces.dirt(blockState), 1);
+        }
         return palette.shape == Shape.VERTICAL_SLAB ? Pieces.slabDrop(definition(blockState).id, blockState)
                 : Pieces.stack(blockState, 1);
     }
 
     public boolean canSilkHarvest(World world, BlockPos position, IBlockState blockState, EntityPlayer player) {
-        return true;
+        return !palette.group.equals("path");
     }
 
     public int damageDropped(IBlockState blockState) {
@@ -562,12 +593,20 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     public void onBlockAdded(World world, BlockPos position, IBlockState blockState) {
+        PathPieces.checkCover(world, position, blockState);
         GrassLifecycle.repairSupport(world, position, blockState);
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos position, IBlockState state, EntityPlayer player,
+            EnumHand hand, EnumFacing face, float hitX, float hitY, float hitZ) {
+        return PathPieces.activate(world, position, player, player.getHeldItem(hand), face);
     }
 
     @Override
     public void neighborChanged(IBlockState blockState, World world, BlockPos position, Block changed,
             BlockPos changedPos) {
+        PathPieces.checkCover(world, position, blockState);
         GrassLifecycle.repairSupport(world, position, blockState);
     }
 

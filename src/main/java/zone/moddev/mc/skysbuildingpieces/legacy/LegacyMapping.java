@@ -79,6 +79,7 @@ public final class LegacyMapping {
     public static boolean allowedMaterial(String material, Shape shape) {
         Catalogue.MaterialDef materialDefinition = Catalogue.INSTANCE.materials.get(material(material));
 
-        return materialDefinition != null && Catalogue.supportsShape(materialDefinition, shape);
+        return materialDefinition != null && !materialDefinition.type.equals("path")
+                && Catalogue.supportsShape(materialDefinition, shape);
     }
 }

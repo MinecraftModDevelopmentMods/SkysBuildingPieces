@@ -22,9 +22,12 @@ public final class ClientProxy extends CommonProxy {
     public static void models(net.minecraftforge.client.event.ModelRegistryEvent event) {
         ClientProxy client = (ClientProxy) zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces.proxy;
 
+        java.util.Set<String> namespaces = new java.util.LinkedHashSet<String>();
         for (zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.Module module : zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.modules
                 .values()) {
-            client.registerModels(module.namespace);
+            if (namespaces.add(module.namespace)) {
+                client.registerModels(module.namespace);
+            }
         }
         for (java.util.Map.Entry<String, Item> entry : Pieces.RETIRED_TEMPLATES.entrySet()) {
             ModelLoader.setCustomModelResourceLocation(entry.getValue(), 0,
@@ -63,7 +66,8 @@ public final class ClientProxy extends CommonProxy {
 
                 ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(pieceBlock), meta,
                         new ModelResourceLocation(
-                                namespace + ":"
+                                (pieceBlock.palette.module.equals("mineralogy")
+                                        ? zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.ASSETS : namespace) + ":"
                                         + new net.minecraft.util.ResourceLocation(
                                                 pieceBlock.palette.materials.get(slot)).getPath()
                                         + "_" + pieceBlock.palette.shape.name().toLowerCase(java.util.Locale.ROOT),

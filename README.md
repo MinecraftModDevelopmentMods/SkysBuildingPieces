@@ -5,7 +5,9 @@ with: slabs, steps, corners, stairs, walls and ice panes. Add narrow trims,
 fill awkward corners or build a glass wall without using full blocks everywhere.
 
 The mod uses vanilla materials and reuses existing Minecraft pieces where they
-already fit. It doesn't generate terrain.
+already fit. When Mineralogy is installed, its natural rocks also get matching
+steps and corners automatically. No Mineralogy add-on is needed. Building
+Pieces doesn't generate terrain.
 
 ## Building with the pieces
 
@@ -25,12 +27,18 @@ run, with borders at posts, exposed ends and colour changes.
 
 Dirt and grass steps and corners are included too. Grass follows biome colours,
 spreads and decays much like vanilla grass. Plants need a complete upper face.
+Use a shovel on an uncovered dirt or grass step or corner to turn it into a
+matching path piece. Its footprint stays the same, with a one-pixel lower top.
+Flattening a grass piece also turns an ordinary grass block directly beneath
+it into a path, using the same shovel action.
 
 ## Crafting
 
 Craft pieces from matching full blocks, slabs and steps. For example, three
 full blocks in a row make six slabs, and two matching slabs placed diagonally
 make four steps. Existing vanilla recipes stay available.
+You can also rebuild larger pieces: stack two matching corners in the crafting
+grid for one step, or two matching steps for one slab.
 
 The [recipe and placement guide](docs/GAMEPLAY.md) has the full patterns,
 quantities and exceptions, including the separate dirt vertical slab recipe

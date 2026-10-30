@@ -106,6 +106,8 @@ minecraft {
     runs {
         configureEach {
             workingDir.convention layout.projectDirectory.dir(developmentRunDirectory)
+            // Supply the legacy version before ForgeGradle expands the launch environment.
+            environment 'MC_VERSION', project.minecraft_version.toString()
             systemProperty 'forge.logging.console.level', 'debug'
             systemProperty 'fml.coreMods.load', 'zone.moddev.mc.skysbuildingpieces.legacy.LoaderPlugin'
         }
@@ -211,6 +213,17 @@ repositories {
         filter { includeGroupAndSubgroups('org.spongepowered') }
     }
     mavenCentral()
+    exclusiveContent {
+        forRepository {
+            ivy {
+                name = 'GrassSlabsReleases'
+                url = 'https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs/releases/download'
+                patternLayout { artifact '[revision]/[artifact]-[revision].[ext]' }
+                metadataSources { artifact() }
+            }
+        }
+        filter { includeModule 'zone.moddev.mc.skysgrassslabs', 'SkysGrassSlabs' }
+    }
     maven {
         name = 'MinecraftLibraries'
         url = 'https://libraries.minecraft.net/'
@@ -237,6 +250,15 @@ tasks.register('generateWallModels', JavaExec) {
     if (providers.gradleProperty('wallAssetRoot').isPresent()) {
         args(providers.gradleProperty('wallAssetNamespace').get(), providers.gradleProperty('wallAssetRoot').get())
     }
+}
+
+tasks.register('alignSoilModels', JavaExec) {
+    group = 'build setup'
+    description = 'Aligns grass and snow fringes with the exposed top of each soil piece.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'zone.moddev.mc.skysbuildingpieces.AlignSoilModels'
+    workingDir = project.projectDir
 }
 
 def integrationTestClasses = layout.buildDirectory.dir('integration-test-mod/classes')
@@ -585,9 +607,10 @@ ext.releaseFiles = releaseFiles
 ext.releaseJar = releaseJar
 apply from: 'gradle/release.gradle'
 
-// Keep the old entry point disabled until publication is configured.
+
+// Releases use the validated MMD workflow.
 tasks.register('publishRelease') {
-    doLast { throw new GradleException('Publication is disabled for the local beta.') }
+    doLast { throw new GradleException('Use the MMD release workflow to publish this mod.') }
 }
 
 idea {
@@ -705,3 +728,11 @@ tasks.register('verifyEclipseProductionClasspath') {
 tasks.named('check') {
     dependsOn tasks.named('verifyReleaseMetadata')
 }
+
+// Optional native mods stay in a separate development folder and never enter the published jar.
+ext.configureMineralogyVerificationRun = configureFromForgeRun
+ext.mineralogyProfileProbeId = 'skysbuildingpieces'
+ext.mineralogyProfileAdditionalMods = files()
+apply from: 'gradle/mineralogy-runs.gradle'
+apply from: 'gradle/mineralogy-fixtures.gradle'
+apply from: 'gradle/grass-slabs-release.gradle'
