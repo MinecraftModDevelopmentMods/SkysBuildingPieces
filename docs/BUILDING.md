@@ -43,3 +43,14 @@ locked native jars are available.
 
 Verification worlds live under `build/`. Keep player worlds in the separate
 ordinary game folders or another instance.
+
+## Recipe-book resources
+
+The build generates unlock advancements from `src/main/recipe-book/recipes.json`.
+The runtime checks compare those entries with the registered recipes and exercise
+inventory discovery, crafting-table discovery and recipe-book persistence.
+Optional catalogue entries load only when their recipe exists.
+
+Recipe unlocks have no shared advancement parent. Minecraft 1.12 walks that
+visibility tree recursively when loading completed progress, which can overflow
+with a large catalogue. The inventory and crafting unlock criteria are unchanged.

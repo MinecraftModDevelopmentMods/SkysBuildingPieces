@@ -1,0 +1,46 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+// Recipe IDs and exact ingredient variants are checked against the live registry.
+def recipeBookManifest = layout.projectDirectory.file('src/main/recipe-book/recipes.json')
+def recipeBookOutput = layout.buildDirectory.dir('generated/recipe-advancements')
+def generateRecipeAdvancements = tasks.register('generateRecipeAdvancements') {
+    inputs.file(recipeBookManifest)
+    outputs.dir(recipeBookOutput)
+    doLast {
+        File output = recipeBookOutput.get().asFile
+        delete output
+        List entries = new JsonSlurper().parse(recipeBookManifest.asFile) as List
+        Set<String> ids = new HashSet<>()
+        entries.each { entry ->
+            String recipe = entry.recipe
+            String owner = project.mod_id
+            if (entry.owner != owner || !ids.add(recipe) || entry.ingredients.isEmpty()) {
+                throw new GradleException("Invalid recipe-book entry: ${recipe}")
+            }
+            String path = recipe.split(':', 2)[1]
+            Map criteria = [:]
+            List<String> requirements = []
+            entry.ingredients.eachWithIndex { ingredient, index ->
+                String key = entry.ingredients.size() == 1 ? 'has_ingredient' : 'has_ingredient_' + index
+                criteria[key] = [trigger: 'minecraft:inventory_changed', conditions: [items: [ingredient]]]
+                requirements.add(key)
+            }
+            criteria.has_the_recipe = [trigger: 'minecraft:recipe_unlocked', conditions: [recipe: recipe]]
+            requirements.add('has_the_recipe')
+            // A shared parent makes 1.12 recurse through thousands of learned recipes on login.
+            // Independent hidden unlocks keep the same recipe-book behaviour without that recursion.
+            Map advancement = [rewards: [recipes: [recipe]],
+                               criteria: criteria, requirements: [requirements]]
+            if (project.mod_id != 'skysgrassslabs') {
+                // Optional catalogues and recovery recipes must not leave phantom unlocks.
+                advancement.conditions = [[type: 'skysbuildingpieces:recipe_exists', recipe: recipe]]
+            }
+            File target = new File(output, "assets/${owner}/advancements/recipes/${path}.json")
+            target.parentFile.mkdirs()
+            target.setText(JsonOutput.prettyPrint(JsonOutput.toJson(advancement)) + '\n', 'UTF-8')
+        }
+    }
+}
+sourceSets.main.resources.srcDir(generateRecipeAdvancements)
+tasks.named('processResources') { dependsOn generateRecipeAdvancements }

@@ -88,6 +88,8 @@ public final class ClientProbe extends ProbeProxy {
 
             System.out.println("BUILDING_PIECES_CREATIVE_TAB_PASS entries=" + creative.size());
 
+            RecipePreviewModels.check(minecraft);
+
             int checked = 0;
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {

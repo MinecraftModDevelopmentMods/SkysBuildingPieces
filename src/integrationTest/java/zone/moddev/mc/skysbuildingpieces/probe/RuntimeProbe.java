@@ -115,6 +115,17 @@ public final class RuntimeProbe {
                 return;
             }
 
+            if (phase.startsWith("recipe-book-")) {
+                RecipeBookChecks.run(world);
+                File result = new File(world.getSaveHandler().getWorldDirectory(), phase + ".pass");
+                try (Writer writer = new FileWriter(result)) {
+                    writer.write("RECIPE_BOOK_PHASE_PASS " + phase + "\n");
+                }
+                System.out.println("RECIPE_BOOK_PHASE_PASS " + phase);
+                server.initiateShutdown();
+                return;
+            }
+
             rawStoredInventory(world);
             GameplayChecks.run(world);
             PathChecks.run(world);

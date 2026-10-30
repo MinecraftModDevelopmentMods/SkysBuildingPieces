@@ -69,6 +69,9 @@ tasks.withType(Test).configureEach {
     if (pinnedJava8.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava8Spec)
 }
 tasks.withType(JavaExec).configureEach {
+    if (providers.gradleProperty('snapshotRecipeBook').getOrElse('false').toBoolean()) {
+        systemProperty 'skysbuildingpieces.snapshotRecipeBook', 'true'
+    }
     if (pinnedJava8.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava8Spec)
 }
 
@@ -736,3 +739,9 @@ ext.mineralogyProfileAdditionalMods = files()
 apply from: 'gradle/mineralogy-runs.gradle'
 apply from: 'gradle/mineralogy-fixtures.gradle'
 apply from: 'gradle/grass-slabs-release.gradle'
+
+apply from: 'gradle/recipe-advancements.gradle'
+
+ext.configureRecipeBookRun = configureFromForgeRun
+ext.recipeBookLogConfiguration = file('src/integrationTest/resources/log4j2.xml').toURI().toString()
+apply from: 'gradle/recipe-book-verification.gradle'

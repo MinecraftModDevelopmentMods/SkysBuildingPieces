@@ -1,0 +1,53 @@
+// Recipe-book checks get their own server runs rather than sharing one long gameplay tick.
+def bookDirectory = layout.buildDirectory.dir('recipe-book-test-run')
+def prepareBook = tasks.register('prepareRecipeBookTest') {
+    dependsOn tasks.named('integrationTestModJar')
+    doLast {
+        File directory = bookDirectory.get().asFile
+        if (directory.canonicalFile != new File(buildDir, 'recipe-book-test-run').canonicalFile) {
+            throw new GradleException('Recipe-book verification must stay inside the build directory')
+        }
+        delete directory
+        copy {
+            from tasks.named('integrationTestModJar', Jar).flatMap { it.archiveFile }
+            into new File(directory, 'mods')
+        }
+        new File(directory, 'eula.txt').setText('eula=true\n', 'UTF-8')
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
+            new File(directory, it).setText('[]\n', 'UTF-8')
+        }
+        new File(directory, 'server.properties').setText('''level-name=world
+level-seed=4815162342
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+generate-structures=false
+spawn-animals=false
+spawn-monsters=false
+max-tick-time=120000
+''', 'UTF-8')
+        if (project.ext.has('recipeBookExtraMods')) {
+            copy { from project.ext.recipeBookExtraMods; into new File(directory, 'mods') }
+        }
+    }
+}
+def bookTasks = [:]
+['fresh', 'reload'].each { phase ->
+    bookTasks[phase] = tasks.register('integrationRecipeBook' + phase.capitalize() + 'Process', JavaExec) {
+        dependsOn phase == 'fresh' ? prepareBook : bookTasks.fresh
+        workingDir bookDirectory
+        systemProperty 'skysbuildingpieces.integrationPhase', 'recipe-book-' + phase
+        systemProperty 'log4j.configurationFile', project.ext.recipeBookLogConfiguration
+        project.ext.configureRecipeBookRun(delegate, 'runServer')
+        doLast {
+            if (!new File(bookDirectory.get().asFile, 'world/recipe-book-' + phase + '.pass').isFile()) {
+                throw new GradleException('Recipe-book ' + phase + ' verification did not complete')
+            }
+            if (!fileTree(new File(bookDirectory.get().asFile, 'crash-reports')).isEmpty()) {
+                throw new GradleException('Recipe-book verification produced a crash report')
+            }
+        }
+    }
+}
+tasks.register('integrationRecipeBookTest') { dependsOn bookTasks.reload }
+tasks.named('check') { dependsOn tasks.named('integrationRecipeBookTest') }

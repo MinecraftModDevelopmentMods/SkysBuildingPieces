@@ -1,0 +1,5 @@
+{
+  "conditions": {
+    "recipe_exists": "zone.moddev.mc.skysbuildingpieces.content.RecipeExistsCondition"
+  }
+}

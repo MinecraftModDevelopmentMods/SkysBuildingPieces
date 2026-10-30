@@ -281,7 +281,7 @@ public final class RecipeChecks {
         require(conflicts == 0, "recipe preflight conflicts=" + conflicts);
     }
 
-    private static InventoryCrafting grid(int size) {
+    static InventoryCrafting grid(int size) {
         return new InventoryCrafting(new Container() {
             public boolean canInteractWith(net.minecraft.entity.player.EntityPlayer player) {
                 return true;
