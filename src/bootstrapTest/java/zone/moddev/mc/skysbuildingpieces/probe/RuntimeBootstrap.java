@@ -48,7 +48,8 @@ public final class RuntimeBootstrap {
 
         try {
             require(phase.equals("fresh") || phase.equals("reload") || phase.startsWith("forward")
-                    || phase.startsWith("client") || phase.equals("water"), "Unknown bootstrap phase");
+                    || phase.startsWith("client") || phase.equals("water") || phase.equals("staging"),
+                    "Unknown bootstrap phase");
             require(Pieces.BLOCKS.size() == Catalogue.INSTANCE.palettes.size(), "Every fixed palette is registered");
 
             int recipes = 0;
@@ -56,6 +57,9 @@ public final class RuntimeBootstrap {
 
             if (phase.equals("water")) {
                 WaterloggingChecks.run(world);
+            } else if (phase.equals("staging")) {
+                stacks = legacyStacks();
+                zone.moddev.mc.skysbuildingpieces.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
             } else {
@@ -174,6 +178,7 @@ public final class RuntimeBootstrap {
 
     private static int legacyStacks() {
         int checked = 0;
+        java.util.Set<net.minecraft.item.Item> nativeItems = new java.util.HashSet<>();
 
         for (PieceBlock block : Pieces.BLOCKS.values()) {
             int assigned = block.palette.materials.size() * block.palette.shape.states;
@@ -200,6 +205,30 @@ public final class RuntimeBootstrap {
                 require(actual.hasTag() && actual.getTag().equals(custom) && raw.getByte("Slot") == 4,
                         "Legacy custom data and inventory slot");
 
+                if (expected.getItem().getRegistryName().getNamespace().equals("minecraft")
+                        && nativeItems.add(expected.getItem())) {
+                    // Native item names can have an older meaning. Check the chosen target after both the direct
+                    // fixer and the chunk loader's intermediate-version route, not only our own raw conversion.
+                    for (boolean intermediate : new boolean[] { false, true }) {
+                        CompoundNBT fixed = new CompoundNBT();
+                        ListNBT inventory = new ListNBT();
+                        inventory.add(raw.copy());
+                        fixed.put("Inventory", inventory);
+                        if (intermediate) {
+                            fixed = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
+                                    net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, fixed, 1343, 1493);
+                        }
+                        fixed = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
+                                net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, fixed,
+                                intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
+                        ItemStack saved = ItemStack.read(fixed);
+                        require(saved.getItem() == expected.getItem() && saved.getCount() == 17
+                                && saved.hasTag() && saved.getTag().equals(custom) && fixed.getByte("Slot") == 4,
+                                "Native item fixer changed " + expected.getItem().getRegistryName()
+                                        + " intermediate=" + intermediate + ": " + fixed);
+                    }
+                }
+
                 CompoundNBT before = raw.copy();
 
                 LegacyBridge.prepareStack(raw);
@@ -208,6 +237,7 @@ public final class RuntimeBootstrap {
             }
         }
 
+        System.out.println("BUILDING_PIECES_NATIVE_ITEM_FIXERS_PASS identities=" + nativeItems.size() + " pipelines=2");
         return checked;
     }
 

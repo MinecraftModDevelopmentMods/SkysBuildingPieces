@@ -73,6 +73,8 @@ final class LegacyPreflight {
 
                             CompoundNBT level = root.getCompound("Level");
 
+                            HistoricalBiomes.validate(root);
+
                             {
                                 Map<Integer, CompoundNBT> tiles = new HashMap<Integer, CompoundNBT>();
                                 ListNBT tileList = level.getList("TileEntities", 10);
@@ -179,6 +181,10 @@ final class LegacyPreflight {
     }
 
     private static void stacks(INBT value) {
+        inspectStacks(value instanceof CompoundNBT ? HistoricalItems.prepareCopy((CompoundNBT) value) : value);
+    }
+
+    private static void inspectStacks(INBT value) {
         if (value instanceof CompoundNBT) {
             CompoundNBT compoundTag = (CompoundNBT) value;
             String registryId = compoundTag.getString("id");
@@ -213,14 +219,14 @@ final class LegacyPreflight {
             }
             for (String key : compoundTag.keySet()) {
                 if (!key.equals("retained_tiles")) {
-                    stacks(compoundTag.get(key));
+                    inspectStacks(compoundTag.get(key));
                 }
             }
         } else if (value instanceof ListNBT) {
             ListNBT list = (ListNBT) value;
 
             for (int entryIndex = 0; entryIndex < list.size(); entryIndex++) {
-                stacks(list.get(entryIndex));
+                inspectStacks(list.get(entryIndex));
             }
         }
     }
@@ -237,7 +243,7 @@ final class LegacyPreflight {
 
     private static LegacyBridge.RecoveryAbort blocked(String detail) {
         return new LegacyBridge.RecoveryAbort("World upgrade stopped before chunk loading: " + detail
-                + " has no safe target. Restore BuildingBricks and its material add-ons, then use a backup. No unsupported material was substituted.",
+                + " has no safe target. Restore the original modpack and use a backup. No unsupported content was substituted.",
                 null);
     }
 }

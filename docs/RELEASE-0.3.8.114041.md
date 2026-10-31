@@ -11,6 +11,12 @@ This build brings Building Pieces to Minecraft 1.14.4 and Forge 28.2.26.
   glass walls.
 - Supports the coordinated Grass Slabs 1.2.0.114041 build. Mineralogy remains
   optional and needs no separate piece add-on.
+- Keeps later Sky registrations alongside older recovery information, including
+  worlds that already have a migration sidecar.
+- Preserves recovered inventories in saved chunks that had not finished
+  population, and unlocks add-on recipes while the crafting table is still open.
+- Keeps rough-stone slabs distinct from smooth stone during old-world upgrades.
+  Stored rough-stone stair items also retain their material.
 
 Back up the whole world before upgrading. Recovery covers supported building
 pieces, not unrelated content from another mod. Use matching 1.14.4 add-ons.

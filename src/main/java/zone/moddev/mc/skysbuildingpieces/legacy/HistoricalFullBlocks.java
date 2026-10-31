@@ -58,11 +58,39 @@ public final class HistoricalFullBlocks {
     }
 
     public static boolean historical(String registryId) {
-        return MODULES.containsKey(registryId);
+        return MODULES.containsKey(registryId) || HOLDERS.containsKey(registryId);
     }
 
     public static String module(String registryId) {
-        return MODULES.get(HOLDERS.getOrDefault(registryId, registryId));
+        String direct = MODULES.get(registryId);
+
+        return direct != null ? direct : MODULES.get(HOLDERS.getOrDefault(registryId, registryId));
+    }
+
+    public static boolean recoveryHolder(String registryId) {
+        return HOLDERS.containsKey(registryId) && !registryId.equals(HOLDERS.get(registryId));
+    }
+
+    static boolean sameSource(String first, String second) {
+        return HOLDERS.getOrDefault(first, first).equals(HOLDERS.getOrDefault(second, second));
+    }
+
+    /** A later flattening pass must also visit holders left by an earlier recovery module. */
+    public static void registerHolderCoverage(String holderId, String module) {
+        if (LegacyBridge.ready || !recoveryHolder(holderId) || MODULES.containsKey(holderId) || module == null
+                || module.isEmpty()) {
+            throw new IllegalStateException("Invalid or late recovery-holder coverage: " + holderId);
+        }
+
+        MODULES.put(holderId, module);
+    }
+
+    public static void registerFlatteningCoverage(String sourceId, String module) {
+        if (LegacyBridge.ready || !MODULES.containsKey(sourceId) || module == null || module.isEmpty()) {
+            throw new IllegalStateException("Invalid or late flattening coverage: " + sourceId);
+        }
+
+        MODULES.put(sourceId, module);
     }
 
     public static boolean hasSource(Map<Integer, String> savedIds) {

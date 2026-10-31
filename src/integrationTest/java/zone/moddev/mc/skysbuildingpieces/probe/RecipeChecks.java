@@ -35,6 +35,34 @@ public final class RecipeChecks {
                 continue;
             }
 
+            if (entry instanceof net.minecraft.item.crafting.ShapelessRecipe) {
+                net.minecraft.item.crafting.ShapelessRecipe recipe = (net.minecraft.item.crafting.ShapelessRecipe) entry;
+
+                require(recipe.getId().getNamespace().equals("skysbuildingpiecesbop")
+                        && recipe.getId().getPath().startsWith("restore_") && recipe.getIngredients().size() == 1,
+                        "Unexpected shapeless building recipe: " + recipe.getId());
+
+                for (int size : new int[] { 2, 3 }) {
+                    for (int slot = 0; slot < size * size; slot++) {
+                        CraftingInventory grid = grid(size);
+                        ItemStack input = recipe.getIngredients().get(0).getMatchingStacks()[0].copy();
+
+                        input.setCount(17);
+                        grid.setInventorySlotContents(slot, input);
+                        assertManager(grid, world, recipe.getRecipeOutput(), recipe.getId().toString());
+                        require(input.getCount() == 17, "Restore lookup changed its input");
+                        grid.setInventorySlotContents((slot + 1) % (size * size), input.copy());
+                        require(!recipe.matches(grid, world), "Restore recipe accepts an extra block");
+                        variants++;
+                    }
+                }
+
+                obtainable.add(recipe.getRecipeOutput().getItem());
+                network(recipe);
+                recipes++;
+                continue;
+            }
+
             require(entry instanceof ShapedRecipe, "Expected an ordinary shaped recipe: " + entry.getId());
 
             ShapedRecipe recipe = (ShapedRecipe) entry;
@@ -168,7 +196,7 @@ public final class RecipeChecks {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static void network(ShapedRecipe recipe) {
+    private static void network(ICraftingRecipe recipe) {
         IRecipeSerializer serializer = recipe.getSerializer();
         PacketBuffer buffer = new PacketBuffer(io.netty.buffer.Unpooled.buffer());
 
@@ -184,9 +212,13 @@ public final class RecipeChecks {
 
             CraftingInventory grid = grid(3);
 
-            for (int row = 0; row < recipe.getRecipeHeight(); row++) {
-                for (int column = 0; column < recipe.getRecipeWidth(); column++) {
-                    Ingredient ingredient = recipe.getIngredients().get(column + row * recipe.getRecipeWidth());
+            int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeWidth()
+                    : recipe.getIngredients().size();
+            int height = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeHeight() : 1;
+
+            for (int row = 0; row < height; row++) {
+                for (int column = 0; column < width; column++) {
+                    Ingredient ingredient = recipe.getIngredients().get(column + row * width);
 
                     if (ingredient != Ingredient.EMPTY) {
                         grid.setInventorySlotContents(column + row * 3, ingredient.getMatchingStacks()[0].copy());

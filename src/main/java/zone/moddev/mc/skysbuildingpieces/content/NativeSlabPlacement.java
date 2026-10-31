@@ -24,6 +24,9 @@ public final class NativeSlabPlacement {
 
     private NativeSlabPlacement() {
         for (Catalogue.MaterialDef definition : Catalogue.INSTANCE.materials.values()) {
+            if (definition.replacement() != null) {
+                continue;
+            }
             if (Pieces.state(definition.id, Shape.VERTICAL_SLAB, 0) == null) {
                 continue;
             }

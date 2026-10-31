@@ -70,7 +70,9 @@ public final class ClientProbe extends ProbeProxy {
                 }
 
                 PieceItem piece = (PieceItem) item;
-                boolean hidden = piece.piece.palette.shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.VERTICAL_SLAB
+                boolean hidden = zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.materials
+                        .get(piece.material).replacement() != null
+                        || piece.piece.palette.shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.VERTICAL_SLAB
                         || Pieces.nativeState(
                                 zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.materials
                                         .get(piece.material),

@@ -20,12 +20,14 @@ class LegacyAccountingTest {
 
         modules.putLong("biomesoplenty", 601);
         root.put("skysbuildingpieces_module_delta", modules.copy());
+        root.put("skysbuildingpieces_additional_module_delta", modules.copy());
         root.put("skysbuildingpieces_historical_delta", modules.copy());
         LegacyBridge.finalizeLegacyChunk(root);
         assertEquals(26, level.getLong("skysbuildingpieces_delta"));
         assertEquals(4, level.getLong("skysbuildingpieces_additional_vanilla_delta"));
         assertEquals(7, level.getLong("skysbuildingpieces_retired_delta"));
         assertEquals(modules, level.getCompound("skysbuildingpieces_module_delta"));
+        assertEquals(modules, level.getCompound("skysbuildingpieces_additional_module_delta"));
         assertEquals(modules, level.getCompound("skysbuildingpieces_historical_delta"));
         assertFalse(root.contains("skysbuildingpieces_delta"));
         assertEquals("Keep unknown data", level.getString("future_addon_note"));

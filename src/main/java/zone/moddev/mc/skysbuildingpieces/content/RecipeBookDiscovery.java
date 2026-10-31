@@ -17,6 +17,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 
 /** Unlock the next cut even when a crafted piece is still on the table cursor. */
 @Mod.EventBusSubscriber(
@@ -47,8 +48,18 @@ public final class RecipeBookDiscovery {
                 continue;
             }
 
+            String owner = id.getNamespace();
+
+            if (owner.equals(SkysBuildingPieces.ID)) {
+                Catalogue.Module module = Catalogue.INSTANCE.modules.get(id.getPath().split("/", 2)[0]);
+
+                if (module != null) {
+                    owner = module.namespace;
+                }
+            }
+
             Advancement advancement = player.getServer().getAdvancementManager()
-                    .getAdvancement(new ResourceLocation(id.getNamespace(), "recipes/" + id.getPath()));
+                    .getAdvancement(new ResourceLocation(owner, "recipes/" + id.getPath()));
 
             if (advancement == null) {
                 continue;

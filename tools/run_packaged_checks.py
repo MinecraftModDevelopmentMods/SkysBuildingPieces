@@ -9,7 +9,7 @@ import re
 import shutil
 import subprocess
 import zipfile
-from native_client_log import audit as audit_client
+from native_client_log import audit as audit_client, audit_server
 
 
 def digest(path, algorithm="sha256"):
@@ -139,12 +139,11 @@ def audit(directory, phase, mode):
         shutil.copyfile(directory / "logs/latest.log", directory / (phase + "-complete.log"))
         return
     log = (directory / "logs/latest.log").read_text(encoding="utf-8")
-    errors = [line for line in log.splitlines() if re.search(r"/(?:ERROR|FATAL)\]", line)]
+    audit_server(directory, phase)
     required = ("Done (", "BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase)
-    if errors or "[STDERR/" in log or "[STDERR]" in log or any(marker not in log for marker in required):
-        raise ValueError("Packaged runtime failed its log or completion checks: " + repr(errors[:4]))
-    if list((directory / "crash-reports").glob("*")):
-        raise ValueError("Packaged runtime produced a crash report")
+    missing = [marker for marker in required if marker not in log]
+    if missing:
+        raise ValueError("Packaged runtime completion checks are missing: " + repr(missing))
     shutil.copyfile(directory / "logs/latest.log", directory / (phase + "-complete.log"))
 
 

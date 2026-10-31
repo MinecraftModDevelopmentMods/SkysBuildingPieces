@@ -48,6 +48,12 @@ public final class BuildingPiecesApi {
         Pieces.registerNamespaceItems(namespace, registry);
     }
 
+    /** Register during item registration when a full block has one item per saved variant. */
+    public static void registerStateItems(net.minecraft.block.Block block,
+            java.util.function.Function<BlockState, net.minecraft.item.Item> items) {
+        Pieces.registerStateItems(block, items);
+    }
+
     /** Reads materials.json and palettes.json from the contributor's assets catalogue. */
     public static Catalogue.Module registerCatalogue(String module, String namespace, int maximumBlocks,
             Class<?> anchor) {
@@ -60,10 +66,6 @@ public final class BuildingPiecesApi {
     /** Register resolved definitions, for example when a native mod disables its slab forms. */
     public static Catalogue.Module registerCatalogue(String module, String namespace, int maximumBlocks,
             com.google.gson.JsonArray materials, com.google.gson.JsonArray palettes) {
-        if (!Pieces.initialized) {
-            throw new IllegalStateException("The core must initialize before its add-ons");
-        }
-
         Catalogue.Module contribution = Catalogue.INSTANCE.registerModule(module, namespace, materials, palettes,
                 maximumBlocks);
 

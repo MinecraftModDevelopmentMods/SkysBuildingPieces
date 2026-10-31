@@ -69,6 +69,50 @@ def audit(directory, phase, control=False):
     return receipt
 
 
+def classify_server(log, debug, unchanged_defaults):
+    """Recognise only the native server-config self-save observed by the Forge-only control."""
+    lines = log.splitlines()
+    debug_lines = debug.splitlines()
+    severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
+    notices = [line for line in severe if CONFIG_NOTICE.fullmatch(line)]
+    startup = next((index for index, line in enumerate(lines)
+                    if 'Preparing level ' in line or 'Preparing start region for dimension ' in line), -1)
+    if not unchanged_defaults or len(notices) > 1 or startup < 0:
+        raise ValueError('Native server defaults or startup sequence changed')
+    if any(line not in notices for line in severe) or '[STDERR/' in log or '[STDERR]' in log:
+        raise ValueError('Unexpected server error')
+    for notice in notices:
+        if lines.index(notice) >= startup or notice not in debug_lines:
+            raise ValueError('Server configuration notice occurred outside controlled startup')
+        index = debug_lines.index(notice)
+        thread = re.search(r'\[(Thread-\d+)/FATAL\]', notice).group(1)
+        expected = re.compile(
+            r'.*\[' + re.escape(thread) + r'/DEBUG\] '
+            r'\[(?:net\.minecraftforge\.fml\.config\.)?ConfigFileTypeHandler/CONFIG\]: '
+            r'Config file forge-server\.toml changed, sending notifies')
+        if index == 0 or not expected.fullmatch(debug_lines[index - 1]):
+            raise ValueError('Server notice lacks the exact native Forge config debug entry')
+    return {'native_server_config_notices': len(notices), 'notices': notices,
+            'unchanged_native_defaults': True, 'debug_identity_verified': True}
+
+
+def audit_server(directory, phase):
+    directory = Path(directory)
+    defaults = Path(__file__).resolve().parent.parent / 'src/bootstrapTest/defaultconfigs'
+    expected = defaults / 'defaultconfigs/forge-server.toml'
+    actual = directory / 'world/serverconfig/forge-server.toml'
+    unchanged = actual.is_file() and tomllib.loads(expected.read_text(encoding='utf-8')) == tomllib.loads(
+        actual.read_text(encoding='utf-8'))
+    receipt = classify_server((directory / 'logs/latest.log').read_text(encoding='utf-8'),
+                              (directory / 'logs/debug.log').read_text(encoding='utf-8'), unchanged)
+    if list((directory / 'crash-reports').glob('*')):
+        raise ValueError('Native server produced a crash report')
+    receipt['phase'] = phase
+    (directory / (phase + '-server-log-audit.json')).write_text(
+        json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
+    return receipt
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)

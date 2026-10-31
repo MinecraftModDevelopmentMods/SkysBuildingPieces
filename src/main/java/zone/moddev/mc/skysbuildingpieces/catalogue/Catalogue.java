@@ -16,6 +16,7 @@ public final class Catalogue {
     public final List<Palette> palettes = Collections.unmodifiableList(registeredPalettes);
     public final Map<String, Module> modules = Collections.unmodifiableMap(registeredModules);
     private boolean frozen;
+    private volatile boolean replacementsPresent;
 
     public Catalogue() {
         Module core = registerModule("vanilla", "skysbuildingpieces", read(Catalogue.class, ROOT + "materials.json"),
@@ -92,11 +93,20 @@ public final class Catalogue {
             throw new IllegalArgumentException("Module block budget exceeded: " + module);
         }
 
+        Map<String, MaterialDef> complete = new LinkedHashMap<>(definitions);
+
+        complete.putAll(additions);
+
+        for (MaterialDef material : additions.values()) {
+            resolveReplacement(material.id, complete);
+        }
+
         Module contribution = new Module(module, namespace, additions, addedPalettes, maximumBlocks);
 
         definitions.putAll(additions);
         registeredPalettes.addAll(addedPalettes);
         registeredModules.put(module, contribution);
+        replacementsPresent |= additions.values().stream().anyMatch(material -> material.replacement() != null);
         return contribution;
     }
 
@@ -113,6 +123,45 @@ public final class Catalogue {
         MaterialDef definition = materials.get(material);
 
         return definition == null ? null : definition.module;
+    }
+
+    /** Explicit replacements retain old palette slots without adding duplicate playable materials. */
+    public String resolveReplacement(String material) {
+        return resolveReplacement(material, materials);
+    }
+
+    public boolean hasReplacements() {
+        return replacementsPresent;
+    }
+
+    private static String resolveReplacement(String material, Map<String, MaterialDef> definitions) {
+        MaterialDef first = definitions.get(material);
+
+        if (first == null || first.replacement() == null) {
+            return material;
+        }
+
+        Set<String> visited = new HashSet<>();
+        String current = material;
+
+        while (definitions.containsKey(current)) {
+            if (!visited.add(current)) {
+                throw new IllegalArgumentException("Cyclic material replacement: " + material);
+            }
+
+            String replacement = definitions.get(current).replacement();
+
+            if (replacement == null) {
+                return current;
+            }
+
+            current = replacement;
+        }
+        if (visited.isEmpty()) {
+            return material;
+        }
+
+        throw new IllegalArgumentException("Missing replacement for " + material + ": " + current);
     }
 
     public static JsonArray read(Class<?> anchor, String resource) {
@@ -167,6 +216,10 @@ public final class Catalogue {
             JsonElement value = blocks.get(shape);
 
             return value == null ? null : new JsonParser().parse(value.toString());
+        }
+
+        public String replacement() {
+            return json.has("replacement") ? json.get("replacement").getAsString() : null;
         }
 
         /** Source identities remain available to the pre-flattening recovery bridge. */

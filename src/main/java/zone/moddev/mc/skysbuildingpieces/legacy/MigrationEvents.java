@@ -103,6 +103,17 @@ public final class MigrationEvents {
             worldState.markDirty();
             legacyTileData.remove("skysbuildingpieces_module_delta");
         }
+        if (legacyTileData.contains("skysbuildingpieces_additional_module_delta", 10)) {
+            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld().getWorld());
+            CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_additional_module_delta");
+
+            for (String module : deltas.keySet()) {
+                worldState.addBlocks(module, deltas.getLong(module));
+            }
+
+            worldState.markDirty();
+            legacyTileData.remove("skysbuildingpieces_additional_module_delta");
+        }
 
         if (event.getChunk() instanceof Chunk) {
             pending.add((Chunk) event.getChunk());

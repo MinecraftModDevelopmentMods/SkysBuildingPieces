@@ -25,6 +25,8 @@ public final class NativeLegacyChecks {
     }
 
     public static void run(ServerWorld world) throws Exception {
+        zone.moddev.mc.skysbuildingpieces.legacy.NativeStagingChecks.run(world);
+
         boolean forced = SkysBuildingPieces.forceReplace;
         boolean installed = ModList.get().isLoaded("buildingbricks");
 

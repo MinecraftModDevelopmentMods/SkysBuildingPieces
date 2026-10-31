@@ -90,22 +90,28 @@ final class NativeForwardChecks {
                     saved.get("z").getAsInt());
             String id = saved.get("id").getAsString();
             BlockState actual = world.getBlockState(position);
+            net.minecraft.block.Block registered = net.minecraftforge.registries.ForgeRegistries.BLOCKS
+                    .getValue(new net.minecraft.util.ResourceLocation(id));
 
-            require(actual.getBlock() instanceof PieceBlock
-                    && actual.getBlock().getRegistryName().toString().equals(id),
-                    "Saved palette identity at " + position + ": " + actual + " expected " + id);
+            require(registered instanceof PieceBlock, "Permanent palette registration is missing: " + id);
 
-            PieceBlock block = (PieceBlock) actual.getBlock();
+            PieceBlock source = (PieceBlock) registered;
+            BlockState expected = Pieces.canonicalState(source.getStateFromMeta(saved.get("meta").getAsInt()));
 
-            require(block.getMetaFromState(actual) == saved.get("meta").getAsInt(),
-                    "Saved material and orientation at " + position);
+            // Minecraft adds native equivalents between releases. The source identity remains registered, while
+            // recovery may use that equivalent with the same material and occupied half.
+            if (expected.getBlock() instanceof PieceBlock) {
+                PieceBlock block = (PieceBlock) expected.getBlock();
+
+                expected = block.getActualState(expected, world, position);
+            } else {
+                expected = net.minecraft.block.Block.getValidBlockForPosition(expected, world, position);
+            }
+
+            require(actual.equals(expected), "Saved material, orientation and derived geometry at " + position
+                    + ": " + actual + " expected " + expected);
             require(!actual.get(SlabBlock.WATERLOGGED), "Legacy pieces begin dry");
             require(world.getTileEntity(position) == null, "Converted pieces need no material tile");
-
-            BlockState connected = block.getActualState(actual, world, position);
-
-            require(actual.equals(connected),
-                    "Saved derived geometry at " + position + ": " + actual + " expected " + connected);
 
             if (actual.has(PieceBlock.CONNECTIONS)) {
                 derived++;

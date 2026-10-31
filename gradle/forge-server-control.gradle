@@ -1,0 +1,27 @@
+// This control is excluded from ordinary runs and every release artifact.
+def controlClasses = layout.buildDirectory.dir('forge-server-control/classes')
+def compileControl = tasks.register('compileForgeServerControl', JavaCompile) {
+    source fileTree('src/serverControl/java')
+    classpath = sourceSets.main.runtimeClasspath
+    destinationDirectory = controlClasses
+}
+def controlJar = tasks.register('forgeServerControlJar', Jar) {
+    dependsOn compileControl
+    archiveFileName = 'forge-server-control.jar'
+    destinationDirectory = layout.buildDirectory.dir('forge-server-control')
+    from controlClasses
+    from 'src/serverControl/resources'
+}
+def packagedControl = renamer.classes(controlJar) {
+    map.from minecraft.dependency.toSrgFile
+    libraries.from sourceSets.main.compileClasspath
+    output = layout.buildDirectory.file('forge-server-control/forge-server-control-reobf.jar')
+}
+tasks.register('preparePackagedServerControl') { dependsOn packagedControl }
+
+tasks.register('verifyNativeServerLogPolicy', Exec) {
+    group = 'verification'
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+            'tools/test_native_server_log.py'
+}
+tasks.named('check') { dependsOn tasks.named('verifyNativeServerLogPolicy') }

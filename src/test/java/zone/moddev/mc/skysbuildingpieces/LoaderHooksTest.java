@@ -16,6 +16,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderHooksTest {
@@ -96,6 +97,36 @@ class LoaderHooksTest {
             assertEquals(target.getKey().endsWith("legacy_chunk") ? 1 : 0, calls(node, "prepareLegacyChunk"));
             assertEquals(returns, calls(node, "finalizeLegacyChunk"));
             assertEquals(target.getKey().endsWith("raw_inventory") ? 1 : 0, calls(node, "prepareNbt"));
+
+            if (target.getKey().endsWith("raw_inventory")) {
+                int inventoryReturns = 0;
+
+                for (MethodNode method : node.methods) {
+                    if (method.desc.equals(
+                            "(Lcom/mojang/datafixers/DataFixer;" + "Lnet/minecraft/util/datafix/DefaultTypeReferences;"
+                                    + "Lnet/minecraft/nbt/CompoundNBT;II)Lnet/minecraft/nbt/CompoundNBT;")) {
+                        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+                            if (instruction.getOpcode() == Opcodes.ARETURN) {
+                                inventoryReturns++;
+                            }
+                            if (instruction instanceof MethodInsnNode
+                                    && ((MethodInsnNode) instruction).name.equals("finalizeNbt")) {
+                                MethodInsnNode finish = (MethodInsnNode) instruction;
+                                assertEquals("(Lnet/minecraft/nbt/CompoundNBT;I)Lnet/minecraft/nbt/CompoundNBT;",
+                                        finish.desc);
+                                assertTrue(finish.getPrevious() instanceof VarInsnNode);
+                                VarInsnNode version = (VarInsnNode) finish.getPrevious();
+                                assertEquals(Opcodes.ILOAD, version.getOpcode());
+                                assertEquals(4, version.var, "Forward the requested target version, not the old version");
+                            }
+                        }
+                    }
+                }
+
+                assertTrue(inventoryReturns > 0);
+                assertEquals(inventoryReturns, calls(node, "finalizeNbt"));
+            }
+
             assertEquals(target.getKey().endsWith("native_slab_placement") ? 1 : 0, calls(node, "place"));
 
             int instructions = node.methods.stream().mapToInt(method -> method.instructions.size()).sum();

@@ -37,9 +37,10 @@ public final class PieceItem extends Item {
         boolean nativeEquivalent = Pieces.nativeState(Catalogue.INSTANCE.materials.get(material),
                 block.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
         boolean hiddenVertical = block.palette.shape == Shape.VERTICAL_SLAB;
+        boolean retired = Catalogue.INSTANCE.materials.get(material).replacement() != null;
         Item.Properties properties = new Item.Properties();
 
-        return nativeEquivalent || hiddenVertical ? properties : properties.group(PiecesTab.INSTANCE);
+        return nativeEquivalent || hiddenVertical || retired ? properties : properties.group(PiecesTab.INSTANCE);
     }
 
     @Override

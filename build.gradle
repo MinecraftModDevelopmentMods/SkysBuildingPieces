@@ -84,6 +84,8 @@ tasks.withType(Javadoc).configureEach {
 }
 
 tasks.withType(AbstractArchiveTask).configureEach {
+    // Generated empty folders do not exist in a fresh checkout.
+    includeEmptyDirs = false
     filteringCharset = 'UTF-8'
     preserveFileTimestamps = false
     reproducibleFileOrder = true
@@ -778,3 +780,4 @@ ext.configureNativeBootstrapRun = configureFromForgeRun
 apply from: 'gradle/native-bootstrap.gradle'
 apply from: 'gradle/forge-client-control.gradle'
 apply from: 'gradle/native-compatibility.gradle'
+apply from: 'gradle/forge-server-control.gradle'

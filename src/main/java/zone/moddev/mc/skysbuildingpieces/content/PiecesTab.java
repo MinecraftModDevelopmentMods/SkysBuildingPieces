@@ -37,6 +37,9 @@ public final class PiecesTab extends ItemGroup {
             present.add(stack.getItem().getRegistryName().toString());
         }
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
+            if (material.replacement() != null) {
+                continue;
+            }
             for (Shape shape : new Shape[] { Shape.SLAB, Shape.STAIRS, Shape.WALL, Shape.PANE }) {
                 if (material.block(shape.name().toLowerCase(Locale.ROOT)) == null) {
                     continue;

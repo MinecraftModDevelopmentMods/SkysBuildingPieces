@@ -192,7 +192,8 @@ public final class PresentationChecks {
         }
         if (zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.modules.containsKey("biomesoplenty")) {
             require(Pieces.stack(Pieces.state("biomesoplenty:sapphire_block", Shape.WALL, 0), 1).getDisplayName()
-                    .getString().equals("Sapphire Wall"), "BOP gem display name");
+                    .getString().equals("Light Blue Terracotta Wall"),
+                    "retired sapphire uses its current material name");
             require(Pieces.stack(Pieces.state("biomesoplenty:planks_redwood", Shape.HORIZONTAL_STEP, 0), 1)
                     .getDisplayName().getString().equals("Redwood Step"), "BOP wood display name");
         }

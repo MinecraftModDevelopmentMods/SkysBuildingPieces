@@ -33,6 +33,7 @@ public final class GameplayChecks {
         // Native lighting retains data for tracked chunks. Keep this distant fixture tracked while the tests exercise
         // it during a real server tick.
         world.forceChunk(position.getX() >> 4, position.getZ() >> 4, true);
+
         long trackingDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
         while (!world.getChunkProvider().canTick(position) && System.nanoTime() < trackingDeadline) {
@@ -68,12 +69,12 @@ public final class GameplayChecks {
                 state = pieceBlock.getStateFromMeta(0);
                 world.setBlockState(position, state, 2);
             } else {
-                BlockState nativeEquivalent = Pieces.nativeState(pieceBlock.definition(pieceBlock.getDefaultState()),
-                        pieceBlock.palette.shape.name().toLowerCase(Locale.ROOT));
+                // Retired material items deliberately place their current equivalent, including another module's fixed
+                // palette.
+                BlockState equivalent = Pieces.state(pieceBlock.palette.materials.get(0), pieceBlock.palette.shape, 0);
 
-                require(state.getBlock() == pieceBlock
-                        || nativeEquivalent != null && state.getBlock() == nativeEquivalent.getBlock(),
-                        "own placement uses the material's shape");
+                require(state.getBlock() == equivalent.getBlock(), "own placement uses the material's shape: "
+                        + pieceBlock.getRegistryName() + " placed " + state + ", expected " + equivalent);
                 state = pieceBlock.getStateFromMeta(0);
                 world.setBlockState(position, state, 2);
             }
@@ -168,8 +169,9 @@ public final class GameplayChecks {
         nativeSlabs(world, position, player);
         world.setBlockState(position.up(), Blocks.STONE.getDefaultState(), 2);
         settleLighting(world, position);
-        require(world.getLight(position.up()) < 4, "Covered grass fixture is dark after native lighting finishes: light="
-                + world.getLight(position.up()) + " cover=" + world.getBlockState(position.up()));
+        require(world.getLight(position.up()) < 4,
+                "Covered grass fixture is dark after native lighting finishes: light=" + world.getLight(position.up())
+                        + " cover=" + world.getBlockState(position.up()));
 
         // Grass shapes decay to dirt without changing their octant geometry.
         for (Shape shape : new Shape[] { Shape.HORIZONTAL_STEP, Shape.VERTICAL_STEP, Shape.CORNER, Shape.STAIRS }) {
@@ -233,12 +235,14 @@ public final class GameplayChecks {
         java.util.concurrent.CompletableFuture<?> finished = lights.lightChunk(world.getChunkAt(position), true);
         long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(10);
 
-        while (!finished.isDone() && System.nanoTime() < deadline) {
+        // checkBlock is queued after the light pass. Its propagation can still be pending when lightChunk's completion
+        // callback runs.
+        while ((!finished.isDone() || lights.func_215570_a()) && System.nanoTime() < deadline) {
             lights.func_215588_z_();
             Thread.yield();
         }
 
-        require(finished.isDone(), "Native lighting did not finish for the grass fixture");
+        require(finished.isDone() && !lights.func_215570_a(), "Native lighting did not finish for the grass fixture");
         finished.join();
     }
 
@@ -289,7 +293,9 @@ public final class GameplayChecks {
                                             Direction.DOWN, Direction.UP }[click];
                                 }
 
-                                ItemStack stack = Pieces.stack(block.getStateFromMeta(slot * 2), 2);
+                                // Exercise this registered Sky item directly. Drops and recipes may reuse a native
+                                // slab, whose placement belongs to BuildingBricks while that mod is installed.
+                                ItemStack stack = ownSlab(block, block.palette.materials.get(slot));
 
                                 require(use(stack, player, world, anchor, Hand.MAIN_HAND, face, hitX, hitY,
                                         hitZ) == ActionResultType.SUCCESS,
@@ -420,12 +426,15 @@ public final class GameplayChecks {
                     int actualSpread = pieceBlock.getFireSpreadSpeed(state, world, position, Direction.UP);
 
                     world.setBlockState(position, nativeFull, 2);
-                    require(actualFire == nativeFull.getBlock().getFlammability(nativeFull, world, position,
-                            Direction.UP),
-                            "native flammability " + materialDefinition.id + " actual=" + actualFire + " expected="
-                                    + nativeFull.getBlock().getFlammability(nativeFull, world, position, Direction.UP));
-                    require(actualSpread == nativeFull.getBlock().getFireSpreadSpeed(nativeFull, world, position,
-                            Direction.UP), "native fire spread");
+
+                    int expectedFire = materialDefinition.flammability() >= 0 ? materialDefinition.flammability()
+                            : nativeFull.getBlock().getFlammability(nativeFull, world, position, Direction.UP);
+                    int expectedSpread = materialDefinition.fireSpread() >= 0 ? materialDefinition.fireSpread()
+                            : nativeFull.getBlock().getFireSpreadSpeed(nativeFull, world, position, Direction.UP);
+
+                    require(actualFire == expectedFire, "native flammability " + materialDefinition.id + " actual="
+                            + actualFire + " expected=" + expectedFire);
+                    require(actualSpread == expectedSpread, "native fire spread");
                     world.setBlockState(position, state, 2);
                     require(ItemStack.areItemStacksEqual(pieceBlock.getPickBlock(state, null, world, position, player),
                             expectedDrop(materialDefinition.id, pieceBlock, state)),
@@ -568,6 +577,13 @@ public final class GameplayChecks {
         player.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);
 
         if (net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")) {
+            BlockState unchanged = world.getBlockState(position);
+
+            require(NativeSlabPlacement.place(oak, player, world, position, Hand.MAIN_HAND, Direction.UP,
+                    .1f, 1, .5f) == null && world.getBlockState(position).equals(unchanged) && oak.getCount() == 2,
+                    "installed BuildingBricks retains native slab placement without a Sky write or item consumption");
+            clearAround(world, position);
+            System.out.println("BUILDING_PIECES_NATIVE_SLAB_POLICY_PASS installed=true hook=unchanged");
             return;
         }
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
@@ -623,6 +639,20 @@ public final class GameplayChecks {
         clearAround(world, position);
         player.setSneaking(false);
         System.out.println("BUILDING_PIECES_NATIVE_SLABS_PASS cases=" + checked + " creative=hidden drops=regular");
+    }
+
+    private static ItemStack ownSlab(PieceBlock block, String material) {
+        for (Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+            if (item instanceof PieceItem) {
+                PieceItem piece = (PieceItem) item;
+
+                if (piece.piece == block && piece.material.equals(material)) {
+                    return new ItemStack(piece, 2);
+                }
+            }
+        }
+
+        throw new AssertionError("Missing registered slab item: " + block.getRegistryName() + " / " + material);
     }
 
     public static final class PlacementVeto {

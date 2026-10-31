@@ -19,11 +19,16 @@ The permanent Sky palette IDs and orientation values are unchanged. The 1.14
 loader turns old numeric states into named states, preserving the material and
 orientation. Old pieces start dry. Wall connections, joined stairs, snow and
 path supports are refreshed through Minecraft's normal chunk post-processing.
+When Minecraft now has an equivalent piece, recovery uses that native block,
+keeping its material and orientation. The old Sky palette remains registered
+so its saved identity can still be read.
 
 Old palette inventory items are converted to their matching material items,
 keeping counts, names and custom data. A registry sidecar in the world's `data`
-folder preserves the original numeric snapshot for chunks opened later. Keep
-that file with the world and its backups. Back up
+folder preserves the original numeric snapshot for chunks opened later. It also
+keeps registrations added during later 1.12 saves, so newly added Sky pieces are
+not lost behind an older recovery snapshot. Conflicting block numbers stop the
+upgrade instead of being guessed. Keep that file with the world and its backups. Back up
 the whole world before upgrading, and check every other mod's missing content.
 
 With BuildingBricks installed, replacement is off by default. When explicitly

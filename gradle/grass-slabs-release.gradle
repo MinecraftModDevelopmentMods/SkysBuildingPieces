@@ -153,6 +153,18 @@ def fresh = tasks.register('integrationGrassSlabsFreshProcess', JavaExec) {
     systemProperty 'skysbuildingpieces.integrationPhase', 'fresh'
     systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runServer')
+    doLast {
+        File directory = runtime.get().asFile
+        File result = new File(directory, 'world/skysbuildingpieces-integration.properties')
+        Properties marker = new Properties()
+        if (result.isFile()) result.withInputStream { marker.load(it) }
+        String log = new File(directory, 'logs/latest.log').getText('UTF-8')
+        if (marker.fresh_complete != 'true' || !log.contains('Done (')
+                || log.find(/\/(?:ERROR|FATAL)\]/) || log.contains('[STDERR')
+                || !fileTree(new File(directory, 'crash-reports')).isEmpty()) {
+            throw new GradleException('The pinned Grass Slabs fresh phase failed; preserve it before a reload')
+        }
+    }
 }
 def reload = tasks.register('integrationGrassSlabsReloadProcess', JavaExec) {
     group = 'verification'

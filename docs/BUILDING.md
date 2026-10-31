@@ -48,12 +48,13 @@ official BuildingBricks release for this Minecraft target, and that fixture is
 not a claim of compatibility with an unofficial port. Genuine saved-world
 fixtures separately exercise conversion before vanilla data fixing.
 
-Forge 28 can log its first-save config watcher notification at `FATAL` even
-after a successful start. The native client audit accepts only that exact
-startup notification, with both Forge configuration files still equal to the
-staged defaults. It also recognises the two empty handshake messages reproduced
-by the Forge-only control. These messages stay in the logs and audit receipt;
-other errors, changed settings, crashes and incomplete checks still fail.
+Forge 28 logs an ordinary startup config notification at `FATAL`. The packaged
+server audit recognises one exact notification before level preparation, with
+unchanged native settings and the preceding debug entry naming `forge-server.toml`.
+The native client audit also recognises the two empty handshake messages
+reproduced by the Forge-only control. These messages stay in the logs and audit
+receipt; other errors, later changes, changed settings, crashes and incomplete
+checks still fail.
 
 The resource helpers in `tools` regenerate models, translations and native
 recipe/advancement JSON from the fixed catalogues. Unlocks retain their existing

@@ -34,3 +34,15 @@ that contributor's namespace.
 The API returns native `BlockState` values. The permanent palette IDs and slots
 remain unchanged, while ordinary inventory items have one identity per material
 and shape. Use the public lookup rather than constructing inventory metadata.
+
+For a retired material, `replacement` can name another registered material.
+Keep its original ID and palette slots: saved pieces then use the replacement's
+matching geometry. Unknown targets and replacement cycles are rejected before
+the catalogue is published. This is for explicit material changes, not a
+fallback for missing dependencies.
+
+Full blocks with several state variants can call
+`BuildingPiecesApi.registerStateItems(block, lookup)` during item registration.
+The lookup returns the normal item for a block state, so recipes and drops can
+use distinct items instead of inventory metadata. Duplicate or late lookups
+are rejected.

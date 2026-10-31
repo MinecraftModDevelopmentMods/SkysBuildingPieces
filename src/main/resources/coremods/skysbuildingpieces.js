@@ -73,14 +73,31 @@ function initializeCoreMod() {
                         continue;
                     }
                     matches++;
-                    if (hasCall(method, bridge, 'prepareNbt')) {
-                        continue;
+                    if (!hasCall(method, bridge, 'prepareNbt')) {
+                        var entry = new InsnList();
+                        entry.add(new VarInsnNode(Opcodes.ALOAD, 2));
+                        entry.add(new MethodInsnNode(Opcodes.INVOKESTATIC, bridge, 'prepareNbt',
+                                '(Lnet/minecraft/nbt/CompoundNBT;)V', false));
+                        method.instructions.insert(entry);
                     }
-                    var entry = new InsnList();
-                    entry.add(new VarInsnNode(Opcodes.ALOAD, 2));
-                    entry.add(new MethodInsnNode(Opcodes.INVOKESTATIC, bridge, 'prepareNbt',
-                            '(Lnet/minecraft/nbt/CompoundNBT;)V', false));
-                    method.instructions.insert(entry);
+                    if (!hasCall(method, bridge, 'finalizeNbt')) {
+                        var returns = 0;
+                        for (var instruction = method.instructions.getFirst(); instruction !== null;
+                                instruction = instruction.getNext()) {
+                            if (instruction.getOpcode() === Opcodes.ARETURN) {
+                                var finish = new InsnList();
+                                finish.add(new VarInsnNode(Opcodes.ILOAD, 4));
+                                finish.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                        bridge, 'finalizeNbt', '(Lnet/minecraft/nbt/CompoundNBT;I)'
+                                        + 'Lnet/minecraft/nbt/CompoundNBT;', false));
+                                method.instructions.insertBefore(instruction, finish);
+                                returns++;
+                            }
+                        }
+                        if (returns === 0) {
+                            throw new Error("Sky's Building Pieces: Forge 28 NBT updater has no return");
+                        }
+                    }
                 }
                 if (matches !== 1) {
                     throw new Error("Sky's Building Pieces: expected one Forge 28 NBT updater, found " + matches);

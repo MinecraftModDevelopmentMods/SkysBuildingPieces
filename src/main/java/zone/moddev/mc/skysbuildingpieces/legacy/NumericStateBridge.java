@@ -19,6 +19,7 @@ import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
 /** Source-world numbers are independent of the registry numbers in the running game. */
 final class NumericStateBridge {
+    static final String NATIVE_STATE_ID = "skysbuildingpieces_native_state";
     private static final BitSet occupied = new BitSet(4096);
     private static final BitSet stagingIds = new BitSet(4096);
     private static final Map<Integer, Dynamic<?>> previous = new LinkedHashMap<>();
@@ -27,6 +28,7 @@ final class NumericStateBridge {
     private static final Map<Integer, BlockState> staging = new LinkedHashMap<>();
     private static int openStagingId = -1;
     private static int nextStagingSlot;
+    private static boolean nativeNames;
 
     private NumericStateBridge() {
     }
@@ -50,7 +52,8 @@ final class NumericStateBridge {
                 int assigned = block.palette.materials.size() * block.palette.shape.states;
 
                 for (int metadata = 0; metadata < assigned; metadata++) {
-                    put(source.getKey() << 4 | metadata, block.getStateFromMeta(metadata));
+                    put(source.getKey() << 4 | metadata, zone.moddev.mc.skysbuildingpieces.content.Pieces
+                            .canonicalState(block.getStateFromMeta(metadata)));
                 }
             }
         }
@@ -153,11 +156,40 @@ final class NumericStateBridge {
             previous.put(encoded, table[encoded]);
         }
 
-        Dynamic<?> value = BlockStateFlatteningMap.makeDynamic(NBTUtil.writeBlockState(state).toString());
+        CompoundNBT flattened = NBTUtil.writeBlockState(state);
+        preserveNativeName(flattened);
+        String name = flattened.getString("Name");
+
+        if (name.equals("minecraft:kelp")) {
+            // The later vanilla rename turns kelp_top into today's growing tip; passing today's kelp name here would
+            // turn it into a stem instead.
+            flattened.putString("Name", "minecraft:kelp_top");
+        }
+        if (name.matches("minecraft:(oak|spruce|birch|jungle|acacia|dark_oak)_leaves")) {
+            // Vanilla's next leaves fixer still reads the old decayable flag. Supply it during numeric flattening so
+            // placed leaves stay persistent.
+            CompoundNBT properties = flattened.getCompound("Properties");
+
+            properties.putString("decayable", Boolean.toString(!properties.getString("persistent").equals("true")));
+        }
+
+        Dynamic<?> value = BlockStateFlatteningMap.makeDynamic(flattened.toString());
 
         table[encoded] = value;
         installed.put(encoded, value);
         encodings.putIfAbsent(state, encoded);
+    }
+
+    static synchronized void preserveNativeName(CompoundNBT state) {
+        if (state.getString("Name").equals("minecraft:stone_slab")) {
+            // This rough-stone slab was added in 1.14. Vanilla still renames the old use of its ID to smooth stone.
+            state.putString(NATIVE_STATE_ID, "minecraft:stone_slab");
+            nativeNames = true;
+        }
+    }
+
+    static synchronized boolean needsNativeNames() {
+        return nativeNames;
     }
 
     static synchronized void reset() {
@@ -179,6 +211,7 @@ final class NumericStateBridge {
         staging.clear();
         openStagingId = -1;
         nextStagingSlot = 0;
+        nativeNames = false;
     }
 
     private static Dynamic<?>[] table() {

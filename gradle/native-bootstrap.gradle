@@ -128,6 +128,21 @@ tasks.register('nativeWaterloggingTest', JavaExec) {
     }
 }
 
+tasks.register('nativeStagingTest', JavaExec) {
+    dependsOn prepare
+    workingDir directory
+    systemProperty 'skysbuildingpieces.bootstrapPhase', 'staging'
+    project.ext.configureNativeBootstrapRun(delegate, 'runServer')
+    doLast {
+        String log = new File(directory.get().asFile, 'logs/latest.log').getText('UTF-8')
+        if (!log.contains('BUILDING_PIECES_NATIVE_STAGING_PASS') ||
+                !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS staging') ||
+                log =~ /\/(?:ERROR|FATAL)\]/ || log.contains('[STDERR/')) {
+            throw new GradleException('Native staging checks did not complete cleanly')
+        }
+    }
+}
+
 def forwardDirectory = layout.buildDirectory.dir('native-forward-test-run')
 def prepareForward = tasks.register('prepareNativeForwardTest') {
     dependsOn bootstrapJar

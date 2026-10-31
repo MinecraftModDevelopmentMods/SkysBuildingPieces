@@ -29,9 +29,14 @@ public final class Pieces {
     public static final Map<String, PieceBlock> BLOCKS = new LinkedHashMap<>();
     public static final Map<String, Item> RETIRED_TEMPLATES = new LinkedHashMap<>();
     private static final Map<String, PieceItem> ITEMS = new LinkedHashMap<>();
+    private static final Map<Block, java.util.function.Function<BlockState, Item>> STATE_ITEMS = new java.util.concurrent.ConcurrentHashMap<>();
     public static boolean initialized;
 
     private Pieces() {
+    }
+
+    public static PieceItem pieceItem(String identifier) {
+        return ITEMS.get(identifier);
     }
 
     public static void register() {
@@ -105,7 +110,22 @@ public final class Pieces {
         }
     }
 
+    /** Flat inventory identities for native full blocks that retain a saved palette. */
+    public static synchronized void registerStateItems(Block block,
+            java.util.function.Function<BlockState, Item> items) {
+        if (zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge.ready || block == null || items == null
+                || STATE_ITEMS.containsKey(block)) {
+            throw new IllegalStateException("Invalid, duplicate or late state-item lookup");
+        }
+
+        STATE_ITEMS.put(block, items);
+    }
+
     public static BlockState nativeState(Catalogue.MaterialDef material, String shape) {
+        if (material.replacement() != null) {
+            material = Catalogue.INSTANCE.materials.get(Catalogue.INSTANCE.resolveReplacement(material.id));
+        }
+
         JsonElement value = material.block(shape);
 
         return value == null ? null : nativeState(value);
@@ -153,6 +173,8 @@ public final class Pieces {
     }
 
     public static BlockState state(String material, Shape shape, int orientation) {
+        material = Catalogue.INSTANCE.resolveReplacement(material);
+
         if (shape == Shape.STEP) {
             shape = orientation >= 8 ? Shape.VERTICAL_STEP : Shape.HORIZONTAL_STEP;
             orientation = orientation >= 8 ? orientation & 3 : orientation;
@@ -209,6 +231,43 @@ public final class Pieces {
         return null;
     }
 
+    /** Recover retired materials and newly native equivalents without changing the saved geometry. */
+    public static BlockState canonicalState(BlockState state) {
+        if (!(state.getBlock() instanceof PieceBlock)) {
+            return state;
+        }
+
+        PieceBlock source = (PieceBlock) state.getBlock();
+        Catalogue.MaterialDef material = source.definition(state);
+
+        if (material.replacement() == null
+                && material.block(source.palette.shape.name().toLowerCase(Locale.ROOT)) == null) {
+            return state;
+        }
+
+        int orientation = source.getMetaFromState(state) % source.palette.shape.states;
+        BlockState result = state(material.id, source.palette.shape, orientation);
+
+        if (result == null || result.getBlock().hasTileEntity(result)) {
+            throw new IllegalStateException("No safe replacement geometry for " + material.id);
+        }
+        for (Map.Entry<IProperty<?>, Comparable<?>> property : state.getValues().entrySet()) {
+            if (property.getKey().getName().equals("meta")) {
+                continue;
+            }
+
+            IProperty<?> target = result.getBlock().getStateContainer().getProperty(property.getKey().getName());
+
+            if (target != null) {
+                result = withProperty(result, target, property.getValue().toString().toLowerCase(Locale.ROOT));
+            } else if (property.getKey().getName().equals("waterlogged") && Boolean.TRUE.equals(property.getValue())) {
+                throw new IllegalStateException("Material replacement would lose water: " + material.id);
+            }
+        }
+
+        return result;
+    }
+
     static ItemStack slabDrop(String material, BlockState fallback) {
         BlockState horizontal = state(material, Shape.SLAB, 1);
 
@@ -219,6 +278,9 @@ public final class Pieces {
         if (state == null) {
             return null;
         }
+
+        state = canonicalState(state);
+
         if (state.has(net.minecraft.block.SlabBlock.TYPE)
                 && state.get(net.minecraft.block.SlabBlock.TYPE) == net.minecraft.state.properties.SlabType.DOUBLE) {
             return null; // A native double slab has no distinct full-block inventory item.
@@ -231,7 +293,9 @@ public final class Pieces {
 
             item = ITEMS.get(PaletteItemIds.itemId(block.palette, block.definition(state).id));
         } else {
-            item = Item.getItemFromBlock(state.getBlock());
+            java.util.function.Function<BlockState, Item> lookup = STATE_ITEMS.get(state.getBlock());
+
+            item = lookup == null ? Item.getItemFromBlock(state.getBlock()) : lookup.apply(state);
         }
 
         return item == null || item == Items.AIR ? null : new ItemStack(item, count);
