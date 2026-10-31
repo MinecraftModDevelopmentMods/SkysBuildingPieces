@@ -1,19 +1,20 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
+import zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
 /** Catalogue contributions are complete before Forge opens the registries. */
 @Mod.EventBusSubscriber(
-        modid = SkysBuildingPieces.ID)
+        modid = SkysBuildingPieces.ID,
+        bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class RegistryEvents {
     private RegistryEvents() {
     }
@@ -28,26 +29,30 @@ public final class RegistryEvents {
     @SubscribeEvent
     public static void items(RegistryEvent.Register<Item> event) {
         Pieces.registerItems(event.getRegistry());
-        event.getRegistry().register(
-                new ItemBlock(SkysBuildingPieces.HOLDER).setRegistryName(SkysBuildingPieces.HOLDER.getRegistryName()));
+
+        BlockItem holder = new BlockItem(SkysBuildingPieces.HOLDER, new Item.Properties());
+
+        holder.setRegistryName(SkysBuildingPieces.HOLDER.getRegistryName());
+        event.getRegistry().register(holder);
     }
 
-    @SubscribeEvent(
-            priority = EventPriority.LOWEST)
-    public static void recipes(RegistryEvent.Register<IRecipe> event) {
-        CuttingRecipe.register(event.getRegistry());
+    @SubscribeEvent
+    public static void serializers(RegistryEvent.Register<net.minecraft.item.crafting.IRecipeSerializer<?>> event) {
+        event.getRegistry().register(CuttingRecipe.SERIALIZER.setRegistryName(SkysBuildingPieces.ID, "cutting"));
+        event.getRegistry()
+                .register(LegacyPieceRecipe.SERIALIZER.setRegistryName(SkysBuildingPieces.ID, "legacy_piece"));
     }
 
     @SubscribeEvent
     public static void missingBlocks(RegistryEvent.MissingMappings<Block> event) {
         for (RegistryEvent.MissingMappings.Mapping<Block> mapping : event.getAllMappings()) {
-            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
-                    .formerBlock(mapping.key.toString());
-            if (formerPiece != null) {
-                mapping.remap(formerPiece);
-                continue;
-            }
-            if (LegacyMapping.owned(mapping.key.toString())) {
+            Block former = MineralogyCompat.formerBlock(mapping.key.toString());
+
+            if (former != null) {
+                mapping.remap(former);
+            } else if (LegacyMapping.owned(mapping.key.toString())) {
+                // The early loader resolves material NBT before these old generic identities disappear. Unsafe sources
+                // fail the startup preflight.
                 mapping.ignore();
             }
         }
@@ -56,13 +61,11 @@ public final class RegistryEvents {
     @SubscribeEvent
     public static void missingItems(RegistryEvent.MissingMappings<Item> event) {
         for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getAllMappings()) {
-            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
-                    .formerBlock(mapping.key.toString());
-            if (formerPiece != null) {
-                mapping.remap(Item.getItemFromBlock(formerPiece));
-                continue;
-            }
-            if (LegacyMapping.owned(mapping.key.toString())) {
+            Block former = MineralogyCompat.formerBlock(mapping.key.toString());
+
+            if (former != null) {
+                mapping.remap(Item.getItemFromBlock(former));
+            } else if (LegacyMapping.owned(mapping.key.toString())) {
                 mapping.ignore();
             }
         }

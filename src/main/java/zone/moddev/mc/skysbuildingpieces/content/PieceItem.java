@@ -1,94 +1,121 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import zone.moddev.mc.skysbuildingpieces.catalogue.*;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Direct placement, deliberately not delegated to BuildingBricks' ItemBlock interception. */
-public final class PieceItem extends ItemBlock {
+/** One material per inventory item; placement still uses the fixed block palette. */
+public final class PieceItem extends Item {
     public final PieceBlock piece;
+    public final String material;
 
-    public PieceItem(PieceBlock block) {
-        super(block);
-        piece = block;
-        setHasSubtypes(true);
+    public PieceItem(PieceBlock block, String material) {
+        super(properties(block, material));
+        this.piece = block;
+        this.material = material;
     }
 
-    public int getMetadata(int damage) {
-        return damage;
-    }
+    private static Item.Properties properties(PieceBlock block, String material) {
+        boolean nativeEquivalent = Pieces.nativeState(Catalogue.INSTANCE.materials.get(material),
+                block.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
+        boolean hiddenVertical = block.palette.shape == Shape.VERTICAL_SLAB;
+        Item.Properties properties = new Item.Properties();
 
-    public String getTranslationKey(ItemStack itemStack) {
-        return "tile." + piece.palette.namespace + "."
-                + new ResourceLocation(piece.palette.material(itemStack.getMetadata())).getPath() + "."
-                + piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT);
-    }
-
-    public String getItemStackDisplayName(ItemStack stack) {
-        Catalogue.MaterialDef materialDefinition = Catalogue.INSTANCE.materials
-                .get(piece.palette.material(stack.getMetadata()));
-        ItemStack full = Pieces.stack(Pieces.nativeState(materialDefinition, "full"), 1);
-        String material = full == null
-                ? net.minecraft.util.text.translation.I18n.translateToLocal("tile.stoneSlab.stone.name")
-                : full.getDisplayName();
-
-        return PieceNames.displayName(piece.palette.namespace, materialDefinition.id,
-                piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), material);
+        return nativeEquivalent || hiddenVertical ? properties : properties.group(PiecesTab.INSTANCE);
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos position, EnumHand hand,
-            EnumFacing face, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ITextComponent getDisplayName(ItemStack stack) {
+        ItemStack full = Pieces.stack(Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "full"), 1);
 
-        if (stack.isEmpty()) {
-            return EnumActionResult.FAIL;
+        if (full == null) {
+            full = Pieces.stack(Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "slab"), 1);
         }
 
-        String materialId = piece.palette.material(stack.getMetadata());
+        String namespace = piece.palette.module.equals("mineralogy")
+                ? zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.ASSETS
+                : piece.palette.namespace;
+
+        return PieceNames.displayName(namespace, material,
+                piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), full.getDisplayName());
+    }
+
+    @Override
+    public int getBurnTime(ItemStack stack) {
+        return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
+    }
+
+    @Override
+    public ActionResultType onItemUse(ItemUseContext context) {
+        PlayerEntity player = context.getPlayer();
+
+        if (player == null || context.getItem().isEmpty()) {
+            return ActionResultType.FAIL;
+        }
+
+        BlockPos position = context.getPos();
+        Vec3d hit = context.getHitVec();
         Shape shape = piece.palette.shape;
 
-        if (shape == Shape.VERTICAL_SLAB && Pieces.state(materialId, Shape.SLAB, 1) != null) {
+        if (shape == Shape.VERTICAL_SLAB && Pieces.state(material, Shape.SLAB, 1) != null) {
             shape = Shape.SLAB;
         }
 
-        return place(stack, player, world, position, hand, face, hitX, hitY, hitZ, materialId, shape);
+        return place(context.getItem(), player, context.getWorld(), position, context.getHand(), context.getFace(),
+                (float) (hit.x - position.getX()), (float) (hit.y - position.getY()), (float) (hit.z - position.getZ()),
+                material, shape);
     }
 
-    static EnumActionResult place(ItemStack stack, EntityPlayer player, World world, BlockPos position, EnumHand hand,
-            EnumFacing face, float hitX, float hitY, float hitZ, String materialId, Shape shape) {
+    static ActionResultType place(ItemStack stack, PlayerEntity player, World world, BlockPos position, Hand hand,
+            Direction face, float hitX, float hitY, float hitZ, String materialId, Shape shape) {
         if (stack == null || stack.isEmpty()) {
-            return EnumActionResult.FAIL;
+            return ActionResultType.FAIL;
         }
 
         float targetX = hitX;
         float targetY = hitY;
         float targetZ = hitZ;
 
-        IBlockState existingState = world.getBlockState(position);
+        BlockState existingState = world.getBlockState(position);
 
-        if (!existingState.getBlock().isReplaceable(world, position)) {
-            if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ)) {
-                return EnumActionResult.SUCCESS;
-            }
-
+        // Vanilla slabs call a matching half replaceable. Join it before asking the placement context whether this cell
+        // can accept a new block.
+        if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ)) {
+            return ActionResultType.SUCCESS;
+        }
+        if (!replaceable(world, position, player, hand, stack, face, hitX, hitY, hitZ)) {
             position = position.offset(face);
             existingState = world.getBlockState(position);
-            // Moving to the next block reverses the clicked boundary's local coordinates.
             targetX -= face.getXOffset();
             targetY -= face.getYOffset();
             targetZ -= face.getZOffset();
+
+            if (combine(world, position, existingState, materialId, shape, player, stack, face, targetX, targetY,
+                    targetZ)) {
+                return ActionResultType.SUCCESS;
+            }
         }
-        if (!player.canPlayerEdit(position, face, stack)) {
-            return EnumActionResult.FAIL;
-        }
-        if (!existingState.getBlock().isReplaceable(world, position)) {
-            return combine(world, position, existingState, materialId, shape, player, stack, face, targetX, targetY,
-                    targetZ) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+        if (!player.canPlayerEdit(position, face, stack)
+                || !replaceable(world, position, player, hand, stack, face, targetX, targetY, targetZ)) {
+            return ActionResultType.FAIL;
         }
 
         int horizontalRotation = closest(hitX, hitZ);
@@ -97,7 +124,7 @@ public final class PieceItem extends ItemBlock {
 
         switch (shape) {
             case SLAB:
-                EnumFacing slabSide = SlabPlacement.side(face, hitX, hitY, hitZ);
+                Direction slabSide = SlabPlacement.side(face, hitX, hitY, hitZ);
                 placedShape = SlabPlacement.shape(slabSide);
                 orientation = SlabPlacement.orientation(slabSide);
                 break;
@@ -106,7 +133,7 @@ public final class PieceItem extends ItemBlock {
                 break;
             case HORIZONTAL_STEP:
                 orientation = horizontalRotation
-                        + (face == EnumFacing.DOWN || face.getAxis() != EnumFacing.Axis.Y && hitY > .5f ? 0 : 4);
+                        + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 0 : 4);
                 break;
             case VERTICAL_STEP:
                 orientation = corner(hitX, hitZ);
@@ -114,50 +141,54 @@ public final class PieceItem extends ItemBlock {
             case STEP:
                 orientation = player.isSneaking() ? 8 + corner(hitX, hitZ)
                         : horizontalRotation
-                                + (face == EnumFacing.DOWN || face.getAxis() != EnumFacing.Axis.Y && hitY > .5f ? 0
-                                        : 4);
+                                + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 0 : 4);
                 break;
             case CORNER:
                 orientation = corner(hitX, hitZ)
-                        + (face == EnumFacing.DOWN || face.getAxis() != EnumFacing.Axis.Y && hitY > .5f ? 0 : 4);
+                        + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 0 : 4);
                 break;
             case STAIRS:
-                EnumFacing playerFacing = player.getHorizontalFacing();
-                orientation = (playerFacing == EnumFacing.EAST ? 0
-                        : playerFacing == EnumFacing.WEST ? 1 : playerFacing == EnumFacing.SOUTH ? 2 : 3)
-                        + (face == EnumFacing.DOWN || face.getAxis() != EnumFacing.Axis.Y && hitY > .5f ? 4 : 0);
+                Direction playerFacing = player.getHorizontalFacing();
+                orientation = (playerFacing == Direction.EAST ? 0
+                        : playerFacing == Direction.WEST ? 1 : playerFacing == Direction.SOUTH ? 2 : 3)
+                        + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 4 : 0);
                 break;
             default:
                 orientation = 0;
         }
 
-        IBlockState target = Pieces.state(materialId, placedShape, orientation);
+        BlockState target = Pieces.state(materialId, placedShape, orientation);
 
         if (shape == Shape.HORIZONTAL_STEP && player.isSneaking()) {
             target = Pieces.state(materialId, Shape.VERTICAL_STEP, corner(hitX, hitZ));
         }
+        if (target != null && target.has(SlabBlock.WATERLOGGED)) {
+            boolean water = world.getFluidState(position).getFluid() == Fluids.WATER
+                    || world.getFluidState(position).getFluid() == Fluids.FLOWING_WATER;
+
+            target = target.with(SlabBlock.WATERLOGGED, water);
+        }
         // Check the chosen orientation, not the block's default collision box.
-        if (target == null || !world.mayPlace(target.getBlock(), position, true, face, player)
-                || !safe(world, position, target)) {
-            return EnumActionResult.FAIL;
+        if (target == null || !target.isValidPosition(world, position) || !safe(world, position, target)) {
+            return ActionResultType.FAIL;
         }
         if (!world.setBlockState(position, target, 3)) {
-            return EnumActionResult.FAIL;
+            return ActionResultType.FAIL;
         }
 
         target.getBlock().onBlockPlacedBy(world, position, target, player, stack);
         finish(world, position, target, player, stack);
-        return EnumActionResult.SUCCESS;
+        return ActionResultType.SUCCESS;
     }
 
-    public boolean canPlaceBlockOnSide(World world, BlockPos position, EnumFacing side, EntityPlayer player,
+    public boolean canPlaceBlockOnSide(World world, BlockPos position, Direction side, PlayerEntity player,
             ItemStack itemStack) {
         return player.canPlayerEdit(position, side, itemStack);
     }
 
     /** Combine occupied cells only when their union is a supported shape of the same material. */
-    private static boolean combine(World world, BlockPos position, IBlockState existingState, String material,
-            Shape shape, EntityPlayer player, ItemStack stack, EnumFacing face, float hitX, float hitY, float hitZ) {
+    private static boolean combine(World world, BlockPos position, BlockState existingState, String material,
+            Shape shape, PlayerEntity player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ) {
         if (!player.canPlayerEdit(position, face, stack) || shape == Shape.WALL || shape == Shape.PANE) {
             return false;
         }
@@ -174,22 +205,17 @@ public final class PieceItem extends ItemBlock {
 
             existingCells = other.mask(existingState);
         } else {
-            IBlockState nativeSlab = Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "slab");
+            BlockState nativeSlab = Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "slab");
 
-            if (nativeSlab == null || !(existingState.getBlock() instanceof net.minecraft.block.BlockSlab)
-                    || existingState.getBlock() != nativeSlab.getBlock()
-                    || !existingState
-                            .withProperty(net.minecraft.block.BlockSlab.HALF,
-                                    net.minecraft.block.BlockSlab.EnumBlockHalf.BOTTOM)
-                            .equals(nativeSlab.withProperty(net.minecraft.block.BlockSlab.HALF,
-                                    net.minecraft.block.BlockSlab.EnumBlockHalf.BOTTOM))) {
+            if (nativeSlab == null || existingState.getBlock() != nativeSlab.getBlock()) {
                 return false;
             }
 
-            existingCells = Geometry.mask(Shape.SLAB,
-                    existingState.getValue(
-                            net.minecraft.block.BlockSlab.HALF) == net.minecraft.block.BlockSlab.EnumBlockHalf.TOP ? 0
-                                    : 1);
+            existingCells = NativeSlabState.mask(existingState);
+
+            if (existingCells < 0) {
+                return false;
+            }
         }
 
         // Nudge seam clicks towards the empty half, including clicks exactly on the centre plane.
@@ -197,7 +223,7 @@ public final class PieceItem extends ItemBlock {
         int clickedCell = (hitX + face.getXOffset() * epsilon >= .5f ? 1 : 0)
                 | (hitZ + face.getZOffset() * epsilon >= .5f ? 2 : 0)
                 | (hitY + face.getYOffset() * epsilon >= .5f ? 4 : 0);
-        IBlockState combinedState = null;
+        BlockState combinedState = null;
         boolean isSlab = shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB;
         Shape[] additions = isSlab ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
 
@@ -234,6 +260,10 @@ public final class PieceItem extends ItemBlock {
             }
         }
 
+        if (combinedState != null && combinedState.has(SlabBlock.WATERLOGGED)
+                && existingState.has(SlabBlock.WATERLOGGED)) {
+            combinedState = combinedState.with(SlabBlock.WATERLOGGED, existingState.get(SlabBlock.WATERLOGGED));
+        }
         if (combinedState == null || !safe(world, position, combinedState)
                 || !world.setBlockState(position, combinedState, 3)) {
             return false;
@@ -243,29 +273,33 @@ public final class PieceItem extends ItemBlock {
         return true;
     }
 
-    private static boolean safe(World world, BlockPos position, IBlockState target) {
-        if (target.getBlock() instanceof PieceBlock) {
-            for (net.minecraft.util.math.AxisAlignedBB boundingBox : ((PieceBlock) target.getBlock())
-                    .boxes(target.getBlock().getActualState(target, world, position))) {
-                if (!world.checkNoEntityCollision(boundingBox.offset(position))) {
-                    return false;
-                }
-            }
-        }
-
-        return !(target.getBlock() instanceof PieceBlock)
-                ? world.checkNoEntityCollision(new net.minecraft.util.math.AxisAlignedBB(position))
-                : true;
+    private static boolean safe(World world, BlockPos position, BlockState target) {
+        return world.func_217350_a(target, position, ISelectionContext.dummy());
     }
 
-    private static void finish(World world, BlockPos position, IBlockState target, EntityPlayer player,
+    private static boolean replaceable(World world, BlockPos position, PlayerEntity player, Hand hand, ItemStack stack,
+            Direction face, float hitX, float hitY, float hitZ) {
+        BlockRayTraceResult hit = new BlockRayTraceResult(
+                new Vec3d(position.getX() + hitX, position.getY() + hitY, position.getZ() + hitZ), face, position,
+                false);
+
+        return new PlacementContext(world, player, hand, stack, hit).replacingClickedOnBlock();
+    }
+
+    private static final class PlacementContext extends BlockItemUseContext {
+        PlacementContext(World world, PlayerEntity player, Hand hand, ItemStack stack, BlockRayTraceResult hit) {
+            super(world, player, hand, stack, hit);
+        }
+    }
+
+    private static void finish(World world, BlockPos position, BlockState target, PlayerEntity player,
             ItemStack stack) {
         net.minecraft.block.SoundType sound = target.getBlock().getSoundType(target, world, position, player);
 
         world.playSound(player, position, sound.getPlaceSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1) / 2,
                 sound.getPitch() * .8f);
 
-        if (!player.capabilities.isCreativeMode) {
+        if (!player.abilities.isCreativeMode) {
             stack.shrink(1);
         }
     }

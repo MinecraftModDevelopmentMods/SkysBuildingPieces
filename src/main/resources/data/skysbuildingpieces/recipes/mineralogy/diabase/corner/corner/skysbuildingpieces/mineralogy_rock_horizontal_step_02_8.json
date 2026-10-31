@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mineralogy_diabase_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:mineralogy_diabase_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_diabase_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_diabase_horizontal_step"
+    }
+  ]
+}

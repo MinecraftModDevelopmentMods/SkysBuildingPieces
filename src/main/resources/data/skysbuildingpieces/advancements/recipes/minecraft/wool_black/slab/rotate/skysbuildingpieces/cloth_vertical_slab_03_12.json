@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:wool_black_vertical_slab"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/wool_black/slab/rotate/skysbuildingpieces/cloth_vertical_slab_03_12"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/wool_black/slab/rotate/skysbuildingpieces/cloth_vertical_slab_03_12"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_black_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_black_vertical_slab"
+    }
+  ]
+}

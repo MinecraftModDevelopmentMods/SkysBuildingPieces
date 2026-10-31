@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+license="LGPL-2.1-only"
+[[mods]]
+modId="forgeclientcontrol"
+version="1"
+displayName="Forge Client Control"

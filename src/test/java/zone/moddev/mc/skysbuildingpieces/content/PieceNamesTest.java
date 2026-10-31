@@ -30,7 +30,11 @@ class PieceNamesTest {
                 Properties names = new Properties();
 
                 try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                    names.load(reader);
+                    com.google.gson.JsonObject language = new com.google.gson.JsonParser().parse(reader)
+                            .getAsJsonObject();
+
+                    language.entrySet()
+                            .forEach(entry -> names.setProperty(entry.getKey(), entry.getValue().getAsString()));
                 }
 
                 java.util.function.Function<String, String> translate = key -> names.getProperty(key, key);

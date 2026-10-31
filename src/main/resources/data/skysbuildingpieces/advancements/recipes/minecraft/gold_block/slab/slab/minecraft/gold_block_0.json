@@ -1,0 +1,32 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:gold_block"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/gold_block/slab/slab/minecraft/gold_block_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/gold_block/slab/slab/minecraft/gold_block_0"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:gold_block_slab"
+    }
+  ]
+}

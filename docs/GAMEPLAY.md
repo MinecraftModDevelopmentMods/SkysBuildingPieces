@@ -51,8 +51,8 @@ slabs one for one, retaining custom item data.
 
 Two matching regular slabs side by side make their matching full block. This
 also applies to supported BOP materials. A vertical pair keeps any existing
-native decorative-block recipe. Smooth stone has no obtainable full block item
-in this Minecraft version and therefore has no recombination recipe.
+native decorative-block recipe. Minecraft 1.14 provides an obtainable smooth stone block, so its slabs can
+also be rebuilt into that block.
 
 To rebuild larger pieces, put two matching corners one above the other to make
 one step. Two matching steps in a column make one slab. This works in either
@@ -77,10 +77,9 @@ Horizontal and vertical step items can also be rotated one for one. Either
 kind can be cut into corners. Soil steps use full dirt, coarse dirt, podzol,
 mycelium or grass blocks because their horizontal slabs are outside this mod.
 
-Smooth stone has no obtainable full block item in Minecraft 1.12.2. Use
-vanilla smooth stone slabs for its stairs and walls; the output
-is half the normal full-block quantity. Its steps and corners follow the
-normal slab and step recipes.
+Use full smooth stone blocks for its missing building shapes. Its steps and
+corners follow the normal slab and step recipes. Native 1.14 slabs, stairs and
+walls take precedence wherever Minecraft already supplies the matching shape.
 
 Put a supported old BuildingBricks piece in the grid by itself to convert one
 item into its equivalent. The material and custom item data are preserved.
@@ -95,8 +94,8 @@ top or bottom edge of a side face can hold a horizontal slab. Sneaking does not
 change slab placement. Old vertical slab items follow these same rules when
 their regular slab exists.
 
-Supported vanilla and BOP slab items use these placement rules too. While
-BuildingBricks is installed, it continues handling its native slab placement.
+Supported vanilla slab items use these placement rules too. Matching add-ons
+can extend the same placement rules to their native slab items.
 Vertical slab items are hidden from creative inventory. Breaking, Silk Touch
 and pick-block return the regular slab, with the material's usual drop rules.
 
@@ -108,7 +107,7 @@ Grass shapes use biome colours and spread to ordinary dirt and matching dirt
 pieces. Covered or dark grass becomes the matching dirt shape, retaining its
 orientation. Steps and corners leave exposed ground grassy; pieces covering
 the whole footprint keep dirt underneath. With Grass
-Slabs 1.1.1.112021 or later installed, spreading also works across its slabs and turf.
+Slabs 1.2.0.114041 or later installed, spreading also works across its slabs and turf.
 Plants and bonemeal need a complete upper supporting face. Nearby snow gives
 soil and grass pieces a visual snow cap without changing their collision.
 

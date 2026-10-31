@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/grass_path",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:grass_path_step"
+    }
+  },
+  "result": {
+    "item": "skysgrassslabs:path_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:grass_path_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysgrassslabs:path_slab"
+    }
+  ]
+}

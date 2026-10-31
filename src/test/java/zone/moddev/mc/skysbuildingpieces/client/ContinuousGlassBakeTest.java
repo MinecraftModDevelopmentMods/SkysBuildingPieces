@@ -1,18 +1,18 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
 import java.util.*;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.registry.RegistrySimple;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContinuousGlassBakeTest {
     @Test
     void onlyWallBlockVariantsAreWrappedAndAliasesStayShared() {
-        RegistrySimple<ModelResourceLocation, IBakedModel> registry = new RegistrySimple<ModelResourceLocation, IBakedModel>();
+        Map<ResourceLocation, IBakedModel> registry = new LinkedHashMap<ResourceLocation, IBakedModel>();
         IBakedModel base = new EmptyModel();
         IBakedModel missing = new EmptyModel();
 
@@ -23,43 +23,43 @@ class ContinuousGlassBakeTest {
 
         ModelResourceLocation absent = key("stained_glass_wall_00", "connections=0,meta=0,up=true");
 
-        registry.putObject(wall, base);
-        registry.putObject(alias, base);
-        registry.putObject(item, base);
-        registry.putObject(other, base);
-        registry.putObject(absent, missing);
+        registry.put(wall, base);
+        registry.put(alias, base);
+        registry.put(item, base);
+        registry.put(other, base);
+        registry.put(absent, missing);
 
         Set<String> targets = new HashSet<String>(
                 Arrays.asList("skysbuildingpieces:clear_glass_wall_00", "skysbuildingpieces:stained_glass_wall_00"));
 
         ContinuousGlassModel.install(registry, missing, targets);
 
-        IBakedModel wrapped = registry.getObject(wall);
+        IBakedModel wrapped = registry.get(wall);
 
         assertTrue(wrapped instanceof ContinuousGlassModel);
-        assertSame(wrapped, registry.getObject(alias));
-        assertSame(base, registry.getObject(item));
-        assertSame(base, registry.getObject(other));
-        assertSame(missing, registry.getObject(absent));
+        assertSame(wrapped, registry.get(alias));
+        assertSame(base, registry.get(item));
+        assertSame(base, registry.get(other));
+        assertSame(missing, registry.get(absent));
         ContinuousGlassModel.install(registry, missing, targets);
-        assertSame(wrapped, registry.getObject(wall));
+        assertSame(wrapped, registry.get(wall));
     }
 
     @Test
     void aResourceReloadUsesTheNewBaseModel() {
         ModelResourceLocation key = key("clear_glass_wall_00", "connections=10,meta=0,up=false");
         Set<String> targets = Collections.singleton("skysbuildingpieces:clear_glass_wall_00");
-        RegistrySimple<ModelResourceLocation, IBakedModel> registry = new RegistrySimple<ModelResourceLocation, IBakedModel>();
+        Map<ResourceLocation, IBakedModel> registry = new LinkedHashMap<ResourceLocation, IBakedModel>();
 
-        registry.putObject(key, new EmptyModel());
+        registry.put(key, new EmptyModel());
         ContinuousGlassModel.install(registry, null, targets);
 
-        IBakedModel previous = registry.getObject(key);
+        IBakedModel previous = registry.get(key);
 
-        registry.putObject(key, new EmptyModel());
+        registry.put(key, new EmptyModel());
         ContinuousGlassModel.install(registry, null, targets);
-        assertTrue(registry.getObject(key) instanceof ContinuousGlassModel);
-        assertNotSame(previous, registry.getObject(key));
+        assertTrue(registry.get(key) instanceof ContinuousGlassModel);
+        assertNotSame(previous, registry.get(key));
     }
 
     private static ModelResourceLocation key(String block, String variant) {
@@ -67,7 +67,7 @@ class ContinuousGlassBakeTest {
     }
 
     private static final class EmptyModel implements IBakedModel {
-        public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long random) {
+        public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
             return Collections.emptyList();
         }
 
@@ -92,7 +92,7 @@ class ContinuousGlassBakeTest {
         }
 
         public ItemOverrideList getOverrides() {
-            return ItemOverrideList.NONE;
+            return ItemOverrideList.EMPTY;
         }
     }
 }

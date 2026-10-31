@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:stained_glass_cyan_vertical_step"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/stained_glass_cyan/corner/corner/skysbuildingpieces/stained_glass_vertical_step_02_4"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_cyan/corner/corner/skysbuildingpieces/stained_glass_vertical_step_02_4"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_cyan_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_cyan_vertical_step"
+    }
+  ]
+}

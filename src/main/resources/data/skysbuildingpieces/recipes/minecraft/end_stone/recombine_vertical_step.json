@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/end_stone",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:end_stone_vertical_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:end_stone_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_stone_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_stone_vertical_step"
+    }
+  ]
+}

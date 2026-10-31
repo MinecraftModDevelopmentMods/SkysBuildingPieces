@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/prismarine_dark",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:dark_prismarine_slab"
+    }
+  },
+  "result": {
+    "item": "minecraft:dark_prismarine",
+    "count": 1
+  }
+}

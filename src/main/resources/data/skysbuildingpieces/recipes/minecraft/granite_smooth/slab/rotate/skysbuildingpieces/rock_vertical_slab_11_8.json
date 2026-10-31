@@ -1,0 +1,21 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:granite_smooth_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "minecraft:polished_granite_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:granite_smooth_vertical_slab"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stained_glass_orange_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_glass_orange_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_orange_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_orange_horizontal_step"
+    }
+  ]
+}

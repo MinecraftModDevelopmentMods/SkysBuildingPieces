@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:chiseled_red_sandstone_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+    }
+  ]
+}

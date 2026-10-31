@@ -1,114 +1,102 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
-import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
-/** Optional one-item legacy bridges, not part of normal crafting progression. */
-public final class LegacyPieceRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
-    public static void register(IForgeRegistry<IRecipe> registry) {
-        RecipeSorter.register("skysbuildingpieces:legacy_piece", LegacyPieceRecipe.class,
-                RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
-        registry.register(new LegacyPieceRecipe().setRegistryName("skysbuildingpieces", "legacy_piece"));
+/** Optional recovery for a legacy piece obtained while its original mod is installed. */
+public final class LegacyPieceRecipe extends SpecialRecipe {
+    public static final SpecialRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SpecialRecipeSerializer<>(
+            LegacyPieceRecipe::new);
+
+    public LegacyPieceRecipe(ResourceLocation id) {
+        super(id);
     }
 
-    private ItemStack result(InventoryCrafting inventory) {
-        ItemStack source = null;
+    private ItemStack result(CraftingInventory inventory) {
+        ItemStack source = ItemStack.EMPTY;
 
-        for (int slotIndex = 0; slotIndex < inventory.getSizeInventory(); slotIndex++) {
-            ItemStack stack = inventory.getStackInSlot(slotIndex);
+        for (int slot = 0; slot < inventory.getSizeInventory(); slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
 
             if (!stack.isEmpty()) {
-                if (source != null) {
-                    return null;
+                if (!source.isEmpty()) {
+                    return ItemStack.EMPTY;
                 }
 
                 source = stack;
             }
         }
-        if (source == null) {
-            return null;
+        if (source.isEmpty()) {
+            return ItemStack.EMPTY;
         }
 
-        ItemStack target;
+        ItemStack output;
 
         if (Pieces.RETIRED_TEMPLATES.containsValue(source.getItem())) {
-            target = new ItemStack(Items.PAPER);
-        } else if (source.getItem() instanceof PieceItem
-                && ((PieceItem) source.getItem()).piece.palette.shape == Shape.VERTICAL_SLAB
-                && ((PieceItem) source.getItem()).piece.palette.material(source.getMetadata())
-                        .equals("minecraft:dirt")) {
-            target = Pieces.slabDrop("minecraft:dirt", Pieces.state("minecraft:dirt", Shape.VERTICAL_SLAB, 0));
-
-            if (ItemStack.areItemsEqual(source, target)) {
-                return null;
-            }
+            output = new ItemStack(Items.PAPER);
         } else {
-            String registryId = source.getItem().getRegistryName().toString();
+            String identity = source.getItem().getRegistryName().toString();
 
-            if (!LegacyMapping.owned(registryId) || !source.hasTagCompound()) {
-                return null;
+            if (!LegacyMapping.owned(identity) || !source.hasTag()) {
+                return ItemStack.EMPTY;
             }
 
-            String material = LegacyMapping.material(source.getTagCompound().getString("material"));
-            Shape shape = LegacyMapping.shape(registryId, 0);
+            String material = LegacyMapping.material(source.getTag().getString("material"));
+            Shape shape = LegacyMapping.shape(identity, 0);
 
-            if (!Catalogue.INSTANCE.materials.containsKey(material)
+            if (shape == null || !Catalogue.INSTANCE.materials.containsKey(material)
                     || !LegacyMapping.allowedMaterial(material, shape)) {
-                return null;
+                return ItemStack.EMPTY;
             }
 
-            target = Pieces.stack(Pieces.state(material, shape, shape == Shape.SLAB ? 1 : 0), 1);
+            output = Pieces.stack(Pieces.state(material, shape, shape == Shape.SLAB ? 1 : 0), 1);
 
-            if (shape == Shape.VERTICAL_SLAB && target != null) {
-                target = Pieces.slabDrop(material, Pieces.state(material, shape, 0));
+            if (shape == Shape.VERTICAL_SLAB && output != null) {
+                output = Pieces.slabDrop(material, Pieces.state(material, shape, 0));
             }
         }
-        if (target == null) {
-            return null;
+        if (output == null) {
+            return ItemStack.EMPTY;
+        }
+        if (source.hasTag()) {
+            output.setTag(source.getTag().copy());
         }
 
-        NBTTagCompound preserved = source.writeToNBT(new NBTTagCompound());
-
-        preserved.setString("id", target.getItem().getRegistryName().toString());
-        preserved.setShort("Damage", (short) target.getMetadata());
-        preserved.setByte("Count", (byte) 1);
-        return new ItemStack(preserved);
+        return output;
     }
 
-    public boolean matches(InventoryCrafting inventory, World world) {
-        return result(inventory) != null;
+    @Override
+    public boolean matches(CraftingInventory inventory, World world) {
+        return !result(inventory).isEmpty();
     }
 
-    public ItemStack getCraftingResult(InventoryCrafting inventory) {
-        ItemStack result = result(inventory);
-
-        return result == null ? ItemStack.EMPTY : result;
+    @Override
+    public ItemStack getCraftingResult(CraftingInventory inventory) {
+        return result(inventory);
     }
 
+    @Override
     public boolean canFit(int width, int height) {
         return width >= 1 && height >= 1;
     }
 
-    public boolean isDynamic() {
-        return true;
+    @Override
+    public IRecipeSerializer<?> getSerializer() {
+        return SERIALIZER;
     }
 
-    public ItemStack getRecipeOutput() {
-        return ItemStack.EMPTY;
-    }
-
-    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inventory) {
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inventory) {
         return NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
     }
 }

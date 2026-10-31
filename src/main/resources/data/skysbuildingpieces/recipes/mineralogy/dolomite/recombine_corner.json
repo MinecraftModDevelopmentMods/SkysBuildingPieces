@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/dolomite",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mineralogy_dolomite_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:mineralogy_dolomite_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_dolomite_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_dolomite_horizontal_step"
+    }
+  ]
+}

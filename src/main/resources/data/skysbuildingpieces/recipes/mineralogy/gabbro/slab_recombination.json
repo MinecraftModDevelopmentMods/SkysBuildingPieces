@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/gabbro",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:gabbro_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:gabbro",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:gabbro"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:gabbro_slab"
+    }
+  ]
+}

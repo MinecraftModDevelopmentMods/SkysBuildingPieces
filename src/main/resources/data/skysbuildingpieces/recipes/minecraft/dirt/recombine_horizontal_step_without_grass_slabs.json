@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/dirt",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:dirt_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:dirt_vertical_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:dirt_slab"
+      }
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:dirt_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:dirt_vertical_slab"
+    }
+  ]
+}

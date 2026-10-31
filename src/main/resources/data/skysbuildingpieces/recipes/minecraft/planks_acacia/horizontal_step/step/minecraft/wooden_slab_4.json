@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:acacia_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:planks_acacia_horizontal_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:planks_acacia_horizontal_step"
+    }
+  ]
+}

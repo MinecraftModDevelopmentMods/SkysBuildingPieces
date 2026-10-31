@@ -3,14 +3,14 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 import java.io.*;
 import java.util.*;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.*;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
@@ -27,7 +27,7 @@ public final class LegacyFixture {
         return new BlockPos(800 + (entryIndex & 15), 70, 800 + (entryIndex >> 4));
     }
 
-    public static void run(WorldServer world, String phase) throws Exception {
+    public static void run(ServerWorld world, String phase) throws Exception {
         boolean source = phase.equals("legacy-source");
         boolean converted = phase.equals("legacy-converted") || phase.equals("legacy-reload")
                 || phase.equals("legacy-disabled-after");
@@ -46,36 +46,39 @@ public final class LegacyFixture {
                     meta = entryIndex - 22;
                 }
 
-                Block legacyBlock = Block.getBlockFromName("buildingbricks:" + legacyId);
+                Block legacyBlock = net.minecraftforge.registries.ForgeRegistries.BLOCKS
+                        .getValue(new net.minecraft.util.ResourceLocation("buildingbricks:" + legacyId));
 
                 require(legacyBlock != null, "real legacy block " + legacyId);
-                world.setBlockState(pos(entryIndex), legacyBlock.getStateFromMeta(meta), 2);
+                world.setBlockState(pos(entryIndex), legacyBlock.getDefaultState().with(
+                        (net.minecraft.state.IntegerProperty) legacyBlock.getStateContainer().getProperty("meta"),
+                        meta), 2);
 
                 TileEntity tile = world.getTileEntity(pos(entryIndex));
 
                 require(tile != null, "real material tile " + legacyId);
 
-                NBTTagCompound compoundTag = tile.writeToNBT(new NBTTagCompound());
+                CompoundNBT compoundTag = tile.write(new CompoundNBT());
 
-                compoundTag.setString("material", material);
-                compoundTag.setString("fixture_note", "material identity, not item damage");
-                tile.readFromNBT(compoundTag);
+                compoundTag.putString("material", material);
+                compoundTag.putString("fixture_note", "material identity, not item damage");
+                tile.read(compoundTag);
                 tile.markDirty();
             }
 
             world.setBlockState(pos(32), Blocks.CHEST.getDefaultState(), 2);
 
-            TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos(32));
+            ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(pos(32));
 
             chest.setInventorySlotContents(0, legacyStack("rock_step", "minecraft:stone", 23));
             chest.setInventorySlotContents(1, legacyStack("wood_corner", "minecraft:planks_oak", 7));
-            world.spawnEntity(new EntityItem(world, 804, 72, 804, legacyStack("rock_step", "minecraft:stone", 5)));
+            world.addEntity(new ItemEntity(world, 804, 72, 804, legacyStack("rock_step", "minecraft:stone", 5)));
         } else {
             for (int entryIndex = 0; entryIndex < 26; entryIndex++) {
                 int family = entryIndex < 16 ? 0 : entryIndex - 15;
                 int meta = entryIndex < 16 ? entryIndex : family == 1 ? 3 : 0;
 
-                IBlockState state = world.getBlockState(pos(entryIndex));
+                BlockState state = world.getBlockState(pos(entryIndex));
                 String legacyId = entryIndex < 22 ? IDS[family] : "dirt_vertical_slab";
                 String material = entryIndex < 22 ? MATERIALS[family] : "minecraft:dirt";
 
@@ -84,9 +87,11 @@ public final class LegacyFixture {
                 }
                 if (converted) {
                     Shape shape = LegacyMapping.shape("buildingbricks:" + legacyId, meta);
-                    IBlockState expected = Pieces.state(material, shape, LegacyMapping.orientation(shape, meta));
+                    BlockState expected = Pieces.state(material, shape, LegacyMapping.orientation(shape, meta));
 
-                    require(state.equals(expected),
+                    require(state.equals(expected.getBlock() instanceof PieceBlock
+                            ? ((PieceBlock) expected.getBlock()).getActualState(expected, world, pos(entryIndex))
+                            : expected),
                             "converted identity and geometry " + entryIndex + " " + state + " != " + expected);
                     require(world.getTileEntity(pos(entryIndex)) == null, "no remaining material tile " + entryIndex);
                 } else {
@@ -95,24 +100,23 @@ public final class LegacyFixture {
 
                     TileEntity tile = world.getTileEntity(pos(entryIndex));
 
-                    require(tile != null
-                            && tile.writeToNBT(new NBTTagCompound()).getString("material").equals(material),
+                    require(tile != null && tile.write(new CompoundNBT()).getString("material").equals(material),
                             "default material identity");
                 }
             }
 
-            TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos(32));
+            ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(pos(32));
             ItemStack stack = chest.getStackInSlot(0);
 
             require(stack != null && stack.getCount() == 23
-                    && stack.getTagCompound().getString("custom_label").equals("NBT survives"),
+                    && stack.getTag().getString("custom_label").equals("NBT survives"),
                     "container count and custom NBT");
             require(stack.getItem().getRegistryName().getNamespace()
                     .equals(converted ? "skysbuildingpieces" : "buildingbricks"), "container identity");
 
-            NBTTagCompound saved = new NBTTagCompound();
+            CompoundNBT saved = new CompoundNBT();
 
-            world.getChunk(pos(0)).getWorld().getMapStorage().saveAllData();
+            world.getSavedData().save();
 
             if (converted) {
                 PiecesWorldState state = PiecesWorldState.get(world);
@@ -137,18 +141,18 @@ public final class LegacyFixture {
     }
 
     private static ItemStack legacyStack(String registryId, String material, int count) {
-        NBTTagCompound compoundTag = new NBTTagCompound();
+        CompoundNBT compoundTag = new CompoundNBT();
 
-        compoundTag.setString("id", "buildingbricks:" + registryId);
-        compoundTag.setByte("Count", (byte) count);
-        compoundTag.setShort("Damage", (short) 0);
+        compoundTag.putString("id", "buildingbricks:" + registryId);
+        compoundTag.putByte("Count", (byte) count);
+        compoundTag.putShort("Damage", (short) 0);
 
-        NBTTagCompound tag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
 
-        tag.setString("material", material);
-        tag.setString("custom_label", "NBT survives");
-        compoundTag.setTag("tag", tag);
-        return new ItemStack(compoundTag);
+        tag.putString("material", material);
+        tag.putString("custom_label", "NBT survives");
+        compoundTag.put("tag", tag);
+        return ItemStack.read(compoundTag);
     }
 
     private static void require(boolean value, String message) {

@@ -20,6 +20,7 @@ class PathPiecesTest {
     @Test
     void pathPalettesAreAppendedWithoutTakingOverLegacyContent() {
         Catalogue catalogue = new Catalogue();
+
         assertTrue(catalogue.materials.containsKey("minecraft:grass_path"), "Path pieces are missing");
         assertEquals("dirt_vertical_slab_00", catalogue.palettes.get(234).id);
         assertEquals("path_step_00", catalogue.palettes.get(235).id);
@@ -34,22 +35,33 @@ class PathPiecesTest {
     void pathModelsKeepTheFootprintAndLowerOnlyTheExposedTop() throws Exception {
         for (String shape : new String[] { "step", "corner" }) {
             int orientations = shape.equals("step") ? 12 : 8;
+
             for (int orientation = 0; orientation < orientations; orientation++) {
                 JsonObject source = read("models/block/grass_" + shape + "_" + orientation + "_dry.json");
                 JsonObject path = read("models/block/grass_path_" + shape + "_" + orientation + ".json");
-                assertEquals("minecraft:blocks/grass_path_top", path.getAsJsonObject("textures").get("top").getAsString());
+
+                assertEquals("minecraft:block/grass_path_top",
+                        path.getAsJsonObject("textures").get("top").getAsString());
+
                 double originalTop = top(source);
+
                 assertEquals(originalTop - 1, top(path));
+
                 int sourceIndex = 0;
+
                 for (JsonElement entry : path.getAsJsonArray("elements")) {
                     JsonObject element = entry.getAsJsonObject();
                     JsonObject original = source.getAsJsonArray("elements").get(sourceIndex).getAsJsonObject();
+
                     sourceIndex += 2; // Grass overlays are separate elements, not part of the path.
                     assertEquals(original.getAsJsonArray("from"), element.getAsJsonArray("from"));
                     assertEquals(original.getAsJsonArray("to").get(0), element.getAsJsonArray("to").get(0));
                     assertEquals(original.getAsJsonArray("to").get(2), element.getAsJsonArray("to").get(2));
-                    for (java.util.Map.Entry<String, JsonElement> entryFace : element.getAsJsonObject("faces").entrySet()) {
+
+                    for (java.util.Map.Entry<String, JsonElement> entryFace : element.getAsJsonObject("faces")
+                            .entrySet()) {
                         JsonObject face = entryFace.getValue().getAsJsonObject();
+
                         assertFalse(face.has("tintindex"));
                         assertFalse(face.has("cullface"));
                         assertNotEquals("#overlay", face.get("texture").getAsString());
@@ -64,19 +76,29 @@ class PathPiecesTest {
         for (String shape : new String[] { "step", "corner" }) {
             int orientations = shape.equals("step") ? 12 : 8;
             JsonObject variants = read("blockstates/path_" + shape + "_00.json").getAsJsonObject("variants");
-            for (int meta = 0; meta < 16; meta++) {
-                assertTrue(variants.has("lowered_support=false,meta=" + meta));
-                assertTrue(variants.has("lowered_support=true,meta=" + meta));
+
+            assertEquals(orientations * 4, variants.size());
+
+            for (int metadata = 0; metadata < orientations; metadata++) {
+                for (boolean lowered : new boolean[] { false, true }) {
+                    for (boolean water : new boolean[] { false, true }) {
+                        assertTrue(variants
+                                .has("lowered_support=" + lowered + ",meta=" + metadata + ",waterlogged=" + water));
+                    }
+                }
             }
             for (int orientation = 0; orientation < orientations; orientation++) {
                 String model = "models/block/grass_path_" + shape + "_" + orientation;
                 JsonObject ordinary = read(model + ".json");
                 JsonObject lowered = read(model + "_lowered.json");
+
                 assertEquals(top(ordinary), top(lowered));
+
                 for (int cell = 0; cell < ordinary.getAsJsonArray("elements").size(); cell++) {
                     JsonObject original = ordinary.getAsJsonArray("elements").get(cell).getAsJsonObject();
                     JsonObject extended = lowered.getAsJsonArray("elements").get(cell).getAsJsonObject();
                     double base = original.getAsJsonArray("from").get(1).getAsDouble();
+
                     assertEquals(base == 0 ? -1 : base, extended.getAsJsonArray("from").get(1).getAsDouble());
                     assertEquals(original.getAsJsonArray("to"), extended.getAsJsonArray("to"));
                     assertEquals(original.getAsJsonArray("from").get(0), extended.getAsJsonArray("from").get(0));
@@ -88,14 +110,16 @@ class PathPiecesTest {
 
     private static double top(JsonObject model) {
         double highest = 0;
+
         for (JsonElement entry : model.getAsJsonArray("elements")) {
             highest = Math.max(highest, entry.getAsJsonObject().getAsJsonArray("to").get(1).getAsDouble());
         }
+
         return highest;
     }
 
     private static JsonObject read(String relative) throws Exception {
-        return new JsonParser().parse(new String(Files.readAllBytes(ASSETS.resolve(relative)),
-                StandardCharsets.UTF_8)).getAsJsonObject();
+        return new JsonParser().parse(new String(Files.readAllBytes(ASSETS.resolve(relative)), StandardCharsets.UTF_8))
+                .getAsJsonObject();
     }
 }

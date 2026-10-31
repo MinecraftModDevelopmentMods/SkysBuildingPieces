@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:snow_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:snow_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:snow_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:snow_vertical_slab"
+    }
+  ]
+}

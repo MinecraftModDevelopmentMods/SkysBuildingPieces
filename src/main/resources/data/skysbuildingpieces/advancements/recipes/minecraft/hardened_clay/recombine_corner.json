@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:hardened_clay_corner"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/hardened_clay/recombine_corner"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/hardened_clay/recombine_corner"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:hardened_clay_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:hardened_clay_horizontal_step"
+    }
+  ]
+}

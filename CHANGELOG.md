@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.114041
+
+Minecraft 1.14.4 support, native waterlogging and recipe-book integration.
+Existing piece palettes, orientations and custom item data are kept when
+upgrading from 1.12.2. See the [release notes](docs/RELEASE-0.3.8.114041.md).
+
 ## 0.3.8.112021
 
 - Added the missing recipe-book unlocks for crafting and rebuilding pieces.

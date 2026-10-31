@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/prismarine_dark",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "minecraft:dark_prismarine_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
+    }
+  ]
+}

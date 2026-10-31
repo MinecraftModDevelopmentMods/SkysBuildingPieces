@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:dirt_horizontal_step"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/dirt/vertical_step/rotate/skysbuildingpieces/dirt_horizontal_step_00_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/dirt/vertical_step/rotate/skysbuildingpieces/dirt_horizontal_step_00_0"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:dirt_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:dirt_vertical_step"
+    }
+  ]
+}

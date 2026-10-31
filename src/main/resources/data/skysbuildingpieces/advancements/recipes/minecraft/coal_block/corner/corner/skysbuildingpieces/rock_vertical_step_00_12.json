@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:coal_block_vertical_step"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/coal_block/corner/corner/skysbuildingpieces/rock_vertical_step_00_12"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/coal_block/corner/corner/skysbuildingpieces/rock_vertical_step_00_12"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:coal_block_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:coal_block_vertical_step"
+    }
+  ]
+}

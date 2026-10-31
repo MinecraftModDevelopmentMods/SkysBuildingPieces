@@ -1,17 +1,61 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import java.util.Locale;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.IllegalFormatException;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
-/** Piece labels use material names, not the names of their full-block ingredients. */
+/** Compose translated material and shape names without baking in the server's language. */
 final class PieceNames {
+    private static final Map<String, Set<String>> TRANSLATION_KEYS = new ConcurrentHashMap<>();
+
     private PieceNames() {
     }
 
-    static String displayName(String namespace, String material, String shape, String nativeName) {
-        return format(namespace, material, shape, nativeName, I18n::translateToLocal);
+    static ITextComponent displayName(String namespace, String material, String shape, ITextComponent nativeName) {
+        String materialKey = "material." + namespace + "." + material.replace(':', '.');
+        ITextComponent materialName = hasTranslation(namespace, materialKey) ? new TranslationTextComponent(materialKey)
+                : nativeName;
+        String shapeKey = "pieces." + namespace + "." + shape;
+
+        if (!hasTranslation(namespace, shapeKey)) {
+            shapeKey = "pieces.skysbuildingpieces." + shape;
+        }
+
+        return new TranslationTextComponent(shapeKey, materialName);
+    }
+
+    private static boolean hasTranslation(String namespace, String key) {
+        return TRANSLATION_KEYS.computeIfAbsent(namespace, PieceNames::readKeys).contains(key);
+    }
+
+    private static Set<String> readKeys(String namespace) {
+        InputStream input = PieceNames.class.getResourceAsStream("/assets/" + namespace + "/lang/en_us.json");
+
+        if (input == null) {
+            return Collections.emptySet();
+        }
+        try (Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
+            JsonObject language = new JsonParser().parse(reader).getAsJsonObject();
+            Set<String> keys = new HashSet<>();
+
+            language.entrySet().forEach(entry -> keys.add(entry.getKey()));
+            return Collections.unmodifiableSet(keys);
+        } catch (java.io.IOException failure) {
+            throw new IllegalStateException("Cannot read the piece names for " + namespace, failure);
+        }
     }
 
     static String format(String namespace, String material, String shape, String nativeName,

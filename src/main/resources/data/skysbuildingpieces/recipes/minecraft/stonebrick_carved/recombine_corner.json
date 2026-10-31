@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stonebrick_carved",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_carved_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stonebrick_carved_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_carved_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_carved_horizontal_step"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:blue_stained_glass"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_glass_blue_stairs",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_blue_stairs"
+    }
+  ]
+}

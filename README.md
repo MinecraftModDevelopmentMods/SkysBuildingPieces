@@ -32,6 +32,10 @@ matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath
 it into a path, using the same shovel action.
 
+Pieces support native waterlogging. Wet grass and path pieces turn into their
+matching dirt shapes, keeping the water and orientation. Drain them before
+using a shovel.
+
 ## Crafting
 
 Recipes appear in the recipe book as you collect their ingredients. Crafting a
@@ -50,14 +54,14 @@ when Grass Slabs isn't installed.
 
 ## Installation and other Sky mods
 
-For **Minecraft 1.12.2**, use **Forge 14.23.5.2859** and **Java 8**.
+For **Minecraft 1.14.4**, use **Forge 28.2.26** and **Java 8**.
 No other mod is required. Put the main jar in `mods` on both the client and
 server.
 
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.1 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.0.114041 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

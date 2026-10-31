@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stone",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stone_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stone_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stone_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stone_horizontal_step"
+    }
+  ]
+}

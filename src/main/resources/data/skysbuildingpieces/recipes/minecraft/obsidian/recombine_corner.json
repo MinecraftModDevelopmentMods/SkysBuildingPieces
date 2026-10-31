@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/obsidian",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:obsidian_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:obsidian_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:obsidian_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:obsidian_horizontal_step"
+    }
+  ]
+}

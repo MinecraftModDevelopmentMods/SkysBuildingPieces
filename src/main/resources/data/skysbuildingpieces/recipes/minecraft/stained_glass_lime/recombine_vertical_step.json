@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stained_glass_lime",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stained_glass_lime_vertical_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_glass_lime_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_lime_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_lime_vertical_step"
+    }
+  ]
+}

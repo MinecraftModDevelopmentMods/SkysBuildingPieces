@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:nether_brick_horizontal_step"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/nether_brick/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_05_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/nether_brick/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_05_0"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:nether_brick_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:nether_brick_vertical_step"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:diorite_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:diorite_horizontal_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:diorite_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:diorite_vertical_slab"
+    }
+  ]
+}

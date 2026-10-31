@@ -5,7 +5,7 @@ import java.nio.file.Files
 def runtimeLock = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { runtimeLock.load(it) }
 def runtimeSources = ['mineralogy', 'orespawn'].collectEntries { mod ->
-    File siblingJar = file(runtimeLock.getProperty(mod + '.path'))
+    File siblingJar = file(runtimeLock.getProperty(mod + '.development.path'))
     File retainedJar = file('.gradle/qualification-dependencies/' + siblingJar.name)
     // Sibling builds can change during other work. A retained copy still has to
     // pass the same checksum check before it can enter a development profile.
@@ -18,54 +18,25 @@ def gameDirectory = layout.projectDirectory.dir(
 
 def configureVerification = project.ext.configureMineralogyVerificationRun
 
-// Legacy release jars declare SRG access rules. The mapped development game needs
-// their MCP names before launch; the original optional jars remain untouched.
-configurations { mineralogyDevelopmentMappings }
-repositories {
-    maven {
-        name = 'MineralogyDevelopmentMappings'
-        url = 'https://maven.minecraftforge.net/'
-        metadataSources { artifact() }
-        content { includeModule('de.oceanlabs.mcp', 'mcp_stable') }
-    }
-}
-dependencies {
-    mineralogyDevelopmentMappings "de.oceanlabs.mcp:mcp_stable:${project.mapping_version}@zip"
-}
-if (runtimeSources.values().every { it.isFile() }) {
-    Map<String, String> mappedMembers = [:]
-    new java.util.zip.ZipFile(configurations.mineralogyDevelopmentMappings.singleFile).withCloseable { mappings ->
-        ['fields.csv', 'methods.csv'].each { name ->
-            mappings.getInputStream(mappings.getEntry(name)).withCloseable { input ->
-                input.getText('UTF-8').readLines().drop(1).each { row ->
-                    String[] columns = row.split(',', 3)
-                    mappedMembers[columns[0]] = columns[1]
-                }
+// Exact mapped reference jars already carry the target's native access rules.
+// Leave their matching production artifacts unchanged for packaged checks.
+ext.nativeOptionalDevelopmentJars = runtimeSources
+ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
+    group = 'verification'
+    doLast {
+        ['mineralogy', 'orespawn'].each { mod ->
+            [[file(runtimeLock.getProperty(mod + '.path')), runtimeLock.getProperty(mod + '.sha256')],
+             [runtimeSources[mod], runtimeLock.getProperty(mod + '.development.sha256')]].each { pair ->
+                File source = pair[0]
+                if (!source.isFile()) throw new GradleException('Missing optional reference jar: ' + source)
+                String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
+                        .encodeHex().toString().toUpperCase(Locale.ROOT)
+                if (actual != pair[1]) throw new GradleException('Optional reference hash changed: ' + source.name)
             }
         }
     }
-    List<String> rules = []
-    runtimeSources.each { mod, source ->
-        new java.util.jar.JarFile(source).withCloseable { archive ->
-            String declared = archive.manifest?.mainAttributes?.getValue('FMLAT')
-            declared?.tokenize()?.each { name ->
-                def entry = archive.getJarEntry('META-INF/' + name)
-                if (entry == null) throw new GradleException("Missing ${mod} access rules: ${name}")
-                archive.getInputStream(entry).withCloseable { input ->
-                    String mapped = input.getText('UTF-8').replaceAll(/\b(?:func|field)_\d+_[A-Za-z_]+\b/) { member ->
-                        if (!mappedMembers.containsKey(member)) throw new GradleException("Unmapped optional access rule: ${member}")
-                        mappedMembers[member]
-                    }
-                    rules.add(mapped)
-                }
-            }
-        }
-    }
-    File accessRules = file('.gradle/mineralogy-runtime/access-transformers.cfg')
-    accessRules.parentFile.mkdirs()
-    accessRules.setText(rules.join('\n') + '\n', 'UTF-8')
-    minecraft.accessTransformers.from(accessRules)
 }
+
 def developmentLogging = file('gradle/development-log4j2.xml').toURI().toString()
 
 
@@ -74,7 +45,7 @@ def installRuntimeMods = {
         if (!source.isFile()) {
             throw new GradleException("Missing optional ${mod} jar: ${source}. Set -P${mod}RuntimeJar=<jar>.")
         }
-        String expected = runtimeLock.getProperty(mod + '.sha256')
+        String expected = runtimeLock.getProperty(mod + '.development.sha256')
         String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
                 .encodeHex().toString()
         if (!(expected ==~ /(?i)[a-f0-9]{64}/) || !actual.equalsIgnoreCase(expected)) {

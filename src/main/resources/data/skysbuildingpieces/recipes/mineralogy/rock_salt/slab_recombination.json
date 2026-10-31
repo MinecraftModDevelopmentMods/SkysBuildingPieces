@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/rock_salt",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:rock_salt_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:rock_salt",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:rock_salt"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:rock_salt_slab"
+    }
+  ]
+}

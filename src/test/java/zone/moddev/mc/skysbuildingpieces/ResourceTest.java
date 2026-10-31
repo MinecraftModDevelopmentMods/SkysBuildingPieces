@@ -19,7 +19,7 @@ class ResourceTest {
         Set<String> actual = new TreeSet<String>();
 
         try (java.util.stream.Stream<Path> files = Files.list(ROOT.resolve("lang"))) {
-            files.forEach(path -> actual.add(path.getFileName().toString().replace(".lang", "")));
+            files.forEach(path -> actual.add(path.getFileName().toString().replace(".json", "")));
         }
 
         assertEquals(new TreeSet<String>(expected), actual);
@@ -27,7 +27,7 @@ class ResourceTest {
         List<String> keys = null;
 
         for (String locale : expected) {
-            byte[] bytes = Files.readAllBytes(ROOT.resolve("lang/" + locale + ".lang"));
+            byte[] bytes = Files.readAllBytes(ROOT.resolve("lang/" + locale + ".json"));
             String text = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
                     .decode(ByteBuffer.wrap(bytes)).toString();
 
@@ -38,16 +38,20 @@ class ResourceTest {
 
             List<String> current = new ArrayList<String>();
 
-            for (String line : text.split("\n")) {
-                assertEquals(line.trim(), line);
-                assertTrue(line.contains("="));
+            com.google.gson.stream.JsonReader reader = new com.google.gson.stream.JsonReader(
+                    new java.io.StringReader(text));
 
-                String key = line.substring(0, line.indexOf('='));
+            reader.beginObject();
 
-                assertFalse(current.contains(key));
+            while (reader.hasNext()) {
+                String key = reader.nextName();
+
+                assertFalse(current.contains(key), locale + " duplicate " + key);
                 current.add(key);
-                assertTrue(line.substring(line.indexOf('=') + 1).length() > 0);
+                assertFalse(reader.nextString().isEmpty());
             }
+
+            reader.endObject();
 
             assertEquals(17 + Catalogue.INSTANCE.materials.size(), current.size());
             assertTrue(current.contains("itemGroup.skysbuildingpieces"));
@@ -59,12 +63,12 @@ class ResourceTest {
             }
         }
 
-        assertArrayEquals(Files.readAllBytes(ROOT.resolve("lang/de_de.lang")),
-                Files.readAllBytes(ROOT.resolve("lang/de_au.lang")));
+        assertArrayEquals(Files.readAllBytes(ROOT.resolve("lang/de_de.json")),
+                Files.readAllBytes(ROOT.resolve("lang/de_au.json")));
 
         for (String english : Arrays.asList("en_ca", "en_en", "en_gb", "en_pt")) {
-            assertArrayEquals(Files.readAllBytes(ROOT.resolve("lang/en_us.lang")),
-                    Files.readAllBytes(ROOT.resolve("lang/" + english + ".lang")));
+            assertArrayEquals(Files.readAllBytes(ROOT.resolve("lang/en_us.json")),
+                    Files.readAllBytes(ROOT.resolve("lang/" + english + ".json")));
         }
     }
 
@@ -79,7 +83,7 @@ class ResourceTest {
                 String name = entry.getValue().getAsJsonObject().get("model").getAsString()
                         .substring("skysbuildingpieces:".length());
 
-                assertTrue(Files.isRegularFile(ROOT.resolve("models/block/" + name + ".json")), name);
+                assertTrue(Files.isRegularFile(ROOT.resolve("models/" + name + ".json")), name);
             }
             for (String m : palette.materials) {
                 assertTrue(Files.isRegularFile(ROOT.resolve("models/item/" + m.substring(10) + "_"
@@ -138,11 +142,14 @@ class ResourceTest {
 
                     for (JsonElement element : model.getAsJsonArray("elements")) {
                         JsonObject faces = element.getAsJsonObject().getAsJsonObject("faces");
+
                         for (String side : Arrays.asList("north", "south", "west", "east")) {
                             if (!faces.has(side)) {
                                 continue;
                             }
+
                             JsonArray uv = faces.getAsJsonObject(side).getAsJsonArray("uv");
+
                             assertEquals(0, uv.get(1).getAsInt(), name + " / " + side + " fringe");
                             assertEquals(8, uv.get(3).getAsInt(), name + " / " + side + " pixel scale");
                         }

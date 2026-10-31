@@ -69,25 +69,33 @@ class WallModelTest {
             JsonObject variants = json(ROOT.resolve("../../blockstates/" + palette.id + ".json").normalize())
                     .getAsJsonObject("variants");
 
-            assertEquals(512, variants.entrySet().size());
+            int assigned = palette.materials.size() * palette.shape.states;
 
-            for (int meta = 0; meta < 16; meta++) {
+            assertEquals(64 * assigned, variants.entrySet().size());
+
+            for (int meta = 0; meta < assigned; meta++) {
                 for (int connections = 0; connections < 16; connections++) {
                     for (boolean post : new boolean[] { false, true }) {
-                        String key = "connections=" + connections + ",meta=" + meta + ",up=" + post;
+                        String key = "connections=" + connections + (assigned > 1 ? ",meta=" + meta : "") + ",up="
+                                + post + ",waterlogged=false";
+
+                        assertEquals(variants.get(key),
+                                variants.get(key.replace("waterlogged=false", "waterlogged=true")));
 
                         assertTrue(variants.has(key), palette.id + " missing " + key);
 
                         String model = variants.getAsJsonObject(key).get("model").getAsString();
                         String material = palette.materials
                                 .get(Math.min(meta / palette.shape.states, palette.materials.size() - 1));
-                        String expected = "skysbuildingpieces:" + material.substring(material.indexOf(':') + 1)
+                        String expected = "skysbuildingpieces:block/" + material.substring(material.indexOf(':') + 1)
                                 + "_wall_0_" + connections
                                 + (!post && (connections == 5 || connections == 10) ? "_no_post" : "");
 
                         assertEquals(expected, model, key + " must retain its material");
                         assertEquals(!post && (connections == 5 || connections == 10), model.endsWith("_no_post"), key);
-                        assertTrue(Files.isRegularFile(ROOT.resolve(model.substring(model.indexOf(':') + 1) + ".json")),
+                        assertTrue(
+                                Files.isRegularFile(
+                                        ROOT.getParent().resolve(model.substring(model.indexOf(':') + 1) + ".json")),
                                 model);
                     }
                 }

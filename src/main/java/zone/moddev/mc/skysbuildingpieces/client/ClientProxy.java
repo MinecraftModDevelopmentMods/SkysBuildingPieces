@@ -1,91 +1,50 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.*;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraftforge.client.model.ModelLoader;
-import zone.moddev.mc.skysbuildingpieces.CommonProxy;
-import zone.moddev.mc.skysbuildingpieces.content.*;
+import net.minecraft.world.GrassColors;
+import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
+import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
+import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-        modid = "skysbuildingpieces",
-        value = net.minecraftforge.fml.relauncher.Side.CLIENT)
-public final class ClientProxy extends CommonProxy {
-    public void preInit() {
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new WallHighlight());
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new ContinuousGlassModel.BakeHandler());
+/** Client listeners stay on the mod bus that posts model and colour events. */
+public final class ClientProxy {
+    private ClientProxy() {
     }
 
-    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-    public static void models(net.minecraftforge.client.event.ModelRegistryEvent event) {
-        ClientProxy client = (ClientProxy) zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces.proxy;
+    public static void register() {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        java.util.Set<String> namespaces = new java.util.LinkedHashSet<String>();
-        for (zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.Module module : zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.modules
-                .values()) {
-            if (namespaces.add(module.namespace)) {
-                client.registerModels(module.namespace);
-            }
-        }
-        for (java.util.Map.Entry<String, Item> entry : Pieces.RETIRED_TEMPLATES.entrySet()) {
-            ModelLoader.setCustomModelResourceLocation(entry.getValue(), 0,
-                    new ModelResourceLocation("skysbuildingpieces:template_" + entry.getKey(), "inventory"));
-        }
+        modBus.addListener(ClientProxy::blockColors);
+        modBus.addListener(ClientProxy::itemColors);
+        modBus.addListener(new ContinuousGlassModel.BakeHandler()::bake);
     }
 
-    public void registerModels(String namespace) {
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
-            if (!pieceBlock.palette.namespace.equals(namespace)) {
-                continue;
-            }
-
-            net.minecraft.client.renderer.block.statemap.StateMap.Builder map = new net.minecraft.client.renderer.block.statemap.StateMap.Builder();
-
-            if (pieceBlock.palette.shape != zone.moddev.mc.skysbuildingpieces.catalogue.Shape.WALL
-                    && pieceBlock.palette.shape != zone.moddev.mc.skysbuildingpieces.catalogue.Shape.PANE) {
-                map.ignore(PieceBlock.CONNECTIONS);
-            }
-            if (pieceBlock.palette.shape != zone.moddev.mc.skysbuildingpieces.catalogue.Shape.STAIRS) {
-                map.ignore(PieceBlock.STAIR_SHAPE);
-            }
-            if (!pieceBlock.palette.group.equals("grass") && !pieceBlock.palette.group.equals("dirt")) {
-                map.ignore(net.minecraft.block.BlockGrass.SNOWY);
-            }
-
-            ModelLoader.setCustomStateMapper(pieceBlock, map.build());
-        }
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
-            for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
-                if (!pieceBlock.palette.namespace.equals(namespace)) {
-                    continue;
-                }
-
-                int meta = slot * pieceBlock.palette.shape.states;
-
-                ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(pieceBlock), meta,
-                        new ModelResourceLocation(
-                                (pieceBlock.palette.module.equals("mineralogy")
-                                        ? zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.ASSETS : namespace) + ":"
-                                        + new net.minecraft.util.ResourceLocation(
-                                                pieceBlock.palette.materials.get(slot)).getPath()
-                                        + "_" + pieceBlock.palette.shape.name().toLowerCase(java.util.Locale.ROOT),
-                                "inventory"));
+    private static void blockColors(ColorHandlerEvent.Block event) {
+        for (PieceBlock block : Pieces.BLOCKS.values()) {
+            if (block.palette.group.equals("grass")) {
+                event.getBlockColors().register(
+                        (state, world, position,
+                                tint) -> tint == 0 ? event.getBlockColors()
+                                        .getColor(Blocks.GRASS_BLOCK.getDefaultState(), world, position, 0) : -1,
+                        block);
             }
         }
     }
 
-    public void init() {
-        final BlockColors colors = Minecraft.getMinecraft().getBlockColors();
-
-        for (final PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
-            if (pieceBlock.palette.group.equals("grass")) {
-                colors.registerBlockColorHandler((state, world, pos,
-                        tint) -> tint == 0 ? colors.colorMultiplier(Blocks.GRASS.getDefaultState(), world, pos, 0) : -1,
-                        pieceBlock);
-                Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
-                        (stack, tint) -> tint == 0 ? 0x7CBD6B : -1, Item.getItemFromBlock(pieceBlock));
+    private static void itemColors(ColorHandlerEvent.Item event) {
+        for (Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
+            if (item instanceof PieceItem && ((PieceItem) item).piece.palette.group.equals("grass")) {
+                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColors.get(0.5D, 1.0D) : -1, item);
+            }
+        }
+        for (PieceBlock block : Pieces.BLOCKS.values()) {
+            if (block.palette.group.equals("grass")) {
+                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColors.get(0.5D, 1.0D) : -1,
+                        Item.getItemFromBlock(block));
             }
         }
     }

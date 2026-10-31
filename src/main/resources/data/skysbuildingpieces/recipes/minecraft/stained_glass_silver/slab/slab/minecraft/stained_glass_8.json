@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:light_gray_stained_glass"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_glass_silver_slab",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_glass_silver_slab"
+    }
+  ]
+}

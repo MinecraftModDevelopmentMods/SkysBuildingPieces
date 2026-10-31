@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+license="LGPL-2.1-only"
+[[mods]]
+modId="buildingpiecesbootstrap"
+version="1"
+displayName="Building Pieces Native Runtime Checks"
+[[dependencies.buildingpiecesbootstrap]]
+modId="skysbuildingpieces"
+mandatory=true
+versionRange="[0,)"
+ordering="AFTER"
+side="BOTH"

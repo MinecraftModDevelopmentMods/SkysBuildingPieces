@@ -85,8 +85,8 @@ public final class WallGeometry {
         for (int connectionVariant = 0; connectionVariant < 32; connectionVariant++) {
             boolean[][][] filled = new boolean[16][16][16];
 
-            // Merge the post and arms on a one-pixel grid before tracing their outline.
-            // This removes selection edges where their boxes overlap.
+            // Merge the post and arms on a one-pixel grid before tracing their outline. This removes selection edges
+            // where their boxes overlap.
             for (Bounds wallBounds : boxes(connectionVariant & 15, (connectionVariant & 16) != 0)) {
                 for (int pixelX = wallBounds.minX; pixelX < wallBounds.maxX; pixelX++) {
                     for (int pixelY = wallBounds.minY; pixelY < wallBounds.maxY; pixelY++) {
@@ -99,8 +99,8 @@ public final class WallGeometry {
 
             List<Edge> edges = new ArrayList<Edge>();
 
-            // Walk each axis while holding the other two coordinates fixed.
-            // Join consecutive crease pixels into one edge.
+            // Walk each axis while holding the other two coordinates fixed. Join consecutive crease pixels into one
+            // edge.
             for (int axis = 0; axis < 3; axis++) {
                 for (int firstOffset = 0; firstOffset <= 16; firstOffset++) {
                     for (int secondOffset = 0; secondOffset <= 16; secondOffset++) {
@@ -136,8 +136,7 @@ public final class WallGeometry {
     }
 
     private static boolean crease(boolean[][][] filled, int axis, int axisPosition, int firstOffset, int secondOffset) {
-        // Four cells meet along each possible edge. Keep corners and diagonal
-        // meetings, but discard flat boundaries.
+        // Four cells meet along each possible edge. Keep corners and diagonal meetings, but discard flat boundaries.
         boolean occupiedBeforeBoth = occupied(filled, axis, axisPosition, firstOffset - 1, secondOffset - 1);
         boolean occupiedBeforeFirst = occupied(filled, axis, axisPosition, firstOffset - 1, secondOffset);
 

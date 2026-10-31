@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/purpur_pillar",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:purpur_pillar_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:purpur_pillar_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:purpur_pillar_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:purpur_pillar_horizontal_step"
+    }
+  ]
+}

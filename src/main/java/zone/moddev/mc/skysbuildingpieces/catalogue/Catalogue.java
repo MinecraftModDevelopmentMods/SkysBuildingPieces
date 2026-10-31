@@ -169,6 +169,14 @@ public final class Catalogue {
             return value == null ? null : new JsonParser().parse(value.toString());
         }
 
+        /** Source identities remain available to the pre-flattening recovery bridge. */
+        public JsonElement legacyBlock(String shape) {
+            JsonObject legacy = json.getAsJsonObject("legacy_blocks");
+            JsonElement value = legacy == null ? blocks.get(shape) : legacy.get(shape);
+
+            return value == null ? null : new JsonParser().parse(value.toString());
+        }
+
         public float hardness() {
             return json.has("hardness") ? json.get("hardness").getAsFloat() : type.equals("grass") ? .6f : 1;
         }

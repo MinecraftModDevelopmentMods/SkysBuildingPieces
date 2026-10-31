@@ -1,0 +1,14 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+license="LGPL-2.1-only"
+[[mods]]
+modId="buildingpiecesprobe"
+version="1.0"
+displayName="Building Pieces Runtime Checks"
+description="Build-only gameplay, recipe and upgrade checks."
+[[dependencies.buildingpiecesprobe]]
+modId="skysbuildingpieces"
+mandatory=true
+versionRange="[0.3.8.114041,)"
+ordering="AFTER"
+side="BOTH"

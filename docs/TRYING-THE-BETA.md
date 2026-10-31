@@ -6,7 +6,7 @@ The generated `runMineralogyClient` Eclipse profile loads the native mods in
 a separate development folder. Check rock textures, all step and corner
 orientations, cutting recipes and rebuilding to the native slab.
 
-Install the main jar in a Minecraft 1.12.2 Forge 14.23.5.2859 instance using
+Install the main jar in a Minecraft 1.14.4 Forge 28.2.26 instance using
 Java 8. The sources and Javadoc jars are not game mods. Start with a new
 creative world; use a separate copy when trying an existing world.
 
@@ -46,9 +46,11 @@ Before relying on the beta in a modpack, check:
 - Use a shovel on a grass step or corner above ordinary grass. Both should
   become paths, with one durability point used. Check after saving and reloading.
 - Check wall and pane connections and stair corners, including their collision.
-- With BuildingBricks present, first leave replacement disabled. On a second
-  backup enable it, restart, and check converted blocks, containers and item
-  entities. Save and reload, then inspect the migration report.
+- On an upgrade copy, check old blocks, containers and item entities. Save and
+  reload, then inspect the migration report. Check joined stairs, wall ends,
+  snow caps and path supports as well as each piece's material and orientation.
+- Fill pieces with water, drain them, and check that wet grass and path pieces
+  become matching dirt. Wet pieces should reject shovel flattening.
 
 Check ordinary dirt vertical slabs in all four directions and combine matching
 halves into dirt. When testing removal of BuildingBricks, use a fresh backup

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/quartz_block",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:quartz_block_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:quartz_block_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:quartz_block_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:quartz_block_horizontal_step"
+    }
+  ]
+}

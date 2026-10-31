@@ -1,56 +1,60 @@
 # Building and running the mod
 
-Run Gradle with Java 17. Production code and Minecraft use Java 8; the tested
-toolchain is Temurin 8.0.502+7. Use the included Gradle wrapper.
+This branch targets Minecraft 1.14.4 and Forge 28.2.26. Run the included Gradle
+wrapper with Java 17. Compilation and Minecraft use Java 8; the pinned production
+toolchain is Temurin 8.0.502+7. ForgeGradle uses Java 25 for its Mavenizer tool.
+The native log checks and resource helpers use Python 3.11 or later. Keep it on
+the command path, or pass `-PpythonExecutable=<python executable>` to Gradle.
 
 ```text
 gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
 gradlew genEclipseRuns eclipse verifyEclipseProductionClasspath
 ```
 
-The main jar is in `build/libs`. Sources and Javadocs are separate jars, and
-`build/release/SHA256SUMS` records their checksums. Only the main jar goes into
-a game's mods folder.
+The main jar goes in the game's mods folder. Sources and Javadocs are separate
+jars in `build/libs`, and `build/release/SHA256SUMS` records all three checksums.
 
-## Eclipse
+## Eclipse and development runs
 
-Import the project through Buildship, using the Gradle wrapper. Regenerate
-the launches after changing dependencies. The generated configuration uses
-processed resources and keeps test code out of ordinary game runs.
+Import the project through Buildship with the Gradle wrapper, then generate the
+launches. Ordinary client and server launches use processed production resources
+and exclude test classes.
 
-- `runClient` and `runServer` run Building Pieces on its own.
-- `runGrassSlabsClient` and `runGrassSlabsServer` also load the released Grass
-  Slabs jar recorded in `gradle/grass-slabs-release.properties`.
-- `runMineralogyClient` and `runMineralogyServer` use the optional Mineralogy
-  and OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
+- `runClient` and `runServer` load Building Pieces on its own.
+- `runGrassSlabsClient` and `runGrassSlabsServer` add the coordinated Grass Slabs
+  candidate recorded in `gradle/grass-slabs-release.properties`.
+- `runMineralogyClient` and `runMineralogyServer` add the optional Mineralogy and
+  OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
-Each profile has its own game folder. Grass Slabs is downloaded from its public
-release, checked against its SHA-256 and mapped to development names. There is
-no sibling source build to prepare. The published Grass Slabs jar remains
-unchanged, and none of its classes are bundled into Building Pieces.
+The Grass Slabs pin currently names a source candidate, not a public release.
+Build that exact commit in the sibling `SkysGrassSlabs114/SkysGrassSlabs` checkout,
+or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
+match their pinned hashes. CI builds the pinned commit before testing the optional
+integration; it can run after that commit is available in the upstream repository.
+Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
-For the Mineralogy profile, supply the jars named in its lock file, or use
-`-PmineralogyRuntimeJar=<jar>` and `-PorespawnRuntimeJar=<jar>` to select matching
-copies. They must pass the recorded checksums.
+Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each
+ordinary profile has its own game folder and leaves existing saves alone.
 
 ## Runtime checks
 
-`check` runs the unit suite and disposable server checks, both standalone and
-with the released Grass Slabs jar. `integrationGrassSlabsClientProcess` checks
-the combined client models. `integrationMineralogyTest` and
-`integrationMineralogyClientProcess` cover the optional rock pieces when the
-locked native jars are available.
+`check` runs focused tests, native gameplay checks, recipe-book discovery and
+fresh/reload servers, both standalone and with Grass Slabs. The isolated native
+client checks bake the models, inspect colours and glass joins, check recipe
+previews, and save/reload a separate world. Verification worlds stay under `build`.
 
-Verification worlds live under `build/`. Keep player worlds in the separate
-ordinary game folders or another instance.
+`nativeInstalledPolicyTest` uses a build-only legacy policy fixture. There is no
+official BuildingBricks release for this Minecraft target, and that fixture is
+not a claim of compatibility with an unofficial port. Genuine saved-world
+fixtures separately exercise conversion before vanilla data fixing.
 
-## Recipe-book resources
+Forge 28 can log its first-save config watcher notification at `FATAL` even
+after a successful start. The native client audit accepts only that exact
+startup notification, with both Forge configuration files still equal to the
+staged defaults. It also recognises the two empty handshake messages reproduced
+by the Forge-only control. These messages stay in the logs and audit receipt;
+other errors, changed settings, crashes and incomplete checks still fail.
 
-The build generates unlock advancements from `src/main/recipe-book/recipes.json`.
-The runtime checks compare those entries with the registered recipes and exercise
-inventory discovery, crafting-table discovery and recipe-book persistence.
-Optional catalogue entries load only when their recipe exists.
-
-Recipe unlocks have no shared advancement parent. Minecraft 1.12 walks that
-visibility tree recursively when loading completed progress, which can overflow
-with a large catalogue. The inventory and crafting unlock criteria are unchanged.
+The resource helpers in `tools` regenerate models, translations and native
+recipe/advancement JSON from the fixed catalogues. Unlocks retain their existing
+identities; the server checks discovery from both inventory and crafting inputs.

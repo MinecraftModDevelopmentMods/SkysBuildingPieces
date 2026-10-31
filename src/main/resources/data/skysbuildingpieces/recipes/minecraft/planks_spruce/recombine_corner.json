@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/planks_spruce",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:planks_spruce_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:planks_spruce_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:planks_spruce_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:planks_spruce_horizontal_step"
+    }
+  ]
+}

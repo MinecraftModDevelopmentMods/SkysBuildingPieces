@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/dolomite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:dolomite_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:dolomite",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:dolomite"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:dolomite_slab"
+    }
+  ]
+}

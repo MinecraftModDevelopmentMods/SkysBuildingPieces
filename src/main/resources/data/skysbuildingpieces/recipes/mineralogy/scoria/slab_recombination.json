@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/scoria",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:scoria_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:scoria",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:scoria"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:scoria_slab"
+    }
+  ]
+}

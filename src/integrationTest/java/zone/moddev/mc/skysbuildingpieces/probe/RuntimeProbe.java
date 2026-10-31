@@ -1,76 +1,42 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import java.io.*;
-import java.util.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.*;
-import net.minecraft.nbt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import zone.moddev.mc.skysbuildingpieces.*;
-import zone.moddev.mc.skysbuildingpieces.catalogue.*;
-import zone.moddev.mc.skysbuildingpieces.content.*;
-import zone.moddev.mc.skysbuildingpieces.legacy.*;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
+import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
-/** Build-only server probe. Never on ordinary launches or in production jars. */
-@Mod(
-        modid = "buildingpiecesprobe",
-        name = "Building Pieces Runtime Probe",
-        version = "1",
-        dependencies = "required-after:skysbuildingpieces;after:buildingbricks")
+/** Build-only gameplay and migration checks, excluded from ordinary launches. */
+@Mod("buildingpiecesprobe")
 public final class RuntimeProbe {
-    @net.minecraftforge.fml.common.SidedProxy(
-            clientSide = "zone.moddev.mc.skysbuildingpieces.probe.ClientProbe",
-            serverSide = "zone.moddev.mc.skysbuildingpieces.probe.ProbeProxy")
-    public static ProbeProxy proxy;
-    private static Block legacy, dirt;
-    private net.minecraft.server.MinecraftServer server;
+    private MinecraftServer server;
     private boolean ran;
 
-    @Mod.EventHandler
-    public void pre(FMLPreInitializationEvent event) {
-        String phase = System.getProperty("skysbuildingpieces.integrationPhase", "");
-
-        if (!net.minecraftforge.fml.common.Loader.isModLoaded("buildingbricks") && !phase.startsWith("legacy-")
-                && !phase.startsWith("client") && !phase.startsWith("sylvester")
-                && !phase.startsWith("retired-rocks-")) {
-            legacy = new Block(Material.ROCK).setRegistryName("buildingbricks", "rock_step");
-            dirt = new Block(Material.GROUND).setRegistryName("buildingbricks", "dirt_vertical_slab");
-        } else {
-            legacy = Block.getBlockFromName("buildingbricks:rock_step");
-        }
-
+    public RuntimeProbe() {
         MinecraftForge.EVENT_BUS.register(this);
-        proxy.init();
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> new ClientProbe().init());
     }
 
     @SubscribeEvent
-    public void blocks(net.minecraftforge.event.RegistryEvent.Register<Block> event) {
-        if (dirt != null) {
-            event.getRegistry().register(legacy);
-            event.getRegistry().register(dirt);
-        }
-    }
-
-    @SubscribeEvent
-    public void items(net.minecraftforge.event.RegistryEvent.Register<Item> event) {
-        if (dirt != null) {
-            event.getRegistry().register(new ItemBlock(legacy).setRegistryName(legacy.getRegistryName()));
-            event.getRegistry().register(new ItemBlock(dirt).setRegistryName(dirt.getRegistryName()));
-        }
-    }
-
-    @Mod.EventHandler
     public void started(FMLServerStartedEvent event) {
-        server = net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
+        server = event.getServer();
     }
 
     @SubscribeEvent
@@ -82,362 +48,142 @@ public final class RuntimeProbe {
         ran = true;
 
         try {
-            WorldServer world = server.getWorld(0);
-
-            world.getGameRules().setOrCreateGameRule("randomTickSpeed", "0");
-            world.getGameRules().setOrCreateGameRule("doFireTick", "false");
-
+            ServerWorld world = server.getWorld(DimensionType.OVERWORLD);
             String phase = System.getProperty("skysbuildingpieces.integrationPhase");
 
             if (phase == null) {
                 throw new AssertionError("Unconfigured runtime probe");
             }
-            if (phase.equals("path-upgrade")) {
-                PathChecks.savedPieces(world, true);
-                System.out.println("BUILDING_PIECES_PATH_UPGRADE_PASS");
-                server.initiateShutdown();
-                return;
-            }
+
+            CompoundNBT rules = world.getGameRules().write();
+
+            rules.putString("randomTickSpeed", "0");
+            rules.putString("doFireTick", "false");
+            world.getGameRules().read(rules);
+
             if (phase.startsWith("sylvester")) {
                 new WorldAuditProbe(world, phase.equals("sylvester-reload"));
                 return;
             }
-            if (phase.startsWith("retired-rocks-")) {
-                Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.RetiredRockUpgrade")
-                        .getMethod("run", WorldServer.class, String.class).invoke(null, world, phase);
-                server.initiateShutdown();
-                return;
-            }
-            if (phase.startsWith("bop-legacy-")) {
-                Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopLegacyFixture")
-                        .getMethod("run", WorldServer.class, String.class).invoke(null, world, phase);
-                server.initiateShutdown();
-                return;
-            }
+            if (phase.startsWith("retired-rocks-") || phase.startsWith("bop-legacy-")) {
+                String helper = phase.startsWith("retired-rocks-") ? "RetiredRockUpgrade" : "BopLegacyFixture";
 
-            if (phase.startsWith("recipe-book-")) {
+                Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe." + helper)
+                        .getMethod("run", ServerWorld.class, String.class).invoke(null, world, phase);
+            } else if (phase.equals("path-upgrade")) {
+                PathChecks.savedPieces(world, true);
+                System.out.println("BUILDING_PIECES_PATH_UPGRADE_PASS");
+            } else if (phase.startsWith("recipe-book-")) {
                 RecipeBookChecks.run(world);
-                File result = new File(world.getSaveHandler().getWorldDirectory(), phase + ".pass");
-                try (Writer writer = new FileWriter(result)) {
+
+                try (java.io.FileWriter writer = new java.io.FileWriter(
+                        new File(world.getSaveHandler().getWorldDirectory(), phase + ".pass"))) {
                     writer.write("RECIPE_BOOK_PHASE_PASS " + phase + "\n");
                 }
+
                 System.out.println("RECIPE_BOOK_PHASE_PASS " + phase);
-                server.initiateShutdown();
-                return;
-            }
-
-            rawStoredInventory(world);
-            GameplayChecks.run(world);
-            PathChecks.run(world);
-            SharedGrassChecks.run(world);
-            MineralogyChecks.run();
-
-            if (!phase.startsWith("client")) {
-                DirtCoverageChecks.run(world);
-            }
-            if (net.minecraftforge.fml.common.Loader.isModLoaded("skysbuildingpiecesbop")
-                    && !phase.startsWith("client")) {
-                Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks")
-                        .getMethod("run", WorldServer.class).invoke(null, world);
-            }
-            if (phase.startsWith("client-")) {
-                int number = 0;
-
-                for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
-                    for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
-                        for (int orientation = 0; orientation < pieceBlock.palette.shape.states; orientation++) {
-                            BlockPos position = new BlockPos(500 + (number & 31), 64 + ((number >> 5) & 31),
-                                    500 + (number >> 10));
-
-                            number++;
-
-                            IBlockState state = pieceBlock
-                                    .getStateFromMeta(slot * pieceBlock.palette.shape.states + orientation);
-
-                            if (phase.equals("client-reload")) {
-                                require(world.getBlockState(position).equals(state),
-                                        "client integrated reload identity");
-                            } else {
-                                world.setBlockState(position, state, 2);
-                            }
-                        }
-                    }
-                }
-
-                ClientStatus.complete = true;
-                System.out.println("BUILDING_PIECES_CLIENT_WORLD_PASS " + phase + " states=" + number);
-                return;
-            }
-            if (phase.equals("compat")) {
-                CompatibilityChecks.run(world);
-                server.initiateShutdown();
-                return;
-            }
-            if (phase.startsWith("legacy-")) {
+            } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
-                server.initiateShutdown();
-                return;
-            }
-            for (int meta = 0; meta < 16; meta++) {
-                NBTTagCompound root = new NBTTagCompound();
-                NBTTagCompound level = new NBTTagCompound();
-                NBTTagCompound section = new NBTTagCompound();
+            } else {
+                RecipeChecks.run(world);
+                NativeLegacyChecks.run(world);
+                GameplayChecks.run(world);
+                WaterloggingChecks.run(world);
+                PathChecks.run(world);
+                SharedGrassChecks.run(world);
+                MineralogyChecks.run();
+                RecombinationChecks.run(world);
+                RecipeBookChecks.run(world);
+                PresentationChecks.run(world);
 
-                root.setTag("Level", level);
-
-                byte[] blockIdLowBytes = new byte[4096];
-                byte[] high = new byte[2048];
-                byte[] data = new byte[2048];
-
-                int blockId = Block.getIdFromBlock(legacy);
-
-                blockIdLowBytes[0] = (byte) blockId;
-                LegacyBridge.setNibble(high, 0, blockId >> 8);
-                LegacyBridge.setNibble(data, 0, meta);
-                section.setByte("Y", (byte) 4);
-                section.setByteArray("Blocks", blockIdLowBytes);
-                section.setByteArray("Add", high);
-                section.setByteArray("Data", data);
-
-                NBTTagList sections = new NBTTagList();
-
-                sections.appendTag(section);
-                level.setTag("Sections", sections);
-
-                NBTTagCompound tile = new NBTTagCompound();
-
-                tile.setString("id", "legacyMaterial");
-                tile.setString("material", "minecraft:stone");
-                tile.setInteger("x", 0);
-                tile.setInteger("y", 64);
-                tile.setInteger("z", 0);
-
-                NBTTagList tiles = new NBTTagList();
-
-                tiles.appendTag(tile);
-                level.setTag("TileEntities", tiles);
-                LegacyBridge.prepareChunk(world, root);
-
-                int targetId = (section.getByteArray("Blocks")[0] & 255)
-                        | (LegacyBridge.nibble(section.getByteArray("Add"), 0) << 8);
-                IBlockState actual = Block.getBlockById(targetId)
-                        .getStateFromMeta(LegacyBridge.nibble(section.getByteArray("Data"), 0));
-
-                require(actual.getBlock() instanceof PieceBlock, "legacy step target");
-
-                PieceBlock pieceBlock = (PieceBlock) actual.getBlock();
-
-                require(pieceBlock.mask(actual) == Geometry.mask(LegacyMapping.shape("buildingbricks:rock_step", meta),
-                        LegacyMapping.orientation(LegacyMapping.shape("buildingbricks:rock_step", meta), meta)),
-                        "step geometry " + meta);
-                require(level.getTagList("TileEntities", 10).tagCount() == 0, "old tile removal");
-
-                NBTTagCompound copy = root.copy();
-
-                LegacyBridge.prepareChunk(world, root);
-                require(copy.equals(root), "idempotence");
-            }
-
-            NBTTagCompound stack = new NBTTagCompound();
-
-            stack.setString("id", "buildingbricks:rock_step");
-            stack.setByte("Count", (byte) 17);
-            stack.setShort("Damage", (short) 327);
-
-            NBTTagCompound tag = new NBTTagCompound();
-
-            tag.setString("material", "minecraft:stone");
-            tag.setString("custom", "preserved");
-            stack.setTag("tag", tag);
-
-            ItemStack decoded = new ItemStack(stack);
-
-            require(decoded != null && decoded.getItem().getRegistryName().getNamespace().equals("skysbuildingpieces"),
-                    "raw item hook active");
-            require(decoded.getCount() == 17 && decoded.getTagCompound().getString("custom").equals("preserved"),
-                    "item count and NBT");
-
-            int ordinal = 0;
-
-            for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
-                for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
-                    for (int orientation = 0; orientation < pieceBlock.palette.shape.states; orientation++) {
-                        IBlockState state = pieceBlock
-                                .getStateFromMeta(slot * pieceBlock.palette.shape.states + orientation);
-
-                        require(pieceBlock.getMetaFromState(state) == slot * pieceBlock.palette.shape.states
-                                + orientation, "metadata roundtrip");
-
-                        BlockPos position = new BlockPos(500 + (ordinal & 63), 64 + ((ordinal >> 6) & 31),
-                                500 + (ordinal >> 11));
-
-                        ordinal++;
-
-                        if (phase.equals("reload")) {
-                            require(world.getBlockState(position).equals(state),
-                                    "persisted state " + pieceBlock.getRegistryName() + " / " + orientation);
-                        } else {
-                            world.setBlockState(position, state, 2);
-                            require(world.getBlockState(position).equals(state), "real storage");
-                        }
-                    }
+                if (phase.equals("compat")) {
+                    CompatibilityChecks.run(world);
+                }
+                if (ModList.get().isLoaded("skysbuildingpiecesbop") && !phase.startsWith("client")) {
+                    Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks")
+                            .getMethod("run", ServerWorld.class).invoke(null, world);
+                }
+                if (phase.startsWith("client")) {
+                    grid(world, phase.endsWith("reload"));
+                    PresentationChecks.connectedGlass(world);
+                    ClientStatus.complete = true;
+                    return;
                 }
             }
 
-            require(Pieces.BLOCKS.size() == Catalogue.INSTANCE.palettes.size(), "production budget");
-
-            NBTTagCompound bad = new NBTTagCompound();
-
-            bad.setString("id", "buildingbricks:rock_step");
-            bad.setByte("Count", (byte) 3);
-
-            NBTTagCompound unknown = new NBTTagCompound();
-
-            unknown.setString("material", "missing:unknown");
-            bad.setTag("tag", unknown);
-
-            NBTTagCompound before = bad.copy();
-            boolean stopped = false;
-
-            try {
-                LegacyBridge.prepareStack(bad);
-            } catch (LegacyBridge.RecoveryAbort expected) {
-                stopped = true;
-            }
-
-            require(stopped && before.equals(bad), "unknown absent content stops unchanged");
-
-            NBTTagCompound crate = new NBTTagCompound();
-
-            crate.setString("id", "minecraft:chest");
-            crate.setByte("Count", (byte) 1);
-
-            NBTTagCompound crateTag = new NBTTagCompound();
-
-            crateTag.setBoolean("Sealed", true);
-
-            NBTTagList contents = new NBTTagList();
-            NBTTagCompound nested = stack.copy();
-
-            nested.setString("id", "buildingbricks:rock_step");
-            nested.setShort("Damage", (short) 327);
-            contents.appendTag(nested);
-            contents.appendTag(bad.copy());
-            crateTag.setTag("Items", contents);
-            crate.setTag("tag", crateTag);
-            before = crate.copy();
-            stopped = false;
-
-            try {
-                LegacyBridge.prepareStack(crate);
-            } catch (LegacyBridge.RecoveryAbort expected) {
-                stopped = true;
-            }
-
-            require(stopped && before.equals(crate), "nested unknown abort is atomic");
-            contents.removeTag(1);
-            LegacyBridge.prepareStack(crate);
-            require(crateTag.getBoolean("Sealed")
-                    && contents.getCompoundTagAt(0).getString("id").startsWith("skysbuildingpieces:"),
-                    "sealed nested inventory recovery");
-            before = crate.copy();
-            LegacyBridge.prepareStack(crate);
-            require(before.equals(crate), "nested recovery idempotence");
-
-            Properties props = new Properties();
             File marker = new File(world.getSaveHandler().getWorldDirectory(),
                     "skysbuildingpieces-integration.properties");
+            Properties result = new Properties();
 
             if (marker.isFile()) {
-                try (InputStream input = new FileInputStream(marker)) {
-                    props.load(input);
+                try (FileInputStream input = new FileInputStream(marker)) {
+                    result.load(input);
                 }
             }
 
-            props.setProperty(phase + "_complete", "true");
-            props.setProperty("gameplay_checks", "metadata and storage");
-            props.setProperty("migration_checks", "16 step codes, raw item hook, NBT, idempotence");
+            result.setProperty(phase + "_complete", "true");
+            result.setProperty("gameplay_checks", "placement, recipes, drops, paths, grass and walls");
+            result.setProperty("migration_checks",
+                    "source registry, all 16 step codes, raw inventories and native data fixing");
 
-            try (OutputStream output = new FileOutputStream(marker)) {
-                props.store(output, "Runtime verification");
+            try (FileOutputStream output = new FileOutputStream(marker)) {
+                result.store(output, "Disposable runtime checks");
             }
 
             System.out.println("BUILDING_PIECES_PROBE_PASS " + phase);
-            server.initiateShutdown();
+            server.initiateShutdown(false);
         } catch (Throwable failure) {
+            ClientStatus.failure = failure;
             failure.printStackTrace();
-            net.minecraftforge.fml.common.FMLCommonHandler.instance().exitJava(2, true);
+            server.initiateShutdown(false);
         }
     }
 
-    private static void require(boolean value, String message) {
-        if (!value) {
-            throw new AssertionError(message);
-        }
-    }
+    private static void grid(ServerWorld world, boolean reload) throws Exception {
+        File file = new File(world.getSaveHandler().getWorldDirectory(), "runtime-grid.dat");
+        CompoundNBT saved = new CompoundNBT();
 
-    private static void rawStoredInventory(WorldServer world) {
-        NBTTagCompound root = new NBTTagCompound();
-        NBTTagCompound level = new NBTTagCompound();
-        NBTTagCompound coverage = new NBTTagCompound();
-
-        root.setTag("Level", level);
-
-        for (String module : Catalogue.INSTANCE.modules.keySet()) {
-            coverage.setInteger(module, 1);
+        if (reload) {
+            try (FileInputStream input = new FileInputStream(file)) {
+                saved = CompressedStreamTools.readCompressed(input);
+            }
         }
 
-        coverage.setInteger("dirt_vertical_slabs", 1);
-        level.setTag("skysbuildingpieces_coverage", coverage);
+        int number = 0;
 
-        NBTTagCompound cabinet = new NBTTagCompound();
+        for (PieceBlock block : Pieces.BLOCKS.values()) {
+            int assigned = block.palette.materials.size() * block.palette.shape.states;
 
-        cabinet.setString("id", "cfm:cabinet");
+            for (int metadata = 0; metadata < assigned; metadata++) {
+                BlockPos position = new BlockPos(500 + (number & 63), 180 + (number >> 6 & 15), 500 + (number >> 10));
 
-        NBTTagCompound stack = new NBTTagCompound();
+                if (reload) {
+                    if (!NBTUtil.writeBlockState(world.getBlockState(position))
+                            .equals(saved.getCompound("" + number))) {
+                        throw new AssertionError(
+                                "Saved client grid lost " + block.getRegistryName() + " / " + metadata);
+                    }
+                } else {
+                    world.setBlockState(position, block.getStateFromMeta(metadata), 18);
+                }
 
-        stack.setString("id", "buildingbricks:rock_step");
-        stack.setByte("Count", (byte) 17);
-        stack.setShort("Damage", (short) 327);
-        stack.setByte("cabinetSlot", (byte) 4);
+                number++;
+            }
+        }
+        if (!reload) {
+            for (int index = 0; index < number; index++) {
+                BlockPos position = new BlockPos(500 + (index & 63), 180 + (index >> 6 & 15), 500 + (index >> 10));
+                BlockState actual = world.getBlockState(position);
 
-        NBTTagCompound tag = new NBTTagCompound();
-
-        tag.setString("material", "minecraft:stone");
-        tag.setString("custom", "Preserve before the container reads its items");
-        stack.setTag("tag", tag);
-
-        NBTTagList inventory = new NBTTagList();
-
-        inventory.appendTag(stack);
-        cabinet.setTag("cabinetItems", inventory);
-
-        NBTTagList tiles = new NBTTagList();
-
-        tiles.appendTag(cabinet);
-        level.setTag("TileEntities", tiles);
-        LegacyBridge.report(world);
-
-        PiecesWorldState totals = PiecesWorldState.get(world);
-        NBTTagCompound previous = totals.writeToNBT(new NBTTagCompound());
-
-        try {
-            LegacyBridge.prepareChunk(world, root);
-            require(stack.getString("id").startsWith(LegacyBridge.active() ? "skysbuildingpieces:" : "buildingbricks:"),
-                    "raw cabinet stacks recover before a foreign serializer can discard missing IDs, even in covered chunks");
-            require(stack.getByte("Count") == 17 && stack.getByte("cabinetSlot") == 4
-                    && stack.getCompoundTag("tag").equals(tag), "raw cabinet count, slot and custom data");
-
-            NBTTagCompound copy = root.copy();
-
-            LegacyBridge.prepareChunk(world, root);
-            require(copy.equals(root), "raw cabinet reload idempotence");
-        } finally {
-            LegacyBridge.report(world);
-            totals.readFromNBT(previous);
-            totals.markDirty();
+                actual = ((PieceBlock) actual.getBlock()).getActualState(actual, world, position);
+                world.setBlockState(position, actual, 18);
+                saved.put("" + index, NBTUtil.writeBlockState(actual));
+            }
+            try (FileOutputStream output = new FileOutputStream(file)) {
+                CompressedStreamTools.writeCompressed(saved, output);
+            }
         }
 
-        System.out.println("BUILDING_PIECES_RAW_CONTAINER_PASS covered_chunk=true nonstandard_inventory_key=true");
+        System.out.println("BUILDING_PIECES_CLIENT_WORLD_PASS reload=" + reload + " states=" + number);
     }
 }

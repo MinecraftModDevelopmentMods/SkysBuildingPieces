@@ -3,11 +3,11 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.legacy.*;
 
 /** Loads only indexed existing chunks in a disposable full-world copy. */
@@ -19,8 +19,8 @@ public final class WorldAuditProbe {
     private final int batch = Integer.getInteger("skysbuildingpieces.auditBatch", 4);
     private int settleTicks;
 
-    public WorldAuditProbe(WorldServer world, boolean reload) throws IOException {
-        this.server = world.getMinecraftServer();
+    public WorldAuditProbe(ServerWorld world, boolean reload) throws IOException {
+        this.server = world.getServer();
         this.reload = reload;
 
         if (batch < 1 || batch > 8) {
@@ -29,15 +29,13 @@ public final class WorldAuditProbe {
         }
 
         int registryCount = 0;
-        int highest = 0;
 
-        for (net.minecraft.block.Block block : net.minecraft.block.Block.REGISTRY) {
+        for (net.minecraft.block.Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValues()) {
             registryCount++;
-            highest = Math.max(highest, net.minecraft.block.Block.getIdFromBlock(block));
         }
 
-        System.out.println("BUILDING_PIECES_WORLD_REGISTRY registered=" + registryCount + " highest=" + highest
-                + " free=" + (4096 - registryCount));
+        System.out
+                .println("BUILDING_PIECES_WORLD_REGISTRY registered=" + registryCount + " legacy_numeric_limit=false");
 
         Path root = world.getSaveHandler().getWorldDirectory().toPath();
 
@@ -99,14 +97,16 @@ public final class WorldAuditProbe {
         try {
             for (int entryIndex = 0; entryIndex < batch && next < chunks.size(); entryIndex++) {
                 int[] point = chunks.get(next++);
-                WorldServer world = server.getWorld(point[0]);
+                ServerWorld world = server.getWorld(net.minecraft.world.dimension.DimensionType.getById(point[0]));
                 Chunk chunk = world.getChunk(point[1], point[2]);
 
-                world.getChunkProvider().queueUnload(chunk);
+                world.getChunkProvider().save(false);
             }
             // A whole-world scan must not outrun the legacy asynchronous save queue.
             if (next % 256 == 0 || next == chunks.size()) {
-                net.minecraft.world.storage.ThreadedFileIOBase.getThreadedIOInstance().waitForFinish();
+                for (ServerWorld savedWorld : server.getWorlds()) {
+                    savedWorld.getChunkProvider().save(true);
+                }
             }
             if (next % 2048 == 0) {
                 System.out.println("BUILDING_PIECES_WORLD_AUDIT_PROGRESS " + next + " / " + chunks.size());
@@ -118,7 +118,7 @@ public final class WorldAuditProbe {
                     return;
                 }
 
-                WorldServer world = server.getWorld(0);
+                ServerWorld world = server.getWorld(net.minecraft.world.dimension.DimensionType.OVERWORLD);
                 long blocks = 0;
                 long items = 0;
 
@@ -137,7 +137,7 @@ public final class WorldAuditProbe {
                         throw new AssertionError(
                                 "Qualified encountered inventory count: " + items + " instead of 1170");
                     }
-                    if (net.minecraftforge.fml.common.Loader.isModLoaded("skysbuildingpiecesbop")) {
+                    if (net.minecraftforge.fml.ModList.get().isLoaded("skysbuildingpiecesbop")) {
                         PiecesWorldState.Totals bop = state.modules.get("biomesoplenty");
 
                         if (bop == null || bop.blocks != 601 || bop.items != 52) {
@@ -198,11 +198,11 @@ public final class WorldAuditProbe {
                 System.out.println(
                         "BUILDING_PIECES_WORLD_AUDIT_PASS blocks=" + blocks + " items=" + items + " reload=" + reload);
                 MinecraftForge.EVENT_BUS.unregister(this);
-                server.initiateShutdown();
+                server.initiateShutdown(false);
             }
         } catch (Throwable failure) {
             failure.printStackTrace();
-            net.minecraftforge.fml.common.FMLCommonHandler.instance().exitJava(2, true);
+            server.initiateShutdown(false);
         }
     }
 }

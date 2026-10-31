@@ -5,11 +5,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
@@ -26,78 +26,251 @@ public final class LegacyBridge {
     }
 
     public static boolean active() {
-        return ready && LegacyMapping.enabled(Loader.isModLoaded("buildingbricks"), SkysBuildingPieces.forceReplace);
+        return ready
+                && LegacyMapping.enabled(ModList.get().isLoaded("buildingbricks"), SkysBuildingPieces.forceReplace);
     }
 
     public static boolean recoveryActive() {
         return active() || ready && HistoricalFullBlocks.hasSource(savedIds);
     }
 
-    public static void start(MinecraftServer server) {
+    private static CompoundNBT registrySnapshot = new CompoundNBT();
+    private static boolean registryValidated;
+
+    public static synchronized void start(MinecraftServer server) {
         stop();
-        worldDirectory = server.isDedicatedServer() ? server.getFile(server.getFolderName())
-                : new File(server.getDataDirectory(), "saves/" + server.getFolderName());
 
-        File level = new File(worldDirectory, "level.dat");
+        File level = server.getActiveAnvilConverter().getFile(server.getFolderName(), "level.dat");
 
-        if (level.isFile()) {
-            try {
-                NBTTagCompound root;
+        worldDirectory = level.getParentFile();
 
+        File sidecar = new File(worldDirectory, "data/skysbuildingpieces_legacy_registry.dat");
+        CompoundNBT previous = new CompoundNBT();
+
+        try {
+            if (sidecar.isFile()) {
+                try (InputStream input = new FileInputStream(sidecar)) {
+                    previous = CompressedStreamTools.readCompressed(input);
+                }
+
+                registrySnapshot = previous.contains("FML", 10) ? previous.getCompound("FML").copy() : previous.copy();
+            } else if (level.isFile()) {
                 try (InputStream input = new FileInputStream(level)) {
-                    root = CompressedStreamTools.readCompressed(input);
+                    registrySnapshot = CompressedStreamTools.readCompressed(input).getCompound("FML").copy();
+                }
+            }
+
+            ListNBT ids = registrySnapshot.getCompound("Registries").getCompound("minecraft:blocks").getList("ids", 10);
+
+            for (int index = 0; index < ids.size(); index++) {
+                CompoundNBT entry = ids.getCompound(index);
+                int numeric = entry.getInt("V");
+                String name = entry.getString("K");
+                String duplicate = savedIds.put(numeric, name);
+
+                if (duplicate != null && !duplicate.equals(name)) {
+                    throw new RecoveryAbort("Conflicting saved block numbers: " + numeric, null);
+                }
+            }
+            if (!savedIds.isEmpty()) {
+                NumericStateBridge.begin(savedIds, previous.getList("staging", 10));
+                // Check every source before writing a sidecar or allowing destructive loading.
+                LegacyPreflight.validate(worldDirectory, savedIds);
+                registryValidated = true;
+                persistRegistry();
+            }
+        } catch (IOException failure) {
+            throw new RecoveryAbort("Cannot read the original registry snapshot; restore a backup", failure);
+        }
+    }
+
+    static synchronized void persistRegistry() {
+        if (!registryValidated || worldDirectory == null || registrySnapshot.isEmpty()) {
+            return;
+        }
+
+        Path destination = new File(worldDirectory, "data/skysbuildingpieces_legacy_registry.dat").toPath();
+        Path temporary = destination.resolveSibling(destination.getFileName() + ".tmp");
+
+        try {
+            Files.createDirectories(destination.getParent());
+
+            CompoundNBT contents = new CompoundNBT();
+
+            contents.put("FML", registrySnapshot.copy());
+            contents.put("staging", NumericStateBridge.saveStaging());
+
+            try (OutputStream output = Files.newOutputStream(temporary)) {
+                CompressedStreamTools.writeCompressed(contents, output);
+            }
+            try {
+                Files.move(temporary, destination, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException unsupported) {
+                Files.move(temporary, destination, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException failure) {
+            throw new RecoveryAbort("Cannot preserve the original registry snapshot", failure);
+        }
+    }
+
+    /** The coremod calls this before the chunk enters vanilla data fixing. */
+    public static void prepareLegacyChunk(CompoundNBT root) {
+        if (!ready || root == null) {
+            return;
+        }
+
+        prepareStack(root);
+
+        if (root.getInt("DataVersion") > 1343 || !root.contains("Level", 10)) {
+            return;
+        }
+
+        CompoundNBT level = root.getCompound("Level");
+        ListNBT sections = level.getList("Sections", 10);
+        boolean relevant = false;
+        boolean legacyPieces = false;
+
+        for (int index = 0; index < sections.size(); index++) {
+            CompoundNBT section = sections.getCompound(index);
+            byte[] low = section.getByteArray("Blocks");
+            byte[] high = section.getByteArray("Add");
+
+            if (low.length != 4096) {
+                continue;
+            }
+            for (int block = 0; block < 4096; block++) {
+                int number = low[block] & 255 | nibble(high, block) << 8;
+                String name = savedIds.get(number);
+
+                legacyPieces |= name != null && active() && LegacyMapping.owned(name);
+                relevant |= name != null && (palette(name) != null || active() && LegacyMapping.owned(name)
+                        || HistoricalFullBlocks.historical(name)) || NumericStateBridge.staged(number);
+            }
+        }
+        if (!relevant) {
+            return;
+        }
+
+        prepareChunk(null, root, legacyPieces);
+        carryDeltas(root, level);
+        queueShapeRefresh(level);
+        level.putBoolean("TerrainPopulated", true);
+        level.putBoolean("LightPopulated", true);
+        level.putBoolean("SkysBuildingPiecesPreserveChunk", true);
+    }
+
+    private static void queueShapeRefresh(CompoundNBT level) {
+        ListNBT refresh = level.getList("PostProcessing", 9);
+
+        while (refresh.size() < 16) {
+            refresh.add(new ListNBT());
+        }
+
+        ListNBT sections = level.getList("Sections", 10);
+
+        for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
+            CompoundNBT section = sections.getCompound(sectionIndex);
+            byte[] blocks = section.getByteArray("Blocks");
+
+            if (blocks.length != 4096) {
+                continue;
+            }
+
+            int sectionY = section.getByte("Y") & 255;
+
+            if (sectionY >= 16) {
+                throw new RecoveryAbort("Legacy piece section is outside the world height", null);
+            }
+
+            byte[] high = section.getByteArray("Add");
+            byte[] metadata = section.getByteArray("Data");
+            ListNBT positions = refresh.getList(sectionY);
+            Set<Short> queued = new HashSet<>();
+
+            for (int index = 0; index < positions.size(); index++) {
+                queued.add(positions.getShort(index));
+            }
+            for (int index = 0; index < 4096; index++) {
+                int number = blocks[index] & 255 | nibble(high, index) << 8;
+                String saved = savedIds.get(number);
+                BlockState staged = NumericStateBridge.stagedState(number << 4 | nibble(metadata, index));
+
+                if ((saved == null || palette(saved) == null)
+                        && (staged == null || !(staged.getBlock() instanceof PieceBlock))) {
+                    continue;
                 }
 
-                NBTTagCompound registry = root.getCompoundTag("FML").getCompoundTag("Registries")
-                        .getCompoundTag("minecraft:blocks");
-                NBTTagList ids = registry.getTagList("ids", 10);
+                // Native post-processing packs X, Y, Z rather than the section array's X, Z, Y order. Existing
+                // vanilla/mod entries stay intact.
+                short packed = (short) ((index & 15) | (index >> 8 & 15) << 4 | (index >> 4 & 15) << 8);
 
-                for (int registryIndex = 0; registryIndex < ids.tagCount(); registryIndex++) {
-                    NBTTagCompound registryEntry = ids.getCompoundTagAt(registryIndex);
-                    String name = registryEntry.getString("K");
-
-                    if (LegacyMapping.owned(name) || HistoricalFullBlocks.historical(name)) {
-                        savedIds.put(registryEntry.getInteger("V"), name);
-                    }
+                if (queued.add(packed)) {
+                    positions.add(new ShortNBT(packed));
                 }
+            }
+        }
 
-                File sidecar = new File(worldDirectory, "data/skysbuildingpieces_legacy_registry.dat");
+        level.put("PostProcessing", refresh);
+    }
 
-                if (sidecar.isFile()) {
-                    NBTTagList prior;
+    public static CompoundNBT finalizeLegacyChunk(CompoundNBT root) {
+        if (root != null && root.contains("Level", 10)) {
+            CompoundNBT level = root.getCompound("Level");
 
-                    try (InputStream input = new FileInputStream(sidecar)) {
-                        prior = CompressedStreamTools.readCompressed(input).getCompoundTag("Registries")
-                                .getCompoundTag("minecraft:blocks").getTagList("ids", 10);
-                    }
-                    for (int registryIndex = 0; registryIndex < prior.tagCount(); registryIndex++) {
-                        NBTTagCompound registryEntry = prior.getCompoundTagAt(registryIndex);
+            carryDeltas(root, level);
 
-                        if (LegacyMapping.owned(registryEntry.getString("K"))
-                                || HistoricalFullBlocks.historical(registryEntry.getString("K"))) {
-                            savedIds.putIfAbsent(registryEntry.getInteger("V"), registryEntry.getString("K"));
-                        }
-                    }
-                }
-                if ((!Loader.isModLoaded("buildingbricks") || HistoricalFullBlocks.hasSource(savedIds))
-                        && !savedIds.isEmpty()) {
-                    LegacyPreflight.validate(worldDirectory, savedIds);
-                }
-                // An unsafe upgrade must not write even a migration sidecar.
-                if (recoveryActive() && !savedIds.isEmpty() && !sidecar.isFile()) {
-                    sidecar.getParentFile().mkdirs();
+            if (level.getBoolean("SkysBuildingPiecesPreserveChunk")) {
+                level.putString("Status", "full");
+                level.remove("SkysBuildingPiecesPreserveChunk");
+            }
+        }
 
-                    try (OutputStream output = new FileOutputStream(sidecar)) {
-                        CompressedStreamTools.writeCompressed(root.getCompoundTag("FML"), output);
-                    }
-                }
-            } catch (IOException failure) {
-                throw new RecoveryAbort("Cannot read the legacy registry snapshot", failure);
+        return root;
+    }
+
+    private static void carryDeltas(CompoundNBT root, CompoundNBT level) {
+        // Forge 28 passes only Level to ChunkDataEvent.Load. Keep pending accounting with that data while vanilla fixes
+        // the enclosing chunk.
+        String[] keys = { "skysbuildingpieces_delta", "skysbuildingpieces_additional_vanilla_delta",
+                "skysbuildingpieces_module_delta", "skysbuildingpieces_historical_delta",
+                "skysbuildingpieces_retired_delta" };
+
+        for (String key : keys) {
+            if (root.contains(key) && level.contains(key) && !level.get(key).equals(root.get(key))) {
+                throw new RecoveryAbort("Conflicting pending migration accounting: " + key, null);
+            }
+        }
+        for (String key : keys) {
+            if (root.contains(key)) {
+                level.put(key, root.get(key));
+                root.remove(key);
             }
         }
     }
 
+    /** Also covers player and nested inventory data before the native item fixer runs. */
+    public static void prepareNbt(CompoundNBT root) {
+        if (ready && root != null) {
+            prepareStack(root);
+        }
+    }
+
+    static PieceBlock palette(String name) {
+        String replacement = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.replacementId(name);
+        String identifier = replacement == null ? name : replacement;
+        PieceBlock block = Pieces.BLOCKS.get(identifier);
+
+        if (block == null && identifier.startsWith(SkysBuildingPieces.ID + ":")) {
+            block = Pieces.BLOCKS.get(identifier.substring(SkysBuildingPieces.ID.length() + 1));
+        }
+
+        return block;
+    }
+
     public static synchronized void stop() {
+        NumericStateBridge.reset();
+        registrySnapshot = new CompoundNBT();
+        registryValidated = false;
         savedIds.clear();
         unresolved.clear();
         worldDirectory = null;
@@ -111,67 +284,87 @@ public final class LegacyBridge {
         }
     }
 
-    public static void prepareStack(NBTTagCompound stack) {
-        if (ready) {
-            zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(stack);
-        }
+    public static void prepareStack(CompoundNBT stack) {
         if (!ready) {
             return;
         }
 
         List<StackChange> changes = new ArrayList<StackChange>();
 
-        collectStack(stack, changes);
+        collectInventories(stack, changes);
         applyStacks(changes);
     }
 
     private static void applyStacks(List<StackChange> changes) {
         // Resolve every nested target before changing any part of the stack.
         for (StackChange change : changes) {
-            change.stack.setString("id", change.output.getItem().getRegistryName().toString());
-            change.stack.setShort("Damage", (short) change.output.getMetadata());
+            change.stack.putString("id", change.output.getItem().getRegistryName().toString());
+            change.stack.remove("Damage");
 
-            if (worldDirectory != null) {
+            if (worldDirectory != null && change.module != null) {
                 pendingItems.computeIfAbsent(change.module, key -> new java.util.concurrent.atomic.AtomicLong())
                         .addAndGet(change.stack.getByte("Count") & 255);
             }
         }
     }
 
-    private static void collectStack(NBTTagCompound stack, List<StackChange> changes) {
-        if (stack.hasKey("id", 8) && stack.hasKey("Count", 99)) {
+    private static void collectStack(CompoundNBT stack, List<StackChange> changes) {
+        if (stack.contains("id", 8) && stack.contains("Count", 99)) {
             collectIdentity(stack, changes);
         }
 
-        collectInventories(stack.getTag("tag"), changes);
-        collectInventories(stack.getTag("ForgeCaps"), changes);
+        for (String key : stack.keySet()) {
+            if (!key.equals("retained_tiles")) {
+                collectInventories(stack.get(key), changes);
+            }
+        }
     }
 
-    private static void collectInventories(NBTBase value, List<StackChange> changes) {
-        if (value instanceof NBTTagCompound) {
-            NBTTagCompound compound = (NBTTagCompound) value;
+    private static void collectInventories(INBT value, List<StackChange> changes) {
+        if (value instanceof CompoundNBT) {
+            CompoundNBT compound = (CompoundNBT) value;
 
-            if (compound.hasKey("id", 8) && compound.hasKey("Count", 99)) {
+            if (compound.contains("id", 8) && compound.contains("Count", 99)) {
                 collectStack(compound, changes);
                 return;
             }
-            for (String key : compound.getKeySet()) {
-                NBTBase child = compound.getTag(key);
-
-                collectInventories(child, changes);
+            for (String key : compound.keySet()) {
+                if (!key.equals("retained_tiles")) {
+                    collectInventories(compound.get(key), changes);
+                }
             }
-        } else if (value instanceof NBTTagList) {
-            NBTTagList list = (NBTTagList) value;
+        } else if (value instanceof ListNBT) {
+            ListNBT list = (ListNBT) value;
 
-            for (int entryIndex = 0; entryIndex < list.tagCount(); entryIndex++) {
+            for (int entryIndex = 0; entryIndex < list.size(); entryIndex++) {
                 collectInventories(list.get(entryIndex), changes);
             }
         }
     }
 
-    private static void collectIdentity(NBTTagCompound stack, List<StackChange> changes) {
+    private static void collectIdentity(CompoundNBT stack, List<StackChange> changes) {
         String registry = stack.getString("id");
-        IBlockState retired = HistoricalFullBlocks.resolve(registry, stack.getShort("Damage"));
+        PieceBlock sourcePalette = palette(registry);
+
+        if (sourcePalette != null) {
+            int metadata = stack.getShort("Damage");
+            net.minecraft.item.ItemStack output = Pieces.legacyItem(sourcePalette.getRegistryName().toString(),
+                    metadata, 1);
+
+            if (output == null || output.isEmpty()) {
+                throw new RecoveryAbort("No inventory target for " + registry + " / " + metadata, null);
+            }
+
+            changes.add(new StackChange(stack, output, null));
+            return;
+        }
+        if (LegacyPreflight.skyOwned(registry) && !HistoricalFullBlocks.historical(registry)
+                && !net.minecraftforge.registries.ForgeRegistries.ITEMS
+                        .containsKey(new net.minecraft.util.ResourceLocation(registry))) {
+            throw new RecoveryAbort("Cannot recover " + registry + ". Restore its Sky add-on before loading.", null);
+        }
+
+        BlockState retired = HistoricalFullBlocks.resolve(registry, stack.getShort("Damage"));
 
         if (retired != null) {
             net.minecraft.item.ItemStack output = Pieces.stack(retired, 1);
@@ -187,11 +380,11 @@ public final class LegacyBridge {
             return;
         }
 
-        NBTTagCompound tag = stack.getCompoundTag("tag");
+        CompoundNBT tag = stack.getCompound("tag");
         String material = LegacyMapping.material(tag.getString("material"));
         // Item damage is a dynamic material index, never a placement orientation.
         Shape shape = LegacyMapping.shape(registry, 0);
-        IBlockState target = resolve(registry, material, shape, shape == Shape.SLAB ? 1 : 0);
+        BlockState target = resolve(registry, material, shape, shape == Shape.SLAB ? 1 : 0);
 
         if (target == null) {
             return;
@@ -208,63 +401,64 @@ public final class LegacyBridge {
     }
 
     private static final class StackChange {
-        final NBTTagCompound stack;
+        final CompoundNBT stack;
         final net.minecraft.item.ItemStack output;
         final String module;
 
-        StackChange(NBTTagCompound stack, net.minecraft.item.ItemStack output, String module) {
+        StackChange(CompoundNBT stack, net.minecraft.item.ItemStack output, String module) {
             this.stack = stack;
             this.output = output;
             this.module = module;
         }
     }
 
-    public static void prepareChunk(World world, NBTTagCompound root) {
-        if (ready) {
-            zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(root.getCompoundTag("Level"));
-        }
+    public static void prepareChunk(World world, CompoundNBT root) {
+        prepareChunk(world, root, true);
+    }
+
+    private static void prepareChunk(World world, CompoundNBT root, boolean legacyPieces) {
         if (ready) {
             // Some containers reject missing item IDs before constructing an ItemStack. Recover saved stacks before
             // those serializers run, including inventories with names other than vanilla's Items.
-            NBTTagCompound stored = root.getCompoundTag("Level");
+            CompoundNBT stored = root.getCompound("Level");
             List<StackChange> changes = new ArrayList<StackChange>();
 
-            collectInventories(stored.getTag("TileEntities"), changes);
-            collectInventories(stored.getTag("Entities"), changes);
+            collectInventories(stored.get("TileEntities"), changes);
+            collectInventories(stored.get("Entities"), changes);
             applyStacks(changes);
         }
         if (ready) {
             HistoricalFullBlocks.prepareChunk(root, savedIds);
         }
-        if (!active()) {
+        if (!active() || !legacyPieces) {
             return;
         }
 
-        NBTTagCompound level = root.getCompoundTag("Level");
-        NBTTagCompound coverage = level.getCompoundTag("skysbuildingpieces_coverage");
+        CompoundNBT level = root.getCompound("Level");
+        CompoundNBT coverage = level.getCompound("skysbuildingpieces_coverage");
         Set<String> pendingModules = new LinkedHashSet<String>();
 
         for (String module : Catalogue.INSTANCE.modules.keySet()) {
-            if (coverage.getInteger(module) < 1) {
+            if (coverage.getInt(module) < 1) {
                 pendingModules.add(module);
             }
         }
 
-        boolean pendingDirt = coverage.getInteger("dirt_vertical_slabs") < 1;
+        boolean pendingDirt = coverage.getInt("dirt_vertical_slabs") < 1;
 
         if (pendingModules.isEmpty() && !pendingDirt) {
             return;
         }
 
-        NBTTagList tiles = level.getTagList("TileEntities", 10);
-        NBTTagList sections = level.getTagList("Sections", 10);
+        ListNBT tiles = level.getList("TileEntities", 10);
+        ListNBT sections = level.getList("Sections", 10);
 
-        Map<Integer, NBTTagCompound> materialAt = new HashMap<Integer, NBTTagCompound>();
+        Map<Integer, CompoundNBT> materialAt = new HashMap<Integer, CompoundNBT>();
 
-        for (int tileIndex = 0; tileIndex < tiles.tagCount(); tileIndex++) {
-            NBTTagCompound legacyTileData = tiles.getCompoundTagAt(tileIndex);
-            int index = (legacyTileData.getInteger("x") & 15) | ((legacyTileData.getInteger("z") & 15) << 4)
-                    | (legacyTileData.getInteger("y") << 8);
+        for (int tileIndex = 0; tileIndex < tiles.size(); tileIndex++) {
+            CompoundNBT legacyTileData = tiles.getCompound(tileIndex);
+            int index = (legacyTileData.getInt("x") & 15) | ((legacyTileData.getInt("z") & 15) << 4)
+                    | (legacyTileData.getInt("y") << 8);
 
             materialAt.put(index, legacyTileData);
         }
@@ -272,8 +466,8 @@ public final class LegacyBridge {
         // Resolve every candidate before modifying any section or deleting a legacy tile.
         List<Conversion> decisions = new ArrayList<Conversion>();
 
-        for (int sectionIndex = 0; sectionIndex < sections.tagCount(); sectionIndex++) {
-            NBTTagCompound section = sections.getCompoundTagAt(sectionIndex);
+        for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
+            CompoundNBT section = sections.getCompound(sectionIndex);
             byte[] blocks = section.getByteArray("Blocks");
             byte[] blockIdHighNibbles = section.getByteArray("Add");
             byte[] data = section.getByteArray("Data");
@@ -284,28 +478,15 @@ public final class LegacyBridge {
             }
             for (int blockIndex = 0; blockIndex < 4096; blockIndex++) {
                 int numeric = (blocks[blockIndex] & 255) | (nibble(blockIdHighNibbles, blockIndex) << 8);
-                Block legacyBlock = Block.getBlockById(numeric);
-                net.minecraft.util.ResourceLocation registeredName = legacyBlock == null ? null
-                        : Block.REGISTRY.getNameForObject(legacyBlock);
-                String registry = registeredName == null ? "" : registeredName.toString();
+                String registry = savedIds.get(numeric);
 
-                if (!LegacyMapping.owned(registry)) {
-                    // Never reinterpret an already converted Sky or unrelated live ID through a historical snapshot
-                    // that used the same numeric slot.
-                    if (legacyBlock == SkysBuildingPieces.HOLDER || legacyBlock == null
-                            || legacyBlock instanceof net.minecraft.block.BlockAir) {
-                        registry = savedIds.get(numeric);
-                    } else {
-                        continue;
-                    }
-                }
                 if (registry == null || !LegacyMapping.owned(registry)) {
                     continue;
                 }
 
                 int tilePositionKey = (blockIndex & 255)
                         | (((section.getByte("Y") & 255) * 16 + (blockIndex >> 8)) << 8);
-                NBTTagCompound legacyTileData = materialAt.get(tilePositionKey);
+                CompoundNBT legacyTileData = materialAt.get(tilePositionKey);
                 String material = legacyTileData == null ? "" : legacyTileData.getString("material");
                 String module = Catalogue.INSTANCE.moduleFor(LegacyMapping.material(material));
                 boolean dirtVertical = registry.equals("buildingbricks:dirt_vertical_slab");
@@ -315,7 +496,7 @@ public final class LegacyBridge {
                 }
 
                 Shape shape = LegacyMapping.shape(registry, nibble(data, blockIndex));
-                IBlockState target = resolve(registry, LegacyMapping.material(material), shape,
+                BlockState target = resolve(registry, LegacyMapping.material(material), shape,
                         LegacyMapping.orientation(shape, nibble(data, blockIndex)));
 
                 if (target != null) {
@@ -324,12 +505,13 @@ public final class LegacyBridge {
             }
         }
 
-        Set<NBTTagCompound> removed = Collections.newSetFromMap(new IdentityHashMap<NBTTagCompound, Boolean>());
-        NBTTagList retainedTileData = coverage.getTagList("retained_tiles", 10);
+        Set<CompoundNBT> removed = Collections.newSetFromMap(new IdentityHashMap<CompoundNBT, Boolean>());
+        ListNBT retainedTileData = coverage.getList("retained_tiles", 10);
 
         // Every target is now known. Commit the block states before removing their old material tiles.
         for (Conversion conversion : decisions) {
-            int blockId = Block.getIdFromBlock(conversion.state.getBlock());
+            int encoded = NumericStateBridge.encode(conversion.state);
+            int blockId = encoded >>> 4;
             byte[] blockIdLowBytes = conversion.section.getByteArray("Blocks");
 
             blockIdLowBytes[conversion.index] = (byte) blockId;
@@ -341,63 +523,63 @@ public final class LegacyBridge {
             }
             if (blockIdHighNibbles.length != 0) {
                 setNibble(blockIdHighNibbles, conversion.index, blockId >> 8);
-                conversion.section.setByteArray("Add", blockIdHighNibbles);
+                conversion.section.putByteArray("Add", blockIdHighNibbles);
             }
 
             byte[] meta = conversion.section.getByteArray("Data");
 
-            setNibble(meta, conversion.index, conversion.state.getBlock().getMetaFromState(conversion.state));
-            conversion.section.setByteArray("Blocks", blockIdLowBytes);
-            conversion.section.setByteArray("Data", meta);
+            setNibble(meta, conversion.index, encoded & 15);
+            conversion.section.putByteArray("Blocks", blockIdLowBytes);
+            conversion.section.putByteArray("Data", meta);
 
             if (conversion.tile != null) {
                 removed.add(conversion.tile);
-                retainedTileData.appendTag(conversion.tile.copy());
+                retainedTileData.add(conversion.tile.copy());
             }
         }
 
-        NBTTagList retained = new NBTTagList();
+        ListNBT retained = new ListNBT();
 
-        for (int tileIndex = 0; tileIndex < tiles.tagCount(); tileIndex++) {
-            if (!removed.contains(tiles.getCompoundTagAt(tileIndex))) {
-                retained.appendTag(tiles.getCompoundTagAt(tileIndex));
+        for (int tileIndex = 0; tileIndex < tiles.size(); tileIndex++) {
+            if (!removed.contains(tiles.getCompound(tileIndex))) {
+                retained.add(tiles.getCompound(tileIndex));
             }
         }
 
-        level.setTag("TileEntities", retained);
+        level.put("TileEntities", retained);
 
-        NBTTagCompound deltas = new NBTTagCompound();
+        CompoundNBT deltas = new CompoundNBT();
 
         for (String module : pendingModules) {
-            coverage.setInteger(module, 1);
-            deltas.setLong(module, 0);
+            coverage.putInt(module, 1);
+            deltas.putLong(module, 0);
         }
         if (pendingDirt) {
-            coverage.setInteger("dirt_vertical_slabs", 1);
+            coverage.putInt("dirt_vertical_slabs", 1);
         }
         for (Conversion conversion : decisions) {
-            deltas.setLong(conversion.module, deltas.getLong(conversion.module) + 1);
+            deltas.putLong(conversion.module, deltas.getLong(conversion.module) + 1);
         }
 
-        coverage.setTag("retained_tiles", retainedTileData);
-        level.setTag("skysbuildingpieces_coverage", coverage);
+        coverage.put("retained_tiles", retainedTileData);
+        level.put("skysbuildingpieces_coverage", coverage);
 
         if (pendingModules.contains("vanilla")) {
-            root.setLong("skysbuildingpieces_delta", deltas.getLong("vanilla"));
+            root.putLong("skysbuildingpieces_delta", deltas.getLong("vanilla"));
         } else if (deltas.getLong("vanilla") > 0) {
-            root.setLong("skysbuildingpieces_additional_vanilla_delta", deltas.getLong("vanilla"));
+            root.putLong("skysbuildingpieces_additional_vanilla_delta", deltas.getLong("vanilla"));
         }
 
-        deltas.removeTag("vanilla");
+        deltas.remove("vanilla");
 
         if (!deltas.isEmpty()) {
-            root.setTag("skysbuildingpieces_module_delta", deltas);
+            root.put("skysbuildingpieces_module_delta", deltas);
         }
     }
 
     /** Keep unsupported pieces with their installed mod; stop absent-mod recovery rather than guess. */
-    public static IBlockState resolve(String registry, String material, Shape shape, int orientation) {
-        IBlockState target = LegacyMapping.allowedMaterial(material, shape) ? Pieces.state(material, shape, orientation)
+    public static BlockState resolve(String registry, String material, Shape shape, int orientation) {
+        BlockState target = LegacyMapping.allowedMaterial(material, shape) ? Pieces.state(material, shape, orientation)
                 : null;
 
         if (target == null) {
@@ -406,7 +588,7 @@ public final class LegacyBridge {
             synchronized (unresolved) {
                 unresolved.put(key, unresolved.getOrDefault(key, 0L) + 1);
             }
-            if (!Loader.isModLoaded("buildingbricks")) {
+            if (!ModList.get().isLoaded("buildingbricks")) {
                 throw new RecoveryAbort("Cannot safely recover " + key
                         + ". Restore BuildingBricks and its material add-ons, then load a backup. Upgrade was stopped.",
                         null);
@@ -448,8 +630,7 @@ public final class LegacyBridge {
 
         state.markDirty();
 
-        File destination = new File(world.getSaveHandler().getWorldDirectory(),
-                "serverconfig/skysbuildingpieces-migration-report.txt");
+        File destination = new File(worldDirectory, "serverconfig/skysbuildingpieces-migration-report.txt");
 
         destination.getParentFile().mkdirs();
 
@@ -477,12 +658,12 @@ public final class LegacyBridge {
     }
 
     private static final class Conversion {
-        final NBTTagCompound section, tile;
+        final CompoundNBT section, tile;
         final int index;
-        final IBlockState state;
+        final BlockState state;
         final String module;
 
-        Conversion(NBTTagCompound section, int index, IBlockState state, NBTTagCompound tile, String module) {
+        Conversion(CompoundNBT section, int index, BlockState state, CompoundNBT tile, String module) {
             this.section = section;
             this.index = index;
             this.state = state;

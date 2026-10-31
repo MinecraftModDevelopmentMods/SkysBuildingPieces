@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/smooth_sandstone",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:smooth_sandstone_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:smooth_sandstone_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:smooth_sandstone_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+    }
+  ]
+}

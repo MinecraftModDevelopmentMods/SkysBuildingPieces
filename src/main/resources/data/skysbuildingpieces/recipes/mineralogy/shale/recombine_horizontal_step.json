@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/shale",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mineralogy_shale_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "mineralogy:shale_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:shale_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_shale_horizontal_step"
+    }
+  ]
+}

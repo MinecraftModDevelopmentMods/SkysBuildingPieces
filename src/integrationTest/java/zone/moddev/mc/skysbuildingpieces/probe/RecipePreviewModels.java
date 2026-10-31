@@ -4,26 +4,27 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
+
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
 /** Checks every ingredient picture the recipe book can cycle through. */
 final class RecipePreviewModels {
-    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList(
-            "skysbuildingpieces", "skysbuildingpiecesbop", "skysgrassslabs",
-            "skysterrainsmoother", "skysterrainsmootherbop"));
+    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
+            "skysgrassslabs", "skysterrainsmoother", "skysterrainsmootherbop"));
 
     static void check(Minecraft minecraft) {
         int recipes = 0;
         int previews = 0;
-        for (IRecipe recipe : CraftingManager.REGISTRY) {
-            ResourceLocation id = recipe.getRegistryName();
+
+        for (IRecipe<?> recipe : minecraft.getConnection().getRecipeManager().getRecipes()) {
+            ResourceLocation id = recipe.getId();
+
             if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isDynamic()) {
                 continue;
             }
@@ -33,10 +34,15 @@ final class RecipePreviewModels {
                     previews++;
                 }
             }
+
             checkModel(minecraft, recipe.getRecipeOutput(), id);
             previews++;
             recipes++;
         }
+        if (recipes < 1000) {
+            throw new AssertionError("Client did not receive the complete native recipe catalogue: " + recipes);
+        }
+
         System.out.println("SKY_RECIPE_PREVIEW_MODELS_PASS recipes=" + recipes + " previews=" + previews);
     }
 
@@ -44,17 +50,19 @@ final class RecipePreviewModels {
         if (stack.isEmpty()) {
             throw new AssertionError("Empty recipe preview: " + recipe);
         }
-        String label = recipe + " -> " + stack.getItem().getRegistryName() + ":" + stack.getMetadata();
-        IBakedModel model = minecraft.getRenderItem().getItemModelWithOverrides(stack, null, null);
-        IBakedModel missing = minecraft.getBlockRendererDispatcher().getBlockModelShapes()
-                .getModelManager().getMissingModel();
-        if (model == missing || model.getParticleTexture().getIconName().contains("missingno")) {
+
+        String label = recipe + " -> " + stack.getItem().getRegistryName();
+        IBakedModel model = minecraft.getItemRenderer().getItemModelWithOverrides(stack, null, null);
+        IBakedModel missing = minecraft.getBlockRendererDispatcher().getBlockModelShapes().getModelManager()
+                .getMissingModel();
+
+        if (model == missing || model.getParticleTexture().getName().toString().contains("missingno")) {
             throw new AssertionError("Missing recipe preview model: " + label);
         }
-        for (EnumFacing face : new EnumFacing[] {null, EnumFacing.DOWN, EnumFacing.UP,
-                EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST}) {
-            for (BakedQuad quad : model.getQuads(null, face, 0)) {
-                if (quad.getSprite().getIconName().contains("missingno")) {
+        for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
+                Direction.WEST, Direction.EAST }) {
+            for (BakedQuad quad : model.getQuads(null, face, new java.util.Random(0))) {
+                if (quad.getSprite().getName().toString().contains("missingno")) {
                     throw new AssertionError("Missing recipe preview texture: " + label);
                 }
             }

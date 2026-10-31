@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/peridotite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:peridotite_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:peridotite",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:peridotite"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:peridotite_slab"
+    }
+  ]
+}

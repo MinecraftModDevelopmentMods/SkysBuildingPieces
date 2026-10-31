@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:end_stone_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:end_stone_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_stone_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_stone_vertical_slab"
+    }
+  ]
+}

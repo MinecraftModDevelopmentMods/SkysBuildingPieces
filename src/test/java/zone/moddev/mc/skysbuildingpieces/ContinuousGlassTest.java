@@ -1,17 +1,19 @@
 package zone.moddev.mc.skysbuildingpieces;
 
 import com.google.gson.*;
-import java.lang.reflect.Proxy;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import org.junit.jupiter.api.Test;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraft.util.Direction;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelProperty;
 import zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel;
 import zone.moddev.mc.skysbuildingpieces.content.GlassWallTexture;
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,11 +88,18 @@ class ContinuousGlassTest {
     @Test
     void bakedWrapperPreservesInventoryBordersAndQuadAttributesWithoutGraphics() {
         JsonObject part = new JsonParser().parse("{\"from\":[5,0,0],\"to\":[5,13,16]}").getAsJsonObject();
-        int[] data = quad(part, "west", 0);
-        BakedQuad source = new BakedQuad(data, 3, EnumFacing.WEST, null, false, DefaultVertexFormats.BLOCK);
+        int[] compact = quad(part, "west", 0);
+        int stride = DefaultVertexFormats.BLOCK.getIntegerSize();
+        int[] data = new int[stride * 4];
+
+        for (int vertex = 0; vertex < 4; vertex++) {
+            System.arraycopy(compact, vertex * 7, data, vertex * stride, 7);
+        }
+
+        BakedQuad source = new BakedQuad(data, 3, Direction.WEST, null, false, DefaultVertexFormats.BLOCK);
         List<BakedQuad> original = Collections.singletonList(source);
         IBakedModel base = new IBakedModel() {
-            public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long random) {
+            public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
                 assertNull(state);
                 return original;
             }
@@ -116,25 +125,25 @@ class ContinuousGlassTest {
             }
 
             public ItemOverrideList getOverrides() {
-                return ItemOverrideList.NONE;
+                return ItemOverrideList.EMPTY;
             }
         };
         ContinuousGlassModel model = new ContinuousGlassModel(base);
 
-        assertSame(original, model.getQuads(null, null, 0));
-        assertSame(original, model.getQuads(state(0), EnumFacing.WEST, 0));
+        assertSame(original, model.getQuads(null, null, new Random(0)));
+        assertSame(original, model.getQuads(null, Direction.WEST, new Random(0), data(0)));
 
-        List<BakedQuad> joined = model.getQuads(state(5), EnumFacing.WEST, 0);
+        List<BakedQuad> joined = model.getQuads(null, Direction.WEST, new Random(0), data(5));
 
-        assertSame(joined, model.getQuads(state(5), EnumFacing.WEST, 123));
+        assertSame(joined, model.getQuads(null, Direction.WEST, new Random(123), data(5)));
         assertThrows(UnsupportedOperationException.class, () -> joined.clear());
 
         BakedQuad trimmed = joined.get(0);
 
         assertNotSame(source, trimmed);
-        assertArrayEquals(GlassWallTexture.trim(data, 7, 0, 4, 5), trimmed.getVertexData());
+        assertArrayEquals(GlassWallTexture.trim(data, stride, 0, 4, 5), trimmed.getVertexData());
         assertEquals(3, trimmed.getTintIndex());
-        assertEquals(EnumFacing.WEST, trimmed.getFace());
+        assertEquals(Direction.WEST, trimmed.getFace());
         assertFalse(trimmed.shouldApplyDiffuseLighting());
         assertSame(source.getSprite(), trimmed.getSprite());
         assertSame(source.getFormat(), trimmed.getFormat());
@@ -146,18 +155,19 @@ class ContinuousGlassTest {
         assertSame(base.getItemCameraTransforms(), model.getItemCameraTransforms());
     }
 
-    private static IBlockState state(int joins) {
-        return (IBlockState) Proxy.newProxyInstance(ContinuousGlassTest.class.getClassLoader(),
-                new Class<?>[] { IExtendedBlockState.class }, (proxy, method, args) -> {
-                    if (method.getName().equals("getValue") && args[0] == GlassWallTexture.JOINS) {
-                        return joins;
-                    }
-                    if (method.getName().equals("getClean")) {
-                        return null;
-                    }
+    private static IModelData data(int joins) {
+        try {
+            java.lang.reflect.Field field = ContinuousGlassModel.class.getDeclaredField("JOINS");
 
-                    throw new AssertionError("Unexpected state call: " + method.getName());
-                });
+            field.setAccessible(true);
+
+            @SuppressWarnings("unchecked")
+            ModelProperty<Integer> property = (ModelProperty<Integer>) field.get(null);
+
+            return new ModelDataMap.Builder().withInitial(property, joins).build();
+        } catch (ReflectiveOperationException failure) {
+            throw new AssertionError(failure);
+        }
     }
 
     private static int[] quad(JsonObject part, String face, int rotation) {

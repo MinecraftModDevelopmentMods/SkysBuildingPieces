@@ -1,0 +1,24 @@
+package zone.moddev.mc.skysbuildingpieces.control;
+
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+
+/** A dependency-only startup control, launched without any Sky content. */
+@Mod("optionalmodcontrol")
+public final class OptionalModControl {
+    public OptionalModControl() {
+        MinecraftForge.EVENT_BUS.addListener(this::started);
+    }
+
+    private void started(FMLServerStartedEvent event) {
+        if (!ModList.get().isLoaded("mineralogy") || !ModList.get().isLoaded("orespawn")
+                || ModList.get().isLoaded("skysbuildingpieces") || ModList.get().isLoaded("skysgrassslabs")) {
+            throw new AssertionError("Dependency control contains the wrong mods");
+        }
+
+        System.out.println("OPTIONAL_MOD_CONTROL_STARTED sky_mods=false");
+        event.getServer().initiateShutdown(false);
+    }
+}

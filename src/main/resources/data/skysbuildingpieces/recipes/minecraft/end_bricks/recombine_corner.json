@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/end_bricks",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:end_bricks_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:end_bricks_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_bricks_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_bricks_horizontal_step"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 
@@ -48,7 +48,7 @@ public final class PiecesWorldState extends WorldSavedData {
         }
     }
 
-    private NBTTagCompound retained = new NBTTagCompound();
+    private CompoundNBT retained = new CompoundNBT();
 
     public PiecesWorldState() {
         super(NAME);
@@ -58,8 +58,9 @@ public final class PiecesWorldState extends WorldSavedData {
         super(name);
     }
 
-    public void readFromNBT(NBTTagCompound compoundTag) {
-        int schema = compoundTag.getInteger("schema_version");
+    @Override
+    public void read(CompoundNBT compoundTag) {
+        int schema = compoundTag.getInt("schema_version");
 
         if (schema != 1) {
             throw new IllegalStateException("Unsupported building-pieces state schema " + schema);
@@ -72,18 +73,18 @@ public final class PiecesWorldState extends WorldSavedData {
         retained = compoundTag.copy();
         unresolved.clear();
 
-        NBTTagCompound issues = compoundTag.getCompoundTag("unresolved");
+        CompoundNBT issues = compoundTag.getCompound("unresolved");
 
-        for (String key : issues.getKeySet()) {
+        for (String key : issues.keySet()) {
             unresolved.put(key, issues.getLong(key));
         }
 
         modules.clear();
 
-        NBTTagCompound savedModules = compoundTag.getCompoundTag("modules");
+        CompoundNBT savedModules = compoundTag.getCompound("modules");
 
-        for (String key : savedModules.getKeySet()) {
-            NBTTagCompound saved = savedModules.getCompoundTag(key);
+        for (String key : savedModules.keySet()) {
+            CompoundNBT saved = savedModules.getCompound(key);
             Totals moduleTotals = totals(key);
 
             moduleTotals.blocks = saved.getLong("blocks");
@@ -92,52 +93,47 @@ public final class PiecesWorldState extends WorldSavedData {
         }
     }
 
-    public NBTTagCompound writeToNBT(NBTTagCompound compoundTag) {
+    @Override
+    public CompoundNBT write(CompoundNBT compoundTag) {
         compoundTag.merge(retained);
-        compoundTag.setInteger("schema_version", 1);
-        compoundTag.setLong("vanilla_blocks", blocks);
-        compoundTag.setLong("vanilla_items", items);
-        compoundTag.setLong("vanilla_chunks", chunks);
+        compoundTag.putInt("schema_version", 1);
+        compoundTag.putLong("vanilla_blocks", blocks);
+        compoundTag.putLong("vanilla_items", items);
+        compoundTag.putLong("vanilla_chunks", chunks);
 
-        NBTTagCompound issues = new NBTTagCompound();
+        CompoundNBT issues = new CompoundNBT();
 
         for (java.util.Map.Entry<String, Long> entry : unresolved.entrySet()) {
-            issues.setLong(entry.getKey(), entry.getValue());
+            issues.putLong(entry.getKey(), entry.getValue());
         }
 
-        compoundTag.setTag("unresolved", issues);
+        compoundTag.put("unresolved", issues);
 
-        NBTTagCompound savedModules = compoundTag.getCompoundTag("modules");
+        CompoundNBT savedModules = compoundTag.getCompound("modules");
 
         for (java.util.Map.Entry<String, Totals> entry : modules.entrySet()) {
-            NBTTagCompound saved = savedModules.getCompoundTag(entry.getKey());
+            CompoundNBT saved = savedModules.getCompound(entry.getKey());
 
-            saved.setLong("blocks", entry.getValue().blocks);
-            saved.setLong("items", entry.getValue().items);
-            saved.setLong("chunks", entry.getValue().chunks);
-            savedModules.setTag(entry.getKey(), saved);
+            saved.putLong("blocks", entry.getValue().blocks);
+            saved.putLong("items", entry.getValue().items);
+            saved.putLong("chunks", entry.getValue().chunks);
+            savedModules.put(entry.getKey(), saved);
         }
         if (!savedModules.isEmpty()) {
-            compoundTag.setTag("modules", savedModules);
+            compoundTag.put("modules", savedModules);
         }
 
         return compoundTag;
     }
 
     public static PiecesWorldState get(World world) {
-        if (world.getMinecraftServer() != null) {
-            world = world.getMinecraftServer().getWorld(0);
+        if (world.getServer() != null) {
+            world = world.getServer().getWorld(net.minecraft.world.dimension.DimensionType.OVERWORLD);
+        }
+        if (!(world instanceof net.minecraft.world.server.ServerWorld)) {
+            throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
-        PiecesWorldState worldState = (PiecesWorldState) world.getMapStorage().getOrLoadData(PiecesWorldState.class,
-                NAME);
-
-        if (worldState == null) {
-            worldState = new PiecesWorldState();
-            world.getMapStorage().setData(NAME, worldState);
-            worldState.markDirty();
-        }
-
-        return worldState;
+        return ((net.minecraft.world.server.ServerWorld) world).getSavedData().getOrCreate(PiecesWorldState::new, NAME);
     }
 }

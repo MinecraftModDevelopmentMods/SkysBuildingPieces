@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:sandstone_vertical_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:sandstone_horizontal_step",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:sandstone_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:sandstone_vertical_step"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "mineralogy:diorite"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"]
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:diorite"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_diorite_horizontal_step"
+    }
+  ]
+}

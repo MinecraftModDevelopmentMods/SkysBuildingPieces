@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/wool_pink",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_pink_corner"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:wool_pink_horizontal_step",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_pink_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_pink_horizontal_step"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:light_blue_wool"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:wool_light_blue_stairs",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_light_blue_stairs"
+    }
+  ]
+}

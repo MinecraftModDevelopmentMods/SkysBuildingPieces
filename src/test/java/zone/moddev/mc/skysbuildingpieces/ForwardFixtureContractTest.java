@@ -1,0 +1,125 @@
+package zone.moddev.mc.skysbuildingpieces;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class ForwardFixtureContractTest {
+    @Test
+    void delayedFixtureKeepsItsOriginalProvenanceAndUnopenedContent() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser()
+                .parse(new String(Files.readAllBytes(root.resolve("buildingbricks-delayed-1.10.2.json")),
+                        StandardCharsets.UTF_8))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("buildingbricks-delayed-1.10.2.zip"));
+
+        assertEquals("975C3D03F335EC7D64C35B84A4810AB77F4FF55E710EA85620EE765E50311CC5", sha256(archive));
+        assertEquals("8D5BA8583465AEA76403475C71A3AA558DA6AB9AF4576C5C858B98330EF5ADB0",
+                manifest.get("derived_from_archive_sha256").getAsString());
+        assertEquals(52, manifest.getAsJsonArray("states").size());
+        assertEquals(26, java.util.stream.StreamSupport.stream(manifest.getAsJsonArray("states").spliterator(), false)
+                .filter(value -> value.getAsJsonObject().has("delayed")).count());
+        verifyMembers(manifest, archive);
+    }
+
+    @Test
+    void originalBuildingBricksFixtureKeepsAllStepCodesAndSourceRegistry() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser()
+                .parse(new String(Files.readAllBytes(root.resolve("buildingbricks-pieces-1.10.2.json")),
+                        StandardCharsets.UTF_8))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("buildingbricks-pieces-1.10.2.zip"));
+
+        assertEquals("8D5BA8583465AEA76403475C71A3AA558DA6AB9AF4576C5C858B98330EF5ADB0", sha256(archive));
+        assertEquals(26, manifest.getAsJsonArray("states").size());
+
+        Set<Integer> stepCodes = new HashSet<>();
+
+        manifest.getAsJsonArray("states").forEach(value -> {
+            JsonObject saved = value.getAsJsonObject();
+
+            if (saved.get("id").getAsString().equals("buildingbricks:rock_step")) {
+                stepCodes.add(saved.get("meta").getAsInt());
+            }
+        });
+        assertEquals(java.util.stream.IntStream.range(0, 16).boxed().collect(java.util.stream.Collectors.toSet()),
+                stepCodes);
+        assertEquals(1, manifest.getAsJsonArray("containers").size());
+        assertEquals(1, manifest.getAsJsonArray("entities").size());
+        verifyMembers(manifest, archive);
+    }
+
+    @Test
+    void accepted112FixtureAndEveryWorldFileStayChecksumLocked() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser().parse(
+                new String(Files.readAllBytes(root.resolve("building-pieces-1.12.2.json")), StandardCharsets.UTF_8))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("building-pieces-1.12.2.zip"));
+
+        assertEquals("af3ce9b73d215a2f9e27a11324da56a752e4edac", manifest.get("source_commit").getAsString());
+        assertEquals("4273DD260D2F259F4FCE56680DA79AA9B2FBF90FD3ABCC1B494E228965FE1316",
+                manifest.get("source_jar_sha256").getAsString());
+        assertEquals(3434, manifest.getAsJsonArray("states").size());
+
+        Set<String> seen = verifyMembers(manifest, archive);
+
+        assertTrue(seen.contains("data/skysbuildingpieces_world_state.dat"));
+    }
+
+    private Set<String> verifyMembers(JsonObject manifest, byte[] archive) throws Exception {
+        assertEquals(manifest.get("archive_sha256").getAsString(), sha256(archive));
+
+        Set<String> seen = new HashSet<>();
+
+        try (ZipInputStream input = new ZipInputStream(new java.io.ByteArrayInputStream(archive))) {
+            ZipEntry entry;
+
+            while ((entry = input.getNextEntry()) != null) {
+                assertTrue(seen.add(entry.getName()), "Duplicate fixture member");
+                assertFalse(entry.getName().startsWith("/") || entry.getName().contains(".."));
+
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                byte[] buffer = new byte[8192];
+                int count;
+
+                while ((count = input.read(buffer)) >= 0) {
+                    bytes.write(buffer, 0, count);
+                }
+
+                assertEquals(manifest.getAsJsonObject("files").get(entry.getName()).getAsString(),
+                        sha256(bytes.toByteArray()), entry.getName());
+            }
+        }
+
+        Set<String> expected = manifest.getAsJsonObject("files").entrySet().stream().map(java.util.Map.Entry::getKey)
+                .collect(java.util.stream.Collectors.toSet());
+
+        assertEquals(expected, seen);
+        assertTrue(seen.contains("level.dat"));
+        return seen;
+    }
+
+    private static String sha256(byte[] bytes) throws Exception {
+        StringBuilder result = new StringBuilder();
+
+        for (byte value : MessageDigest.getInstance("SHA-256").digest(bytes)) {
+            result.append(String.format("%02X", value & 255));
+        }
+
+        return result.toString();
+    }
+}

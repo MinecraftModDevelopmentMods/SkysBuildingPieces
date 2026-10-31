@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mossy_cobblestone_vertical_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:mossy_cobblestone_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mossy_cobblestone_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mossy_cobblestone_vertical_step"
+    }
+  ]
+}

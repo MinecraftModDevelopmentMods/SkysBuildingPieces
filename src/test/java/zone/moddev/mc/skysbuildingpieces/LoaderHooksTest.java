@@ -1,155 +1,135 @@
 package zone.moddev.mc.skysbuildingpieces;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import org.junit.jupiter.api.Test;
-import org.objectweb.asm.*;
-import org.objectweb.asm.tree.*;
-import zone.moddev.mc.skysbuildingpieces.legacy.LoaderTransformer;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderHooksTest {
-    private byte[] fixture(String name, String method, String descriptor) {
-        ClassWriter w = new ClassWriter(0);
+    private static Map<String, String> targets() {
+        Map<String, String> targets = new LinkedHashMap<>();
 
-        w.visit(52, Opcodes.ACC_PUBLIC, name, null, "java/lang/Object", null);
-
-        MethodVisitor m = w.visitMethod(Opcodes.ACC_PUBLIC, method, descriptor, null, null);
-
-        m.visitCode();
-
-        if (Type.getReturnType(descriptor).getSort() == Type.VOID) {
-            m.visitInsn(Opcodes.RETURN);
-        } else {
-            m.visitInsn(Opcodes.ACONST_NULL);
-            m.visitInsn(Opcodes.ARETURN);
-        }
-
-        m.visitMaxs(1, 10);
-        m.visitEnd();
-        w.visitEnd();
-        return w.toByteArray();
+        targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/chunk/storage/ChunkLoader");
+        targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/nbt/NBTUtil");
+        targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/item/BlockItem");
+        return targets;
     }
 
-    @Test
-    void exactChunkAndItemHooksAreIdempotent() {
-        for (boolean chunk : new boolean[] { true, false }) {
-            String name = chunk ? "net.minecraft.world.chunk.storage.AnvilChunkLoader" : "net.minecraft.item.ItemStack";
-            byte[] original = fixture(name.replace('.', '/'), chunk ? "checkedReadChunkFromNBT__Async" : "<init>",
-                    chunk ? "(Lnet/minecraft/world/World;IILnet/minecraft/nbt/NBTTagCompound;)[Ljava/lang/Object;"
-                            : "(Lnet/minecraft/nbt/NBTTagCompound;)V");
-            LoaderTransformer t = new LoaderTransformer();
-            byte[] patched = t.transform(name, name, original);
+    private ScriptEngine engine() throws Exception {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-            assertArrayEquals(patched, t.transform(name, name, patched));
-
-            ClassNode n = new ClassNode();
-
-            new ClassReader(patched).accept(n, 0);
-
-            int hooks = 0;
-            int placements = 0;
-
-            for (MethodNode method : n.methods) {
-                for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                    if (instruction instanceof MethodInsnNode) {
-                        if (((MethodInsnNode) instruction).owner.endsWith("/LegacyBridge")) {
-                            hooks++;
-                        }
-                        if (((MethodInsnNode) instruction).owner.endsWith("/NativeSlabPlacement")) {
-                            placements++;
-                        }
-                    }
-                }
-            }
-
-            assertEquals(1, hooks);
-            assertEquals(0, placements);
-        }
+        assertNotNull(engine, "Forge 28 transformers and their tests require the production Java 8 runtime");
+        engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
+                StandardCharsets.UTF_8));
+        return engine;
     }
 
-    @Test
-    void unexpectedLoaderStructuresFailClearly() {
-        String name = "net.minecraft.world.chunk.storage.AnvilChunkLoader";
-
-        assertThrows(IllegalStateException.class,
-                () -> new LoaderTransformer().transform(name, name,
-                        fixture(name.replace('.', '/'), "checkedReadChunkFromNBT__Async",
-                                "(Lnet/minecraft/world/World;IILjava/lang/Object;)[Ljava/lang/Object;")));
-        assertThrows(IllegalStateException.class, () -> new LoaderTransformer().transform(name, name,
-                fixture(name.replace('.', '/'), "unexpectedMethod", "()V")));
-
-        String item = "net.minecraft.item.ItemSlab";
-
-        assertThrows(IllegalStateException.class, () -> new LoaderTransformer().transform(item, item,
-                fixture(item.replace('.', '/'), "onItemUse", "()V")));
-    }
-
-    @Test
-    void nativePlacementHooksAreExactAndIdempotent() {
-        for (String name : new String[] { "net.minecraft.item.ItemSlab", "net.minecraft.item.ItemBlock" }) {
-            String descriptor = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumHand;Lnet/minecraft/util/EnumFacing;FFF)Lnet/minecraft/util/EnumActionResult;";
-            LoaderTransformer transformer = new LoaderTransformer();
-            byte[] patched = transformer.transform(name, name,
-                    fixture(name.replace('.', '/'), "onItemUse", descriptor));
-
-            assertArrayEquals(patched, transformer.transform(name, name, patched));
+    private ClassNode original(String target) throws Exception {
+        try (InputStream stream = getClass().getClassLoader().getResourceAsStream(target + ".class")) {
+            assertNotNull(stream, target);
 
             ClassNode node = new ClassNode();
 
-            new ClassReader(patched).accept(node, 0);
-
-            int hooks = 0;
-
-            for (MethodNode method : node.methods) {
-                for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                    if (instruction instanceof MethodInsnNode
-                            && ((MethodInsnNode) instruction).owner.endsWith("/NativeSlabPlacement")) {
-                        ++hooks;
-                    }
-                }
-            }
-
-            assertEquals(1, hooks);
+            new ClassReader(stream).accept(node, 0);
+            return node;
         }
     }
 
-    @Test
-    void realForge112ClassesMatchAllFourHooks() throws Exception {
-        for (String name : new String[] { "net.minecraft.item.ItemStack", "net.minecraft.item.ItemBlock",
-                "net.minecraft.item.ItemSlab", "net.minecraft.world.chunk.storage.AnvilChunkLoader" }) {
-            try (java.io.InputStream stream = getClass().getClassLoader()
-                    .getResourceAsStream(name.replace('.', '/') + ".class")) {
-                assertNotNull(stream, name);
+    private void transform(ScriptEngine engine, String key, ClassNode node) throws Exception {
+        engine.put("candidate", node);
+        engine.eval("initializeCoreMod()['" + key + "'].transformer(candidate)");
+    }
 
-                java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
-                byte[] buffer = new byte[8192];
-                int count;
+    private int calls(ClassNode node, String name) {
+        int count = 0;
 
-                while ((count = stream.read(buffer)) != -1) {
-                    bytes.write(buffer, 0, count);
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode instruction : method.instructions.toArray()) {
+                if (instruction instanceof MethodInsnNode) {
+                    MethodInsnNode call = (MethodInsnNode) instruction;
+
+                    if (call.owner.startsWith("zone/moddev/mc/skysbuildingpieces/") && call.name.equals(name)) {
+                        count++;
+                    }
                 }
+            }
+        }
 
-                LoaderTransformer transformer = new LoaderTransformer();
-                byte[] patched = transformer.transform(name, name, bytes.toByteArray());
+        return count;
+    }
 
-                assertArrayEquals(patched, transformer.transform(name, name, patched), name);
+    @Test
+    void realForge28MethodsMatchAndEveryReturnIsWrapped() throws Exception {
+        for (Map.Entry<String, String> target : targets().entrySet()) {
+            ScriptEngine engine = engine();
+            ClassNode node = original(target.getValue());
+            int returns = 0;
 
-                ClassNode node = new ClassNode();
-
-                new ClassReader(patched).accept(node, 0);
-
-                int hooks = 0;
-
+            if (target.getKey().endsWith("legacy_chunk")) {
                 for (MethodNode method : node.methods) {
-                    for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                        if (instruction instanceof MethodInsnNode && ((MethodInsnNode) instruction).owner
-                                .startsWith("zone/moddev/mc/skysbuildingpieces/")) {
-                            hooks++;
+                    if (method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundNBT;)")) {
+                        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+                            if (instruction.getOpcode() == Opcodes.ARETURN) {
+                                returns++;
+                            }
                         }
                     }
                 }
 
-                assertEquals(1, hooks, name);
+                assertTrue(returns > 0);
             }
+
+            transform(engine, target.getKey(), node);
+            assertEquals(target.getKey().endsWith("legacy_chunk") ? 1 : 0, calls(node, "prepareLegacyChunk"));
+            assertEquals(returns, calls(node, "finalizeLegacyChunk"));
+            assertEquals(target.getKey().endsWith("raw_inventory") ? 1 : 0, calls(node, "prepareNbt"));
+            assertEquals(target.getKey().endsWith("native_slab_placement") ? 1 : 0, calls(node, "place"));
+
+            int instructions = node.methods.stream().mapToInt(method -> method.instructions.size()).sum();
+
+            transform(engine, target.getKey(), node);
+            assertEquals(instructions, node.methods.stream().mapToInt(method -> method.instructions.size()).sum(),
+                    "A repeated transformation must leave the class unchanged: " + target.getValue());
+        }
+    }
+
+    @Test
+    void missingAndAmbiguousStructuresFailBeforeLoading() throws Exception {
+        for (Map.Entry<String, String> target : targets().entrySet()) {
+            ClassNode empty = new ClassNode();
+
+            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), empty));
+
+            ClassNode node = original(target.getValue());
+
+            transform(engine(), target.getKey(), node);
+
+            MethodNode patched = node.methods.stream().filter(method -> {
+                for (AbstractInsnNode instruction : method.instructions.toArray()) {
+                    if (instruction instanceof MethodInsnNode
+                            && ((MethodInsnNode) instruction).owner.startsWith("zone/moddev/mc/skysbuildingpieces/")) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }).findFirst().get();
+
+            node.methods.add(patched);
+            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), node));
         }
     }
 }

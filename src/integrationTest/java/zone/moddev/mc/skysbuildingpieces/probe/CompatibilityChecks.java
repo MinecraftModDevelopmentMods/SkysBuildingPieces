@@ -2,59 +2,90 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Method;
 import net.minecraft.block.Block;
-import net.minecraft.entity.item.*;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.*;
-import net.minecraft.nbt.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ItemFrameEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.*;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.items.*;
-import zone.moddev.mc.skysbuildingpieces.content.*;
-import zone.moddev.mc.skysbuildingpieces.legacy.*;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.registries.ForgeRegistries;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
+import zone.moddev.mc.skysbuildingpieces.content.LegacyPieceRecipe;
+import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
+import zone.moddev.mc.skysbuildingpieces.legacy.LegacyTestScope;
+import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 
-/** Live event, handler, player, ender and frame checks with the real legacy mod. */
+/** Real native events with an explicitly labelled build-only legacy policy mod. */
 public final class CompatibilityChecks {
+    private CompatibilityChecks() {
+    }
+
     public static ItemStack legacy(int count) {
-        ItemStack stack = new ItemStack(Item.getByNameOrId("buildingbricks:rock_step"), count, 327);
-        NBTTagCompound tag = new NBTTagCompound();
+        ItemStack stack = new ItemStack(
+                ForgeRegistries.ITEMS.getValue(new ResourceLocation("buildingbricks:rock_step")), count);
 
-        tag.setString("material", "minecraft:stone");
-        tag.setString("custom_label", "Unrelated NBT");
-
-        NBTTagList enchantments = new NBTTagList();
-        NBTTagCompound enchantment = new NBTTagCompound();
-
-        enchantment.setShort("id", (short) 33);
-        enchantment.setShort("lvl", (short) 1);
-        enchantments.appendTag(enchantment);
-        tag.setTag("ench", enchantments);
-        stack.setTagCompound(tag);
+        stack.setTag(NativeLegacyChecks.stack("minecraft:stone", count).getCompound("tag").copy());
         return stack;
     }
 
-    private static void identity(ItemStack stack, int count, boolean convert) {
-        require(stack != null && stack.getCount() == count, "stack count");
-        require(stack.getItem().getRegistryName().getNamespace()
-                .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "optional identity");
-        require(stack.getTagCompound().getString("custom_label").equals("Unrelated NBT")
-                && stack.getTagCompound().getTagList("ench", 10).tagCount() == 1, "complete unrelated NBT");
+    public static void run(ServerWorld world) throws Exception {
+        if (!ModList.get().isLoaded("buildingbricks")) {
+            throw new AssertionError("Installed-mod policy checks require their build-only fixture");
+        }
+
+        boolean original = SkysBuildingPieces.forceReplace;
+
+        try (LegacyTestScope source = new LegacyTestScope(world)) {
+            for (boolean convert : new boolean[] { false, true }) {
+                SkysBuildingPieces.forceReplace = convert;
+                liveInventories(world, convert);
+                newlyPlaced(world, convert);
+                unknownMaterial(world);
+            }
+        } finally {
+            SkysBuildingPieces.forceReplace = original;
+        }
+
+        System.out.println(
+                "BUILDING_PIECES_COMPATIBILITY_PASS installed_fixture=true replacement_off=true replacement_on=true");
     }
 
-    public static void run(WorldServer world) throws Exception {
-        slabReference();
+    private static void identity(ItemStack stack, int count, boolean converted) {
+        String namespace = converted ? "skysbuildingpieces" : "buildingbricks";
 
-        boolean convert = LegacyBridge.active();
-        EntityPlayerMP player = FakePlayerFactory.getMinecraft(world);
+        NativeLegacyChecks.require(
+                !stack.isEmpty() && stack.getCount() == count
+                        && stack.getItem().getRegistryName().getNamespace().equals(namespace),
+                "Live stack replacement policy");
+        NativeLegacyChecks.require(stack.hasTag() && stack.getTag().equals(legacy(count).getTag()),
+                "Complete unrelated custom data is retained");
+    }
+
+    private static void liveInventories(ServerWorld world, boolean convert) throws Exception {
+        ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
 
         player.inventory.setInventorySlotContents(0, legacy(13));
         player.getInventoryEnderChest().setInventorySlotContents(0, legacy(11));
@@ -67,19 +98,19 @@ public final class CompatibilityChecks {
         identity(player.inventory.getStackInSlot(1), 9, convert);
         world.getChunk(new BlockPos(930, 70, 930));
 
-        EntityItem drop = new EntityItem(world, 930, 70, 930, legacy(5));
+        ItemEntity drop = new ItemEntity(world, 930, 70, 930, legacy(5));
 
-        require(world.spawnEntity(drop), "dropped entity must actually join the loaded world");
+        NativeLegacyChecks.require(world.addEntity(drop), "Dropped item joins the actual native world");
         identity(drop.getItem(), 5, convert);
 
         BlockPos position = new BlockPos(930, 70, 932);
 
         world.setBlockState(position.north(), Blocks.STONE.getDefaultState(), 2);
 
-        EntityItemFrame frame = new EntityItemFrame(world, position, EnumFacing.SOUTH);
+        ItemFrameEntity frame = new ItemFrameEntity(world, position, Direction.SOUTH);
 
         frame.setDisplayedItem(legacy(1));
-        world.spawnEntity(frame);
+        world.addEntity(frame);
         identity(frame.getDisplayedItem(), 1, convert);
 
         HandlerTile tile = new HandlerTile();
@@ -93,193 +124,106 @@ public final class CompatibilityChecks {
         scan.invoke(null, tile);
         identity(tile.handler.getStackInSlot(0), 17, convert);
 
-        // The same container reached through several faces is converted only once.
-        NBTTagCompound before = tile.handler.serializeNBT();
+        CompoundNBT once = tile.handler.serializeNBT();
 
         scan.invoke(null, tile);
-        require(before.equals(tile.handler.serializeNBT()), "handler reload idempotence");
+        NativeLegacyChecks.require(once.equals(tile.handler.serializeNBT()), "Shared handler faces convert only once");
 
-        // Sealed item containers expose saved stacks before opening their GUI.
         ItemStack crate = new ItemStack(Blocks.CHEST);
-        NBTTagCompound crateTag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
 
-        crateTag.setBoolean("Sealed", true);
+        tag.putBoolean("Sealed", true);
 
-        NBTTagList contents = new NBTTagList();
+        ListNBT contents = new ListNBT();
 
-        contents.appendTag(legacy(7).writeToNBT(new NBTTagCompound()));
-        crateTag.setTag("Items", contents);
-        crate.setTagCompound(crateTag);
+        contents.add(legacy(7).write(new CompoundNBT()));
+        tag.put("Items", contents);
+        crate.setTag(tag);
 
-        ItemStack migratedCrate = MigrationEvents.convert(crate, world);
-        NBTTagCompound recovered = migratedCrate.getTagCompound().getTagList("Items", 10).getCompoundTagAt(0);
+        ItemStack migrated = MigrationEvents.convert(crate, world);
+        CompoundNBT recovered = migrated.getTag().getList("Items", 10).getCompound(0);
 
-        require(migratedCrate.getItem() == crate.getItem() && migratedCrate.getCount() == 1
-                && migratedCrate.getTagCompound().getBoolean("Sealed"), "container identity and unrelated data");
-        require(recovered.getString("id").startsWith(convert ? "skysbuildingpieces:" : "buildingbricks:"),
-                "nested inventory replacement gating");
-        require(recovered.getByte("Count") == 7 && recovered.getCompoundTag("tag").equals(legacy(7).getTagCompound()),
-                "nested count and complete custom NBT");
-        require(MigrationEvents.convert(migratedCrate, world) == migratedCrate, "nested inventory idempotence");
+        identity(ItemStack.read(recovered), 7, convert);
+        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && migrated.getTag().getBoolean("Sealed"),
+                "Sealed container identity and custom data");
+        NativeLegacyChecks.require(MigrationEvents.convert(migrated, world) == migrated,
+                "Live nested inventory is idempotent");
 
-        net.minecraft.block.state.IBlockState existingState = Block.getBlockFromName("buildingbricks:rock_step")
-                .getStateFromMeta(11);
-
-        world.setBlockState(position, existingState, 2);
-
-        TileEntity material = world.getTileEntity(position);
-        NBTTagCompound raw = material.writeToNBT(new NBTTagCompound());
-
-        raw.setString("material", "minecraft:stone");
-        raw.setString("custom_tile", "Retain me");
-        material.readFromNBT(raw);
-        MinecraftForge.EVENT_BUS.post(new BlockEvent.PlaceEvent(BlockSnapshot.getBlockSnapshot(world, position),
-                Blocks.STONE.getDefaultState(), player, EnumHand.MAIN_HAND));
-        require(world.getBlockState(position).getBlock().getRegistryName().getNamespace()
-                .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "newly placed replacement gating");
-
-        if (convert) {
-            require(world.getTileEntity(position) == null, "successful placement removes material tile");
-        }
-
-        // Soil slabs remain exclusively under the independent Grass Slabs policy.
-        boolean grassForce = (Boolean) Class.forName("zone.moddev.mc.skysgrassslabs.config.SkysGrassSlabsConfig")
-                .getMethod("forceReplaceBuildingBricksSlabs").invoke(null);
-
-        if (convert) {
-            LegacyBridge.report(world);
-        }
-
-        long beforeBlocks = convert ? PiecesWorldState.get(world).blocks : 0;
-
-        for (String soil : new String[] { "grass_slab", "dirt_slab" }) {
-            for (int orientation = 0; orientation < 2; orientation++) {
-                BlockPos soilPos = new BlockPos(940 + (soil.equals("grass_slab") ? 0 : 3) + orientation, 75, 940);
-                net.minecraft.block.state.IBlockState oldSoil = Block.getBlockFromName("buildingbricks:" + soil)
-                        .getStateFromMeta(orientation);
-
-                world.setBlockState(soilPos, oldSoil, 2);
-                MinecraftForge.EVENT_BUS.post(new BlockEvent.PlaceEvent(BlockSnapshot.getBlockSnapshot(world, soilPos),
-                        Blocks.STONE.getDefaultState(), player, EnumHand.MAIN_HAND));
-
-                net.minecraft.block.state.IBlockState actualSoil = world.getBlockState(soilPos);
-
-                require(actualSoil.getBlock().getRegistryName().toString()
-                        .equals((grassForce ? "skysgrassslabs:" : "buildingbricks:") + soil),
-                        "Grass Slabs alone owns horizontal soil mapping");
-                require(actualSoil.getBlock().getMetaFromState(actualSoil) == orientation,
-                        "Grass Slabs orientation is unchanged");
-                world.setBlockToAir(soilPos);
+        CraftingInventory grid = new CraftingInventory(new Container(null, 0) {
+            @Override
+            public boolean canInteractWith(PlayerEntity ignored) {
+                return true;
             }
-        }
-        if (convert) {
-            require(PiecesWorldState.get(world).blocks == beforeBlocks,
-                    "soil replacements must not advance Building Pieces counters");
-        }
-
-        System.out.println("BUILDING_PIECES_GRASS_COEXISTENCE_PASS force=" + grassForce);
-
-        // Explicit bridge recipe is available without enabling world replacement.
-        net.minecraft.inventory.InventoryCrafting grid = new net.minecraft.inventory.InventoryCrafting(
-                new net.minecraft.inventory.Container() {
-                    public boolean canInteractWith(net.minecraft.entity.player.EntityPlayer player) {
-                        return true;
-                    }
-                }, 3, 3);
+        }, 3, 3);
 
         grid.setInventorySlotContents(0, legacy(1));
 
-        LegacyPieceRecipe recipe = new LegacyPieceRecipe();
+        LegacyPieceRecipe recipe = new LegacyPieceRecipe(new ResourceLocation("skysbuildingpieces:bridge_test"));
 
-        require(recipe.matches(grid, world), "explicit bridge recipe");
+        NativeLegacyChecks.require(recipe.matches(grid, world),
+                "Explicit bridge recipe works independently of replacement");
         identity(recipe.getCraftingResult(grid), 1, true);
-
-        if (convert) {
-            NBTTagCompound chunk = new NBTTagCompound();
-            NBTTagCompound level = new NBTTagCompound();
-            NBTTagCompound coverage = new NBTTagCompound();
-
-            chunk.setTag("Level", level);
-            coverage.setInteger("vanilla", 1);
-            coverage.setInteger("later_addon", 0);
-            level.setTag("skysbuildingpieces_coverage", coverage);
-            LegacyBridge.prepareChunk(world, chunk);
-            require(coverage.getInteger("later_addon") == 0, "vanilla marker must not claim later addon coverage");
-            coverage.setInteger("later_addon", 1);
-            LegacyBridge.prepareChunk(world, chunk);
-            require(coverage.getInteger("later_addon") == 1, "independent later-module coverage survives");
-            CoverageContributor.verify(world);
-        }
-
-        drop.setDead();
-        frame.setDead();
-        world.setBlockToAir(position);
+        drop.remove();
+        frame.remove();
+        world.removeBlock(position.north(), false);
         player.inventory.clear();
         player.getInventoryEnderChest().clear();
-        LegacyBridge.report(world);
-        System.out.println("BUILDING_PIECES_COMPATIBILITY_PASS forced=" + convert);
     }
 
-    private static void slabReference() throws Exception {
-        // The installed, unmodified legacy mod supplies the reference decision only. Sky items never enter its material
-        // catalogue or placement code.
-        Class<?> util = Class.forName("com.hea3ven.buildingbricks.core.util.BlockPlacingUtil");
-        Method inner = util.getMethod("isInnerRing", EnumFacing.class, double.class, double.class, double.class);
-        Method closest = util.getMethod("getClosestFace", EnumFacing.class, double.class, double.class, double.class);
-        Method side = util.getMethod("getClosestSide", EnumFacing.class, double.class, double.class, double.class);
-        float[] hits = { 0, .1f, .125f, .219f, .22f, .25f, .5f, .75f, .78f, .781f, .875f, .9f, 1 };
-        int checks = 0;
+    private static void newlyPlaced(ServerWorld world, boolean convert) {
+        BlockPos position = new BlockPos(934, 70, 932);
+        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("buildingbricks:rock_step"));
+        BlockState old = block.getDefaultState().with((IntegerProperty) block.getStateContainer().getProperty("meta"),
+                11);
 
-        for (EnumFacing face : EnumFacing.values()) {
-            for (float a : hits) {
-                for (float b : hits) {
-                    float hitX = face.getAxis() == EnumFacing.Axis.X ? .5f : a;
-                    float hitY = face.getAxis() == EnumFacing.Axis.Y ? .5f : b;
-                    float hitZ = face.getAxis() == EnumFacing.Axis.X ? a
-                            : face.getAxis() == EnumFacing.Axis.Y ? b : .5f;
-                    Object[] args = { face, (double) hitX, (double) hitY, (double) hitZ };
-                    boolean centre = (Boolean) inner.invoke(null, args);
-                    EnumFacing nearest = (EnumFacing) closest.invoke(null, args);
-                    EnumFacing edge = (EnumFacing) side.invoke(null, args);
+        world.setBlockState(position, old, 2);
 
-                    EnumFacing expected = centre ? face.getOpposite()
-                            : face.getAxis() == EnumFacing.Axis.Y ? edge
-                                    : nearest.getAxis() == EnumFacing.Axis.Y
-                                            ? (hitY > .5f ? EnumFacing.UP : EnumFacing.DOWN)
-                                            : edge;
+        TileEntity tile = world.getTileEntity(position);
+        CompoundNBT tag = tile.write(new CompoundNBT());
 
-                    require(SlabPlacement.side(face, hitX, hitY, hitZ) == expected,
-                            "legacy slab face/edge reference " + face + " " + a + " " + b);
-
-                    EnumFacing vertical = face.getAxis() != EnumFacing.Axis.Y && centre ? face.getOpposite() : edge;
-
-                    require(SlabPlacement.verticalSide(face, hitX, hitY, hitZ) == vertical,
-                            "legacy vertical slab reference");
-                    checks++;
-                }
-            }
-        }
-
-        System.out
-                .println("BUILDING_PIECES_SLAB_REFERENCE_PASS " + checks + " clicks against installed BuildingBricks");
+        tag.putString("material", "minecraft:stone");
+        tag.putString("custom", "Keep the old tile in coverage");
+        tile.read(tag);
+        MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.getBlockSnapshot(world, position),
+                Blocks.STONE.getDefaultState(), FakePlayerFactory.getMinecraft(world)));
+        NativeLegacyChecks.require(world.getBlockState(position).getBlock().getRegistryName().getNamespace()
+                .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "New placement replacement policy");
+        NativeLegacyChecks.require((world.getTileEntity(position) == null) == convert,
+                "Remove the material tile only after successful conversion");
+        world.removeBlock(position, false);
     }
 
-    private static void require(boolean value, String message) {
-        if (!value) {
-            throw new AssertionError(message);
-        }
+    private static void unknownMaterial(ServerWorld world) {
+        ItemStack unknown = legacy(3);
+
+        unknown.getTag().putString("material", "missing:unknown");
+
+        CompoundNBT before = unknown.write(new CompoundNBT());
+        ItemStack result = MigrationEvents.convert(unknown, world);
+
+        NativeLegacyChecks.require(result.write(new CompoundNBT()).equals(before),
+                "Installed legacy mod retains unsupported materials");
+
+        // Horizontal soil recovery belongs to Grass Slabs and must stay outside this bridge.
+        CompoundNBT soil = NativeLegacyChecks.stack("minecraft:dirt", 7);
+
+        soil.putString("id", "buildingbricks:dirt_slab");
+        before = soil.copy();
+        LegacyBridge.prepareStack(soil);
+        NativeLegacyChecks.require(soil.equals(before), "Core must not take ownership of horizontal soil slabs");
     }
 
     public static final class HandlerTile extends TileEntity {
         final ItemStackHandler handler = new ItemStackHandler(2);
+        private final LazyOptional<ItemStackHandler> optional = LazyOptional.of(() -> handler);
 
-        public boolean hasCapability(Capability<?> capability, EnumFacing side) {
-            return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, side);
+        HandlerTile() {
+            super(TileEntityType.CHEST);
         }
 
-        public <T> T getCapability(Capability<T> capability, EnumFacing side) {
-            return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
-                    ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handler)
+        @Override
+        public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction side) {
+            return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? optional.cast()
                     : super.getCapability(capability, side);
         }
     }

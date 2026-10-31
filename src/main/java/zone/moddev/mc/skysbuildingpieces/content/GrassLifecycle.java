@@ -1,60 +1,64 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Random;
-import net.minecraft.block.BlockDirt;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
+import java.util.Set;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.StairsBlock;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.ModList;
 
-/** Standalone grass rules, with a lazily linked optional Grass Slabs API bridge. */
+/** Standalone grass rules with an optional shared Grass Slabs lifecycle. */
 public final class GrassLifecycle {
-    private static Method sharedGrass, sharedDirt;
+    private static Method sharedGrass;
+    private static Method sharedDirt;
 
     private GrassLifecycle() {
     }
 
-    /** Link the optional grass API only when installed, so Building Pieces also works on its own. */
     public static void initialize() {
-        if (!Loader.isModLoaded("skysgrassslabs")) {
+        if (!ModList.get().isLoaded("skysgrassslabs")) {
             return;
         }
         try {
-            Class<?> grassApiClass = Class.forName("zone.moddev.mc.skysgrassslabs.api.GrassSlabsApi");
-            Method register = grassApiClass.getMethod("registerGrassForm", IBlockState.class, IBlockState.class);
+            Class<?> api = Class.forName("zone.moddev.mc.skysgrassslabs.api.GrassSlabsApi");
+            Method register = api.getMethod("registerGrassForm", BlockState.class, BlockState.class);
+            Set<BlockState> registered = new HashSet<>();
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {
-                if (block.palette.group.equals("grass")) {
-                    for (int orientation = 0; orientation < block.palette.shape.states; ++orientation) {
-                        IBlockState grass = Pieces.state("minecraft:grass", block.palette.shape, orientation);
-                        IBlockState dirt = Pieces.state("minecraft:dirt", block.palette.shape, orientation);
+                for (BlockState state : block.getStateContainer().getValidStates()) {
+                    if (!grass(state) || !block.definition(state).id.equals("minecraft:grass")) {
+                        continue;
+                    }
 
-                        if (grass != null && dirt != null) {
-                            register.invoke(null, dirt, grass);
-                        }
+                    BlockState canonical = state.with(net.minecraft.block.SnowyDirtBlock.SNOWY, false);
+                    BlockState dirt = counterpart(canonical, false);
+
+                    if (dirt != null && registered.add(canonical)) {
+                        register.invoke(null, dirt, canonical);
                     }
                 }
             }
 
-            sharedGrass = grassApiClass.getMethod("tickGrass", World.class, BlockPos.class, IBlockState.class,
-                    Random.class);
-            sharedDirt = grassApiClass.getMethod("tickDirt", World.class, BlockPos.class, IBlockState.class,
-                    Random.class);
+            sharedGrass = api.getMethod("tickGrass", World.class, BlockPos.class, BlockState.class, Random.class);
+            sharedDirt = api.getMethod("tickDirt", World.class, BlockPos.class, BlockState.class, Random.class);
         } catch (ReflectiveOperationException failure) {
-            throw new IllegalStateException("Install Sky's Grass Slabs 1.1.1.112021 or later for grass-piece integration",
-                    failure);
+            throw new IllegalStateException(
+                    "Install Sky's Grass Slabs 1.2.0.114041 or later for grass-piece integration", failure);
         }
     }
 
-    public static boolean grass(IBlockState state) {
+    public static boolean grass(BlockState state) {
         return state.getBlock() instanceof PieceBlock
                 && ((PieceBlock) state.getBlock()).definition(state).type.equals("grass");
     }
 
-    /** Change the material without changing the piece's shape or orientation. */
-    public static IBlockState counterpart(IBlockState state, boolean toGrass) {
+    /** Retain orientation, water and joined stair shape when the material changes. */
+    public static BlockState counterpart(BlockState state, boolean toGrass) {
         if (!(state.getBlock() instanceof PieceBlock)) {
             return null;
         }
@@ -65,106 +69,122 @@ public final class GrassLifecycle {
             return null;
         }
 
-        return Pieces.state(toGrass ? "minecraft:grass" : "minecraft:dirt", block.palette.shape,
+        BlockState replacement = Pieces.state(toGrass ? "minecraft:grass" : "minecraft:dirt", block.palette.shape,
                 block.orientation(state));
+
+        if (replacement != null && replacement.has(SlabBlock.WATERLOGGED)) {
+            replacement = replacement.with(SlabBlock.WATERLOGGED, state.get(SlabBlock.WATERLOGGED));
+        }
+        if (replacement != null && replacement.has(StairsBlock.SHAPE)) {
+            replacement = replacement.with(StairsBlock.SHAPE, state.get(StairsBlock.SHAPE));
+        }
+
+        return replacement;
     }
 
-    public static void repairSupport(World world, BlockPos pos, IBlockState state) {
-        if (!world.isRemote && grass(state) && coversSupport(state) && world.isBlockLoaded(pos.down())
-                && world.getBlockState(pos.down()).getBlock() == Blocks.GRASS) {
-            world.setBlockState(pos.down(), Blocks.DIRT.getDefaultState(), 2);
+    public static void repairSupport(World world, BlockPos position, BlockState state) {
+        if (!world.isRemote && grass(state) && coversSupport(state) && world.isBlockPresent(position.down())
+                && world.getBlockState(position.down()).getBlock() == Blocks.GRASS_BLOCK) {
+            world.setBlockState(position.down(), Blocks.DIRT.getDefaultState(), 2);
         }
     }
 
-    public static void tick(World world, BlockPos pos, IBlockState state, Random random) {
-        if (world.isRemote) {
+    public static boolean coversSupport(BlockState state) {
+        PieceBlock block = (PieceBlock) state.getBlock();
+        int occupied = block.mask(state);
+
+        return ((occupied & 15) | (occupied >>> 4 & 15)) == 15;
+    }
+
+    public static void tick(World world, BlockPos position, BlockState state, Random random) {
+        if (world.isRemote || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
 
-        boolean isGrass = grass(state);
-
-        if (!isGrass && counterpart(state, true) == null) {
-            return;
-        }
-
-        Method shared = isGrass ? sharedGrass : sharedDirt;
+        Method shared = grass(state) ? sharedGrass : sharedDirt;
 
         if (shared != null) {
             try {
-                shared.invoke(null, world, pos, state, random);
+                shared.invoke(null, world, position, state, random);
+                return;
             } catch (ReflectiveOperationException failure) {
-                throw new IllegalStateException("Grass integration failed", failure);
+                throw new IllegalStateException("Grass-piece integration failed", failure);
             }
-
-            return;
         }
-        if (isGrass) {
-            repairSupport(world, pos, state);
+        if (grass(state)) {
+            repairSupport(world, position, state);
 
-            BlockPos above = pos.up();
+            if (state.get(SlabBlock.WATERLOGGED) || !canRemainGrass(world, position)) {
+                BlockState dirt = counterpart(state, false);
 
-            if (world.getLightFromNeighbors(above) < 4
-                    && world.getBlockState(above).getLightOpacity(world, above) > 2) {
-                world.setBlockState(pos, counterpart(state, false), 3);
-                return;
-            }
-            if (!world.isAreaLoaded(pos, 3) || world.getLightFromNeighbors(above) < 9
-                    || world.getBlockState(above).getLightOpacity(world, above) > 2) {
-                return;
-            }
-            for (int attempt = 0; attempt < 4; ++attempt) {
-                BlockPos target = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
-
-                if ((!target.equals(pos.down()) || !coversSupport(state)) && viableTarget(world, target)) {
-                    IBlockState dirt = world.getBlockState(target);
-
-                    world.setBlockState(target,
-                            dirt.getBlock() == Blocks.DIRT ? Blocks.GRASS.getDefaultState() : counterpart(dirt, true),
-                            3);
+                if (dirt != null) {
+                    world.setBlockState(position, dirt, 3);
                 }
-            }
-        } else if (world.isAreaLoaded(pos, 3) && viableTarget(world, pos)) {
-            for (int attempt = 0; attempt < 4; ++attempt) {
-                BlockPos source = pos.add(random.nextInt(3) - 1, random.nextInt(5) - 1, random.nextInt(3) - 1);
 
-                if (source.getY() < 0 || source.getY() >= 256 || !world.isBlockLoaded(source)) {
+                return;
+            }
+            if (!world.isAreaLoaded(position, 3) || world.getLight(position.up()) < 9) {
+                return;
+            }
+            for (int attempt = 0; attempt < 4; attempt++) {
+                BlockPos target = position.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
+
+                if ((target.equals(position.down()) && coversSupport(state)) || !viableTarget(world, target)) {
                     continue;
                 }
 
-                IBlockState origin = world.getBlockState(source);
-                IBlockState cover = world.getBlockState(source.up());
+                BlockState existing = world.getBlockState(target);
+                BlockState grown = existing.getBlock() == Blocks.DIRT ? Blocks.GRASS_BLOCK.getDefaultState()
+                        : counterpart(existing, true);
 
-                if ((origin.getBlock() == Blocks.GRASS || grass(origin))
-                        && world.getLightFromNeighbors(source.up()) >= 9
-                        && cover.getLightOpacity(world, source.up()) <= 2) {
-                    world.setBlockState(pos, counterpart(state, true), 3);
-                    return;
+                if (grown != null) {
+                    world.setBlockState(target, grown, 3);
+                }
+            }
+        } else if (counterpart(state, true) != null && viableTarget(world, position)
+                && world.isAreaLoaded(position, 3)) {
+            for (int attempt = 0; attempt < 4; attempt++) {
+                BlockPos source = position.add(random.nextInt(3) - 1, random.nextInt(5) - 1, random.nextInt(3) - 1);
+                BlockState neighbour = world.getBlockState(source);
+
+                if ((neighbour.getBlock() == Blocks.GRASS_BLOCK || grass(neighbour))
+                        && neighbour.getFluidState().isEmpty() && canRemainGrass(world, source)) {
+                    world.setBlockState(position, counterpart(state, true), 3);
+                    break;
                 }
             }
         }
     }
 
-    private static boolean viableTarget(World world, BlockPos pos) {
-        if (pos.getY() < 0 || pos.getY() >= 255 || !world.isBlockLoaded(pos)) {
+    private static boolean canRemainGrass(World world, BlockPos position) {
+        BlockPos above = position.up();
+
+        return world.getLight(above) >= 4
+                || world.getBlockState(above).getOpacity(world, above) < world.getMaxLightLevel();
+    }
+
+    private static boolean viableTarget(World world, BlockPos position) {
+        if (position.getY() < 0 || position.getY() >= 256 || !world.isBlockPresent(position)) {
             return false;
         }
 
-        IBlockState state = world.getBlockState(pos);
-        IBlockState cover = world.getBlockState(pos.up());
+        BlockState state = world.getBlockState(position);
 
-        boolean dirt = counterpart(state, true) != null
-                || state.getBlock() == Blocks.DIRT && state.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT;
+        if (state.getBlock() != Blocks.DIRT && counterpart(state, true) == null) {
+            return false;
+        }
+        if (!state.getFluidState().isEmpty() || state.has(SlabBlock.WATERLOGGED) && state.get(SlabBlock.WATERLOGGED)) {
+            return false;
+        }
 
-        // Exposed ground may regrow, but a covered dirt piece keeps its existing growth restriction.
-        return dirt && (!grass(cover) || state.getBlock() == Blocks.DIRT && !coversSupport(cover))
-                && world.getLightFromNeighbors(pos.up()) >= 4
-                && cover.getLightOpacity(world, pos.up()) <= 2;
-    }
+        BlockPos above = position.up();
+        BlockState cover = world.getBlockState(above);
 
-    private static boolean coversSupport(IBlockState state) {
-        PieceBlock piece = (PieceBlock) state.getBlock();
-        int cells = piece.mask(state);
-        // Project both height layers onto the ground, retaining holes beside steps and corners.
-        return ((cells | cells >> 4) & 15) == 15;
+        if (grass(cover) && (state.getBlock() != Blocks.DIRT || coversSupport(cover))) {
+            return false;
+        }
+
+        return world.getLight(above) >= 4 && cover.getOpacity(world, above) < world.getMaxLightLevel()
+                && world.getFluidState(above).isEmpty();
     }
 }

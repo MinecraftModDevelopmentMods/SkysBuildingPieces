@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "skysbuildingpieces:diorite_smooth_vertical_step"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/diorite_smooth/corner/corner/skysbuildingpieces/rock_vertical_step_11_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/diorite_smooth/corner/corner/skysbuildingpieces/rock_vertical_step_11_0"]
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:diorite_smooth_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:diorite_smooth_vertical_step"
+    }
+  ]
+}

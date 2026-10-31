@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/packed_ice",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:packed_ice_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:packed_ice_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:packed_ice_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:packed_ice_step"
+    }
+  ]
+}

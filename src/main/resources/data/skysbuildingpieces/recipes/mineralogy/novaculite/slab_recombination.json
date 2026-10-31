@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/novaculite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:novaculite_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:novaculite",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:novaculite"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:novaculite_slab"
+    }
+  ]
+}

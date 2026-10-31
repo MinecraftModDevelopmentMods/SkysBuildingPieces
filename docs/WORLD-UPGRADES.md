@@ -13,9 +13,17 @@ material tile data. Sky's Building Pieces resolves both the saved material
 and orientation before replacing a piece. It never guesses from an item's
 temporary material index.
 
-There is no supported BuildingBricks release for Minecraft 1.12.2. Recovery
+There is no supported BuildingBricks release for Minecraft 1.14.4. Recovery
 from an older save is automatic and does not require the replacement setting.
-The permanent Sky palette IDs and orientation metadata are unchanged. Back up
+The permanent Sky palette IDs and orientation values are unchanged. The 1.14
+loader turns old numeric states into named states, preserving the material and
+orientation. Old pieces start dry. Wall connections, joined stairs, snow and
+path supports are refreshed through Minecraft's normal chunk post-processing.
+
+Old palette inventory items are converted to their matching material items,
+keeping counts, names and custom data. A registry sidecar in the world's `data`
+folder preserves the original numeric snapshot for chunks opened later. Keep
+that file with the world and its backups. Back up
 the whole world before upgrading, and check every other mod's missing content.
 
 With BuildingBricks installed, replacement is off by default. When explicitly

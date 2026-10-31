@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:purpur_pillar"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:purpur_pillar_wall",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:purpur_pillar_wall"
+    }
+  ]
+}
