@@ -9,7 +9,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
 
 /** Internal bridge for biome numbers stored in pre-flattening chunks. */
 public final class HistoricalBiomes {
@@ -82,10 +81,12 @@ public final class HistoricalBiomes {
         }
 
         active = new Mappings(source, aliases, name -> {
-            Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(name));
+            // Numeric IDs belong to the world's biome instances, which can differ from Forge's registration objects.
+            Registry<Biome> current = net.minecraftforge.fml.server.ServerLifecycleHooks.getCurrentServer()
+                    .registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+            Biome biome = current.get(new ResourceLocation(name));
 
-            return biome == null ? -1 : net.minecraftforge.fml.server.ServerLifecycleHooks.getCurrentServer().registryAccess()
-                    .registryOrThrow(Registry.BIOME_REGISTRY).getId(biome);
+            return biome == null ? -1 : current.getId(biome);
         });
     }
 

@@ -3,6 +3,8 @@
 This build brings Building Pieces to Minecraft 1.16.5 and Forge 36.2.34.
 
 - Keeps existing pieces and their orientations when upgrading from 1.12.2.
+- Resolves recovered mod biomes through the world's active registry, keeping
+  old biome numbers valid when a matching material add-on is installed.
 - Uses the native recipe book and waterlogging. Wet grass and path pieces
   become matching dirt pieces without losing their shape or water.
 - Keeps edge placement for ordinary slabs, including the vanilla pieces the
