@@ -287,9 +287,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (hardness == -1.0F) {
             return 0.0F;
         }
-        // One palette can contain several tool tiers. Ask the native material
-        // about tools, while retaining this piece's material-specific hardness.
-        int divisor = net.minecraftforge.common.ForgeHooks.isCorrectToolForDrops(full, player) ? 30 : 100;
+        // The full block may handle tool tiers per state. Keep its mining rules
+        // and scale only the hardness when this piece declares a different value.
+        float fullHardness = full.getDestroySpeed(world, position);
+        if (fullHardness > 0 && hardness > 0) {
+            return full.getDestroyProgress(player, world, position) * fullHardness / hardness;
+        }
+        int divisor = full.canHarvestBlock(world, position, player) ? 30 : 100;
         return player.getDigSpeed(full, position) / hardness / divisor;
     }
 
