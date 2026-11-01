@@ -439,7 +439,7 @@ tasks.named('jar', Jar) {
                 'Implementation-Title': base.archivesName.get(),
                 'Implementation-Version': project.version,
                 'Implementation-Vendor': project.mod_authors,
-                'Built-On-Java': '8',
+                'Built-On-Java': project.java_version,
                 'Built-On': "${project.minecraft_version}-${project.forge_version}"
         ])
     }
@@ -504,6 +504,10 @@ tasks.register('verifyReleaseArtifacts') {
         }
         ZipFile zip = new ZipFile(new File(libs, releaseFiles.get()[0]))
         try {
+            def metadata = new java.util.jar.Manifest(zip.getInputStream(zip.getEntry('META-INF/MANIFEST.MF')))
+            if (metadata.mainAttributes.getValue('Built-On-Java') != project.java_version.toString()) {
+                throw new GradleException("The jar's Java label does not match its production target")
+            }
             Set<String> names = zip.entries().collect { it.name } as Set<String>
             ['META-INF/mods.toml', 'pack.mcmeta', 'META-INF/coremods.json',
              'META-INF/LICENSE', 'META-INF/LICENSE.spdx', 'META-INF/NOTICE',
