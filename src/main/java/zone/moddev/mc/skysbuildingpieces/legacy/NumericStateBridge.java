@@ -67,7 +67,12 @@ final class NumericStateBridge {
                 throw new LegacyBridge.RecoveryAbort("Invalid saved migration staging entry: " + encoded, null);
             }
 
-            BlockState state = NBTUtil.readBlockState(entry.getCompound("state"));
+            // Staging survives later ports too. Let an installed catalogue recover a retired native target first.
+            CompoundNBT wrapped = new CompoundNBT();
+
+            wrapped.put("BlockState", entry.getCompound("state"));
+
+            BlockState state = NBTUtil.readBlockState(HistoricalItems.prepareCopy(wrapped).getCompound("BlockState"));
 
             if (state.isAir() || state.hasTileEntity()) {
                 throw new LegacyBridge.RecoveryAbort("A saved migration target is no longer available: " + entry, null);

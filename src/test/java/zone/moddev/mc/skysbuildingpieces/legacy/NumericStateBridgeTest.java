@@ -98,6 +98,37 @@ class NumericStateBridgeTest {
     }
 
     @Test
+    void restoredStagingTargetsUseRegisteredRecoveryBeforeBlockDeserialization() {
+        HistoricalItems.register("staging_target_test",
+                root -> root.getCompound("BlockState").getString("Name").equals("missing:retired_native_log"),
+                root -> root.getCompound("BlockState").putString("Name", "minecraft:birch_log"));
+
+        CompoundNBT state = new CompoundNBT();
+        CompoundNBT properties = new CompoundNBT();
+        CompoundNBT entry = new CompoundNBT();
+        ListNBT saved = new ListNBT();
+
+        properties.putString("axis", "z");
+        state.putString("Name", "missing:retired_native_log");
+        state.put("Properties", properties);
+        entry.putInt("encoded", 2000 << 4 | 7);
+        entry.put("state", state);
+        saved.add(entry);
+
+        ListNBT before = saved.copy();
+
+        NumericStateBridge.begin(new LinkedHashMap<>(), saved);
+
+        CompoundNBT restored = NumericStateBridge.saveStaging().getCompound(0);
+        CompoundNBT expected = state.copy();
+
+        expected.putString("Name", "minecraft:birch_log");
+        assertEquals(2000 << 4 | 7, restored.getInt("encoded"));
+        assertEquals(expected, restored.getCompound("state"));
+        assertEquals(before, saved);
+    }
+
+    @Test
     void corruptSidecarsAndOutOfRangeSourceNumbersFailClearly() {
         Map<Integer, String> snapshot = new LinkedHashMap<>();
 
