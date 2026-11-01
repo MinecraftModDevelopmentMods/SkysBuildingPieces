@@ -249,8 +249,14 @@ public final class MigrationEvents {
         }
         if (entity instanceof ItemFrameEntity) {
             ItemFrameEntity itemFrame = (ItemFrameEntity) entity;
+            ItemStack original = itemFrame.getDisplayedItem();
+            ItemStack updated = convert(original, event.getWorld());
 
-            itemFrame.setDisplayedItem(convert(itemFrame.getDisplayedItem(), event.getWorld()));
+            if (updated != original) {
+                // Entity loading runs before its chunk future completes. Vanilla
+                // uses this same path to restore a frame without reading comparators.
+                itemFrame.setDisplayedItemWithUpdate(updated, false);
+            }
         }
         if (entity instanceof IInventory) {
             inventory((IInventory) entity);
