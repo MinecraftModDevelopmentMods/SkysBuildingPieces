@@ -6,6 +6,7 @@
 - Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
 - Show recipes in the recipe book when their matching ingredients are collected.
 - Keep saved palettes, orientations and custom item data when upgrading.
+- Keep add-on material names short and translated, including BOP wood pieces.
 
 ## 0.3.8.116051 - Minecraft 1.16.5 (unreleased)
 

@@ -44,6 +44,22 @@ final class PieceNames {
     private static Set<String> readKeys(String namespace) {
         InputStream input = PieceNames.class.getResourceAsStream("/assets/" + namespace + "/lang/en_us.json");
 
+        // Java modules keep another mod's assets outside this class's resource
+        // lookup. Read an add-on's own file without changing its language keys.
+        if (input == null) {
+            net.minecraftforge.forgespi.language.IModFileInfo owner =
+                    net.minecraftforge.fml.ModList.get().getModFileById(namespace);
+            if (owner != null) {
+                java.nio.file.Path language = owner.getFile().findResource("assets", namespace, "lang", "en_us.json");
+                if (java.nio.file.Files.isRegularFile(language)) {
+                    try {
+                        input = java.nio.file.Files.newInputStream(language);
+                    } catch (java.io.IOException failure) {
+                        throw new IllegalStateException("Cannot open the piece names for " + namespace, failure);
+                    }
+                }
+            }
+        }
         if (input == null) {
             return Collections.emptySet();
         }
