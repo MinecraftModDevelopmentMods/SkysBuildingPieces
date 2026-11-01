@@ -6,7 +6,9 @@ from pathlib import Path
 import shutil
 import tempfile
 import tomllib
+from unittest.mock import patch
 from native_client_log import audit, classify
+import run_packaged_checks
 
 
 LOGIN = "[Client thread/INFO] [NetworkHooks/]: Connected to a modded server."
@@ -103,6 +105,33 @@ class NativeClientFilesTest(unittest.TestCase):
         (self.directory / "crash-reports/test.txt").write_text("Simulated failure")
         with self.assertRaises(ValueError):
             audit(self.directory, "control", True)
+
+
+class PackagedClientLogArchiveTest(unittest.TestCase):
+    def test_reload_preserves_each_phases_complete_debug_log(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            logs = directory / "logs"
+            logs.mkdir()
+            with patch.object(run_packaged_checks, "audit_client"):
+                for phase in ("client-fresh", "client-reload"):
+                    (logs / "latest.log").write_text("Normal log: " + phase, encoding="utf-8")
+                    (logs / "debug.log").write_text("Complete debug log: " + phase, encoding="utf-8")
+                    run_packaged_checks.audit(directory, phase, "client")
+            for phase in ("client-fresh", "client-reload"):
+                self.assertEqual((directory / (phase + "-complete.log")).read_text(encoding="utf-8"),
+                                 "Normal log: " + phase)
+                self.assertEqual((directory / (phase + "-debug.log")).read_text(encoding="utf-8"),
+                                 "Complete debug log: " + phase)
+
+    def test_missing_debug_log_stops_packaged_client_check(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            (directory / "logs").mkdir()
+            (directory / "logs/latest.log").write_text("Normal log", encoding="utf-8")
+            with patch.object(run_packaged_checks, "audit_client"):
+                with self.assertRaises(FileNotFoundError):
+                    run_packaged_checks.audit(directory, "client-fresh", "client")
 
 
 if __name__ == "__main__":

@@ -182,14 +182,14 @@ def prepare(options, directory):
 def audit(directory, phase, mode):
     if mode == "client":
         audit_client(directory, phase)
-        shutil.copyfile(directory / "logs/latest.log", directory / (phase + "-complete.log"))
-        return
-    log = (directory / "logs/latest.log").read_text(encoding="utf-8")
-    audit_server(directory, phase)
-    required = ("Done (", "BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase)
-    missing = [marker for marker in required if marker not in log]
-    if missing:
-        raise ValueError("Packaged runtime completion checks are missing: " + repr(missing))
+    else:
+        log = (directory / "logs/latest.log").read_text(encoding="utf-8")
+        audit_server(directory, phase)
+        required = ("Done (", "BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase)
+        missing = [marker for marker in required if marker not in log]
+        if missing:
+            raise ValueError("Packaged runtime completion checks are missing: " + repr(missing))
+    # A reload replaces the active files. Retain both logs from every phase.
     shutil.copyfile(directory / "logs/latest.log", directory / (phase + "-complete.log"))
     shutil.copyfile(directory / "logs/debug.log", directory / (phase + "-debug.log"))
 
