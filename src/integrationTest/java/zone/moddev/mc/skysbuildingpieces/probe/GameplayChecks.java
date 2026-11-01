@@ -269,16 +269,11 @@ public final class GameplayChecks {
         java.util.concurrent.CompletableFuture<?> finished = lights.lightChunk(world.getChunkAt(position), true);
         long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(10);
 
-        // Other chunks can keep generating while the integrated server starts. Wait for this
-        // chunk's light pass and the fixture's actual darkness, rather than global light inactivity.
-        while ((!finished.isDone() || world.getMaxLocalRawBrightness(position.above()) >= 4)
-                && System.nanoTime() < deadline) {
-            lights.tryScheduleUpdate();
-            // Chunk light tickets also complete work on the server mailbox.
-            if (!world.getChunkSource().pollTask()) {
-                Thread.yield();
-            }
-        }
+        // Light tickets complete through the server mailbox as well as the chunk
+        // mailbox. Pump the native event loop while waiting for this exact pass.
+        lights.tryScheduleUpdate();
+        world.getServer().managedBlock(() -> (finished.isDone()
+                && world.getMaxLocalRawBrightness(position.above()) < 4) || System.nanoTime() >= deadline);
 
         require(finished.isDone() && world.getMaxLocalRawBrightness(position.above()) < 4,
                 "Native lighting did not finish for the grass fixture: own_pass=" + finished.isDone()
