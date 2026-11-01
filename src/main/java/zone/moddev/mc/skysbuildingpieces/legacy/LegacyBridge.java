@@ -71,10 +71,16 @@ public final class LegacyBridge {
                         synchronized (LegacyBridge.class) {
                             capturedDirectory = save.getWorldDir().toAbsolutePath().normalize();
                             capturedRegistry = registry.copy();
+                            SourceLevelData.capture(capturedDirectory);
                         }
                     }
                 });
         persistenceRegistered = true;
+    }
+
+    /** Returns a copy of the original biome table and save version for this world. */
+    public static CompoundNBT sourceBiomeSnapshot(MinecraftServer server) {
+        return SourceLevelData.forWorld(server.getWorldPath(net.minecraft.world.storage.FolderName.ROOT));
     }
 
     public static synchronized void start(MinecraftServer server) {
@@ -104,6 +110,13 @@ public final class LegacyBridge {
                             laterRegistrySnapshot = current.getCompound("FML").copy();
                         }
                     }
+                }
+                if (laterRegistrySnapshot.isEmpty()
+                        && !capturedRegistry.equals(registrySnapshot)
+                        && worldDirectory.toPath().toAbsolutePath().normalize().equals(capturedDirectory)) {
+                    // Forge can save level.dat before this event. The early hook still has
+                    // the source registry, including pieces added after the older sidecar.
+                    laterRegistrySnapshot = capturedRegistry.copy();
                 }
             } else if (level.isFile()) {
                 try (InputStream input = new FileInputStream(level)) {
@@ -407,6 +420,7 @@ public final class LegacyBridge {
         resetRecovery();
         capturedDirectory = null;
         capturedRegistry = new CompoundNBT();
+        SourceLevelData.clear();
     }
 
     private static void resetRecovery() {

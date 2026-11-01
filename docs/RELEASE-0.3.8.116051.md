@@ -14,7 +14,10 @@ This build brings Building Pieces to Minecraft 1.16.5 and Forge 36.2.34.
 - Supports the coordinated Grass Slabs 1.2.0.116051 build. Mineralogy remains
   optional and needs no separate piece add-on.
 - Keeps later Sky registrations alongside older recovery information, including
-  worlds that already have a migration sidecar.
+  worlds that already have a migration sidecar. This also works when Forge saves
+  the level information before recovery starts.
+- Preserves the original biome table for material add-ons before that early save,
+  so their saved biome numbers can be resolved after an upgrade.
 - Preserves recovered inventories in saved chunks that had not finished
   population, and unlocks add-on recipes while the crafting table is still open.
 - Keeps rough-stone slabs distinct from smooth stone during old-world upgrades.
