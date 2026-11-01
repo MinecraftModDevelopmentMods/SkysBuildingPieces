@@ -24,7 +24,7 @@ public final class LegacyTestScope implements AutoCloseable {
         this.world = world;
         LegacyBridge.report(world);
         totals = PiecesWorldState.get(world);
-        originalTotals = totals.write(new CompoundNBT());
+        originalTotals = totals.save(new CompoundNBT());
 
         Map<Integer, String> ids = (Map<Integer, String>) field("savedIds").get(null);
 
@@ -59,8 +59,8 @@ public final class LegacyTestScope implements AutoCloseable {
     @SuppressWarnings("unchecked")
     public void close() throws Exception {
         LegacyBridge.report(world);
-        totals.read(originalTotals);
-        totals.markDirty();
+        totals.load(originalTotals);
+        totals.setDirty();
 
         Map<Integer, String> ids = (Map<Integer, String>) field("savedIds").get(null);
 

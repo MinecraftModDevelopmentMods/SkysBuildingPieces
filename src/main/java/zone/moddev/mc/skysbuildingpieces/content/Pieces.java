@@ -13,7 +13,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
@@ -43,7 +43,7 @@ public final class Pieces {
         initialized = true;
 
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
-            Item item = new Item(new Item.Properties().maxStackSize(1));
+            Item item = new Item(new Item.Properties().stacksTo(1));
 
             item.setRegistryName(SkysBuildingPieces.ID, "template_" + name);
             RETIRED_TEMPLATES.put(name, item);
@@ -147,11 +147,11 @@ public final class Pieces {
             throw new IllegalStateException("Missing native building material: " + identifier);
         }
 
-        BlockState result = block.getDefaultState();
+        BlockState result = block.defaultBlockState();
 
         if (definition != null && definition.has("properties")) {
             for (Map.Entry<String, JsonElement> entry : definition.getAsJsonObject("properties").entrySet()) {
-                IProperty<?> property = block.getStateContainer().getProperty(entry.getKey());
+                Property<?> property = block.getStateDefinition().getProperty(entry.getKey());
 
                 if (property == null) {
                     throw new IllegalStateException("Unknown property " + entry.getKey() + " on " + identifier);
@@ -164,12 +164,12 @@ public final class Pieces {
         return result;
     }
 
-    private static <T extends Comparable<T>> BlockState withProperty(BlockState state, IProperty<T> property,
+    private static <T extends Comparable<T>> BlockState withProperty(BlockState state, Property<T> property,
             String value) {
-        T parsed = property.parseValue(value).orElseThrow(
+        T parsed = property.getValue(value).orElseThrow(
                 () -> new IllegalStateException("Invalid " + property.getName() + "=" + value + " on " + state));
 
-        return state.with(property, parsed);
+        return state.setValue(property, parsed);
     }
 
     public static BlockState state(String material, Shape shape, int orientation) {
@@ -204,9 +204,9 @@ public final class Pieces {
                 Direction facing = new Direction[] { Direction.EAST, Direction.WEST, Direction.SOUTH,
                         Direction.NORTH }[orientation & 3];
 
-                return nativePiece.with(StairsBlock.FACING, facing)
-                        .with(StairsBlock.HALF, orientation < 4 ? Half.BOTTOM : Half.TOP)
-                        .with(StairsBlock.SHAPE, StairsShape.STRAIGHT);
+                return nativePiece.setValue(StairsBlock.FACING, facing)
+                        .setValue(StairsBlock.HALF, orientation < 4 ? Half.BOTTOM : Half.TOP)
+                        .setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT);
             }
 
             return nativePiece;
@@ -251,12 +251,12 @@ public final class Pieces {
         if (result == null || result.getBlock().hasTileEntity(result)) {
             throw new IllegalStateException("No safe replacement geometry for " + material.id);
         }
-        for (Map.Entry<IProperty<?>, Comparable<?>> property : state.getValues().entrySet()) {
+        for (Map.Entry<Property<?>, Comparable<?>> property : state.getValues().entrySet()) {
             if (property.getKey().getName().equals("meta")) {
                 continue;
             }
 
-            IProperty<?> target = result.getBlock().getStateContainer().getProperty(property.getKey().getName());
+            Property<?> target = result.getBlock().getStateDefinition().getProperty(property.getKey().getName());
 
             if (target != null) {
                 result = withProperty(result, target, property.getValue().toString().toLowerCase(Locale.ROOT));
@@ -281,8 +281,8 @@ public final class Pieces {
 
         state = canonicalState(state);
 
-        if (state.has(net.minecraft.block.SlabBlock.TYPE)
-                && state.get(net.minecraft.block.SlabBlock.TYPE) == net.minecraft.state.properties.SlabType.DOUBLE) {
+        if (state.hasProperty(net.minecraft.block.SlabBlock.TYPE)
+                && state.getValue(net.minecraft.block.SlabBlock.TYPE) == net.minecraft.state.properties.SlabType.DOUBLE) {
             return null; // A native double slab has no distinct full-block inventory item.
         }
 
@@ -295,7 +295,7 @@ public final class Pieces {
         } else {
             java.util.function.Function<BlockState, Item> lookup = STATE_ITEMS.get(state.getBlock());
 
-            item = lookup == null ? Item.getItemFromBlock(state.getBlock()) : lookup.apply(state);
+            item = lookup == null ? state.getBlock().asItem() : lookup.apply(state);
         }
 
         return item == null || item == Items.AIR ? null : new ItemStack(item, count);

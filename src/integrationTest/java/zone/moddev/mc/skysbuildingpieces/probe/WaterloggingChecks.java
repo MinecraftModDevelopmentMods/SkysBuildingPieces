@@ -27,8 +27,8 @@ public final class WaterloggingChecks {
     public static void run(ServerWorld world) {
         BlockPos position = new BlockPos(1158, 180, 1158);
 
-        world.setBlockState(position.down(), Blocks.STONE.getDefaultState(), 2);
-        world.removeBlock(position.up(), false);
+        world.setBlock(position.below(), Blocks.STONE.defaultBlockState(), 2);
+        world.removeBlock(position.above(), false);
 
         ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
         int tested = 0;
@@ -41,10 +41,10 @@ public final class WaterloggingChecks {
                 BlockState dry = block.getStateFromMeta(metadata);
                 String material = block.definition(dry).id;
 
-                world.setBlockState(position, dry, 18);
-                require(block.canContainFluid(world, position, dry, Fluids.WATER), "Dry piece accepts water");
-                require(!block.canContainFluid(world, position, dry, Fluids.LAVA), "Pieces reject lava waterlogging");
-                require(block.receiveFluid(world, position, dry, Fluids.WATER.getStillFluidState(false)),
+                world.setBlock(position, dry, 18);
+                require(block.canPlaceLiquid(world, position, dry, Fluids.WATER), "Dry piece accepts water");
+                require(!block.canPlaceLiquid(world, position, dry, Fluids.LAVA), "Pieces reject lava waterlogging");
+                require(block.placeLiquid(world, position, dry, Fluids.WATER.getSource(false)),
                         "Water enters the native fluid container");
 
                 BlockState wet = world.getBlockState(position);
@@ -55,31 +55,31 @@ public final class WaterloggingChecks {
                 boolean decayed = wetDirt != null && wet.getBlock() == wetDirt.getBlock()
                         && ((PieceBlock) wet.getBlock()).mask(wet) == ((PieceBlock) wetDirt.getBlock()).mask(wetDirt);
 
-                require((preserved || decayed) && wet.get(SlabBlock.WATERLOGGED)
-                        && wet.getFluidState().getFluid() == Fluids.WATER,
+                require((preserved || decayed) && wet.getValue(SlabBlock.WATERLOGGED)
+                        && wet.getFluidState().getType() == Fluids.WATER,
                         "Waterlogging preserves geometry, allowing wet soil decay: " + dry + " became " + wet);
-                require(!block.canContainFluid(world, position, wet, Fluids.WATER)
-                        && !block.receiveFluid(world, position, wet, Fluids.WATER.getStillFluidState(false)),
+                require(!block.canPlaceLiquid(world, position, wet, Fluids.WATER)
+                        && !block.placeLiquid(world, position, wet, Fluids.WATER.getSource(false)),
                         "An already wet piece rejects another water placement");
-                require(world.getPendingFluidTicks().isTickScheduled(position, Fluids.WATER),
+                require(world.getLiquidTicks().hasScheduledTick(position, Fluids.WATER),
                         "Waterlogging schedules the native fluid tick");
-                require(block.pickupFluid(world, position, wet) == Fluids.WATER
-                        && !world.getBlockState(position).get(SlabBlock.WATERLOGGED),
+                require(block.takeLiquid(world, position, wet) == Fluids.WATER
+                        && !world.getBlockState(position).getValue(SlabBlock.WATERLOGGED),
                         "Bucket pickup leaves the same dry piece");
-                require(block.pickupFluid(world, position, world.getBlockState(position)) == Fluids.EMPTY,
+                require(block.takeLiquid(world, position, world.getBlockState(position)) == Fluids.EMPTY,
                         "Water cannot be collected twice");
 
                 if (material.equals("minecraft:grass") || material.equals("minecraft:grass_path")) {
-                    world.setBlockState(position, dry.with(SlabBlock.WATERLOGGED, true), 18);
+                    world.setBlock(position, dry.setValue(SlabBlock.WATERLOGGED, true), 18);
 
                     ItemStack shovel = new ItemStack(Items.IRON_SHOVEL);
 
-                    shovel.setDamage(7);
+                    shovel.setDamageValue(7);
 
-                    CompoundNBT before = shovel.write(new CompoundNBT());
+                    CompoundNBT before = shovel.save(new CompoundNBT());
 
                     require(!PathPieces.activate(world, position, player, shovel, Direction.UP, Hand.MAIN_HAND)
-                            && before.equals(shovel.write(new CompoundNBT())),
+                            && before.equals(shovel.save(new CompoundNBT())),
                             "Wet pieces cannot consume shovel durability");
 
                     BlockState current = world.getBlockState(position);
@@ -89,12 +89,12 @@ public final class WaterloggingChecks {
                     BlockState expected = Pieces.state("minecraft:dirt", block.palette.shape, block.orientation(dry));
                     BlockState actual = world.getBlockState(position);
 
-                    require(actual.getBlock() == expected.getBlock() && actual.get(SlabBlock.WATERLOGGED)
+                    require(actual.getBlock() == expected.getBlock() && actual.getValue(SlabBlock.WATERLOGGED)
                             && ((PieceBlock) actual.getBlock()).mask(actual) == ((PieceBlock) expected.getBlock())
                                     .mask(expected),
                             "Wet grass and paths decay to matching waterlogged dirt: " + dry + " became " + actual
                                     + ", expected " + expected);
-                    require(!((PieceBlock) actual.getBlock()).canGrow(world, position, actual, false),
+                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(world, position, actual, false),
                             "Wet dirt cannot grow grass through bonemeal");
                     decays++;
                 }
@@ -104,7 +104,7 @@ public final class WaterloggingChecks {
         }
 
         world.removeBlock(position, false);
-        world.removeBlock(position.down(), false);
+        world.removeBlock(position.below(), false);
         System.out.println("BUILDING_PIECES_WATERLOGGING_PASS states=" + tested + " decays=" + decays);
     }
 

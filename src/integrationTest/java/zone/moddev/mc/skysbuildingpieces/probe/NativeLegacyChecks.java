@@ -56,7 +56,7 @@ public final class NativeLegacyChecks {
                 LegacyBridge.prepareLegacyChunk(raw);
                 require(once.equals(raw), "Raw chunk recovery is idempotent");
 
-                CompoundNBT fixed = NBTUtil.update(world.getServer().getDataFixer(), DefaultTypeReferences.CHUNK,
+                CompoundNBT fixed = NBTUtil.update(world.getServer().getFixerUpper(), DefaultTypeReferences.CHUNK,
                         raw.copy(), 1343, 1976);
 
                 require(contains(fixed.getCompound("Level"), actual), "Native flattening lost step code " + code);
@@ -215,7 +215,7 @@ public final class NativeLegacyChecks {
         require(raw.getByte("Count") == 17 && raw.getByte("cabinetSlot") == 4 && raw.getCompound("tag").equals(custom),
                 "Container slot, count and unrelated NBT");
 
-        ItemStack decoded = ItemStack.read(raw);
+        ItemStack decoded = ItemStack.of(raw);
 
         require(!decoded.isEmpty() && decoded.getCount() == 17, "Recovered stack deserializes normally");
 
@@ -235,7 +235,7 @@ public final class NativeLegacyChecks {
         ender.add(stack("minecraft:stone", 11));
         player.put("EnderItems", ender);
 
-        CompoundNBT fixed = NBTUtil.update(world.getServer().getDataFixer(), DefaultTypeReferences.PLAYER, player, 1343,
+        CompoundNBT fixed = NBTUtil.update(world.getServer().getFixerUpper(), DefaultTypeReferences.PLAYER, player, 1343,
                 1976);
 
         require(fixed.getList("Inventory", 10).getCompound(0).getString("id").startsWith("skysbuildingpieces:")
@@ -249,7 +249,7 @@ public final class NativeLegacyChecks {
 
         assertAbort(bad, false);
 
-        CompoundNBT crate = new ItemStack(Blocks.CHEST).write(new CompoundNBT());
+        CompoundNBT crate = new ItemStack(Blocks.CHEST).save(new CompoundNBT());
         ListNBT contents = new ListNBT();
 
         contents.add(stack("minecraft:stone", 7));

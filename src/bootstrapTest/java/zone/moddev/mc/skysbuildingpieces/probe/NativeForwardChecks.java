@@ -66,7 +66,7 @@ final class NativeForwardChecks {
             int chunkZ = saved.get("z").getAsInt() >> 4;
 
             tracked.add(world.getChunk(chunkX, chunkZ));
-            world.forceChunk(chunkX, chunkZ, true);
+            world.setChunkForced(chunkX, chunkZ, true);
         }
 
         // FULL storage alone does not run native post-processing. A normal ticking ticket must promote the chunk before
@@ -74,7 +74,7 @@ final class NativeForwardChecks {
         long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
         while (pending(tracked) && System.nanoTime() < deadline) {
-            if (!world.getChunkProvider().driveOneTask()) {
+            if (!world.getChunkSource().pollTask()) {
                 Thread.yield();
             }
         }
@@ -82,7 +82,7 @@ final class NativeForwardChecks {
         require(!pending(tracked), "Native chunk post-processing did not finish");
 
         for (net.minecraft.world.chunk.Chunk chunk : tracked) {
-            world.forceChunk(chunk.getPos().x, chunk.getPos().z, false);
+            world.setChunkForced(chunk.getPos().x, chunk.getPos().z, false);
         }
         if (fixture.has("kind") && fixture.get("kind").getAsString().equals("named")) {
             namedPieces(world, fixture);
@@ -117,15 +117,15 @@ final class NativeForwardChecks {
 
                 expected = block.getActualState(expected, world, position);
             } else {
-                expected = net.minecraft.block.Block.getValidBlockForPosition(expected, world, position);
+                expected = net.minecraft.block.Block.updateFromNeighbourShapes(expected, world, position);
             }
 
             require(actual.equals(expected), "Saved material, orientation and derived geometry at " + position
                     + ": " + actual + " expected " + expected);
-            require(!actual.get(SlabBlock.WATERLOGGED), "Legacy pieces begin dry");
-            require(world.getTileEntity(position) == null, "Converted pieces need no material tile");
+            require(!actual.getValue(SlabBlock.WATERLOGGED), "Legacy pieces begin dry");
+            require(world.getBlockEntity(position) == null, "Converted pieces need no material tile");
 
-            if (actual.has(PieceBlock.CONNECTIONS)) {
+            if (actual.hasProperty(PieceBlock.CONNECTIONS)) {
                 derived++;
             }
 
@@ -134,15 +134,15 @@ final class NativeForwardChecks {
 
         PathChecks.savedPieces(world, true);
 
-        ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(new BlockPos(880, 96, 886));
+        ChestTileEntity chest = (ChestTileEntity) world.getBlockEntity(new BlockPos(880, 96, 886));
         int units = 0;
 
         for (int slot = 0; slot < 20; slot++) {
-            ItemStack stack = chest.getStackInSlot(slot);
+            ItemStack stack = chest.getItem(slot);
 
             require(stack.getCount() == slot + 1 && stack.hasTag() && stack.getTag().contains("path_fixture"),
                     "Saved path inventory count and custom data: " + slot);
-            require(stack.getDisplayName().getString().equals("Path fixture " + slot),
+            require(stack.getHoverName().getString().equals("Path fixture " + slot),
                     "Saved custom item name: " + slot);
             units += stack.getCount();
         }
@@ -153,7 +153,7 @@ final class NativeForwardChecks {
                 "Existing migration counters changed during palette flattening");
         require(state.unresolved.get("buildingbricks:dirt_vertical_slab / missing:unknown / VERTICAL_SLAB") == 2,
                 "Existing unresolved report is retained");
-        require(new File(world.getSaveHandler().getWorldDirectory(), "data/skysbuildingpieces_legacy_registry.dat")
+        require(new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), "data/skysbuildingpieces_legacy_registry.dat")
                 .isFile(), "Original registry snapshot survives in its sidecar");
         System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS states=" + checked + " derived=" + derived
                 + " item_units=" + units + " schema=1 counters=unchanged");
@@ -166,7 +166,7 @@ final class NativeForwardChecks {
             JsonObject saved = value.getAsJsonObject();
             BlockPos position = position(saved);
             net.minecraft.nbt.CompoundNBT expected = net.minecraft.nbt.JsonToNBT
-                    .getTagFromJson(saved.get("state").getAsString());
+                    .parseTag(saved.get("state").getAsString());
 
             require(net.minecraft.nbt.NBTUtil.writeBlockState(world.getBlockState(position)).equals(expected),
                     "Named state changed during the native upgrade at " + position + ": "
@@ -178,17 +178,17 @@ final class NativeForwardChecks {
 
         for (JsonElement value : fixture.getAsJsonArray("containers")) {
             JsonObject saved = value.getAsJsonObject();
-            ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(position(saved));
+            ChestTileEntity chest = (ChestTileEntity) world.getBlockEntity(position(saved));
 
             require(chest != null, "Named-state fixture chest is missing");
 
             for (JsonElement item : saved.getAsJsonArray("items")) {
                 JsonObject entry = item.getAsJsonObject();
-                ItemStack expected = ItemStack.read(net.minecraft.nbt.JsonToNBT
-                        .getTagFromJson(entry.get("stack").getAsString()));
-                ItemStack actual = chest.getStackInSlot(entry.get("slot").getAsInt());
+                ItemStack expected = ItemStack.of(net.minecraft.nbt.JsonToNBT
+                        .parseTag(entry.get("stack").getAsString()));
+                ItemStack actual = chest.getItem(entry.get("slot").getAsInt());
 
-                require(ItemStack.areItemStacksEqual(expected, actual),
+                require(ItemStack.matches(expected, actual),
                         "Named-state inventory lost its identity, count or custom data: " + entry);
                 units += actual.getCount();
             }
@@ -196,22 +196,44 @@ final class NativeForwardChecks {
 
         for (JsonElement value : fixture.getAsJsonArray("entities")) {
             JsonObject saved = value.getAsJsonObject();
-            net.minecraft.entity.Entity entity = world.getEntityByUuid(java.util.UUID
+            net.minecraft.entity.Entity entity = world.getEntity(java.util.UUID
                     .fromString(saved.get("uuid").getAsString()));
-            ItemStack expected = ItemStack.read(net.minecraft.nbt.JsonToNBT
-                    .getTagFromJson(saved.get("stack").getAsString()));
+            ItemStack expected = ItemStack.of(net.minecraft.nbt.JsonToNBT
+                    .parseTag(saved.get("stack").getAsString()));
 
             require(entity instanceof net.minecraft.entity.item.ItemEntity
-                    && ItemStack.areItemStacksEqual(expected,
+                    && ItemStack.matches(expected,
                             ((net.minecraft.entity.item.ItemEntity) entity).getItem()),
                     "Named-state dropped stack is missing or changed");
             units += expected.getCount();
         }
 
-        net.minecraft.nbt.CompoundNBT expectedState = net.minecraft.nbt.JsonToNBT
-                .getTagFromJson(fixture.get("world_state").getAsString());
+        if (fixture.has("player")) {
+            java.util.UUID id = java.util.UUID.fromString(fixture.get("player").getAsString());
+            net.minecraftforge.common.util.FakePlayer player = net.minecraftforge.common.util.FakePlayerFactory.get(
+                    world, new com.mojang.authlib.GameProfile(id, "PieceFixture"));
+            require(world.getServer().getPlayerList().load(player) != null, "Saved player data is missing");
+            ItemStack shovel = ItemStack.of(net.minecraft.nbt.JsonToNBT
+                    .parseTag(fixture.get("player_shovel").getAsString()));
+            ItemStack nested = ItemStack.of(net.minecraft.nbt.JsonToNBT
+                    .parseTag(fixture.get("player_nested").getAsString()));
+            require(ItemStack.matches(shovel, player.inventory.getItem(0)),
+                    "Player tool lost its damage, enchantment, name or custom data");
+            require(ItemStack.matches(nested, player.inventory.getItem(1)),
+                    "Player nested inventory changed");
+            require(ItemStack.matches(nested, player.getEnderChestInventory().getItem(0)),
+                    "Ender inventory changed");
+            // Save this disconnected fixture player through the native protected path.
+            net.minecraftforge.fml.common.ObfuscationReflectionHelper.findMethod(
+                    net.minecraft.server.management.PlayerList.class, "func_72391_b",
+                    net.minecraft.entity.player.ServerPlayerEntity.class)
+                    .invoke(world.getServer().getPlayerList(), player);
+        }
 
-        require(PiecesWorldState.get(world).write(new net.minecraft.nbt.CompoundNBT()).equals(expectedState),
+        net.minecraft.nbt.CompoundNBT expectedState = net.minecraft.nbt.JsonToNBT
+                .parseTag(fixture.get("world_state").getAsString());
+
+        require(PiecesWorldState.get(world).save(new net.minecraft.nbt.CompoundNBT()).equals(expectedState),
                 "Named-state world data, counters or unknown module fields changed");
         System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS named_states=" + states + " item_units=" + units
                 + " waterlogging=true snow=true schema=1 counters=unchanged");
@@ -248,12 +270,12 @@ final class NativeForwardChecks {
             if (expected.getBlock() instanceof PieceBlock) {
                 expected = ((PieceBlock) expected.getBlock()).getActualState(expected, world, position);
             } else {
-                expected = net.minecraft.block.Block.getValidBlockForPosition(expected, world, position);
+                expected = net.minecraft.block.Block.updateFromNeighbourShapes(expected, world, position);
             }
 
             require(actual.equals(expected),
                     "Historical shape/orientation at " + position + ": " + actual + " expected " + expected);
-            require(world.getTileEntity(position) == null, "Converted piece retains an obsolete material tile");
+            require(world.getBlockEntity(position) == null, "Converted piece retains an obsolete material tile");
             states++;
         }
 
@@ -269,15 +291,15 @@ final class NativeForwardChecks {
 
             BlockPos position = new BlockPos(saved.get("x").getAsInt(), saved.get("y").getAsInt(),
                     saved.get("z").getAsInt());
-            ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(position);
+            ChestTileEntity chest = (ChestTileEntity) world.getBlockEntity(position);
 
             require(chest != null, "Historical chest survives the native upgrade");
 
             for (JsonElement value : saved.getAsJsonArray("items")) {
                 net.minecraft.nbt.CompoundNBT original = net.minecraft.nbt.JsonToNBT
-                        .getTagFromJson(value.getAsString());
+                        .parseTag(value.getAsString());
                 int slot = original.getByte("Slot") & 255;
-                ItemStack actual = chest.getStackInSlot(slot);
+                ItemStack actual = chest.getItem(slot);
 
                 recoveredItem(actual, original);
                 units += actual.getCount();
@@ -296,11 +318,11 @@ final class NativeForwardChecks {
             }
 
             net.minecraft.nbt.CompoundNBT original = net.minecraft.nbt.JsonToNBT
-                    .getTagFromJson(saved.get("item").getAsString());
+                    .parseTag(saved.get("item").getAsString());
             double x = saved.get("x").getAsDouble();
             double y = saved.get("y").getAsDouble();
             double z = saved.get("z").getAsDouble();
-            java.util.List<net.minecraft.entity.item.ItemEntity> found = world.getEntitiesWithinAABB(
+            java.util.List<net.minecraft.entity.item.ItemEntity> found = world.getEntitiesOfClass(
                     net.minecraft.entity.item.ItemEntity.class,
                     new net.minecraft.util.math.AxisAlignedBB(x - 8, y - 8, z - 8, x + 8, y + 8, z + 8));
 
@@ -321,7 +343,7 @@ final class NativeForwardChecks {
         require(totals.blocks == states && totals.items == units && totals.chunks == chunks.size(),
                 "Historical migration counters: " + totals.blocks + "/" + totals.items + "/" + totals.chunks);
 
-        File sidecar = new File(world.getSaveHandler().getWorldDirectory(),
+        File sidecar = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
                 "data/skysbuildingpieces_legacy_registry.dat");
 
         require(sidecar.isFile(), "Original numeric registry survives in the Sky sidecar");
@@ -355,7 +377,7 @@ final class NativeForwardChecks {
     }
 
     private static net.minecraft.nbt.CompoundNBT rawChunk(ServerWorld world, int chunkX, int chunkZ) throws Exception {
-        File region = new File(world.getSaveHandler().getWorldDirectory(),
+        File region = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
                 "region/r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
 
         try (java.io.RandomAccessFile input = new java.io.RandomAccessFile(region, "r")) {
@@ -403,7 +425,7 @@ final class NativeForwardChecks {
 
     private static boolean pending(java.util.Set<net.minecraft.world.chunk.Chunk> chunks) {
         for (net.minecraft.world.chunk.Chunk chunk : chunks) {
-            for (it.unimi.dsi.fastutil.shorts.ShortList positions : chunk.getPackedPositions()) {
+            for (it.unimi.dsi.fastutil.shorts.ShortList positions : chunk.getPostProcessing()) {
                 if (positions != null && !positions.isEmpty()) {
                     return true;
                 }

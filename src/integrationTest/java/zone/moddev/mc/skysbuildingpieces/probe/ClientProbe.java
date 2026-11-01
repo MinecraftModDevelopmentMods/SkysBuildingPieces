@@ -14,6 +14,7 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 public final class ClientProbe extends ProbeProxy {
     private boolean ran;
     private boolean startedWorld;
+    private long worldStarted;
 
     public void init() {
         if (System.getProperty("skysbuildingpieces.integrationPhase",
@@ -30,20 +31,30 @@ public final class ClientProbe extends ProbeProxy {
 
         Minecraft minecraft = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getMainWindow().getHandle());
+        org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().getWindow());
 
         if (ClientStatus.failure != null) {
-            minecraft.shutdown();
+            minecraft.stop();
             return;
         }
 
         if (ran) {
-            if (startedWorld && ClientStatus.complete && minecraft.world != null && minecraft.getConnection() != null
+            if (startedWorld && minecraft.level == null) {
+                confirmDisposableWorld(minecraft);
+                if (System.nanoTime() - worldStarted > java.util.concurrent.TimeUnit.SECONDS.toNanos(180)) {
+                    ClientStatus.failure = new AssertionError("Disposable client world did not start; screen="
+                            + (minecraft.screen == null ? "none" : minecraft.screen.getClass().getName()));
+                    ClientStatus.failure.printStackTrace();
+                    minecraft.stop();
+                    return;
+                }
+            }
+            if (startedWorld && ClientStatus.complete && minecraft.level != null && minecraft.getConnection() != null
                     && !minecraft.getConnection().getRecipeManager().getRecipes().isEmpty()) {
                 RecipePreviewModels.check(minecraft);
                 colours(minecraft);
                 System.out.println("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED");
-                minecraft.shutdown();
+                minecraft.stop();
                 startedWorld = false;
             }
 
@@ -53,10 +64,10 @@ public final class ClientProbe extends ProbeProxy {
         ran = true;
 
         try {
-            org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getMainWindow().getHandle());
+            org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().getWindow());
 
             for (net.minecraft.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
-                if (retired.getGroup() != null) {
+                if (retired.getItemCategory() != null) {
                     throw new AssertionError("Retired template appears in creative inventory");
                 }
             }
@@ -78,12 +89,12 @@ public final class ClientProbe extends ProbeProxy {
                                         .get(piece.material),
                                 piece.piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
 
-                if (hidden ? item.getGroup() != null : item.getGroup() != PiecesTab.INSTANCE) {
+                if (hidden ? item.getItemCategory() != null : item.getItemCategory() != PiecesTab.INSTANCE) {
                     throw new AssertionError("Incorrect creative visibility " + item.getRegistryName());
                 }
             }
 
-            PiecesTab.INSTANCE.fill(creative);
+            PiecesTab.INSTANCE.fillItemList(creative);
 
             java.util.Set<String> entries = new java.util.HashSet<String>();
 
@@ -107,7 +118,7 @@ public final class ClientProbe extends ProbeProxy {
             if (entries.contains("skysbuildingpieces:legacy_piece_holder")) {
                 throw new AssertionError("Recovery holder in mod tab");
             }
-            if (!net.minecraft.client.resources.I18n.format("itemGroup.skysbuildingpieces")
+            if (!net.minecraft.client.resources.I18n.get("itemGroup.skysbuildingpieces")
                     .equals("Sky's Building Pieces")) {
                 throw new AssertionError("Missing creative tab name");
             }
@@ -119,17 +130,17 @@ public final class ClientProbe extends ProbeProxy {
             int checked = 0;
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {
-                for (BlockState state : block.getStateContainer().getValidStates()) {
-                    IBakedModel model = minecraft.getBlockRendererDispatcher().getModelForState(state);
+                for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+                    IBakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
 
-                    if (model == minecraft.getBlockRendererDispatcher().getBlockModelShapes().getModelManager()
+                    if (model == minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                             .getMissingModel()) {
                         throw new AssertionError("Missing baked model " + state);
                     }
                     for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH,
                             Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                         for (BakedQuad quad : model.getQuads(state, face, new java.util.Random(0))) {
-                            if (quad.func_187508_a().getName().toString().contains("missingno")) {
+                            if (quad.getSprite().getName().toString().contains("missingno")) {
                                 throw new AssertionError("Missing sprite " + state);
                             }
                         }
@@ -149,15 +160,15 @@ public final class ClientProbe extends ProbeProxy {
                 if (block == null || block == net.minecraft.block.Blocks.AIR) {
                     continue;
                 }
-                for (BlockState state : block.getStateContainer().getValidStates()) {
-                    IBakedModel model = minecraft.getBlockRendererDispatcher().getModelForState(state);
+                for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+                    IBakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
 
-                    if (model == minecraft.getBlockRendererDispatcher().getBlockModelShapes().getModelManager()
+                    if (model == minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                             .getMissingModel()) {
                         throw new AssertionError("Missing decoration model " + state);
                     }
                     for (BakedQuad quad : model.getQuads(state, null, new java.util.Random(0))) {
-                        if (quad.func_187508_a().getName().toString().contains("missingno")) {
+                        if (quad.getSprite().getName().toString().contains("missingno")) {
                             throw new AssertionError("Missing decoration texture " + state);
                         }
                     }
@@ -176,17 +187,17 @@ public final class ClientProbe extends ProbeProxy {
                 if (block == null || block == net.minecraft.block.Blocks.AIR) {
                     continue;
                 }
-                for (BlockState state : block.getStateContainer().getValidStates()) {
-                    IBakedModel model = minecraft.getBlockRendererDispatcher().getModelForState(state);
+                for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+                    IBakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
 
-                    if (model == minecraft.getBlockRendererDispatcher().getBlockModelShapes().getModelManager()
+                    if (model == minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                             .getMissingModel()) {
                         throw new AssertionError("Missing recovery model " + state);
                     }
                     for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH,
                             Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                         for (BakedQuad quad : model.getQuads(state, face, new java.util.Random(0))) {
-                            if (quad.func_187508_a().getName().toString().contains("missingno")) {
+                            if (quad.getSprite().getName().toString().contains("missingno")) {
                                 throw new AssertionError("Missing recovery sprite " + state);
                             }
                         }
@@ -195,7 +206,7 @@ public final class ClientProbe extends ProbeProxy {
                     recoveryModels++;
                 }
             }
-            try (PrintWriter writer = new PrintWriter(new File(minecraft.gameDir, "building-pieces-client-pass.txt"),
+            try (PrintWriter writer = new PrintWriter(new File(minecraft.gameDirectory, "building-pieces-client-pass.txt"),
                     "UTF-8")) {
                 writer.println("baked_states=" + checked);
                 writer.println("recovery_models=" + recoveryModels);
@@ -205,23 +216,73 @@ public final class ClientProbe extends ProbeProxy {
 
             if (System.getProperty("skysbuildingpieces.integrationPhase",
                     System.getProperty("skysbuildingpieces.bootstrapPhase", "")).equals("client")) {
-                minecraft.shutdown();
+                minecraft.stop();
             } else {
                 startedWorld = true;
-                minecraft.launchIntegratedServer("building-pieces-world", "Building Pieces Test",
-                        new net.minecraft.world.WorldSettings(4815162342L, net.minecraft.world.GameType.CREATIVE, true,
-                                false, net.minecraft.world.WorldType.FLAT));
+                worldStarted = System.nanoTime();
+                if (new File(minecraft.gameDirectory, "saves/building-pieces-world/level.dat").isFile()) {
+                    minecraft.loadLevel("building-pieces-world");
+                } else {
+                    net.minecraft.util.registry.DynamicRegistries.Impl registries =
+                            net.minecraft.util.registry.DynamicRegistries.builtin();
+                    net.minecraft.util.registry.Registry<net.minecraft.world.DimensionType> dimensions =
+                            registries.registryOrThrow(net.minecraft.util.registry.Registry.DIMENSION_TYPE_REGISTRY);
+                    net.minecraft.util.registry.Registry<net.minecraft.world.biome.Biome> biomes =
+                            registries.registryOrThrow(net.minecraft.util.registry.Registry.BIOME_REGISTRY);
+                    net.minecraft.world.gen.settings.DimensionGeneratorSettings defaults =
+                            net.minecraft.world.gen.settings.DimensionGeneratorSettings.makeDefault(dimensions, biomes,
+                                    registries.registryOrThrow(net.minecraft.util.registry.Registry.NOISE_GENERATOR_SETTINGS_REGISTRY));
+                    net.minecraft.world.gen.settings.DimensionGeneratorSettings generator =
+                            new net.minecraft.world.gen.settings.DimensionGeneratorSettings(4815162342L, false, false,
+                                    net.minecraft.world.gen.settings.DimensionGeneratorSettings.withOverworld(dimensions,
+                                            defaults.dimensions(), new net.minecraft.world.gen.FlatChunkGenerator(
+                                                    net.minecraft.world.gen.FlatGenerationSettings.getDefault(biomes))));
+                    net.minecraft.world.WorldSettings settings = new net.minecraft.world.WorldSettings(
+                            "Building Pieces Test", net.minecraft.world.GameType.CREATIVE, false,
+                            net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.GameRules(),
+                            net.minecraft.util.datafix.codec.DatapackCodec.DEFAULT);
+                    minecraft.createLevel("building-pieces-world", settings, registries, generator);
+                }
             }
         } catch (Throwable failure) {
             failure.printStackTrace();
-            minecraft.shutdown();
+            minecraft.stop();
         }
     }
 
+    private static void confirmDisposableWorld(Minecraft client) {
+        net.minecraft.client.gui.screen.Screen screen = client.screen;
+        if (screen == null || !(screen.getTitle() instanceof net.minecraft.util.text.TranslationTextComponent)
+                || !((net.minecraft.util.text.TranslationTextComponent) screen.getTitle()).getKey()
+                        .equals("selectWorld.backupQuestion.experimental")) {
+            return;
+        }
+        net.minecraft.util.text.ITextComponent proceed;
+        if (screen instanceof net.minecraft.client.gui.screen.ConfirmBackupScreen) {
+            proceed = new net.minecraft.util.text.TranslationTextComponent("selectWorld.backupJoinSkipButton");
+        } else if (screen instanceof net.minecraft.client.gui.screen.ConfirmScreen) {
+            proceed = net.minecraft.client.gui.DialogTexts.GUI_PROCEED;
+        } else {
+            return;
+        }
+        for (net.minecraft.client.gui.IGuiEventListener child : screen.children()) {
+            if (child instanceof net.minecraft.client.gui.widget.button.Button) {
+                net.minecraft.client.gui.widget.button.Button button =
+                        (net.minecraft.client.gui.widget.button.Button) child;
+                if (button.getMessage().equals(proceed)) {
+                    // Only the marked probe's disposable world reaches this confirmation.
+                    button.onPress();
+                    return;
+                }
+            }
+        }
+        throw new AssertionError("The native experimental-world confirmation has no proceed action");
+    }
+
     private static void colours(Minecraft client) {
-        net.minecraft.util.math.BlockPos sample = new net.minecraft.util.math.BlockPos(client.player);
-        int expected = client.getBlockColors().getColor(net.minecraft.block.Blocks.GRASS_BLOCK.getDefaultState(),
-                client.world, sample, 0);
+        net.minecraft.util.math.BlockPos sample = client.player.blockPosition();
+        int expected = client.getBlockColors().getColor(net.minecraft.block.Blocks.GRASS_BLOCK.defaultBlockState(),
+                client.level, sample, 0);
         int inventory = net.minecraft.world.GrassColors.get(.5, 1);
         int checked = 0;
 
@@ -230,14 +291,14 @@ public final class ClientProbe extends ProbeProxy {
                 continue;
             }
 
-            BlockState state = block.getDefaultState();
+            BlockState state = block.defaultBlockState();
 
-            if (client.getBlockColors().getColor(state, client.world, sample, 0) != expected
-                    || client.getBlockColors().getColor(state, client.world, sample, 1) != -1
+            if (client.getBlockColors().getColor(state, client.level, sample, 0) != expected
+                    || client.getBlockColors().getColor(state, client.level, sample, 1) != -1
                     || !net.minecraft.client.renderer.RenderTypeLookup.canRenderInLayer(state,
-                            net.minecraft.client.renderer.RenderType.getCutoutMipped())
+                            net.minecraft.client.renderer.RenderType.cutoutMipped())
                     || net.minecraft.client.renderer.RenderTypeLookup.canRenderInLayer(state,
-                            net.minecraft.client.renderer.RenderType.getSolid())) {
+                            net.minecraft.client.renderer.RenderType.solid())) {
                 throw new AssertionError("Grass-piece biome tint or render layer: " + block.getRegistryName());
             }
 

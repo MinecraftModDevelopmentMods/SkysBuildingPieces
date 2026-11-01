@@ -20,13 +20,50 @@ function hasCall(method, owner, name) {
 
 function initializeCoreMod() {
     return {
+        'skysbuildingpieces_material_hardness': {
+            'target': {'type': 'CLASS', 'name': 'net.minecraft.block.AbstractBlock$AbstractBlockState'},
+            'transformer': function(type) {
+                var matches = 0;
+                var owner = 'zone/moddev/mc/skysbuildingpieces/compat/NativeStateHooks';
+                for (var index = 0; index < type.methods.size(); index++) {
+                    var method = type.methods.get(index);
+                    if ((method.name !== 'getDestroySpeed' && method.name !== 'func_185887_b')
+                            || method.desc !== '(Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F') {
+                        continue;
+                    }
+                    matches++;
+                    if (hasCall(method, owner, 'destroySpeed')) continue;
+                    var returns = 0;
+                    for (var instruction = method.instructions.getFirst(); instruction !== null;
+                            instruction = instruction.getNext()) {
+                        if (instruction.getOpcode() === Opcodes.FRETURN) {
+                            var hook = new InsnList();
+                            hook.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                            hook.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                            hook.add(new VarInsnNode(Opcodes.ALOAD, 2));
+                            hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner, 'destroySpeed',
+                                    '(FLnet/minecraft/block/AbstractBlock$AbstractBlockState;'
+                                    + 'Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F', false));
+                            method.instructions.insertBefore(instruction, hook);
+                            returns++;
+                        }
+                    }
+                    if (returns === 0) throw new Error("Sky's Building Pieces: native hardness method has no return");
+                    method.maxStack = Math.max(method.maxStack, 4);
+                }
+                if (matches !== 1) {
+                    throw new Error("Sky's Building Pieces: expected one Forge 36 hardness method, found " + matches);
+                }
+                return type;
+            }
+        },
         'skysbuildingpieces_legacy_chunk': {
             'target': {'type': 'CLASS', 'name': 'net.minecraft.world.chunk.storage.ChunkLoader'},
             'transformer': function(type) {
                 var matches = 0;
                 for (var index = 0; index < type.methods.size(); index++) {
                     var method = type.methods.get(index);
-                    if (method.desc !== '(Lnet/minecraft/world/dimension/DimensionType;'
+                    if (method.desc !== '(Lnet/minecraft/util/RegistryKey;'
                             + 'Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundNBT;)'
                             + 'Lnet/minecraft/nbt/CompoundNBT;') {
                         continue;
@@ -51,11 +88,11 @@ function initializeCoreMod() {
                         }
                     }
                     if (returns === 0) {
-                        throw new Error("Sky's Building Pieces: Forge 28 chunk upgrader has no return");
+                        throw new Error("Sky's Building Pieces: Forge 36 chunk upgrader has no return");
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 28 chunk upgrader, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 36 chunk upgrader, found " + matches);
                 }
                 return type;
             }
@@ -95,12 +132,12 @@ function initializeCoreMod() {
                             }
                         }
                         if (returns === 0) {
-                            throw new Error("Sky's Building Pieces: Forge 28 NBT updater has no return");
+                            throw new Error("Sky's Building Pieces: Forge 36 NBT updater has no return");
                         }
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 28 NBT updater, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 36 NBT updater, found " + matches);
                 }
                 return type;
             }

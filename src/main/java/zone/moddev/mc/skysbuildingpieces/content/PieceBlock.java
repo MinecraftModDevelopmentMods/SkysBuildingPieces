@@ -25,7 +25,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
@@ -49,8 +49,8 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameters;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.ToolType;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
@@ -63,7 +63,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     public static final BooleanProperty LOWERED_SUPPORT = BooleanProperty.create("lowered_support");
     public static final EnumProperty<StairsShape> STAIR_SHAPE = StairsBlock.SHAPE;
     private static final ThreadLocal<Construction> CONSTRUCTING = new ThreadLocal<>();
-    private static final Material PATH_MATERIAL = new Material.Builder(MaterialColor.DIRT).notSolid().build();
+    private static final Material PATH_MATERIAL = new Material.Builder(MaterialColor.DIRT).nonSolid().build();
     public final Catalogue.Palette palette;
     private final IntegerProperty metadataProperty;
     private final Map<Integer, VoxelShape> outlines = new ConcurrentHashMap<>();
@@ -94,28 +94,28 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         CONSTRUCTING.remove();
         setRegistryName(palette.namespace, palette.id);
 
-        BlockState initial = stateContainer.getBaseState().with(SlabBlock.WATERLOGGED, false);
+        BlockState initial = stateDefinition.any().setValue(SlabBlock.WATERLOGGED, false);
 
         if (metadataProperty != null) {
-            initial = initial.with(metadataProperty, 0);
+            initial = initial.setValue(metadataProperty, 0);
         }
-        if (initial.has(SnowyDirtBlock.SNOWY)) {
-            initial = initial.with(SnowyDirtBlock.SNOWY, false);
+        if (initial.hasProperty(SnowyDirtBlock.SNOWY)) {
+            initial = initial.setValue(SnowyDirtBlock.SNOWY, false);
         }
-        if (initial.has(CONNECTIONS)) {
-            initial = initial.with(CONNECTIONS, 0);
+        if (initial.hasProperty(CONNECTIONS)) {
+            initial = initial.setValue(CONNECTIONS, 0);
         }
-        if (initial.has(WallBlock.UP)) {
-            initial = initial.with(WallBlock.UP, true);
+        if (initial.hasProperty(WallBlock.UP)) {
+            initial = initial.setValue(WallBlock.UP, true);
         }
-        if (initial.has(STAIR_SHAPE)) {
-            initial = initial.with(STAIR_SHAPE, StairsShape.STRAIGHT);
+        if (initial.hasProperty(STAIR_SHAPE)) {
+            initial = initial.setValue(STAIR_SHAPE, StairsShape.STRAIGHT);
         }
-        if (initial.has(LOWERED_SUPPORT)) {
-            initial = initial.with(LOWERED_SUPPORT, false);
+        if (initial.hasProperty(LOWERED_SUPPORT)) {
+            initial = initial.setValue(LOWERED_SUPPORT, false);
         }
 
-        setDefaultState(initial);
+        registerDefaultState(initial);
     }
 
     private static Block.Properties properties(Catalogue.Palette palette) {
@@ -125,7 +125,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
 
         switch (palette.group) {
             case "metal":
-                material = Material.IRON;
+                material = Material.METAL;
                 break;
             case "wood":
                 material = Material.WOOD;
@@ -134,10 +134,10 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
                 material = PATH_MATERIAL;
                 break;
             case "dirt":
-                material = Material.EARTH;
+                material = Material.DIRT;
                 break;
             case "grass":
-                material = Material.ORGANIC;
+                material = Material.GRASS;
                 break;
             case "cloth":
                 material = Material.WOOL;
@@ -150,29 +150,29 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
                 material = Material.ICE;
                 break;
             case "packed_ice":
-                material = Material.PACKED_ICE;
+                material = Material.ICE_SOLID;
                 break;
             case "snow":
-                material = Material.SNOW_BLOCK;
+                material = Material.SNOW;
                 break;
             default:
-                material = Material.ROCK;
+                material = Material.STONE;
         }
 
-        Block.Properties properties = Block.Properties.create(material).hardnessAndResistance(1).sound(SoundType.STONE)
-                .variableOpacity().notSolid();
+        Block.Properties properties = Block.Properties.of(material).strength(1).sound(SoundType.STONE)
+                .dynamicShape().noOcclusion();
 
         if (palette.group.equals("ice") || palette.group.equals("packed_ice")) {
-            properties.slipperiness(.98F);
+            properties.friction(.98F);
         }
 
         return palette.group.equals("grass") || palette.group.equals("dirt") || palette.group.equals("path")
-                ? properties.tickRandomly()
+                ? properties.randomTicks()
                 : properties;
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
         Construction construction = CONSTRUCTING.get();
 
         if (construction == null) {
@@ -211,11 +211,11 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
             throw new IllegalArgumentException("Unassigned palette metadata: " + palette.registryId() + ":" + metadata);
         }
 
-        return metadataProperty == null ? getDefaultState() : getDefaultState().with(metadataProperty, metadata);
+        return metadataProperty == null ? defaultBlockState() : defaultBlockState().setValue(metadataProperty, metadata);
     }
 
     public int getMetaFromState(BlockState state) {
-        return metadataProperty == null ? 0 : state.get(metadataProperty);
+        return metadataProperty == null ? 0 : state.getValue(metadataProperty);
     }
 
     public Catalogue.MaterialDef definition(BlockState state) {
@@ -231,22 +231,17 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     public int mask(BlockState state) {
-        return palette.shape == Shape.STAIRS ? Geometry.stairs(orientation(state), state.get(STAIR_SHAPE).getName())
+        return palette.shape == Shape.STAIRS ? Geometry.stairs(orientation(state), state.getValue(STAIR_SHAPE).getSerializedName())
                 : Geometry.mask(palette.shape, orientation(state));
     }
 
     @Override
-    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos position) {
-        return false;
-    }
-
-    @Override
-    public int getOpacity(BlockState state, IBlockReader world, BlockPos position) {
+    public int getLightBlock(BlockState state, IBlockReader world, BlockPos position) {
         return 0;
     }
 
     @Override
-    public boolean isSideInvisible(BlockState state, BlockState neighbour, Direction side) {
+    public boolean skipRendering(BlockState state, BlockState neighbour, Direction side) {
         if (palette.shape != Shape.WALL || side.getAxis() == Direction.Axis.Y
                 || !(neighbour.getBlock() instanceof PieceBlock)) {
             return false;
@@ -257,17 +252,15 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         return other.palette.shape == Shape.WALL && other.definition(neighbour).id.equals(definition(state).id);
     }
 
-    @Override
-    public float getBlockHardness(BlockState state, IBlockReader world, BlockPos position) {
+    public float materialDestroySpeed(BlockState state, IBlockReader world, BlockPos position) {
         Catalogue.MaterialDef material = definition(state);
 
-        return material.nativeProperties() ? Pieces.nativeState(material, "full").getBlockHardness(world, position)
+        return material.nativeProperties() ? Pieces.nativeState(material, "full").getDestroySpeed(world, position)
                 : material.hardness();
     }
 
     @Override
-    public float getExplosionResistance(BlockState state, IWorldReader world, BlockPos position, Entity entity,
-            Explosion explosion) {
+    public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos position, Explosion explosion) {
         Catalogue.MaterialDef material = definition(state);
 
         if (material.explosionResistance() >= 0) {
@@ -276,7 +269,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         if (material.nativeProperties()) {
             BlockState full = Pieces.nativeState(material, "full");
 
-            return full.getBlock().getExplosionResistance(full, world, position, entity, explosion);
+            return full.getBlock().getExplosionResistance(full, world, position, explosion);
         }
 
         return material.resistance() < 0 ? material.hardness() : material.resistance() * 3 / 5;
@@ -342,7 +335,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     public boolean canSustainPlant(BlockState state, IBlockReader world, BlockPos position, Direction face,
             IPlantable plant) {
         if (face != Direction.UP || !completeTop(state) || !definition(state).soil()
-                || state.get(SlabBlock.WATERLOGGED)) {
+                || state.getValue(SlabBlock.WATERLOGGED)) {
             return false;
         }
 
@@ -359,8 +352,8 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
 
         if (palette.shape == Shape.WALL) {
-            for (WallGeometry.Bounds wallBounds : WallGeometry.boxes(blockState.get(CONNECTIONS),
-                    blockState.get(WallBlock.UP))) {
+            for (WallGeometry.Bounds wallBounds : WallGeometry.boxes(blockState.getValue(CONNECTIONS),
+                    blockState.getValue(WallBlock.UP))) {
                 boxes.add(new AxisAlignedBB(wallBounds.minX / 16.0, wallBounds.minY / 16.0, wallBounds.minZ / 16.0,
                         wallBounds.maxX / 16.0, wallBounds.maxY / 16.0, wallBounds.maxZ / 16.0));
             }
@@ -370,7 +363,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
 
             boxes.add(new AxisAlignedBB(paneMinimum, 0, paneMinimum, paneMaximum, 1, paneMaximum));
 
-            int connections = blockState.get(CONNECTIONS);
+            int connections = blockState.getValue(CONNECTIONS);
 
             if ((connections & 1) != 0) {
                 boxes.add(new AxisAlignedBB(paneMinimum, 0, 0, paneMaximum, 1, paneMinimum));
@@ -397,7 +390,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
                     double loweredTop = palette.group.equals("path") && exposedTop ? 1.0 / 16.0 : 0;
                     // Extend only the base to meet a lowered vanilla path, keeping the walking surface in place.
                     double loweredBase = palette.group.equals("path") && cellMinimumY == 0
-                            && blockState.get(LOWERED_SUPPORT) ? 1.0 / 16.0 : 0;
+                            && blockState.getValue(LOWERED_SUPPORT) ? 1.0 / 16.0 : 0;
 
                     boxes.add(new AxisAlignedBB(cellMinimumX, cellMinimumY - loweredBase, cellMinimumZ,
                             cellMinimumX + .5, cellMinimumY + .5 - loweredTop, cellMinimumZ + .5));
@@ -410,13 +403,13 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
 
     private int geometryKey(BlockState state) {
         if (palette.shape == Shape.WALL) {
-            return state.get(CONNECTIONS) | (state.get(WallBlock.UP) ? 16 : 0);
+            return state.getValue(CONNECTIONS) | (state.getValue(WallBlock.UP) ? 16 : 0);
         }
         if (palette.shape == Shape.PANE) {
-            return state.get(CONNECTIONS);
+            return state.getValue(CONNECTIONS);
         }
 
-        return mask(state) | (state.has(LOWERED_SUPPORT) && state.get(LOWERED_SUPPORT) ? 256 : 0);
+        return mask(state) | (state.hasProperty(LOWERED_SUPPORT) && state.getValue(LOWERED_SUPPORT) ? 256 : 0);
     }
 
     private VoxelShape shape(BlockState state, boolean collision) {
@@ -448,67 +441,67 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         return shape(state, true);
     }
 
-    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader world, BlockPos position) {
-        return shape(state, false).getBoundingBox();
+    public AxisAlignedBB bounds(BlockState state, IBlockReader world, BlockPos position) {
+        return shape(state, false).bounds();
     }
 
     public BlockState getActualState(BlockState state, IBlockReader world, BlockPos position) {
-        if (state.has(SnowyDirtBlock.SNOWY)) {
+        if (state.hasProperty(SnowyDirtBlock.SNOWY)) {
             boolean snowy = false;
 
             for (Direction side : new Direction[] { Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH,
                     Direction.WEST }) {
-                Block neighbour = readState(world, position.offset(side)).getBlock();
+                Block neighbour = readState(world, position.relative(side)).getBlock();
 
                 snowy |= neighbour == Blocks.SNOW_BLOCK || neighbour == Blocks.SNOW;
             }
 
-            state = state.with(SnowyDirtBlock.SNOWY, snowy);
+            state = state.setValue(SnowyDirtBlock.SNOWY, snowy);
         }
-        if (state.has(CONNECTIONS)) {
+        if (state.hasProperty(CONNECTIONS)) {
             int connections = 0;
             int bit = 1;
 
             for (Direction side : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
                     Direction.WEST }) {
-                BlockPos neighbourPos = position.offset(side);
+                BlockPos neighbourPos = position.relative(side);
                 BlockState neighbour = readState(world, neighbourPos);
                 Block block = neighbour.getBlock();
                 boolean compatible = block instanceof PieceBlock && ((PieceBlock) block).palette.shape == palette.shape;
 
                 if (compatible || block instanceof WallBlock || block instanceof PaneBlock
                         || block instanceof FenceGateBlock
-                        || Block.hasSolidSide(neighbour, world, neighbourPos, side.getOpposite())) {
+                        || Block.isFaceFull(neighbour.getCollisionShape(world, neighbourPos), side.getOpposite())) {
                     connections |= bit;
                 }
 
                 bit <<= 1;
             }
 
-            state = state.with(CONNECTIONS, connections);
+            state = state.setValue(CONNECTIONS, connections);
 
-            if (state.has(WallBlock.UP)) {
-                state = state.with(WallBlock.UP,
-                        connections != 5 && connections != 10 || !readState(world, position.up()).isAir());
+            if (state.hasProperty(WallBlock.UP)) {
+                state = state.setValue(WallBlock.UP,
+                        connections != 5 && connections != 10 || !readState(world, position.above()).isAir());
             }
         }
         if (palette.shape == Shape.STAIRS) {
-            state = state.with(STAIR_SHAPE, stairsShape(state, world, position));
+            state = state.setValue(STAIR_SHAPE, stairsShape(state, world, position));
         }
-        if (state.has(LOWERED_SUPPORT)) {
-            state = state.with(LOWERED_SUPPORT, readState(world, position.down()).getBlock() == Blocks.GRASS_PATH);
+        if (state.hasProperty(LOWERED_SUPPORT)) {
+            state = state.setValue(LOWERED_SUPPORT, readState(world, position.below()).getBlock() == Blocks.GRASS_PATH);
         }
 
         return state;
     }
 
     private static BlockState readState(IBlockReader world, BlockPos position) {
-        if (world instanceof World && !((World) world).isBlockPresent(position)) {
-            return Blocks.AIR.getDefaultState();
+        if (world instanceof World && !((World) world).isLoaded(position)) {
+            return Blocks.AIR.defaultBlockState();
         }
         if (world instanceof WorldGenRegion
-                && !((WorldGenRegion) world).chunkExists(position.getX() >> 4, position.getZ() >> 4)) {
-            return Blocks.AIR.getDefaultState();
+                && !((WorldGenRegion) world).hasChunk(position.getX() >> 4, position.getZ() >> 4)) {
+            return Blocks.AIR.defaultBlockState();
         }
 
         return world.getBlockState(position);
@@ -530,11 +523,11 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
             BlockState nativeStairs = Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "stairs");
 
             if (nativeStairs != null && nativeStairs.getBlock() == blockState.getBlock()) {
-                Direction facing = blockState.get(StairsBlock.FACING);
+                Direction facing = blockState.getValue(StairsBlock.FACING);
                 int rotation = facing == Direction.EAST ? 0
                         : facing == Direction.WEST ? 1 : facing == Direction.SOUTH ? 2 : 3;
 
-                return rotation + (blockState.get(StairsBlock.HALF) == Half.TOP ? 4 : 0);
+                return rotation + (blockState.getValue(StairsBlock.HALF) == Half.TOP ? 4 : 0);
             }
         }
 
@@ -542,7 +535,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     private boolean different(BlockState blockState, IBlockReader blockAccess, BlockPos position, Direction offset) {
-        Integer neighbourMetadata = stairMeta(readState(blockAccess, position.offset(offset)),
+        Integer neighbourMetadata = stairMeta(readState(blockAccess, position.relative(offset)),
                 definition(blockState).id);
 
         return neighbourMetadata == null || neighbourMetadata != orientation(blockState);
@@ -550,18 +543,18 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
 
     private StairsShape stairsShape(BlockState blockState, IBlockReader blockAccess, BlockPos position) {
         Direction stairFacing = stairsFacing(orientation(blockState));
-        Integer front = stairMeta(readState(blockAccess, position.offset(stairFacing)), definition(blockState).id);
+        Integer front = stairMeta(readState(blockAccess, position.relative(stairFacing)), definition(blockState).id);
 
         if (front != null && (front & 4) == (orientation(blockState) & 4)) {
             Direction neighbourFacing = stairsFacing(front);
 
             if (neighbourFacing.getAxis() != stairFacing.getAxis()
                     && different(blockState, blockAccess, position, neighbourFacing.getOpposite())) {
-                return neighbourFacing == stairFacing.rotateYCCW() ? StairsShape.OUTER_LEFT : StairsShape.OUTER_RIGHT;
+                return neighbourFacing == stairFacing.getCounterClockWise() ? StairsShape.OUTER_LEFT : StairsShape.OUTER_RIGHT;
             }
         }
 
-        Integer back = stairMeta(readState(blockAccess, position.offset(stairFacing.getOpposite())),
+        Integer back = stairMeta(readState(blockAccess, position.relative(stairFacing.getOpposite())),
                 definition(blockState).id);
 
         if (back != null && (back & 4) == (orientation(blockState) & 4)) {
@@ -569,7 +562,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
 
             if (neighbourFacing.getAxis() != stairFacing.getAxis()
                     && different(blockState, blockAccess, position, neighbourFacing)) {
-                return neighbourFacing == stairFacing.rotateYCCW() ? StairsShape.INNER_LEFT : StairsShape.INNER_RIGHT;
+                return neighbourFacing == stairFacing.getCounterClockWise() ? StairsShape.INNER_LEFT : StairsShape.INNER_RIGHT;
             }
         }
 
@@ -578,10 +571,10 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder context) {
-        ItemStack tool = context.get(LootParameters.TOOL);
+        ItemStack tool = context.getParameter(LootParameters.TOOL);
 
         if (!palette.group.equals("path") && tool != null
-                && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+                && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
             return Collections.singletonList(getSilkTouchDrop(state));
         }
 
@@ -608,21 +601,21 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public ItemStack getItem(IBlockReader world, BlockPos position, BlockState state) {
+    public ItemStack getCloneItemStack(IBlockReader world, BlockPos position, BlockState state) {
         return palette.shape == Shape.VERTICAL_SLAB ? Pieces.slabDrop(definition(state).id, state)
                 : Pieces.stack(Pieces.state(definition(state).id, palette.shape, orientation(state)), 1);
     }
 
     @Override
-    public IFluidState getFluidState(BlockState state) {
-        return state.get(SlabBlock.WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(SlabBlock.WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public BlockState updatePostPlacement(BlockState state, Direction side, BlockState neighbour, IWorld world,
+    public BlockState updateShape(BlockState state, Direction side, BlockState neighbour, IWorld world,
             BlockPos position, BlockPos neighbourPos) {
-        if (state.get(SlabBlock.WATERLOGGED)) {
-            world.getPendingFluidTicks().scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        if (state.getValue(SlabBlock.WATERLOGGED)) {
+            world.getLiquidTicks().scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         }
 
         return getActualState(state, world, position);
@@ -632,13 +625,13 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         BlockState actual = getActualState(state, world, position);
 
         if (actual != state) {
-            world.setBlockState(position, actual, 2);
+            world.setBlock(position, actual, 2);
         }
     }
 
     @Override
     public void tick(BlockState state, ServerWorld world, BlockPos position, Random random) {
-        if (world.isRemote) {
+        if (world.isClientSide) {
             return;
         }
 
@@ -648,8 +641,8 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos position, BlockState oldState, boolean moving) {
-        if (world.isRemote) {
+    public void onPlace(BlockState state, World world, BlockPos position, BlockState oldState, boolean moving) {
+        if (world.isClientSide) {
             return;
         }
 
@@ -659,16 +652,16 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos position, PlayerEntity player, Hand hand,
+    public ActionResultType use(BlockState state, World world, BlockPos position, PlayerEntity player, Hand hand,
             BlockRayTraceResult hit) {
-        return PathPieces.activate(world, position, player, player.getHeldItem(hand), hit.getFace(), hand)
+        return PathPieces.activate(world, position, player, player.getItemInHand(hand), hit.getDirection(), hand)
                 ? ActionResultType.SUCCESS : ActionResultType.PASS;
     }
 
     @Override
     public void neighborChanged(BlockState state, World world, BlockPos position, Block changed, BlockPos changedPos,
             boolean moving) {
-        if (world.isRemote) {
+        if (world.isClientSide) {
             return;
         }
 
@@ -678,19 +671,19 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public boolean canGrow(IBlockReader world, BlockPos position, BlockState state, boolean client) {
-        return GrassLifecycle.grass(state) && completeTop(state) && !state.get(SlabBlock.WATERLOGGED);
+    public boolean isValidBonemealTarget(IBlockReader world, BlockPos position, BlockState state, boolean client) {
+        return GrassLifecycle.grass(state) && completeTop(state) && !state.getValue(SlabBlock.WATERLOGGED);
     }
 
     @Override
-    public boolean canUseBonemeal(World world, Random random, BlockPos position, BlockState state) {
-        return canGrow(world, position, state, world.isRemote);
+    public boolean isBonemealSuccess(World world, Random random, BlockPos position, BlockState state) {
+        return isValidBonemealTarget(world, position, state, world.isClientSide);
     }
 
     @Override
-    public void grow(ServerWorld world, Random random, BlockPos position, BlockState state) {
-        if (canGrow(world, position, state, world.isRemote)) {
-            ((IGrowable) Blocks.GRASS_BLOCK).grow(world, random, position, Blocks.GRASS_BLOCK.getDefaultState());
+    public void performBonemeal(ServerWorld world, Random random, BlockPos position, BlockState state) {
+        if (isValidBonemealTarget(world, position, state, world.isClientSide)) {
+            ((IGrowable) Blocks.GRASS_BLOCK).performBonemeal(world, random, position, Blocks.GRASS_BLOCK.defaultBlockState());
         }
     }
 }

@@ -1,5 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
+import net.minecraft.util.math.vector.Vector3d;
+
 import java.util.*;
 import net.minecraft.block.WallBlock;
 import net.minecraft.block.Block;
@@ -33,7 +35,7 @@ public final class PresentationChecks {
                 continue;
             }
 
-            require(block.getDefaultState().has(WallBlock.UP), "every wall has a derived post state");
+            require(block.defaultBlockState().hasProperty(WallBlock.UP), "every wall has a derived post state");
             materials += block.palette.materials.size();
             coveredMaterials.addAll(block.palette.materials);
 
@@ -42,28 +44,28 @@ public final class PresentationChecks {
                     for (boolean covered : new boolean[] { false, true }) {
                         BlockState state = block.getStateFromMeta(material);
 
-                        world.setBlockState(pos, state, 2);
+                        world.setBlock(pos, state, 2);
 
                         if (covered) {
-                            world.setBlockState(pos.up(), Blocks.STONE.getDefaultState(), 2);
+                            world.setBlock(pos.above(), Blocks.STONE.defaultBlockState(), 2);
                         } else {
-                            world.removeBlock(pos.up(), false);
+                            world.removeBlock(pos.above(), false);
                         }
                         for (int entryIndex = 0; entryIndex < sides.length; entryIndex++) {
                             if ((connections & (1 << entryIndex)) == 0) {
-                                world.removeBlock(pos.offset(sides[entryIndex]), false);
+                                world.removeBlock(pos.relative(sides[entryIndex]), false);
                             } else {
-                                world.setBlockState(pos.offset(sides[entryIndex]), state, 2);
+                                world.setBlock(pos.relative(sides[entryIndex]), state, 2);
                             }
                         }
 
                         BlockState actual = block.getActualState(state, world, pos);
 
-                        require(actual.get(PieceBlock.CONNECTIONS) == connections, "wall connections");
+                        require(actual.getValue(PieceBlock.CONNECTIONS) == connections, "wall connections");
 
                         boolean post = covered || (connections != 5 && connections != 10);
 
-                        require(actual.get(WallBlock.UP) == post,
+                        require(actual.getValue(WallBlock.UP) == post,
                                 "posts follow ends, corners, junctions and overhead support");
                         require(block.getMetaFromState(actual) == material, "connections do not change saved metadata");
 
@@ -95,56 +97,56 @@ public final class PresentationChecks {
             }
         }
 
-        world.removeBlock(pos.up(), false);
+        world.removeBlock(pos.above(), false);
 
         for (Direction side : sides) {
-            world.removeBlock(pos.offset(side), false);
+            world.removeBlock(pos.relative(side), false);
         }
 
         BlockState blue = Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0);
         BlockState redSandState = Pieces.state("minecraft:stained_glass_red", Shape.WALL, 0);
 
-        world.setBlockState(pos, blue, 2);
-        world.setBlockState(pos.east(), redSandState, 2);
+        world.setBlock(pos, blue, 2);
+        world.setBlock(pos.east(), redSandState, 2);
         require(visible((PieceBlock) blue.getBlock(), blue, world, pos, Direction.EAST),
                 "different glass colours retain their boundary");
-        world.setBlockState(pos.north(), blue, 2);
+        world.setBlock(pos.north(), blue, 2);
 
-        BlockRayTraceResult high = trace(blue, world, pos, new Vec3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
-                new Vec3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1));
-        BlockRayTraceResult low = trace(blue, world, pos, new Vec3d(pos.getX() + .5, pos.getY() + .7, pos.getZ() - 1),
-                new Vec3d(pos.getX() + .5, pos.getY() + .7, pos.getZ() + 1));
+        BlockRayTraceResult high = trace(blue, world, pos, new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
+                new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1));
+        BlockRayTraceResult low = trace(blue, world, pos, new Vector3d(pos.getX() + .5, pos.getY() + .7, pos.getZ() - 1),
+                new Vector3d(pos.getX() + .5, pos.getY() + .7, pos.getZ() + 1));
 
-        require(high != null && high.getHitVec().z == pos.getZ() + .25, "ray passes above the lower arm to the post");
-        require(low != null && low.getHitVec().z == pos.getZ(), "ray hits the lower connection");
+        require(high != null && high.getLocation().z == pos.getZ() + .25, "ray passes above the lower arm to the post");
+        require(low != null && low.getLocation().z == pos.getZ(), "ray hits the lower connection");
         world.removeBlock(pos.east(), false);
-        world.setBlockState(pos.south(), blue, 3);
+        world.setBlock(pos.south(), blue, 3);
 
         PieceBlock blueWall = (PieceBlock) blue.getBlock();
         BlockState straight = blueWall.getActualState(blue, world, pos);
 
-        require(!straight.get(WallBlock.UP), "straight runs have no post");
-        require(straight.getShape(world, pos).getBoundingBox().maxY == 13 / 16.0,
+        require(!straight.getValue(WallBlock.UP), "straight runs have no post");
+        require(straight.getShape(world, pos).bounds().maxY == 13 / 16.0,
                 "straight selection follows the lower wall");
-        require(trace(blue, world, pos, new Vec3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
-                new Vec3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1)) == null,
+        require(trace(blue, world, pos, new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
+                new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1)) == null,
                 "no invisible selectable post in a straight run");
         world.removeBlock(pos.south(), false);
-        require(blueWall.getActualState(blue, world, pos).get(WallBlock.UP),
+        require(blueWall.getActualState(blue, world, pos).getValue(WallBlock.UP),
                 "removing the next piece creates an end post");
-        world.setBlockState(pos.south(), blue, 3);
-        require(!blueWall.getActualState(blue, world, pos).get(WallBlock.UP),
+        world.setBlock(pos.south(), blue, 3);
+        require(!blueWall.getActualState(blue, world, pos).getValue(WallBlock.UP),
                 "extending the wall removes its previous end post");
-        world.setBlockState(pos.up(), Blocks.STONE.getDefaultState(), 3);
-        require(blueWall.getActualState(blue, world, pos).get(WallBlock.UP),
+        world.setBlock(pos.above(), Blocks.STONE.defaultBlockState(), 3);
+        require(blueWall.getActualState(blue, world, pos).getValue(WallBlock.UP),
                 "overhead blocks keep their supporting post");
-        world.removeBlock(pos.up(), false);
-        require(!blueWall.getActualState(blue, world, pos).get(WallBlock.UP),
+        world.removeBlock(pos.above(), false);
+        require(!blueWall.getActualState(blue, world, pos).getValue(WallBlock.UP),
                 "removing overhead support removes the post again");
         world.removeBlock(pos, false);
 
         for (Direction side : sides) {
-            world.removeBlock(pos.offset(side), false);
+            world.removeBlock(pos.relative(side), false);
         }
 
         require(checked == materials * 32, "all wall materials, connection profiles and overhead states");
@@ -154,19 +156,19 @@ public final class PresentationChecks {
     }
 
     public static void names() {
-        require(Pieces.stack(Pieces.state("minecraft:gold_block", Shape.WALL, 0), 1).getDisplayName().getString()
+        require(Pieces.stack(Pieces.state("minecraft:gold_block", Shape.WALL, 0), 1).getHoverName().getString()
                 .equals("Gold Wall"), "gold wall display name");
-        require(Pieces.stack(Pieces.state("minecraft:gold_block", Shape.STAIRS, 0), 1).getDisplayName().getString()
+        require(Pieces.stack(Pieces.state("minecraft:gold_block", Shape.STAIRS, 0), 1).getHoverName().getString()
                 .equals("Gold Stairs"), "gold stair display name");
-        require(Pieces.stack(Pieces.state("minecraft:planks_oak", Shape.HORIZONTAL_STEP, 0), 1).getDisplayName()
+        require(Pieces.stack(Pieces.state("minecraft:planks_oak", Shape.HORIZONTAL_STEP, 0), 1).getHoverName()
                 .getString().equals("Oak Step"), "wood piece display name");
-        require(new ItemStack(Blocks.GOLD_BLOCK).getDisplayName().getString().equals("Block of Gold"),
+        require(new ItemStack(Blocks.GOLD_BLOCK).getHoverName().getString().equals("Block of Gold"),
                 "vanilla full block name is unchanged");
 
         ItemStack named = Pieces.stack(Pieces.state("minecraft:gold_block", Shape.WALL, 0), 1);
 
-        named.setDisplayName(new net.minecraft.util.text.StringTextComponent("My Wall"));
-        require(named.getDisplayName().getString().equals("My Wall"), "custom item names are preserved");
+        named.setHoverName(new net.minecraft.util.text.StringTextComponent("My Wall"));
+        require(named.getHoverName().getString().equals("My Wall"), "custom item names are preserved");
 
         int checked = 0;
 
@@ -176,7 +178,7 @@ public final class PresentationChecks {
 
                 for (int orientation = 0; orientation < block.palette.shape.states; orientation++) {
                     ItemStack stack = Pieces.stack(Pieces.state(material, block.palette.shape, orientation), 1);
-                    String name = stack.getDisplayName().getString();
+                    String name = stack.getHoverName().getString();
 
                     require(!name.contains("pieces.") && !name.contains("material.") && !name.contains("%"),
                             "resolved piece name");
@@ -191,11 +193,11 @@ public final class PresentationChecks {
             }
         }
         if (zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.modules.containsKey("biomesoplenty")) {
-            require(Pieces.stack(Pieces.state("biomesoplenty:sapphire_block", Shape.WALL, 0), 1).getDisplayName()
+            require(Pieces.stack(Pieces.state("biomesoplenty:sapphire_block", Shape.WALL, 0), 1).getHoverName()
                     .getString().equals("Light Blue Terracotta Wall"),
                     "retired sapphire uses its current material name");
             require(Pieces.stack(Pieces.state("biomesoplenty:planks_redwood", Shape.HORIZONTAL_STEP, 0), 1)
-                    .getDisplayName().getString().equals("Redwood Step"), "BOP wood display name");
+                    .getHoverName().getString().equals("Redwood Step"), "BOP wood display name");
         }
 
         System.out.println("BUILDING_PIECES_NAMES_PASS states=" + checked);
@@ -224,7 +226,7 @@ public final class PresentationChecks {
 
             PieceBlock block = (PieceBlock) wall.getBlock();
 
-            require(block.getStateContainer().getValidStates().size() == block.palette.materials.size() * 64,
+            require(block.getStateDefinition().getPossibleStates().size() == block.palette.materials.size() * 64,
                     "matching textures add no listed states");
 
             for (int connections = 0; connections < 16; connections++) {
@@ -233,14 +235,14 @@ public final class PresentationChecks {
                         continue;
                     }
 
-                    world.setBlockState(pos, wall, 2);
-                    world.removeBlock(pos.up(), false);
+                    world.setBlock(pos, wall, 2);
+                    world.removeBlock(pos.above(), false);
 
                     for (int entryIndex = 0; entryIndex < sides.length; entryIndex++) {
                         if ((connections & (1 << entryIndex)) == 0) {
-                            world.removeBlock(pos.offset(sides[entryIndex]), false);
+                            world.removeBlock(pos.relative(sides[entryIndex]), false);
                         } else {
-                            world.setBlockState(pos.offset(sides[entryIndex]),
+                            world.setBlock(pos.relative(sides[entryIndex]),
                                     (matching & (1 << entryIndex)) != 0 ? wall : different, 2);
                         }
                     }
@@ -249,11 +251,11 @@ public final class PresentationChecks {
                     int joined = joins(world, pos, actual);
 
                     require(joined == matching, "only identical glass materials lose their border");
-                    require(actual.get(PieceBlock.CONNECTIONS) == connections,
+                    require(actual.getValue(PieceBlock.CONNECTIONS) == connections,
                             "colour changes do not disconnect the wall");
                     require(block.getMetaFromState(actual) == block.getMetaFromState(wall),
                             "render joins do not change the palette value");
-                    require(block.getStateContainer().getValidStates().size() == block.palette.materials.size() * 64,
+                    require(block.getStateDefinition().getPossibleStates().size() == block.palette.materials.size() * 64,
                             "render joins do not add listed save states");
                     checked++;
                 }
@@ -262,13 +264,13 @@ public final class PresentationChecks {
         for (BlockState wall : materials) {
             for (BlockState neighbour : materials) {
                 for (int side = 0; side < sides.length; side++) {
-                    world.setBlockState(pos, wall, 2);
+                    world.setBlock(pos, wall, 2);
 
                     for (Direction facing : sides) {
-                        world.removeBlock(pos.offset(facing), false);
+                        world.removeBlock(pos.relative(facing), false);
                     }
 
-                    world.setBlockState(pos.offset(sides[side]), neighbour, 2);
+                    world.setBlock(pos.relative(sides[side]), neighbour, 2);
 
                     PieceBlock block = (PieceBlock) wall.getBlock();
                     PieceBlock other = (PieceBlock) neighbour.getBlock();
@@ -285,7 +287,7 @@ public final class PresentationChecks {
         world.removeBlock(pos, false);
 
         for (Direction side : sides) {
-            world.removeBlock(pos.offset(side), false);
+            world.removeBlock(pos.relative(side), false);
         }
 
         require(checked == 2533, "every connection combination and clear/stained colour pair");
@@ -297,7 +299,7 @@ public final class PresentationChecks {
         Direction[] sides = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
         ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
 
-        player.abilities.isCreativeMode = false;
+        player.abilities.instabuild = false;
 
         int checked = 0;
 
@@ -311,50 +313,50 @@ public final class PresentationChecks {
                             (TorchBlock) Blocks.REDSTONE_TORCH }) {
                         BlockState wall = block.getStateFromMeta(material);
 
-                        world.setBlockState(pos, wall, 3);
-                        world.removeBlock(pos.up(), false);
+                        world.setBlock(pos, wall, 3);
+                        world.removeBlock(pos.above(), false);
 
                         for (int entryIndex = 0; entryIndex < sides.length; entryIndex++) {
                             if ((connections & (1 << entryIndex)) == 0) {
-                                world.removeBlock(pos.offset(sides[entryIndex]), false);
+                                world.removeBlock(pos.relative(sides[entryIndex]), false);
                             } else {
-                                world.setBlockState(pos.offset(sides[entryIndex]), wall, 3);
+                                world.setBlock(pos.relative(sides[entryIndex]), wall, 3);
                             }
                         }
 
-                        require(torch.isValidPosition(torch.getDefaultState(), world, pos.up()),
+                        require(torch.canSurvive(torch.defaultBlockState(), world, pos.above()),
                                 "wall supports a top torch " + block.getRegistryName());
 
-                        ItemStack stack = new ItemStack(Item.getItemFromBlock(torch), 2);
+                        ItemStack stack = new ItemStack(Item.byBlock(torch), 2);
 
-                        player.setHeldItem(Hand.MAIN_HAND, stack);
-                        require(stack.onItemUse(new ItemUseContext(player, Hand.MAIN_HAND,
-                                new BlockRayTraceResult(new Vec3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
-                                        Direction.UP, pos, false))) == ActionResultType.SUCCESS,
+                        player.setItemInHand(Hand.MAIN_HAND, stack);
+                        require(stack.useOn(new ItemUseContext(player, Hand.MAIN_HAND,
+                                new BlockRayTraceResult(new Vector3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
+                                        Direction.UP, pos, false))) == ActionResultType.CONSUME,
                                 "torch places on wall");
 
-                        BlockState placed = world.getBlockState(pos.up());
+                        BlockState placed = world.getBlockState(pos.above());
 
                         require(placed.getBlock() == torch && stack.getCount() == 1, "upright torch consumes one item");
-                        torch.neighborChanged(placed, world, pos.up(), block, pos, false);
-                        require(world.getBlockState(pos.up()).getBlock() == torch, "torch survives a neighbour update");
+                        torch.neighborChanged(placed, world, pos.above(), block, pos, false);
+                        require(world.getBlockState(pos.above()).getBlock() == torch, "torch survives a neighbour update");
 
-                        if (wall.has(WallBlock.UP)) {
-                            require(block.getActualState(wall, world, pos).get(WallBlock.UP),
+                        if (wall.hasProperty(WallBlock.UP)) {
+                            require(block.getActualState(wall, world, pos).getValue(WallBlock.UP),
                                     "torch creates its supporting post");
                         }
 
-                        world.removeBlock(pos.up(), false);
+                        world.removeBlock(pos.above(), false);
 
-                        if (wall.has(WallBlock.UP)) {
+                        if (wall.hasProperty(WallBlock.UP)) {
                             require(block.getActualState(wall, world, pos)
-                                    .get(WallBlock.UP) == (connections != 5 && connections != 10),
+                                    .getValue(WallBlock.UP) == (connections != 5 && connections != 10),
                                     "removing torch restores the wall profile");
                         }
 
-                        world.setBlockState(pos.up(), placed, 3);
+                        world.setBlock(pos.above(), placed, 3);
                         world.removeBlock(pos, false);
-                        require(world.isAirBlock(pos.up()), "torch drops when its wall is removed");
+                        require(world.isEmptyBlock(pos.above()), "torch drops when its wall is removed");
                         checked++;
                     }
                 }
@@ -362,10 +364,10 @@ public final class PresentationChecks {
         }
 
         world.removeBlock(pos, false);
-        world.removeBlock(pos.up(), false);
+        world.removeBlock(pos.above(), false);
 
         for (Direction side : sides) {
-            world.removeBlock(pos.offset(side), false);
+            world.removeBlock(pos.relative(side), false);
         }
 
         System.out.println("BUILDING_PIECES_WALL_TORCH_PASS cases=" + checked);
@@ -373,15 +375,15 @@ public final class PresentationChecks {
 
     private static boolean visible(PieceBlock block, BlockState state, ServerWorld world, BlockPos position,
             Direction side) {
-        return !block.isSideInvisible(block.getActualState(state, world, position),
-                world.getBlockState(position.offset(side)), side);
+        return !block.skipRendering(block.getActualState(state, world, position),
+                world.getBlockState(position.relative(side)), side);
     }
 
-    private static BlockRayTraceResult trace(BlockState state, ServerWorld world, BlockPos position, Vec3d start,
-            Vec3d end) {
+    private static BlockRayTraceResult trace(BlockState state, ServerWorld world, BlockPos position, Vector3d start,
+            Vector3d end) {
         PieceBlock block = (PieceBlock) state.getBlock();
 
-        return block.getActualState(state, world, position).getShape(world, position).rayTrace(start, end, position);
+        return block.getActualState(state, world, position).getShape(world, position).clip(start, end, position);
     }
 
     @SuppressWarnings("unchecked")
@@ -414,26 +416,26 @@ public final class PresentationChecks {
 
     public static void gallery(ServerWorld world) {
         world.setDayTime(6000);
-        world.getGameRules().get(net.minecraft.world.GameRules.DO_DAYLIGHT_CYCLE).set(false, world.getServer());
+        world.getGameRules().getRule(net.minecraft.world.GameRules.RULE_DAYLIGHT).set(false, world.getServer());
 
         for (int blockX = 0; blockX <= 12; blockX++) {
             for (int blockZ = 0; blockZ <= 11; blockZ++) {
-                world.setBlockState(new BlockPos(blockX, 63, blockZ), Blocks.GRASS_BLOCK.getDefaultState(), 2);
+                world.setBlock(new BlockPos(blockX, 63, blockZ), Blocks.GRASS_BLOCK.defaultBlockState(), 2);
             }
         }
         for (int blockX = 3; blockX <= 7; blockX++) {
-            world.setBlockState(new BlockPos(blockX, 64, 3),
+            world.setBlock(new BlockPos(blockX, 64, 3),
                     Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0), 2);
-            world.setBlockState(new BlockPos(blockX, 64, 7), Pieces.state("minecraft:glass", Shape.WALL, 0), 2);
+            world.setBlock(new BlockPos(blockX, 64, 7), Pieces.state("minecraft:glass", Shape.WALL, 0), 2);
         }
         for (int blockZ = 4; blockZ <= 5; blockZ++) {
-            world.setBlockState(new BlockPos(7, 64, blockZ),
+            world.setBlock(new BlockPos(7, 64, blockZ),
                     Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0), 2);
         }
 
-        world.setBlockState(new BlockPos(5, 64, 2), Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0), 2);
-        world.setBlockState(new BlockPos(1, 64, 3), Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0), 2);
-        world.setBlockState(new BlockPos(1, 64, 7), Pieces.state("minecraft:glass", Shape.WALL, 0), 2);
+        world.setBlock(new BlockPos(5, 64, 2), Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0), 2);
+        world.setBlock(new BlockPos(1, 64, 3), Pieces.state("minecraft:stained_glass_blue", Shape.WALL, 0), 2);
+        world.setBlock(new BlockPos(1, 64, 7), Pieces.state("minecraft:glass", Shape.WALL, 0), 2);
     }
 
     private PresentationChecks() {

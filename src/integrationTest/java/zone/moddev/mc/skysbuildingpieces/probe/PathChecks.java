@@ -1,5 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
+import net.minecraft.util.math.vector.Vector3d;
+
 import java.util.Collections;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
@@ -31,10 +33,10 @@ public final class PathChecks {
         ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
         BlockPos position = new BlockPos(-760, 95, -760);
 
-        world.setBlockState(position.down(), Blocks.DIRT.getDefaultState(), 2);
-        world.removeBlock(position.up(), false);
-        player.abilities.allowEdit = true;
-        player.abilities.isCreativeMode = false;
+        world.setBlock(position.below(), Blocks.DIRT.defaultBlockState(), 2);
+        world.removeBlock(position.above(), false);
+        player.abilities.mayBuild = true;
+        player.abilities.instabuild = false;
 
         int conversions = 0;
 
@@ -50,39 +52,39 @@ public final class PathChecks {
                                 continue;
                             }
 
-                            world.setBlockState(position, source, 2);
-                            world.setBlockState(position.down(), Blocks.GRASS_BLOCK.getDefaultState(), 2);
+                            world.setBlock(position, source, 2);
+                            world.setBlock(position.below(), Blocks.GRASS_BLOCK.defaultBlockState(), 2);
 
                             ItemStack shovel = new ItemStack(Items.IRON_SHOVEL);
 
-                            shovel.setDamage(3);
+                            shovel.setDamageValue(3);
                             require(click(world, player, position, shovel, hand, face) == ActionResultType.SUCCESS,
                                     "a handled shovel click must not fall through to the other hand");
                             expected = ((PieceBlock) expected.getBlock()).getActualState(expected, world, position);
                             require(world.getBlockState(position).equals(expected), "shovel orientation " + material
                                     + " / " + shape + " / " + orientation + " became " + world.getBlockState(position));
-                            require(shovel.getDamage() == 4, "one successful use costs exactly one durability");
+                            require(shovel.getDamageValue() == 4, "one successful use costs exactly one durability");
 
                             BlockState support = material.equals("minecraft:grass")
-                                    ? Blocks.GRASS_PATH.getDefaultState()
-                                    : Blocks.GRASS_BLOCK.getDefaultState();
+                                    ? Blocks.GRASS_PATH.defaultBlockState()
+                                    : Blocks.GRASS_BLOCK.defaultBlockState();
 
-                            require(world.getBlockState(position.down()).equals(support),
+                            require(world.getBlockState(position.below()).equals(support),
                                     "only flattening a grass piece also flattens its grass support");
                             // Notify the support as ordinary building would; a one-tick conversion is not enough.
-                            support.getBlock().neighborChanged(support, world, position.down(), expected.getBlock(),
+                            support.getBlock().neighborChanged(support, world, position.below(), expected.getBlock(),
                                     position, false);
 
                             if (support.getBlock() == Blocks.GRASS_PATH) {
-                                require(support.isValidPosition(world, position.down()),
+                                require(support.canSurvive(world, position.below()),
                                         "partial path pieces do not schedule a covered-path conversion");
                             }
 
-                            require(world.getBlockState(position.down()).equals(support),
+                            require(world.getBlockState(position.below()).equals(support),
                                     "path support must survive neighbour updates beneath a path piece");
 
-                            AxisAlignedBB originalBounds = source.getShape(world, position).getBoundingBox();
-                            AxisAlignedBB pathBounds = expected.getShape(world, position).getBoundingBox();
+                            AxisAlignedBB originalBounds = source.getShape(world, position).bounds();
+                            AxisAlignedBB pathBounds = expected.getShape(world, position).bounds();
                             double base = originalBounds.minY;
 
                             if (material.equals("minecraft:grass") && base == 0) {
@@ -91,7 +93,7 @@ public final class PathChecks {
 
                             require(Math.abs(pathBounds.minY - base) < 1e-9,
                                     "the path base meets its support without moving the top");
-                            require(expected.getMaterial().blocksMovement() && !expected.getMaterial().isReplaceable(),
+                            require(expected.getMaterial().blocksMotion() && !expected.getMaterial().isReplaceable(),
                                     "path pieces retain collision and cannot be overwritten");
                             conversions++;
                         }
@@ -101,78 +103,78 @@ public final class PathChecks {
 
                     require(path.mask(expected) == Geometry.mask(shape, orientation), "path footprint changed");
 
-                    double sourceTop = source.getShape(world, position).getBoundingBox().maxY;
-                    AxisAlignedBB bounds = expected.getShape(world, position).getBoundingBox();
+                    double sourceTop = source.getShape(world, position).bounds().maxY;
+                    AxisAlignedBB bounds = expected.getShape(world, position).bounds();
 
                     require(Math.abs(bounds.maxY - (sourceTop - 1.0 / 16.0)) < 1e-9, "path surface height");
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
-                    silkTool.addEnchantment(net.minecraft.enchantment.Enchantments.SILK_TOUCH, 1);
-                    require(ItemStack.areItemStacksEqual(
+                    silkTool.enchant(net.minecraft.enchantment.Enchantments.SILK_TOUCH, 1);
+                    require(ItemStack.matches(
                             Block.getDrops(expected, world, position, null, player, silkTool).get(0),
                             Pieces.stack(Pieces.state("minecraft:dirt", shape, orientation), 1)),
                             "paths drop dirt even with Silk Touch");
 
                     ItemStack drop = Block.getDrops(expected, world, position, null, player, ItemStack.EMPTY).get(0);
 
-                    require(ItemStack.areItemStacksEqual(drop,
+                    require(ItemStack.matches(drop,
                             Pieces.stack(Pieces.state("minecraft:dirt", shape, orientation), 1)), "matching dirt drop");
-                    world.setBlockState(position.up(), Blocks.STONE.getDefaultState(), 3);
+                    world.setBlock(position.above(), Blocks.STONE.defaultBlockState(), 3);
                     require(world.getBlockState(position).equals(Pieces.state("minecraft:dirt", shape, orientation)),
                             "covered path retains its shape as dirt");
-                    world.removeBlock(position.up(), false);
+                    world.removeBlock(position.above(), false);
                 }
             }
         }
 
         BlockState corner = Pieces.state("minecraft:grass", Shape.CORNER, 4);
 
-        world.setBlockState(position, corner, 2);
+        world.setBlock(position, corner, 2);
 
         ItemStack shovel = new ItemStack(Items.IRON_SHOVEL);
 
         click(world, player, position, shovel, Hand.MAIN_HAND, Direction.DOWN);
-        require(world.getBlockState(position).equals(corner) && shovel.getDamage() == 0,
+        require(world.getBlockState(position).equals(corner) && shovel.getDamageValue() == 0,
                 "underside cannot be flattened");
-        player.abilities.allowEdit = false;
+        player.abilities.mayBuild = false;
         click(world, player, position, shovel, Hand.MAIN_HAND, Direction.UP);
-        require(world.getBlockState(position).equals(corner) && shovel.getDamage() == 0, "edit permission is required");
-        player.abilities.allowEdit = true;
-        world.setBlockState(position.up(), Blocks.STONE.getDefaultState(), 2);
+        require(world.getBlockState(position).equals(corner) && shovel.getDamageValue() == 0, "edit permission is required");
+        player.abilities.mayBuild = true;
+        world.setBlock(position.above(), Blocks.STONE.defaultBlockState(), 2);
         click(world, player, position, shovel, Hand.MAIN_HAND, Direction.UP);
-        require(world.getBlockState(position).equals(corner) && shovel.getDamage() == 0, "blocked paths are rejected");
-        world.removeBlock(position.up(), false);
+        require(world.getBlockState(position).equals(corner) && shovel.getDamageValue() == 0, "blocked paths are rejected");
+        world.removeBlock(position.above(), false);
         click(world, player, position, new ItemStack(Items.IRON_AXE), Hand.MAIN_HAND, Direction.UP);
         require(world.getBlockState(position).equals(corner), "axes do not flatten pieces");
 
-        player.abilities.isCreativeMode = true;
+        player.abilities.instabuild = true;
         click(world, player, position, shovel, Hand.OFF_HAND, Direction.UP);
-        require(shovel.getDamage() == 0 && !world.getBlockState(position).equals(corner), "creative shovel durability");
-        player.abilities.isCreativeMode = false;
+        require(shovel.getDamageValue() == 0 && !world.getBlockState(position).equals(corner), "creative shovel durability");
+        player.abilities.instabuild = false;
 
-        Item compatible = new Item(new Item.Properties().defaultMaxDamage(50)) {
+        Item compatible = new Item(new Item.Properties().defaultDurability(50)) {
             @Override
             public java.util.Set<net.minecraftforge.common.ToolType> getToolTypes(ItemStack stack) {
                 return Collections.singleton(net.minecraftforge.common.ToolType.SHOVEL);
             }
         };
 
-        world.setBlockState(position, corner, 2);
+        world.setBlock(position, corner, 2);
 
         ItemStack custom = new ItemStack(compatible);
 
         click(world, player, position, custom, Hand.MAIN_HAND, Direction.UP);
-        require(custom.getDamage() == 1 && !world.getBlockState(position).equals(corner), "registered shovel support");
+        require(custom.getDamageValue() == 1 && !world.getBlockState(position).equals(corner), "registered shovel support");
 
-        world.setBlockState(position, corner, 2);
-        player.setSneaking(true);
+        world.setBlock(position, corner, 2);
+        player.setShiftKeyDown(true);
 
         ItemStack sneaking = new ItemStack(Items.IRON_SHOVEL);
 
         require(click(world, player, position, sneaking, Hand.MAIN_HAND, Direction.UP) == ActionResultType.SUCCESS
-                && sneaking.getDamage() == 1, "sneaking still activates the shovel once");
-        player.setSneaking(false);
+                && sneaking.getDamageValue() == 1, "sneaking still activates the shovel once");
+        player.setShiftKeyDown(false);
 
         int slabs = slabs(world, player, position);
 
@@ -187,52 +189,52 @@ public final class PathChecks {
     private static void supportChecks(ServerWorld world, ServerPlayerEntity player, BlockPos position) {
         BlockState grassCorner = Pieces.state("minecraft:grass", Shape.CORNER, 4);
 
-        for (BlockState support : new BlockState[] { Blocks.DIRT.getDefaultState(), Blocks.STONE.getDefaultState(),
-                Blocks.GRASS_PATH.getDefaultState(), Blocks.FARMLAND.getDefaultState(),
-                Blocks.CHEST.getDefaultState() }) {
+        for (BlockState support : new BlockState[] { Blocks.DIRT.defaultBlockState(), Blocks.STONE.defaultBlockState(),
+                Blocks.GRASS_PATH.defaultBlockState(), Blocks.FARMLAND.defaultBlockState(),
+                Blocks.CHEST.defaultBlockState() }) {
             world.removeBlock(position, false);
-            world.setBlockState(position.down(), support, 2);
-            world.setBlockState(position, grassCorner, 2);
+            world.setBlock(position.below(), support, 2);
+            world.setBlock(position, grassCorner, 2);
 
             // Native farmland may already turn to dirt when the piece is placed. The shovel must leave the resulting
             // non-grass support untouched.
-            BlockState beforeClick = world.getBlockState(position.down());
+            BlockState beforeClick = world.getBlockState(position.below());
             ItemStack shovel = new ItemStack(Items.IRON_SHOVEL);
 
             click(world, player, position, shovel, Hand.MAIN_HAND, Direction.UP);
-            require(world.getBlockState(position.down()).equals(beforeClick), "non-grass supports stay unchanged");
+            require(world.getBlockState(position.below()).equals(beforeClick), "non-grass supports stay unchanged");
         }
 
         world.removeBlock(position, false);
-        world.setBlockState(position.down(), Blocks.GRASS_BLOCK.getDefaultState(), 2);
-        world.setBlockState(position, grassCorner, 2);
-        world.setBlockState(position.up(), Blocks.STONE.getDefaultState(), 2);
+        world.setBlock(position.below(), Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+        world.setBlock(position, grassCorner, 2);
+        world.setBlock(position.above(), Blocks.STONE.defaultBlockState(), 2);
 
         ItemStack shovel = new ItemStack(Items.IRON_SHOVEL);
 
         click(world, player, position, shovel, Hand.MAIN_HAND, Direction.UP);
-        require(world.getBlockState(position.down()).getBlock() == Blocks.GRASS_BLOCK && shovel.getDamage() == 0,
+        require(world.getBlockState(position.below()).getBlock() == Blocks.GRASS_BLOCK && shovel.getDamageValue() == 0,
                 "a rejected click cannot change the support");
-        world.removeBlock(position.up(), false);
+        world.removeBlock(position.above(), false);
 
-        player.abilities.isCreativeMode = true;
+        player.abilities.instabuild = true;
         click(world, player, position, shovel, Hand.OFF_HAND, Direction.UP);
-        require(world.getBlockState(position.down()).getBlock() == Blocks.GRASS_PATH && shovel.getDamage() == 0,
+        require(world.getBlockState(position.below()).getBlock() == Blocks.GRASS_PATH && shovel.getDamageValue() == 0,
                 "creative mode flattens both blocks without tool wear");
-        player.abilities.isCreativeMode = false;
+        player.abilities.instabuild = false;
 
         // A solid replacement still restores vanilla dirt; only the partial path allows this support.
-        world.setBlockState(position, Blocks.STONE.getDefaultState(), 3);
+        world.setBlock(position, Blocks.STONE.defaultBlockState(), 3);
 
         // Native paths schedule their covered-block check instead of changing immediately during the neighbour
         // notification.
-        BlockState coveredSupport = world.getBlockState(position.down());
+        BlockState coveredSupport = world.getBlockState(position.below());
 
-        require(!coveredSupport.isValidPosition(world, position.down())
-                && world.getPendingBlockTicks().isTickScheduled(position.down(), Blocks.GRASS_PATH),
+        require(!coveredSupport.canSurvive(world, position.below())
+                && world.getBlockTicks().hasScheduledTick(position.below(), Blocks.GRASS_PATH),
                 "solid cover schedules the native path conversion");
-        coveredSupport.getBlock().tick(coveredSupport, world, position.down(), new java.util.Random(0));
-        require(world.getBlockState(position.down()).getBlock() == Blocks.DIRT,
+        coveredSupport.getBlock().tick(coveredSupport, world, position.below(), new java.util.Random(0));
+        require(world.getBlockState(position.below()).getBlock() == Blocks.DIRT,
                 "solid cover still restores a vanilla path support to dirt");
         world.removeBlock(position, false);
     }
@@ -243,14 +245,14 @@ public final class PathChecks {
 
         for (Shape shape : new Shape[] { Shape.HORIZONTAL_STEP, Shape.VERTICAL_STEP, Shape.CORNER }) {
             for (int orientation = 0; orientation < shape.states; orientation++) {
-                BlockPos position = origin.add(checked % 5, 0, checked / 5);
+                BlockPos position = origin.offset(checked % 5, 0, checked / 5);
                 BlockState path = Pieces.state("minecraft:grass_path", shape, orientation);
 
                 if (!requireExisting) {
                     world.removeBlock(position, false);
-                    world.removeBlock(position.up(), false);
-                    world.setBlockState(position.down(), Blocks.GRASS_BLOCK.getDefaultState(), 2);
-                    world.setBlockState(position, Pieces.state("minecraft:grass", shape, orientation), 2);
+                    world.removeBlock(position.above(), false);
+                    world.setBlock(position.below(), Blocks.GRASS_BLOCK.defaultBlockState(), 2);
+                    world.setBlock(position, Pieces.state("minecraft:grass", shape, orientation), 2);
                     click(world, player, position, new ItemStack(Items.IRON_SHOVEL), Hand.MAIN_HAND, Direction.UP);
                 }
 
@@ -258,7 +260,7 @@ public final class PathChecks {
 
                 path = ((PieceBlock) path.getBlock()).getActualState(path, world, position);
                 require(loaded.equals(path), "saved path piece above grass support: " + position);
-                require(world.getBlockState(position.down()).getBlock() == Blocks.GRASS_PATH,
+                require(world.getBlockState(position.below()).getBlock() == Blocks.GRASS_PATH,
                         "saved path support survives reload");
                 checked++;
             }
@@ -273,20 +275,20 @@ public final class PathChecks {
         BlockPos chestPosition = origin.south(6);
 
         if (!requireExisting) {
-            world.setBlockState(chestPosition, Blocks.CHEST.getDefaultState(), 2);
+            world.setBlock(chestPosition, Blocks.CHEST.defaultBlockState(), 2);
         }
 
-        require(world.getTileEntity(chestPosition) instanceof net.minecraft.tileentity.ChestTileEntity,
+        require(world.getBlockEntity(chestPosition) instanceof net.minecraft.tileentity.ChestTileEntity,
                 "saved path fixture chest");
 
         net.minecraft.tileentity.ChestTileEntity chest = (net.minecraft.tileentity.ChestTileEntity) world
-                .getTileEntity(chestPosition);
+                .getBlockEntity(chestPosition);
         int slot = 0;
 
         for (Shape shape : new Shape[] { Shape.STEP, Shape.CORNER }) {
             for (int orientation = 0; orientation < shape.states; orientation++) {
                 BlockState expected = Pieces.state("minecraft:grass_path", shape, orientation);
-                BlockPos position = origin.add(slot % 5, 0, slot / 5);
+                BlockPos position = origin.offset(slot % 5, 0, slot / 5);
                 ItemStack stack = Pieces.stack(expected, slot + 1);
                 net.minecraft.nbt.CompoundNBT data = new net.minecraft.nbt.CompoundNBT();
 
@@ -301,12 +303,12 @@ public final class PathChecks {
                 if (requireExisting) {
                     require(world.getBlockState(position).equals(expected),
                             "saved path state " + shape + " / " + orientation);
-                    require(ItemStack.areItemStacksEqual(chest.getStackInSlot(slot), stack),
+                    require(ItemStack.matches(chest.getItem(slot), stack),
                             "saved path inventory " + shape + " / " + orientation);
                 } else {
-                    world.removeBlock(position.up(), false);
-                    world.setBlockState(position, expected, 2);
-                    chest.setInventorySlotContents(slot, stack);
+                    world.removeBlock(position.above(), false);
+                    world.setBlock(position, expected, 2);
+                    chest.setItem(slot, stack);
                 }
 
                 slot++;
@@ -333,13 +335,13 @@ public final class PathChecks {
 
             for (net.minecraft.state.properties.SlabType half : new net.minecraft.state.properties.SlabType[] {
                     net.minecraft.state.properties.SlabType.BOTTOM, net.minecraft.state.properties.SlabType.TOP }) {
-                world.setBlockState(position, slab.getDefaultState().with(SlabBlock.TYPE, half), 2);
+                world.setBlock(position, slab.defaultBlockState().setValue(SlabBlock.TYPE, half), 2);
 
                 ItemStack shovel = new ItemStack(Items.IRON_SHOVEL);
 
                 click(world, player, position, shovel, Hand.MAIN_HAND, Direction.UP);
-                require(world.getBlockState(position).equals(path.getDefaultState().with(SlabBlock.TYPE, half))
-                        && shovel.getDamage() == 1, "normal dirt/grass slab shovel regression");
+                require(world.getBlockState(position).equals(path.defaultBlockState().setValue(SlabBlock.TYPE, half))
+                        && shovel.getDamageValue() == 1, "normal dirt/grass slab shovel regression");
                 checks++;
             }
         }
@@ -349,9 +351,9 @@ public final class PathChecks {
 
     private static ActionResultType click(ServerWorld world, ServerPlayerEntity player, BlockPos position,
             ItemStack tool, Hand hand, Direction face) {
-        player.setHeldItem(hand, tool);
-        return player.interactionManager.func_219441_a(player, world, tool, hand,
-                new net.minecraft.util.math.BlockRayTraceResult(new net.minecraft.util.math.Vec3d(position.getX() + .25,
+        player.setItemInHand(hand, tool);
+        return player.gameMode.useItemOn(player, world, tool, hand,
+                new net.minecraft.util.math.BlockRayTraceResult(new net.minecraft.util.math.vector.Vector3d(position.getX() + .25,
                         position.getY() + .75, position.getZ() + .25), face, position, false));
     }
 

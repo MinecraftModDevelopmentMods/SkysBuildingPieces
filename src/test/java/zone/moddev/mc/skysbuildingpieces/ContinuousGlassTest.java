@@ -104,7 +104,7 @@ class ContinuousGlassTest {
                 return original;
             }
 
-            public boolean isAmbientOcclusion() {
+            public boolean useAmbientOcclusion() {
                 return false;
             }
 
@@ -112,19 +112,19 @@ class ContinuousGlassTest {
                 return true;
             }
 
-            public boolean func_230044_c_() {
+            public boolean usesBlockLight() {
                 return true;
             }
 
-            public boolean isBuiltInRenderer() {
+            public boolean isCustomRenderer() {
                 return false;
             }
 
-            public TextureAtlasSprite getParticleTexture() {
+            public TextureAtlasSprite getParticleIcon() {
                 return null;
             }
 
-            public ItemCameraTransforms getItemCameraTransforms() {
+            public ItemCameraTransforms getTransforms() {
                 return null;
             }
 
@@ -145,19 +145,19 @@ class ContinuousGlassTest {
         BakedQuad trimmed = joined.get(0);
 
         assertNotSame(source, trimmed);
-        assertArrayEquals(GlassWallTexture.trim(data, stride, 0, 4, 5), trimmed.getVertexData());
+        assertArrayEquals(GlassWallTexture.trim(data, stride, 0, 4, 5), trimmed.getVertices());
         assertEquals(3, trimmed.getTintIndex());
-        assertEquals(Direction.WEST, trimmed.getFace());
-        assertFalse(trimmed.shouldApplyDiffuseLighting());
-        assertSame(source.func_187508_a(), trimmed.func_187508_a());
-        assertEquals(stride * 4, trimmed.getVertexData().length);
-        assertFalse(model.isAmbientOcclusion());
+        assertEquals(Direction.WEST, trimmed.getDirection());
+        assertFalse(trimmed.isShade());
+        assertSame(source.getSprite(), trimmed.getSprite());
+        assertEquals(stride * 4, trimmed.getVertices().length);
+        assertFalse(model.useAmbientOcclusion());
         assertTrue(model.isGui3d());
-        assertTrue(model.func_230044_c_());
-        assertFalse(model.isBuiltInRenderer());
+        assertTrue(model.usesBlockLight());
+        assertFalse(model.isCustomRenderer());
         assertSame(base.getOverrides(), model.getOverrides());
-        assertSame(base.getParticleTexture(), model.getParticleTexture());
-        assertSame(base.getItemCameraTransforms(), model.getItemCameraTransforms());
+        assertSame(base.getParticleIcon(), model.getParticleIcon());
+        assertSame(base.getTransforms(), model.getTransforms());
     }
 
     private static IModelData data(int joins) {

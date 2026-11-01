@@ -6,7 +6,7 @@ The generated `runMineralogyClient` Eclipse profile loads the native mods in
 a separate development folder. Check rock textures, all step and corner
 orientations, cutting recipes and rebuilding to the native slab.
 
-Install the main jar in a Minecraft 1.15.2 Forge 31.2.57 instance using
+Install the main jar in a Minecraft 1.16.5 Forge 36.2.34 instance using
 Java 8. The sources and Javadoc jars are not game mods. Start with a new
 creative world; use a separate copy when trying an existing world.
 

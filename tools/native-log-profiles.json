@@ -1,0 +1,66 @@
+{
+  "profiles": {
+    "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.14.4.zip",
+      "sha256": "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209",
+      "source_jar_sha256": "8A0A1DEA2A4A6C069519C7B1BCF28331186FF2DF6284DB72C2FFDB8178FC84D4",
+      "mappings": {
+        "minecraft:entity_type": {
+          "minecraft:zombie_pigman": 56
+        },
+        "minecraft:item": {
+          "minecraft:zombie_pigman_spawn_egg": 753
+        },
+        "minecraft:memory_module_type": {
+          "minecraft:golem_last_seen_time": 24,
+          "minecraft:opened_doors": 16
+        },
+        "minecraft:sound_event": {
+          "minecraft:entity.zombie_pigman.ambient": 784,
+          "minecraft:entity.zombie_pigman.angry": 785,
+          "minecraft:entity.zombie_pigman.death": 786,
+          "minecraft:entity.zombie_pigman.hurt": 787,
+          "minecraft:music.nether": 400
+        }
+      },
+      "saved_uses": 0,
+      "inspected_nbt_records": 785
+    },
+    "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.15.2.zip",
+      "sha256": "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525",
+      "source_jar_sha256": "94A5BAA4B3DC025A338A60BAC27B3E5BBAD4AE0CE494BA5EC1F852E401A704F7",
+      "mappings": {
+        "minecraft:entity_type": {
+          "minecraft:zombie_pigman": 57
+        },
+        "minecraft:item": {
+          "minecraft:zombie_pigman_spawn_egg": 754
+        },
+        "minecraft:memory_module_type": {
+          "minecraft:golem_last_seen_time": 24,
+          "minecraft:opened_doors": 16
+        },
+        "minecraft:sound_event": {
+          "minecraft:entity.zombie_pigman.ambient": 799,
+          "minecraft:entity.zombie_pigman.angry": 800,
+          "minecraft:entity.zombie_pigman.death": 801,
+          "minecraft:entity.zombie_pigman.hurt": 802,
+          "minecraft:music.nether": 420
+        }
+      },
+      "saved_uses": 0,
+      "inspected_nbt_records": 787
+    }
+  },
+  "native_control": {
+    "source": "Forge 31.2.57",
+    "target": "Forge 36.2.34",
+    "registered_game_content": false,
+    "normal_start_and_stop": true,
+    "reload_errors": 0,
+    "source_sha256": "A0BFEA2E38C268B55A8D4DD1C534F7E8771CD89D737419119BA3098D64A29D16",
+    "helper_sha256": "642233C606CCC38A030E1AF64E6E6196709F3D5A84916DC59AB0C1DB3F5C166F",
+    "first_log_sha256": "DB8C42C854E5C1DBCD11F51D7D6D0BC722088428A8D83728E825801F0126C6BB"
+  }
+}

@@ -1,7 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import net.minecraft.block.Block;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraftforge.fml.ModList;
@@ -15,8 +15,10 @@ final class MineralogyChecks {
 
     static void run() {
         Catalogue.Module rocks = Catalogue.INSTANCE.modules.get("mineralogy");
+        boolean disabled = Boolean.getBoolean("skysbuildingpieces.expectMineralogySlabsDisabled");
 
         if (!ModList.get().isLoaded("mineralogy")) {
+            require(!disabled, "The disabled-slab profile is missing Mineralogy");
             require(rocks == null, "Mineralogy pieces registered without Mineralogy");
             return;
         }
@@ -35,18 +37,30 @@ final class MineralogyChecks {
         require(registered == 35, "Mineralogy must use exactly 35 core block IDs");
 
         int states = 0;
+        if (disabled) {
+            try {
+                Object enabled = Class.forName("zone.moddev.mc.mineralogy.MineralogyConfig")
+                        .getMethod("generateRockSlab").invoke(null);
+                require(Boolean.FALSE.equals(enabled), "The disabled profile did not apply Mineralogy's setting");
+            } catch (ReflectiveOperationException failure) {
+                throw new IllegalStateException("Cannot check the pinned Mineralogy setting", failure);
+            }
+        }
 
         for (Catalogue.MaterialDef material : rocks.materials.values()) {
             BlockState bottom = Pieces.state(material.id, Shape.SLAB, 1);
             BlockState top = Pieces.state(material.id, Shape.SLAB, 0);
 
+            if (disabled) {
+                require(bottom == null && top == null, "Disabled native slabs remain available: " + material.id);
+            }
             if (bottom == null) {
                 require(top == null, "disabled native slab has only one half");
                 continue;
             }
 
             require(facing(bottom) == Direction.UP && facing(top) == Direction.DOWN, "native slab orientation changed");
-            require(Pieces.stack(bottom, 1).getDamage() == 0, "native slab item metadata changed");
+            require(Pieces.stack(bottom, 1).getDamageValue() == 0, "native slab item metadata changed");
         }
         for (Catalogue.Palette palette : rocks.palettes) {
             for (String material : palette.materials) {
@@ -64,13 +78,13 @@ final class MineralogyChecks {
 
         require(states == 540, "not all rock states were checked");
         rawInventories();
-        System.out.println("MINERALOGY_CORE_PASS palettes=" + registered + " states=" + states + " addon=false");
+        System.out.println("MINERALOGY_CORE_PASS palettes=" + registered + " states=" + states + " addon=false native_slabs_disabled=" + disabled);
     }
 
     private static Direction facing(BlockState state) {
-        for (IProperty<?> property : state.getProperties()) {
+        for (Property<?> property : state.getProperties()) {
             if (property.getName().equals("facing")) {
-                return (Direction) state.get(property);
+                return (Direction) state.getValue(property);
             }
         }
 

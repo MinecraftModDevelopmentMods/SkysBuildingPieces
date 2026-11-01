@@ -29,13 +29,13 @@ public final class ClientProxy {
 
     private static void renderLayers(FMLClientSetupEvent event) {
         for (PieceBlock block : Pieces.BLOCKS.values()) {
-            RenderType layer = RenderType.getSolid();
+            RenderType layer = RenderType.solid();
             if (block.palette.group.equals("grass")) {
-                layer = RenderType.getCutoutMipped();
+                layer = RenderType.cutoutMipped();
             } else if (block.palette.group.equals("clear_glass")) {
-                layer = RenderType.getCutout();
+                layer = RenderType.cutout();
             } else if (block.palette.group.equals("stained_glass") || block.palette.group.equals("ice")) {
-                layer = RenderType.getTranslucent();
+                layer = RenderType.translucent();
             }
             RenderTypeLookup.setRenderLayer(block, layer);
         }
@@ -47,7 +47,7 @@ public final class ClientProxy {
                 event.getBlockColors().register(
                         (state, world, position,
                                 tint) -> tint == 0 ? event.getBlockColors()
-                                        .getColor(Blocks.GRASS_BLOCK.getDefaultState(), world, position, 0) : -1,
+                                        .getColor(Blocks.GRASS_BLOCK.defaultBlockState(), world, position, 0) : -1,
                         block);
             }
         }
@@ -62,7 +62,7 @@ public final class ClientProxy {
         for (PieceBlock block : Pieces.BLOCKS.values()) {
             if (block.palette.group.equals("grass")) {
                 event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColors.get(0.5D, 1.0D) : -1,
-                        Item.getItemFromBlock(block));
+                        block.asItem());
             }
         }
     }

@@ -6,7 +6,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LegacyAccountingTest {
     @Test
-    void pendingAccountingTravelsWithTheLevelDataPassedToForge31LoadEvents() {
+    void nativeRootAndDirectLevelExposeTheSameAccountingAndCoverageData() {
+        CompoundNBT root = new CompoundNBT();
+        CompoundNBT level = new CompoundNBT();
+        CompoundNBT markers = new CompoundNBT();
+        markers.putInt("vanilla", 1);
+        level.put("skysbuildingpieces_coverage", markers);
+        root.put("Level", level);
+        root.putLong("skysbuildingpieces_delta", 26);
+        LegacyBridge.finalizeLegacyChunk(root);
+
+        assertSame(level, MigrationEvents.chunkLevel(root));
+        assertSame(level, MigrationEvents.chunkLevel(level));
+        assertEquals(26, MigrationEvents.chunkLevel(root).getLong("skysbuildingpieces_delta"));
+        assertEquals(markers, MigrationEvents.chunkLevel(root).getCompound("skysbuildingpieces_coverage"));
+        MigrationEvents.chunkLevel(root).remove("skysbuildingpieces_delta");
+        assertFalse(level.contains("skysbuildingpieces_delta"));
+    }
+
+    @Test
+    void pendingAccountingTravelsWithTheLevelDataPassedToForge36LoadEvents() {
         CompoundNBT root = new CompoundNBT();
         CompoundNBT level = new CompoundNBT();
 

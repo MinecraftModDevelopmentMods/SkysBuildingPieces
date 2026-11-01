@@ -20,14 +20,14 @@ public final class NativeStagingChecks {
         try (LegacyTestScope ignored = new LegacyTestScope(world)) {
             stoneSlabItems(world);
             for (BlockState expected : new BlockState[] {
-                    Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true),
-                    Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, false),
-                    Blocks.DARK_OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true),
-                    Blocks.DARK_OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, false),
-                    Blocks.KELP.getDefaultState(),
-                    Blocks.STONE_SLAB.getDefaultState().with(net.minecraft.block.SlabBlock.TYPE,
+                    Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true),
+                    Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, false),
+                    Blocks.DARK_OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true),
+                    Blocks.DARK_OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, false),
+                    Blocks.KELP.defaultBlockState(),
+                    Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.block.SlabBlock.TYPE,
                             net.minecraft.state.properties.SlabType.TOP),
-                    Blocks.STONE_SLAB.getDefaultState().with(net.minecraft.block.SlabBlock.TYPE,
+                    Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.block.SlabBlock.TYPE,
                             net.minecraft.state.properties.SlabType.BOTTOM) }) {
                 int number = NumericStateBridge.encode(expected);
                 CompoundNBT root = new CompoundNBT();
@@ -66,10 +66,10 @@ public final class NativeStagingChecks {
                 for (boolean intermediate : new boolean[] { false, true }) {
                     CompoundNBT source = root.copy();
                     if (intermediate) {
-                        source = NBTUtil.update(world.getServer().getDataFixer(), DefaultTypeReferences.CHUNK, source,
+                        source = NBTUtil.update(world.getServer().getFixerUpper(), DefaultTypeReferences.CHUNK, source,
                                 1343, 1493);
                     }
-                    CompoundNBT fixed = NBTUtil.update(world.getServer().getDataFixer(), DefaultTypeReferences.CHUNK,
+                    CompoundNBT fixed = NBTUtil.update(world.getServer().getFixerUpper(), DefaultTypeReferences.CHUNK,
                             source, intermediate ? 1493 : 1343, 1976);
                     ListNBT palette = fixed.getCompound("Level").getList("Sections", 10).getCompound(0)
                             .getList("Palette", 10);
@@ -114,12 +114,12 @@ public final class NativeStagingChecks {
             for (boolean intermediate : new boolean[] { false, true }) {
                 CompoundNBT sourceData = player.copy();
                 if (intermediate) {
-                    sourceData = NBTUtil.update(world.getServer().getDataFixer(), DefaultTypeReferences.PLAYER,
+                    sourceData = NBTUtil.update(world.getServer().getFixerUpper(), DefaultTypeReferences.PLAYER,
                             sourceData, 1343, 1493);
                 }
-                CompoundNBT upgraded = NBTUtil.update(world.getServer().getDataFixer(), DefaultTypeReferences.PLAYER,
+                CompoundNBT upgraded = NBTUtil.update(world.getServer().getFixerUpper(), DefaultTypeReferences.PLAYER,
                         sourceData, intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
-                net.minecraft.item.ItemStack result = net.minecraft.item.ItemStack.read(upgraded);
+                net.minecraft.item.ItemStack result = net.minecraft.item.ItemStack.of(upgraded);
 
                 if (result.getItem() != net.minecraft.item.Items.STONE_SLAB || result.getCount() != 37
                         || !result.hasTag() || !custom.equals(result.getTag()) || upgraded.getByte("Slot") != 7

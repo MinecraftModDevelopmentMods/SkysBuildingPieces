@@ -17,6 +17,31 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ForwardFixtureContractTest {
     @Test
+    void native115FixtureKeepsEveryStateAndBothPlayerInventories() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser().parse(new String(
+                Files.readAllBytes(root.resolve("building-pieces-1.15.2.json")), StandardCharsets.UTF_8))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("building-pieces-1.15.2.zip"));
+
+        assertEquals("named", manifest.get("kind").getAsString());
+        assertEquals("c5573be98e7b148e54b1fcaa15b8a6eb402391cc", manifest.get("source_commit").getAsString());
+        assertEquals("94A5BAA4B3DC025A338A60BAC27B3E5BBAD4AE0CE494BA5EC1F852E401A704F7",
+                manifest.get("source_jar_sha256").getAsString());
+        assertEquals("03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525", sha256(archive));
+        assertEquals(7028, manifest.getAsJsonArray("states").size());
+        assertEquals(3346, manifest.get("wet_states").getAsInt());
+        assertEquals(144, manifest.get("snowy_states").getAsInt());
+        assertEquals(7028, manifest.get("source_saved_states_verified").getAsInt());
+        assertTrue(manifest.get("source_unchanged").getAsBoolean());
+        assertTrue(manifest.get("player_shovel").getAsString().contains("Enchantments"));
+        assertTrue(manifest.get("player_nested").getAsString().contains("Items"));
+        Set<String> members = verifyMembers(manifest, archive);
+        assertTrue(members.contains("playerdata/" + manifest.get("player").getAsString() + ".dat"));
+        assertTrue(members.contains("data/skysbuildingpieces_world_state.dat"));
+    }
+
+    @Test
     void native114FixtureLocksWetSnowyStatesAndRichInventoryData() throws Exception {
         Path root = Paths.get("src/testFixtures/worlds");
         JsonObject manifest = new JsonParser().parse(new String(

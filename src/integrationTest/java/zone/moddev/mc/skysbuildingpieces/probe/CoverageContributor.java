@@ -68,7 +68,7 @@ public final class CoverageContributor {
             CompoundNBT saved = new CompoundNBT();
 
             saved.put("Level", new CompoundNBT());
-            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, saved));
+            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, chunk.getLevel(), saved));
 
             CompoundNBT markers = saved.getCompound("Level").getCompound("skysbuildingpieces_coverage");
 

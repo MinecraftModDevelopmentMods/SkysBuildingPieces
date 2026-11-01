@@ -10,7 +10,7 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILightReader;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -31,7 +31,7 @@ public final class ContinuousGlassModel implements IBakedModel {
     }
 
     @Override
-    public IModelData getModelData(ILightReader world, BlockPos position, BlockState state,
+    public IModelData getModelData(IBlockDisplayReader world, BlockPos position, BlockState state,
             IModelData tileData) {
         int joins = 0;
         PieceBlock wall = (PieceBlock) state.getBlock();
@@ -39,7 +39,7 @@ public final class ContinuousGlassModel implements IBakedModel {
 
         for (Direction direction : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
                 Direction.WEST }) {
-            BlockState neighbour = world.getBlockState(position.offset(direction));
+            BlockState neighbour = world.getBlockState(position.relative(direction));
 
             if (neighbour.getBlock() instanceof PieceBlock) {
                 PieceBlock other = (PieceBlock) neighbour.getBlock();
@@ -102,12 +102,12 @@ public final class ContinuousGlassModel implements IBakedModel {
                 continue;
             }
 
-            int[] data = GlassWallTexture.trim(quad.getVertexData(), format.getIntegerSize(), position,
+            int[] data = GlassWallTexture.trim(quad.getVertices(), format.getIntegerSize(), position,
                     texture, joins);
 
-            result.add(data == quad.getVertexData() ? quad
-                    : new BakedQuad(data, quad.getTintIndex(), quad.getFace(), quad.func_187508_a(),
-                            quad.shouldApplyDiffuseLighting()));
+            result.add(data == quad.getVertices() ? quad
+                    : new BakedQuad(data, quad.getTintIndex(), quad.getDirection(), quad.getSprite(),
+                            quad.isShade()));
         }
 
         List<BakedQuad> immutable = Collections.unmodifiableList(result);
@@ -124,8 +124,8 @@ public final class ContinuousGlassModel implements IBakedModel {
         return immutable;
     }
 
-    public boolean isAmbientOcclusion() {
-        return original.isAmbientOcclusion();
+    public boolean useAmbientOcclusion() {
+        return original.useAmbientOcclusion();
     }
 
     public boolean isGui3d() {
@@ -133,20 +133,20 @@ public final class ContinuousGlassModel implements IBakedModel {
     }
 
     @Override
-    public boolean func_230044_c_() {
-        return original.func_230044_c_();
+    public boolean usesBlockLight() {
+        return original.usesBlockLight();
     }
 
-    public boolean isBuiltInRenderer() {
-        return original.isBuiltInRenderer();
+    public boolean isCustomRenderer() {
+        return original.isCustomRenderer();
     }
 
-    public TextureAtlasSprite getParticleTexture() {
-        return original.getParticleTexture();
+    public TextureAtlasSprite getParticleIcon() {
+        return original.getParticleIcon();
     }
 
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return original.getItemCameraTransforms();
+    public ItemCameraTransforms getTransforms() {
+        return original.getTransforms();
     }
 
     public ItemOverrideList getOverrides() {

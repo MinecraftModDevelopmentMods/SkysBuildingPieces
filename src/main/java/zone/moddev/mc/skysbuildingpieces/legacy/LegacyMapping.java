@@ -74,10 +74,10 @@ public final class LegacyMapping {
 
     /** Compatibility contributors expose their saved orientation explicitly. */
     static int metadata(net.minecraft.block.BlockState state) {
-        net.minecraft.state.IProperty<?> property = state.getBlock().getStateContainer().getProperty("meta");
+        net.minecraft.state.Property<?> property = state.getBlock().getStateDefinition().getProperty("meta");
 
         if (property instanceof net.minecraft.state.IntegerProperty) {
-            return state.get((net.minecraft.state.IntegerProperty) property);
+            return state.getValue((net.minecraft.state.IntegerProperty) property);
         }
 
         throw new LegacyBridge.RecoveryAbort("Cannot read the installed legacy piece orientation: " + state, null);

@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.*;
@@ -20,19 +21,31 @@ import net.minecraftforge.items.*;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 
 public final class MigrationEvents {
+    private static World level(net.minecraft.world.IWorld world) {
+        if (world instanceof World) return (World) world;
+        if (world instanceof net.minecraft.world.ISeedReader) {
+            return ((net.minecraft.world.ISeedReader) world).getLevel();
+        }
+        throw new LegacyBridge.RecoveryAbort("Expected a loaded server world for piece migration", null);
+    }
+
     private int ticks;
     private final java.util.Queue<Chunk> pending = new java.util.concurrent.ConcurrentLinkedQueue<Chunk>();
     private final Map<net.minecraft.world.chunk.IChunk, CompoundNBT> coverage = Collections
             .synchronizedMap(new WeakHashMap<net.minecraft.world.chunk.IChunk, CompoundNBT>());
 
+    static CompoundNBT chunkLevel(CompoundNBT data) {
+        // Forge 36 supplies the whole chunk root. Retain direct-Level handling for fixtures.
+        return data.contains("Level", 10) ? data.getCompound("Level") : data;
+    }
+
     @SubscribeEvent
     public void load(ChunkDataEvent.Load event) {
-        if (event.getWorld() != null && event.getWorld().getWorld().isRemote) {
+        if (event.getWorld() != null && level(event.getWorld()).isClientSide) {
             return;
         }
 
-        CompoundNBT legacyTileData = event.getData();
-        // Unlike the save event, Forge 31's load event contains Level itself.
+        CompoundNBT legacyTileData = chunkLevel(event.getData());
         CompoundNBT level = legacyTileData;
 
         // Turning replacement off must retain existing module markers, while leaving previously unvisited chunks
@@ -46,24 +59,24 @@ public final class MigrationEvents {
             return;
         }
         if (legacyTileData.contains("skysbuildingpieces_retired_delta")) {
-            PiecesWorldState state = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState state = PiecesWorldState.get(level(event.getWorld()));
 
             state.addChunk(HistoricalFullBlocks.MODULE, legacyTileData.getLong("skysbuildingpieces_retired_delta"));
-            state.markDirty();
+            state.setDirty();
             legacyTileData.remove("skysbuildingpieces_retired_delta");
-            event.getChunk().setModified(true);
+            event.getChunk().setUnsaved(true);
         }
         if (legacyTileData.contains("skysbuildingpieces_historical_delta", 10)) {
-            PiecesWorldState state = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState state = PiecesWorldState.get(level(event.getWorld()));
             CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_historical_delta");
 
-            for (String module : deltas.keySet()) {
+            for (String module : deltas.getAllKeys()) {
                 state.addChunk(module, deltas.getLong(module));
             }
 
-            state.markDirty();
+            state.setDirty();
             legacyTileData.remove("skysbuildingpieces_historical_delta");
-            event.getChunk().setModified(true);
+            event.getChunk().setUnsaved(true);
         }
         if (!LegacyBridge.active()) {
             return;
@@ -74,44 +87,44 @@ public final class MigrationEvents {
 
         // Raw recovery changes the compound before constructing the Chunk. That constructor does not know it must
         // persist the recovered data. Mark storage dirty explicitly, without any neighbour notifications.
-        event.getChunk().setModified(true);
+        event.getChunk().setUnsaved(true);
 
         if (legacyTileData.contains("skysbuildingpieces_delta")) {
-            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
 
             worldState.blocks += legacyTileData.getLong("skysbuildingpieces_delta");
             worldState.chunks++;
-            worldState.markDirty();
+            worldState.setDirty();
             legacyTileData.remove("skysbuildingpieces_delta");
         }
         if (legacyTileData.contains("skysbuildingpieces_additional_vanilla_delta")) {
             // New coverage in an already counted chunk adds conversions, not a second chunk visit.
-            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
 
             worldState.blocks += legacyTileData.getLong("skysbuildingpieces_additional_vanilla_delta");
-            worldState.markDirty();
+            worldState.setDirty();
             legacyTileData.remove("skysbuildingpieces_additional_vanilla_delta");
         }
         if (legacyTileData.contains("skysbuildingpieces_module_delta", 10)) {
-            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
             CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_module_delta");
 
-            for (String module : deltas.keySet()) {
+            for (String module : deltas.getAllKeys()) {
                 worldState.addChunk(module, deltas.getLong(module));
             }
 
-            worldState.markDirty();
+            worldState.setDirty();
             legacyTileData.remove("skysbuildingpieces_module_delta");
         }
         if (legacyTileData.contains("skysbuildingpieces_additional_module_delta", 10)) {
-            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
             CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_additional_module_delta");
 
-            for (String module : deltas.keySet()) {
+            for (String module : deltas.getAllKeys()) {
                 worldState.addBlocks(module, deltas.getLong(module));
             }
 
-            worldState.markDirty();
+            worldState.setDirty();
             legacyTileData.remove("skysbuildingpieces_additional_module_delta");
         }
 
@@ -119,7 +132,7 @@ public final class MigrationEvents {
             pending.add((Chunk) event.getChunk());
         }
 
-        LegacyBridge.report(event.getWorld().getWorld());
+        LegacyBridge.report(level(event.getWorld()));
     }
 
     @SubscribeEvent
@@ -133,9 +146,9 @@ public final class MigrationEvents {
             if (chunk == null) {
                 break;
             }
-            for (TileEntity tile : new ArrayList<TileEntity>(chunk.getTileEntityMap().values())) {
+            for (TileEntity tile : new ArrayList<TileEntity>(chunk.getBlockEntities().values())) {
                 // Unopened loot containers must not have their loot generated by migration.
-                CompoundNBT raw = tile.write(new CompoundNBT());
+                CompoundNBT raw = tile.save(new CompoundNBT());
 
                 if (raw.contains("LootTable", 8)) {
                     continue;
@@ -149,25 +162,25 @@ public final class MigrationEvents {
                     .getCurrentServer();
 
             if (server != null) {
-                LegacyBridge.report(server.getWorld(net.minecraft.world.dimension.DimensionType.OVERWORLD));
+                LegacyBridge.report(server.getLevel(World.OVERWORLD));
             }
         }
     }
 
     @SubscribeEvent
     public void unload(WorldEvent.Unload event) {
-        if (event.getWorld().getWorld().isRemote) {
+        if (level(event.getWorld()).isClientSide) {
             return;
         }
         if (LegacyBridge.recoveryActive() && LegacyBridge.hasPendingReport()) {
-            LegacyBridge.report(event.getWorld().getWorld());
+            LegacyBridge.report(level(event.getWorld()));
         }
 
-        pending.removeIf(chunk -> chunk instanceof Chunk && ((Chunk) chunk).getWorld() == event.getWorld());
+        pending.removeIf(chunk -> chunk instanceof Chunk && ((Chunk) chunk).getLevel() == event.getWorld());
 
         synchronized (coverage) {
             coverage.keySet()
-                    .removeIf(chunk -> chunk instanceof Chunk && ((Chunk) chunk).getWorld() == event.getWorld());
+                    .removeIf(chunk -> chunk instanceof Chunk && ((Chunk) chunk).getLevel() == event.getWorld());
         }
     }
 
@@ -182,7 +195,7 @@ public final class MigrationEvents {
 
     @SubscribeEvent
     public void placed(BlockEvent.EntityPlaceEvent event) {
-        if (event.getWorld().getWorld().isRemote || !LegacyBridge.active()) {
+        if (level(event.getWorld()).isClientSide || !LegacyBridge.active()) {
             return;
         }
 
@@ -194,19 +207,19 @@ public final class MigrationEvents {
             return;
         }
 
-        TileEntity tile = event.getWorld().getTileEntity(position);
+        TileEntity tile = event.getWorld().getBlockEntity(position);
 
         if (tile == null) {
             return;
         }
 
-        CompoundNBT legacyTileData = tile.write(new CompoundNBT());
+        CompoundNBT legacyTileData = tile.save(new CompoundNBT());
         Shape shape = LegacyMapping.shape(registryId, LegacyMapping.metadata(existingState));
         BlockState target = LegacyBridge.resolve(registryId,
                 LegacyMapping.material(legacyTileData.getString("material")), shape,
                 LegacyMapping.orientation(shape, LegacyMapping.metadata(existingState)));
 
-        if (target != null && event.getWorld().setBlockState(position, target, 3)) {
+        if (target != null && event.getWorld().setBlock(position, target, 3)) {
             net.minecraft.world.chunk.IChunk chunk = event.getWorld().getChunk(position);
             CompoundNBT chunkCoverage = coverage.get(chunk);
 
@@ -220,17 +233,17 @@ public final class MigrationEvents {
             retained.add(legacyTileData.copy());
             chunkCoverage.put("retained_tiles", retained);
 
-            PiecesWorldState worldState = PiecesWorldState.get(event.getWorld().getWorld());
+            PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
 
             worldState.addBlocks(
                     Catalogue.INSTANCE.moduleFor(LegacyMapping.material(legacyTileData.getString("material"))), 1);
-            worldState.markDirty();
+            worldState.setDirty();
         }
     }
 
     @SubscribeEvent
     public void entity(EntityJoinWorldEvent event) {
-        if (event.getWorld().getWorld().isRemote || !LegacyBridge.ready) {
+        if (level(event.getWorld()).isClientSide || !LegacyBridge.ready) {
             return;
         }
 
@@ -240,7 +253,7 @@ public final class MigrationEvents {
             PlayerEntity player = (PlayerEntity) entity;
 
             inventory(player.inventory);
-            inventory(player.getInventoryEnderChest());
+            inventory(player.getEnderChestInventory());
         }
         if (entity instanceof ItemEntity) {
             ItemEntity item = (ItemEntity) entity;
@@ -249,13 +262,13 @@ public final class MigrationEvents {
         }
         if (entity instanceof ItemFrameEntity) {
             ItemFrameEntity itemFrame = (ItemFrameEntity) entity;
-            ItemStack original = itemFrame.getDisplayedItem();
+            ItemStack original = itemFrame.getItem();
             ItemStack updated = convert(original, event.getWorld());
 
             if (updated != original) {
                 // Entity loading runs before its chunk future completes. Vanilla
                 // uses this same path to restore a frame without reading comparators.
-                itemFrame.setDisplayedItemWithUpdate(updated, false);
+                itemFrame.setItem(updated, false);
             }
         }
         if (entity instanceof IInventory) {
@@ -267,18 +280,18 @@ public final class MigrationEvents {
     public void player(PlayerEvent.LoadFromFile event) {
         if (LegacyBridge.recoveryActive()) {
             inventory(event.getPlayer().inventory);
-            inventory(event.getPlayer().getInventoryEnderChest());
+            inventory(event.getPlayer().getEnderChestInventory());
         }
     }
 
     private static void inventory(IInventory inventory) {
-        for (int slotIndex = 0; slotIndex < inventory.getSizeInventory(); slotIndex++) {
-            ItemStack legacyStack = inventory.getStackInSlot(slotIndex);
+        for (int slotIndex = 0; slotIndex < inventory.getContainerSize(); slotIndex++) {
+            ItemStack legacyStack = inventory.getItem(slotIndex);
             ItemStack updated = convert(legacyStack, null);
 
             if (updated != legacyStack) {
-                inventory.setInventorySlotContents(slotIndex, updated);
-                inventory.markDirty();
+                inventory.setItem(slotIndex, updated);
+                inventory.setChanged();
             }
         }
     }
@@ -299,11 +312,11 @@ public final class MigrationEvents {
                 if (handler instanceof IItemHandlerModifiable && handled.add(handler)) {
                     for (int slot = 0; slot < handler.getSlots(); slot++) {
                         ItemStack legacyStack = handler.getStackInSlot(slot);
-                        ItemStack updated = convert(legacyStack, tile.getWorld());
+                        ItemStack updated = convert(legacyStack, tile.getLevel());
 
                         if (updated != legacyStack) {
                             ((IItemHandlerModifiable) handler).setStackInSlot(slot, updated);
-                            tile.markDirty();
+                            tile.setChanged();
                         }
                     }
                 }
@@ -316,7 +329,7 @@ public final class MigrationEvents {
             return legacyStack;
         }
 
-        CompoundNBT before = legacyStack.write(new CompoundNBT());
+        CompoundNBT before = legacyStack.save(new CompoundNBT());
         CompoundNBT legacyTileData = before.copy();
 
         LegacyBridge.prepareStack(legacyTileData);
@@ -325,7 +338,7 @@ public final class MigrationEvents {
             return legacyStack;
         }
 
-        ItemStack updated = ItemStack.read(legacyTileData);
+        ItemStack updated = ItemStack.of(legacyTileData);
 
         return updated;
     }

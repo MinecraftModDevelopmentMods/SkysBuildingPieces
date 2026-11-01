@@ -25,9 +25,9 @@ public final class PathPieces {
                 event.getFace()) == null) {
             return;
         }
-        // Forge 31 still bypasses block activation while sneaking, even with UseBlock.ALLOW. Finish this valid action
+        // Forge 36 still bypasses block activation while sneaking, even with UseBlock.ALLOW. Finish this valid action
         // here and stop the vanilla call.
-        if (event.getPlayer().isSneaking() && activate(event.getWorld(), event.getPos(), event.getPlayer(),
+        if (event.getPlayer().isShiftKeyDown() && activate(event.getWorld(), event.getPos(), event.getPlayer(),
                 event.getItemStack(), event.getFace(), event.getHand())) {
             event.setCanceled(true);
             event.setCancellationResult(net.minecraft.util.ActionResultType.SUCCESS);
@@ -45,27 +45,27 @@ public final class PathPieces {
         if (path == null) {
             return false;
         }
-        if (world.isRemote) {
+        if (world.isClientSide) {
             return true;
         }
 
         boolean grassPiece = GrassLifecycle.grass(world.getBlockState(position));
 
-        if (!world.setBlockState(position, path, 11)) {
+        if (!world.setBlock(position, path, 11)) {
             return false;
         }
 
-        BlockPos support = position.down();
+        BlockPos support = position.below();
 
-        if (grassPiece && world.isBlockPresent(support) && world.getBlockState(support).getBlock() == Blocks.GRASS_BLOCK
-                && player.canPlayerEdit(support, Direction.UP, shovel)) {
-            world.setBlockState(support, Blocks.GRASS_PATH.getDefaultState(), 3);
+        if (grassPiece && world.isLoaded(support) && world.getBlockState(support).getBlock() == Blocks.GRASS_BLOCK
+                && player.mayUseItemAt(support, Direction.UP, shovel)) {
+            world.setBlock(support, Blocks.GRASS_PATH.defaultBlockState(), 3);
         }
 
-        world.playSound(null, position, SoundEvents.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1, 1);
+        world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1, 1);
 
-        if (!player.abilities.isCreativeMode) {
-            shovel.damageItem(1, player, entity -> entity.sendBreakAnimation(hand));
+        if (!player.abilities.instabuild) {
+            shovel.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
         }
 
         return true;
@@ -79,14 +79,14 @@ public final class PathPieces {
 
         Set<ToolType> tools = shovel.getItem().getToolTypes(shovel);
 
-        if (tools == null || !tools.contains(ToolType.SHOVEL) || !world.isAirBlock(position.up())
-                || !player.canPlayerEdit(position, face, shovel)) {
+        if (tools == null || !tools.contains(ToolType.SHOVEL) || !world.isEmptyBlock(position.above())
+                || !player.mayUseItemAt(position, face, shovel)) {
             return null;
         }
 
         BlockState source = world.getBlockState(position);
 
-        if (!(source.getBlock() instanceof PieceBlock) || source.get(SlabBlock.WATERLOGGED)) {
+        if (!(source.getBlock() instanceof PieceBlock) || source.getValue(SlabBlock.WATERLOGGED)) {
             return null;
         }
 
@@ -106,19 +106,19 @@ public final class PathPieces {
         PieceBlock piece = (PieceBlock) path.getBlock();
         BlockState dirt = Pieces.state("minecraft:dirt", piece.palette.shape, piece.orientation(path));
 
-        return dirt.with(SlabBlock.WATERLOGGED, path.get(SlabBlock.WATERLOGGED));
+        return dirt.setValue(SlabBlock.WATERLOGGED, path.getValue(SlabBlock.WATERLOGGED));
     }
 
     static void checkCover(World world, BlockPos position, BlockState state) {
-        if (world.isRemote || !(state.getBlock() instanceof PieceBlock)) {
+        if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
 
         PieceBlock piece = (PieceBlock) state.getBlock();
 
         if (piece.palette.group.equals("path")
-                && (state.get(SlabBlock.WATERLOGGED) || world.getBlockState(position.up()).getMaterial().isSolid())) {
-            world.setBlockState(position, dirt(state), 3);
+                && (state.getValue(SlabBlock.WATERLOGGED) || world.getBlockState(position.above()).getMaterial().isSolid())) {
+            world.setBlock(position, dirt(state), 3);
         }
     }
 }

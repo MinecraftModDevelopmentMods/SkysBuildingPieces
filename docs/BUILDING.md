@@ -1,6 +1,6 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.15.2 and Forge 31.2.57. Run the included Gradle
+This branch targets Minecraft 1.16.5 and Forge 36.2.34. Run the included Gradle
 wrapper with Java 17. Compilation and Minecraft use Java 8; the pinned production
 toolchain is Temurin 8.0.502+7. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
@@ -27,7 +27,7 @@ and exclude test classes.
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs115/SkysGrassSlabs` checkout,
+Build that exact commit in the sibling `SkysGrassSlabs116/SkysGrassSlabs` checkout,
 or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
 match their pinned hashes. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.
@@ -48,13 +48,13 @@ official BuildingBricks release for this Minecraft target, and that fixture is
 not a claim of compatibility with an unofficial port. Genuine saved-world
 fixtures separately exercise conversion before vanilla data fixing.
 
-Forge 31 logs an ordinary startup config notification at `FATAL`. The packaged
-server audit recognises one exact notification before level preparation, with
-unchanged native settings and the preceding debug entry naming `forge-server.toml`.
-The native client audit also recognises the two empty handshake messages
-reproduced by the Forge-only control. These messages stay in the logs and audit
-receipt; other errors, later changes, changed settings, crashes and incomplete
-checks still fail.
+Native log checks reject errors, fatal messages, standard-error output and crash
+reports. They include rolled logs from earlier loads, as well as the latest log,
+so a clean reload cannot hide an earlier failure. The two locked upgrade fixtures
+contain nine unused vanilla registry names that Forge reports during upgrades.
+Their audit accepts only the exact entries and numeric IDs, after checking every
+saved NBT record and reproducing the notices without Sky mods. All other errors
+still fail. The checked Forge settings must remain unchanged throughout the test.
 
 The resource helpers in `tools` regenerate models, translations and native
 recipe/advancement JSON from the fixed catalogues. Unlocks retain their existing

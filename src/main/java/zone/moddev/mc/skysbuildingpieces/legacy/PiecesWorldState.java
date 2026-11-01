@@ -59,7 +59,7 @@ public final class PiecesWorldState extends WorldSavedData {
     }
 
     @Override
-    public void read(CompoundNBT compoundTag) {
+    public void load(CompoundNBT compoundTag) {
         int schema = compoundTag.getInt("schema_version");
 
         if (schema != 1) {
@@ -75,7 +75,7 @@ public final class PiecesWorldState extends WorldSavedData {
 
         CompoundNBT issues = compoundTag.getCompound("unresolved");
 
-        for (String key : issues.keySet()) {
+        for (String key : issues.getAllKeys()) {
             unresolved.put(key, issues.getLong(key));
         }
 
@@ -83,7 +83,7 @@ public final class PiecesWorldState extends WorldSavedData {
 
         CompoundNBT savedModules = compoundTag.getCompound("modules");
 
-        for (String key : savedModules.keySet()) {
+        for (String key : savedModules.getAllKeys()) {
             CompoundNBT saved = savedModules.getCompound(key);
             Totals moduleTotals = totals(key);
 
@@ -94,7 +94,7 @@ public final class PiecesWorldState extends WorldSavedData {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundTag) {
+    public CompoundNBT save(CompoundNBT compoundTag) {
         compoundTag.merge(retained);
         compoundTag.putInt("schema_version", 1);
         compoundTag.putLong("vanilla_blocks", blocks);
@@ -128,12 +128,12 @@ public final class PiecesWorldState extends WorldSavedData {
 
     public static PiecesWorldState get(World world) {
         if (world.getServer() != null) {
-            world = world.getServer().getWorld(net.minecraft.world.dimension.DimensionType.OVERWORLD);
+            world = world.getServer().getLevel(World.OVERWORLD);
         }
         if (!(world instanceof net.minecraft.world.server.ServerWorld)) {
             throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
-        return ((net.minecraft.world.server.ServerWorld) world).getSavedData().getOrCreate(PiecesWorldState::new, NAME);
+        return ((net.minecraft.world.server.ServerWorld) world).getDataStorage().computeIfAbsent(PiecesWorldState::new, NAME);
     }
 }

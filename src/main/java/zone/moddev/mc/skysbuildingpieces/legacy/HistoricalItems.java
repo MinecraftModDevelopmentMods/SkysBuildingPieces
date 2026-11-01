@@ -105,7 +105,7 @@ public final class HistoricalItems {
 
                 states.add(compound);
             }
-            for (String key : compound.keySet()) {
+            for (String key : compound.getAllKeys()) {
                 collectNativeTargets(compound.get(key), stacks, states, depth + 1);
             }
         } else if (value instanceof net.minecraft.nbt.ListNBT) {

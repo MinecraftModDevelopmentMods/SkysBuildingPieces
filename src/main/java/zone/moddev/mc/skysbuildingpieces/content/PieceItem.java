@@ -14,7 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -40,11 +40,11 @@ public final class PieceItem extends Item {
         boolean retired = Catalogue.INSTANCE.materials.get(material).replacement() != null;
         Item.Properties properties = new Item.Properties();
 
-        return nativeEquivalent || hiddenVertical || retired ? properties : properties.group(PiecesTab.INSTANCE);
+        return nativeEquivalent || hiddenVertical || retired ? properties : properties.tab(PiecesTab.INSTANCE);
     }
 
     @Override
-    public ITextComponent getDisplayName(ItemStack stack) {
+    public ITextComponent getName(ItemStack stack) {
         ItemStack full = Pieces.stack(Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "full"), 1);
 
         if (full == null) {
@@ -56,7 +56,7 @@ public final class PieceItem extends Item {
                 : piece.palette.namespace;
 
         return PieceNames.displayName(namespace, material,
-                piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), full.getDisplayName());
+                piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), full.getHoverName());
     }
 
     @Override
@@ -65,22 +65,22 @@ public final class PieceItem extends Item {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
 
-        if (player == null || context.getItem().isEmpty()) {
+        if (player == null || context.getItemInHand().isEmpty()) {
             return ActionResultType.FAIL;
         }
 
-        BlockPos position = context.getPos();
-        Vec3d hit = context.getHitVec();
+        BlockPos position = context.getClickedPos();
+        Vector3d hit = context.getClickLocation();
         Shape shape = piece.palette.shape;
 
         if (shape == Shape.VERTICAL_SLAB && Pieces.state(material, Shape.SLAB, 1) != null) {
             shape = Shape.SLAB;
         }
 
-        return place(context.getItem(), player, context.getWorld(), position, context.getHand(), context.getFace(),
+        return place(context.getItemInHand(), player, context.getLevel(), position, context.getHand(), context.getClickedFace(),
                 (float) (hit.x - position.getX()), (float) (hit.y - position.getY()), (float) (hit.z - position.getZ()),
                 material, shape);
     }
@@ -103,18 +103,18 @@ public final class PieceItem extends Item {
             return ActionResultType.SUCCESS;
         }
         if (!replaceable(world, position, player, hand, stack, face, hitX, hitY, hitZ)) {
-            position = position.offset(face);
+            position = position.relative(face);
             existingState = world.getBlockState(position);
-            targetX -= face.getXOffset();
-            targetY -= face.getYOffset();
-            targetZ -= face.getZOffset();
+            targetX -= face.getStepX();
+            targetY -= face.getStepY();
+            targetZ -= face.getStepZ();
 
             if (combine(world, position, existingState, materialId, shape, player, stack, face, targetX, targetY,
                     targetZ)) {
                 return ActionResultType.SUCCESS;
             }
         }
-        if (!player.canPlayerEdit(position, face, stack)
+        if (!player.mayUseItemAt(position, face, stack)
                 || !replaceable(world, position, player, hand, stack, face, targetX, targetY, targetZ)) {
             return ActionResultType.FAIL;
         }
@@ -140,7 +140,7 @@ public final class PieceItem extends Item {
                 orientation = corner(hitX, hitZ);
                 break;
             case STEP:
-                orientation = player.isSneaking() ? 8 + corner(hitX, hitZ)
+                orientation = player.isShiftKeyDown() ? 8 + corner(hitX, hitZ)
                         : horizontalRotation
                                 + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 0 : 4);
                 break;
@@ -149,7 +149,7 @@ public final class PieceItem extends Item {
                         + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 0 : 4);
                 break;
             case STAIRS:
-                Direction playerFacing = player.getHorizontalFacing();
+                Direction playerFacing = player.getDirection();
                 orientation = (playerFacing == Direction.EAST ? 0
                         : playerFacing == Direction.WEST ? 1 : playerFacing == Direction.SOUTH ? 2 : 3)
                         + (face == Direction.DOWN || face.getAxis() != Direction.Axis.Y && hitY > .5f ? 4 : 0);
@@ -160,37 +160,37 @@ public final class PieceItem extends Item {
 
         BlockState target = Pieces.state(materialId, placedShape, orientation);
 
-        if (shape == Shape.HORIZONTAL_STEP && player.isSneaking()) {
+        if (shape == Shape.HORIZONTAL_STEP && player.isShiftKeyDown()) {
             target = Pieces.state(materialId, Shape.VERTICAL_STEP, corner(hitX, hitZ));
         }
-        if (target != null && target.has(SlabBlock.WATERLOGGED)) {
-            boolean water = world.getFluidState(position).getFluid() == Fluids.WATER
-                    || world.getFluidState(position).getFluid() == Fluids.FLOWING_WATER;
+        if (target != null && target.hasProperty(SlabBlock.WATERLOGGED)) {
+            boolean water = world.getFluidState(position).getType() == Fluids.WATER
+                    || world.getFluidState(position).getType() == Fluids.FLOWING_WATER;
 
-            target = target.with(SlabBlock.WATERLOGGED, water);
+            target = target.setValue(SlabBlock.WATERLOGGED, water);
         }
         // Check the chosen orientation, not the block's default collision box.
-        if (target == null || !target.isValidPosition(world, position) || !safe(world, position, target)) {
+        if (target == null || !target.canSurvive(world, position) || !safe(world, position, target)) {
             return ActionResultType.FAIL;
         }
-        if (!world.setBlockState(position, target, 3)) {
+        if (!world.setBlock(position, target, 3)) {
             return ActionResultType.FAIL;
         }
 
-        target.getBlock().onBlockPlacedBy(world, position, target, player, stack);
+        target.getBlock().setPlacedBy(world, position, target, player, stack);
         finish(world, position, target, player, stack);
         return ActionResultType.SUCCESS;
     }
 
     public boolean canPlaceBlockOnSide(World world, BlockPos position, Direction side, PlayerEntity player,
             ItemStack itemStack) {
-        return player.canPlayerEdit(position, side, itemStack);
+        return player.mayUseItemAt(position, side, itemStack);
     }
 
     /** Combine occupied cells only when their union is a supported shape of the same material. */
     private static boolean combine(World world, BlockPos position, BlockState existingState, String material,
             Shape shape, PlayerEntity player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ) {
-        if (!player.canPlayerEdit(position, face, stack) || shape == Shape.WALL || shape == Shape.PANE) {
+        if (!player.mayUseItemAt(position, face, stack) || shape == Shape.WALL || shape == Shape.PANE) {
             return false;
         }
 
@@ -221,9 +221,9 @@ public final class PieceItem extends Item {
 
         // Nudge seam clicks towards the empty half, including clicks exactly on the centre plane.
         float epsilon = .0001f;
-        int clickedCell = (hitX + face.getXOffset() * epsilon >= .5f ? 1 : 0)
-                | (hitZ + face.getZOffset() * epsilon >= .5f ? 2 : 0)
-                | (hitY + face.getYOffset() * epsilon >= .5f ? 4 : 0);
+        int clickedCell = (hitX + face.getStepX() * epsilon >= .5f ? 1 : 0)
+                | (hitZ + face.getStepZ() * epsilon >= .5f ? 2 : 0)
+                | (hitY + face.getStepY() * epsilon >= .5f ? 4 : 0);
         BlockState combinedState = null;
         boolean isSlab = shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB;
         Shape[] additions = isSlab ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
@@ -261,12 +261,12 @@ public final class PieceItem extends Item {
             }
         }
 
-        if (combinedState != null && combinedState.has(SlabBlock.WATERLOGGED)
-                && existingState.has(SlabBlock.WATERLOGGED)) {
-            combinedState = combinedState.with(SlabBlock.WATERLOGGED, existingState.get(SlabBlock.WATERLOGGED));
+        if (combinedState != null && combinedState.hasProperty(SlabBlock.WATERLOGGED)
+                && existingState.hasProperty(SlabBlock.WATERLOGGED)) {
+            combinedState = combinedState.setValue(SlabBlock.WATERLOGGED, existingState.getValue(SlabBlock.WATERLOGGED));
         }
         if (combinedState == null || !safe(world, position, combinedState)
-                || !world.setBlockState(position, combinedState, 3)) {
+                || !world.setBlock(position, combinedState, 3)) {
             return false;
         }
 
@@ -275,13 +275,13 @@ public final class PieceItem extends Item {
     }
 
     private static boolean safe(World world, BlockPos position, BlockState target) {
-        return world.func_226663_a_(target, position, ISelectionContext.dummy());
+        return world.isUnobstructed(target, position, ISelectionContext.empty());
     }
 
     private static boolean replaceable(World world, BlockPos position, PlayerEntity player, Hand hand, ItemStack stack,
             Direction face, float hitX, float hitY, float hitZ) {
         BlockRayTraceResult hit = new BlockRayTraceResult(
-                new Vec3d(position.getX() + hitX, position.getY() + hitY, position.getZ() + hitZ), face, position,
+                new Vector3d(position.getX() + hitX, position.getY() + hitY, position.getZ() + hitZ), face, position,
                 false);
 
         return new PlacementContext(world, player, hand, stack, hit).replacingClickedOnBlock();
@@ -300,7 +300,7 @@ public final class PieceItem extends Item {
         world.playSound(player, position, sound.getPlaceSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1) / 2,
                 sound.getPitch() * .8f);
 
-        if (!player.abilities.isCreativeMode) {
+        if (!player.abilities.instabuild) {
             stack.shrink(1);
         }
     }

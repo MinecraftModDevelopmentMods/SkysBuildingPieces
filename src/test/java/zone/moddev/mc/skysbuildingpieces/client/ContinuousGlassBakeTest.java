@@ -71,7 +71,7 @@ class ContinuousGlassBakeTest {
             return Collections.emptyList();
         }
 
-        public boolean isAmbientOcclusion() {
+        public boolean useAmbientOcclusion() {
             return false;
         }
 
@@ -79,19 +79,19 @@ class ContinuousGlassBakeTest {
             return true;
         }
 
-        public boolean func_230044_c_() {
+        public boolean usesBlockLight() {
             return true;
         }
 
-        public boolean isBuiltInRenderer() {
+        public boolean isCustomRenderer() {
             return false;
         }
 
-        public TextureAtlasSprite getParticleTexture() {
+        public TextureAtlasSprite getParticleIcon() {
             return null;
         }
 
-        public ItemCameraTransforms getItemCameraTransforms() {
+        public ItemCameraTransforms getTransforms() {
             return null;
         }
 

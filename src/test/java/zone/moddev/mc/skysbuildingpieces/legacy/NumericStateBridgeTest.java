@@ -34,7 +34,7 @@ class NumericStateBridgeTest {
         int states = 0;
         Map<BlockState, Integer> encoded = new LinkedHashMap<>();
 
-        for (BlockState state : Blocks.OAK_STAIRS.getStateContainer().getValidStates()) {
+        for (BlockState state : Blocks.OAK_STAIRS.getStateDefinition().getPossibleStates()) {
             int number = NumericStateBridge.encode(state);
 
             assertNotEquals(256, number >>> 4);
@@ -70,11 +70,11 @@ class NumericStateBridgeTest {
 
         NumericStateBridge.begin(snapshot, new ListNBT());
 
-        int first = NumericStateBridge.encode(Blocks.GOLD_BLOCK.getDefaultState());
+        int first = NumericStateBridge.encode(Blocks.GOLD_BLOCK.defaultBlockState());
 
         NumericStateBridge.begin(snapshot, NumericStateBridge.saveStaging());
 
-        int second = NumericStateBridge.encode(Blocks.IRON_BLOCK.getDefaultState());
+        int second = NumericStateBridge.encode(Blocks.IRON_BLOCK.defaultBlockState());
 
         assertEquals(first + 1, second);
         assertEquals(first >>> 4, second >>> 4);
@@ -91,7 +91,7 @@ class NumericStateBridgeTest {
         NumericStateBridge.begin(snapshot, new ListNBT());
 
         LegacyBridge.RecoveryAbort failure = assertThrows(LegacyBridge.RecoveryAbort.class,
-                () -> NumericStateBridge.encode(Blocks.STONE.getDefaultState()));
+                () -> NumericStateBridge.encode(Blocks.STONE.defaultBlockState()));
 
         assertTrue(failure.getMessage().contains("1.12.2"));
         assertEquals(0, NumericStateBridge.saveStaging().size());
@@ -137,7 +137,7 @@ class NumericStateBridgeTest {
         CompoundNBT entry = new CompoundNBT();
 
         entry.putInt("encoded", 256 << 4);
-        entry.put("state", net.minecraft.nbt.NBTUtil.writeBlockState(Blocks.GOLD_BLOCK.getDefaultState()));
+        entry.put("state", net.minecraft.nbt.NBTUtil.writeBlockState(Blocks.GOLD_BLOCK.defaultBlockState()));
 
         ListNBT conflict = new ListNBT();
 

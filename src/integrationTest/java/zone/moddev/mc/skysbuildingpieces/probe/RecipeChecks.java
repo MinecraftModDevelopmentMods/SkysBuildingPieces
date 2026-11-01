@@ -31,7 +31,7 @@ public final class RecipeChecks {
         Set<Item> obtainable = new HashSet<>();
 
         for (IRecipe<?> entry : world.getRecipeManager().getRecipes()) {
-            if (!entry.getId().getNamespace().startsWith("skysbuildingpieces") || entry.isDynamic()) {
+            if (!entry.getId().getNamespace().startsWith("skysbuildingpieces") || entry.isSpecial()) {
                 continue;
             }
 
@@ -45,19 +45,19 @@ public final class RecipeChecks {
                 for (int size : new int[] { 2, 3 }) {
                     for (int slot = 0; slot < size * size; slot++) {
                         CraftingInventory grid = grid(size);
-                        ItemStack input = recipe.getIngredients().get(0).getMatchingStacks()[0].copy();
+                        ItemStack input = recipe.getIngredients().get(0).getItems()[0].copy();
 
                         input.setCount(17);
-                        grid.setInventorySlotContents(slot, input);
-                        assertManager(grid, world, recipe.getRecipeOutput(), recipe.getId().toString());
+                        grid.setItem(slot, input);
+                        assertManager(grid, world, recipe.getResultItem(), recipe.getId().toString());
                         require(input.getCount() == 17, "Restore lookup changed its input");
-                        grid.setInventorySlotContents((slot + 1) % (size * size), input.copy());
+                        grid.setItem((slot + 1) % (size * size), input.copy());
                         require(!recipe.matches(grid, world), "Restore recipe accepts an extra block");
                         variants++;
                     }
                 }
 
-                obtainable.add(recipe.getRecipeOutput().getItem());
+                obtainable.add(recipe.getResultItem().getItem());
                 network(recipe);
                 recipes++;
                 continue;
@@ -67,10 +67,10 @@ public final class RecipeChecks {
 
             ShapedRecipe recipe = (ShapedRecipe) entry;
 
-            obtainable.add(recipe.getRecipeOutput().getItem());
+            obtainable.add(recipe.getResultItem().getItem());
 
             for (int size : new int[] { 2, 3 }) {
-                if (!recipe.canFit(size, size)) {
+                if (!recipe.canCraftInDimensions(size, size)) {
                     continue;
                 }
                 for (int rowOffset = 0; rowOffset <= size - recipe.getRecipeHeight(); rowOffset++) {
@@ -88,20 +88,20 @@ public final class RecipeChecks {
                                         continue;
                                     }
 
-                                    require(ingredient.getMatchingStacks().length > 0,
+                                    require(ingredient.getItems().length > 0,
                                             "Empty book ingredient: " + recipe.getId());
 
-                                    ItemStack input = ingredient.getMatchingStacks()[0].copy();
+                                    ItemStack input = ingredient.getItems()[0].copy();
 
                                     input.setCount(17);
-                                    grid.setInventorySlotContents(column + columnOffset + (row + rowOffset) * size,
+                                    grid.setItem(column + columnOffset + (row + rowOffset) * size,
                                             input);
                                 }
                             }
 
                             require(recipe.matches(grid, world), "Offset or mirrored recipe: " + recipe.getId());
 
-                            ItemStack expected = recipe.getRecipeOutput().copy();
+                            ItemStack expected = recipe.getResultItem().copy();
 
                             assertManager(grid, world, expected, recipe.getId().toString());
 
@@ -112,25 +112,25 @@ public final class RecipeChecks {
                             int first = -1;
                             int empty = -1;
 
-                            for (int slot = 0; slot < grid.getSizeInventory(); slot++) {
-                                if (grid.getStackInSlot(slot).isEmpty()) {
+                            for (int slot = 0; slot < grid.getContainerSize(); slot++) {
+                                if (grid.getItem(slot).isEmpty()) {
                                     empty = slot;
                                 } else if (first < 0) {
                                     first = slot;
                                 }
                             }
 
-                            ItemStack input = grid.getStackInSlot(first);
+                            ItemStack input = grid.getItem(first);
 
                             require(input.getCount() == 17, "Recipe lookup changed an input stack");
-                            grid.setInventorySlotContents(first, new ItemStack(Items.APPLE));
+                            grid.setItem(first, new ItemStack(Items.APPLE));
                             require(!recipe.matches(grid, world), "Wrong material accepted: " + recipe.getId());
-                            grid.setInventorySlotContents(first, input);
+                            grid.setItem(first, input);
 
                             if (empty >= 0) {
-                                grid.setInventorySlotContents(empty, input.copy());
+                                grid.setItem(empty, input.copy());
                                 require(!recipe.matches(grid, world), "Extra material accepted: " + recipe.getId());
-                                grid.setInventorySlotContents(empty, ItemStack.EMPTY);
+                                grid.setItem(empty, ItemStack.EMPTY);
                             }
                             if (recipe instanceof CuttingRecipe) {
                                 CompoundNBT tag = new CompoundNBT();
@@ -144,7 +144,7 @@ public final class RecipeChecks {
                                 named.setTag(tag.copy());
                                 assertManager(grid, world, named, "Rotation keeps the complete custom tag");
 
-                                ItemStack result = recipe.getCraftingResult(grid);
+                                ItemStack result = recipe.assemble(grid);
 
                                 result.getTag().putString("custom_label", "Changed result");
                                 require(input.getTag().equals(tag), "Rotation result must not share the input tag");
@@ -201,13 +201,13 @@ public final class RecipeChecks {
         PacketBuffer buffer = new PacketBuffer(io.netty.buffer.Unpooled.buffer());
 
         try {
-            serializer.write(buffer, recipe);
+            serializer.toNetwork(buffer, recipe);
 
-            IRecipe decoded = serializer.read(recipe.getId(), buffer);
+            IRecipe decoded = serializer.fromNetwork(recipe.getId(), buffer);
 
-            require(decoded.getId().equals(recipe.getId()) && !decoded.isDynamic(),
+            require(decoded.getId().equals(recipe.getId()) && !decoded.isSpecial(),
                     "Network recipe identity and visibility");
-            require(ItemStack.areItemStacksEqual(decoded.getRecipeOutput(), recipe.getRecipeOutput()),
+            require(ItemStack.matches(decoded.getResultItem(), recipe.getResultItem()),
                     "Network result changed: " + recipe.getId());
 
             CraftingInventory grid = grid(3);
@@ -221,12 +221,12 @@ public final class RecipeChecks {
                     Ingredient ingredient = recipe.getIngredients().get(column + row * width);
 
                     if (ingredient != Ingredient.EMPTY) {
-                        grid.setInventorySlotContents(column + row * 3, ingredient.getMatchingStacks()[0].copy());
+                        grid.setItem(column + row * 3, ingredient.getItems()[0].copy());
                     }
                 }
             }
 
-            require(ItemStack.areItemStacksEqual(decoded.getCraftingResult(grid), recipe.getCraftingResult(grid)),
+            require(ItemStack.matches(decoded.assemble(grid), recipe.assemble(grid)),
                     "Network assembly changed: " + recipe.getId());
         } finally {
             buffer.release();
@@ -234,7 +234,7 @@ public final class RecipeChecks {
     }
 
     private static void nativeRecipe(ServerWorld world, String path, Item output, int count) {
-        IRecipe<?> recipe = world.getRecipeManager().getRecipe(new ResourceLocation("minecraft", path))
+        IRecipe<?> recipe = world.getRecipeManager().byKey(new ResourceLocation("minecraft", path))
                 .orElseThrow(() -> new AssertionError("Missing native recipe: " + path));
         CraftingInventory grid = grid(3);
         int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeWidth() : 3;
@@ -243,8 +243,8 @@ public final class RecipeChecks {
             Ingredient ingredient = recipe.getIngredients().get(index);
 
             if (ingredient != Ingredient.EMPTY) {
-                grid.setInventorySlotContents(index % width + index / width * 3,
-                        ingredient.getMatchingStacks()[0].copy());
+                grid.setItem(index % width + index / width * 3,
+                        ingredient.getItems()[0].copy());
             }
         }
 
@@ -254,7 +254,7 @@ public final class RecipeChecks {
     private static void templates(ServerWorld world) {
         for (Item retired : Pieces.RETIRED_TEMPLATES.values()) {
             for (IRecipe<?> recipe : world.getRecipeManager().getRecipes()) {
-                require(recipe.getRecipeOutput().getItem() != retired, "Retired templates must not be craftable");
+                require(recipe.getResultItem().getItem() != retired, "Retired templates must not be craftable");
             }
 
             CraftingInventory grid = grid(2);
@@ -266,32 +266,32 @@ public final class RecipeChecks {
             ItemStack input = new ItemStack(retired);
 
             input.setTag(custom);
-            grid.setInventorySlotContents(3, input);
+            grid.setItem(3, input);
 
             ItemStack paper = new ItemStack(Items.PAPER);
 
             paper.setTag(custom.copy());
             assertManager(grid, world, paper, "retired template recycling");
 
-            ICraftingRecipe recycling = world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, grid, world).get();
+            ICraftingRecipe recycling = world.getRecipeManager().getRecipeFor(IRecipeType.CRAFTING, grid, world).get();
 
             for (ItemStack remainder : recycling.getRemainingItems(grid)) {
                 require(remainder.isEmpty(), "Recycling consumes the retired template");
             }
 
-            grid.setInventorySlotContents(0, new ItemStack(Items.STONE));
+            grid.setItem(0, new ItemStack(Items.STONE));
             require(!recycling.matches(grid, world), "Old templates must not cut new pieces");
         }
     }
 
     private static void assertManager(CraftingInventory grid, ServerWorld world, ItemStack expected, String label) {
-        ItemStack actual = world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.getCraftingResult(grid)).orElse(ItemStack.EMPTY);
+        ItemStack actual = world.getRecipeManager().getRecipeFor(IRecipeType.CRAFTING, grid, world)
+                .map(recipe -> recipe.assemble(grid)).orElse(ItemStack.EMPTY);
 
-        require(ItemStack.areItemStacksEqual(expected, actual), "Crafting manager selects " + label);
+        require(ItemStack.matches(expected, actual), "Crafting manager selects " + label);
 
-        for (ICraftingRecipe recipe : world.getRecipeManager().getRecipes(IRecipeType.CRAFTING, grid, world)) {
-            require(ItemStack.areItemStacksEqual(expected, recipe.getCraftingResult(grid)),
+        for (ICraftingRecipe recipe : world.getRecipeManager().getRecipesFor(IRecipeType.CRAFTING, grid, world)) {
+            require(ItemStack.matches(expected, recipe.assemble(grid)),
                     "Conflicting recipe for " + label + ": " + recipe.getId());
         }
     }

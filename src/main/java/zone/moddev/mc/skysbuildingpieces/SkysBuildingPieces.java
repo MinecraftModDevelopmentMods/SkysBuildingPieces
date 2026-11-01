@@ -24,16 +24,17 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.115021";
+    public static final String VERSION = "0.3.8.116051";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;
 
     public SkysBuildingPieces() {
+        LegacyBridge.registerPersistence();
         BuildingPiecesConfig.register();
         Pieces.register();
         MineralogyCompat.register();
-        HOLDER = new Block(Block.Properties.create(Material.ROCK).hardnessAndResistance(-1.0F, 3_600_000.0F));
+        HOLDER = new Block(Block.Properties.of(Material.STONE).strength(-1.0F, 3_600_000.0F));
         HOLDER.setRegistryName(ID, "legacy_piece_holder");
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);

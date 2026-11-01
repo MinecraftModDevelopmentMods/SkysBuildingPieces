@@ -20,3 +20,5 @@
 	#When enabled, Forge will show any warnings that occurred during loading.
 	showLoadWarnings = true
 
+	#Use the target's default separate depth and stencil attachments.
+	useCombinedDepthStencilAttachment = false

@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Dynamic;
 import cpw.mods.modlauncher.api.INameMappingService;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -178,7 +178,7 @@ final class NumericStateBridge {
             properties.putString("decayable", Boolean.toString(!properties.getString("persistent").equals("true")));
         }
 
-        Dynamic<?> value = BlockStateFlatteningMap.makeDynamic(flattened.toString());
+        Dynamic<?> value = BlockStateFlatteningMap.parse(flattened.toString());
 
         table[encoded] = value;
         installed.put(encoded, value);
@@ -224,7 +224,7 @@ final class NumericStateBridge {
             Field field;
 
             try {
-                field = BlockStateFlatteningMap.class.getDeclaredField("ID_TO_FIXED_NBT");
+                field = BlockStateFlatteningMap.class.getDeclaredField("MAP");
             } catch (NoSuchFieldException mappedNameAbsent) {
                 field = BlockStateFlatteningMap.class.getDeclaredField(
                         ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "field_199200_b"));

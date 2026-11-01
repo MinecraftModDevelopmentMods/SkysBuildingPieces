@@ -21,7 +21,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -36,15 +36,17 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
 public final class RuntimeBootstrap {
     public RuntimeBootstrap() {
         MinecraftForge.EVENT_BUS.addListener(this::started);
+        net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
+                .addListener(PersistenceOrderChecks::ready);
         net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                 () -> () -> new ClientProbe().init());
     }
 
     private void started(FMLServerStartedEvent event) {
         MinecraftServer server = event.getServer();
-        ServerWorld world = server.getWorld(DimensionType.OVERWORLD);
+        ServerWorld world = server.getLevel(World.OVERWORLD);
         String phase = System.getProperty("skysbuildingpieces.bootstrapPhase", "");
-        File root = server.getActiveAnvilConverter().getFile(server.getFolderName(), "level.dat").getParentFile();
+        File root = server.getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile();
 
         try {
             require(phase.equals("fresh") || phase.equals("reload") || phase.startsWith("forward")
@@ -105,18 +107,24 @@ public final class RuntimeBootstrap {
                 result.store(output, "Native runtime checks");
             }
 
+            PersistenceOrderChecks.verify(world);
             System.out.println("BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase + " recipes=" + recipes
                     + " legacy_stacks=" + stacks);
-            server.initiateShutdown(false);
+            server.halt(false);
         } catch (Throwable failure) {
             failure.printStackTrace();
             ClientStatus.failure = failure;
-            server.initiateShutdown(false);
+            // World creation waits for server readiness on the render thread.
+            // Report a failed probe there too, so it exits instead of waiting forever.
+            net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                    () -> () -> net.minecraft.client.Minecraft.getInstance().delayCrash(
+                            net.minecraft.crash.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
+            server.halt(false);
         }
     }
 
     private static void clientGrid(ServerWorld world, boolean reload) throws Exception {
-        File file = new File(world.getSaveHandler().getWorldDirectory(), "native-client-grid.dat");
+        File file = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), "native-client-grid.dat");
         CompoundNBT saved = new CompoundNBT();
 
         if (reload) {
@@ -125,10 +133,11 @@ public final class RuntimeBootstrap {
             }
         }
 
-        CompoundNBT rules = world.getGameRules().write();
+        CompoundNBT rules = world.getGameRules().createTag();
 
         rules.putString("randomTickSpeed", "0");
-        world.getGameRules().read(rules);
+        world.getGameRules().assignFrom(new net.minecraft.world.GameRules(
+                new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NBTDynamicOps.INSTANCE, rules)), world.getServer());
 
         int number = 0;
 
@@ -143,7 +152,7 @@ public final class RuntimeBootstrap {
                     require(NBTUtil.writeBlockState(world.getBlockState(position)).equals(saved.getCompound(key)),
                             "Client world reload lost " + block.getRegistryName() + " / " + metadata);
                 } else {
-                    world.setBlockState(position, block.getStateFromMeta(metadata), 18);
+                    world.setBlock(position, block.getStateFromMeta(metadata), 18);
                 }
             }
         }
@@ -156,7 +165,7 @@ public final class RuntimeBootstrap {
                 PieceBlock block = (PieceBlock) state.getBlock();
 
                 state = block.getActualState(state, world, position);
-                world.setBlockState(position, state, 18);
+                world.setBlock(position, state, 18);
                 saved.put(Integer.toString(index), NBTUtil.writeBlockState(state));
             }
             try (FileOutputStream output = new FileOutputStream(file)) {
@@ -170,7 +179,7 @@ public final class RuntimeBootstrap {
     private static CraftingInventory grid() {
         return new CraftingInventory(new Container(null, 0) {
             @Override
-            public boolean canInteractWith(PlayerEntity player) {
+            public boolean stillValid(PlayerEntity player) {
                 return true;
             }
         }, 3, 3);
@@ -197,7 +206,7 @@ public final class RuntimeBootstrap {
                 raw.put("tag", custom);
                 LegacyBridge.prepareStack(raw);
 
-                ItemStack actual = ItemStack.read(raw);
+                ItemStack actual = ItemStack.of(raw);
                 ItemStack expected = Pieces.legacyItem(block.getRegistryName().toString(), metadata, 17);
 
                 require(actual.getItem() == expected.getItem() && actual.getCount() == 17,
@@ -221,7 +230,7 @@ public final class RuntimeBootstrap {
                         fixed = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
                                 net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, fixed,
                                 intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
-                        ItemStack saved = ItemStack.read(fixed);
+                        ItemStack saved = ItemStack.of(fixed);
                         require(saved.getItem() == expected.getItem() && saved.getCount() == 17
                                 && saved.hasTag() && saved.getTag().equals(custom) && fixed.getByte("Slot") == 4,
                                 "Native item fixer changed " + expected.getItem().getRegistryName()
@@ -268,13 +277,13 @@ public final class RuntimeBootstrap {
         CompoundNBT upgraded = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
                 net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, source, 1343, 1976);
         CompoundNBT saved = upgraded.getList("Inventory", 10).getCompound(0);
-        ItemStack actual = ItemStack.read(saved);
+        ItemStack actual = ItemStack.of(saved);
         ItemStack expected = Pieces.legacyItem(block.getRegistryName().toString(), metadata, 23);
 
         require(actual.getItem() == expected.getItem() && actual.getCount() == 23,
                 "The real player data fixer must see the recovered flat item, not the metadata carrier");
         require(actual.hasTag() && actual.getTag().getString("Keep").equals("Unrelated custom data")
-                && actual.getDisplayName().getString().equals("Named legacy piece") && saved.getByte("Slot") == 7,
+                && actual.getHoverName().getString().equals("Named legacy piece") && saved.getByte("Slot") == 7,
                 "Player data fixing must preserve the custom name, slot and unrelated data");
         System.out.println("BUILDING_PIECES_RAW_PLAYER_FIXER_PASS");
     }

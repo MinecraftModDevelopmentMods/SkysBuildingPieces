@@ -25,8 +25,8 @@ public final class LegacyPieceRecipe extends SpecialRecipe {
     private ItemStack result(CraftingInventory inventory) {
         ItemStack source = ItemStack.EMPTY;
 
-        for (int slot = 0; slot < inventory.getSizeInventory(); slot++) {
-            ItemStack stack = inventory.getStackInSlot(slot);
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
 
             if (!stack.isEmpty()) {
                 if (!source.isEmpty()) {
@@ -81,12 +81,12 @@ public final class LegacyPieceRecipe extends SpecialRecipe {
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inventory) {
+    public ItemStack assemble(CraftingInventory inventory) {
         return result(inventory);
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width >= 1 && height >= 1;
     }
 
@@ -97,6 +97,6 @@ public final class LegacyPieceRecipe extends SpecialRecipe {
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingInventory inventory) {
-        return NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
+        return NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
     }
 }

@@ -23,10 +23,10 @@ public final class SlabPlacement {
         double right = right(face, hitX, hitZ);
 
         if (right >= hitY) {
-            return right < 1 - (double) hitY ? Direction.DOWN : face.rotateY();
+            return right < 1 - (double) hitY ? Direction.DOWN : face.getClockWise();
         }
 
-        return right >= 1 - (double) hitY ? Direction.UP : face.rotateYCCW();
+        return right >= 1 - (double) hitY ? Direction.UP : face.getCounterClockWise();
     }
 
     /** Explicit vertical-slab items stay vertical, including clicks near a side edge. */
@@ -42,7 +42,7 @@ public final class SlabPlacement {
             return face.getOpposite();
         }
 
-        return right(face, hitX, hitZ) >= hitY ? face.rotateY() : face.rotateYCCW();
+        return right(face, hitX, hitZ) >= hitY ? face.getClockWise() : face.getCounterClockWise();
     }
 
     public static Shape shape(Direction side) {
@@ -50,7 +50,7 @@ public final class SlabPlacement {
     }
 
     public static int orientation(Direction side) {
-        return side == Direction.UP ? 0 : side == Direction.DOWN ? 1 : side.getHorizontalIndex();
+        return side == Direction.UP ? 0 : side == Direction.DOWN ? 1 : side.get2DDataValue();
     }
 
     private static boolean centre(Direction face, float hitX, float hitY, float hitZ) {

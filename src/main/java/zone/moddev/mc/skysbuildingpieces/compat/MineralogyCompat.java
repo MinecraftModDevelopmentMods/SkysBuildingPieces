@@ -123,7 +123,7 @@ public final class MineralogyCompat {
                     changes.add(new StackIdentity(compound, replacement));
                 }
             }
-            for (String key : compound.keySet()) {
+            for (String key : compound.getAllKeys()) {
                 collectStacks(compound.get(key), changes);
             }
         } else if (value instanceof ListNBT) {

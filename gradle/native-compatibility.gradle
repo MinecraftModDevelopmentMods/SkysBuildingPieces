@@ -50,6 +50,7 @@ tasks.register('nativeInstalledPolicyTest', JavaExec) {
     project.ext.configureNativeBootstrapRun(delegate, 'runServer')
     doLast {
         File directory = policyDirectory.get().asFile
+        project.ext.auditNativeServerLogs(directory, 'compat')
         File log = new File(directory, 'logs/latest.log')
         String text = log.isFile() ? log.getText('UTF-8') : ''
         if (!text.contains('BUILDING_PIECES_COMPATIBILITY_PASS installed_fixture=true') ||

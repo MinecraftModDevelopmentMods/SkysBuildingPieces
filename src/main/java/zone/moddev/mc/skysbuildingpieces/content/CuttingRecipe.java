@@ -16,17 +16,17 @@ public final class CuttingRecipe extends ShapedRecipe {
 
     private CuttingRecipe(ShapedRecipe recipe, boolean preserveTag) {
         super(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(), recipe.getRecipeHeight(),
-                recipe.getIngredients(), recipe.getRecipeOutput());
+                recipe.getIngredients(), recipe.getResultItem());
         this.preserveTag = preserveTag;
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inventory) {
-        ItemStack result = super.getCraftingResult(inventory);
+    public ItemStack assemble(CraftingInventory inventory) {
+        ItemStack result = super.assemble(inventory);
 
         if (preserveTag) {
-            for (int slot = 0; slot < inventory.getSizeInventory(); slot++) {
-                ItemStack input = inventory.getStackInSlot(slot);
+            for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+                ItemStack input = inventory.getItem(slot);
 
                 if (!input.isEmpty()) {
                     if (input.hasTag()) {
@@ -51,21 +51,21 @@ public final class CuttingRecipe extends ShapedRecipe {
         private final ShapedRecipe.Serializer shaped = new ShapedRecipe.Serializer();
 
         @Override
-        public CuttingRecipe read(ResourceLocation id, JsonObject json) {
-            return new CuttingRecipe(shaped.read(id, json),
+        public CuttingRecipe fromJson(ResourceLocation id, JsonObject json) {
+            return new CuttingRecipe(shaped.fromJson(id, json),
                     json.has("preserve_tag") && json.get("preserve_tag").getAsBoolean());
         }
 
         @Override
-        public CuttingRecipe read(ResourceLocation id, PacketBuffer buffer) {
-            ShapedRecipe recipe = shaped.read(id, buffer);
+        public CuttingRecipe fromNetwork(ResourceLocation id, PacketBuffer buffer) {
+            ShapedRecipe recipe = shaped.fromNetwork(id, buffer);
 
             return new CuttingRecipe(recipe, buffer.readBoolean());
         }
 
         @Override
-        public void write(PacketBuffer buffer, CuttingRecipe recipe) {
-            shaped.write(buffer, recipe);
+        public void toNetwork(PacketBuffer buffer, CuttingRecipe recipe) {
+            shaped.toNetwork(buffer, recipe);
             buffer.writeBoolean(recipe.preserveTag);
         }
     }

@@ -11,7 +11,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
@@ -66,18 +66,18 @@ public final class NativeSlabPlacement {
             return null;
         }
 
-        BlockPos position = context.getPos();
-        Vec3d hit = context.getHitVec();
+        BlockPos position = context.getClickedPos();
+        Vector3d hit = context.getClickLocation();
 
-        return place(context.getItem(), context.getPlayer(), context.getWorld(), position, context.getHand(),
-                context.getFace(), (float) (hit.x - position.getX()), (float) (hit.y - position.getY()),
+        return place(context.getItemInHand(), context.getPlayer(), context.getLevel(), position, context.getHand(),
+                context.getClickedFace(), (float) (hit.x - position.getX()), (float) (hit.y - position.getY()),
                 (float) (hit.z - position.getZ()));
     }
 
     /** Null leaves the original item-use path intact. */
     public static ActionResultType place(PlayerEntity player, World world, BlockPos position, Hand hand, Direction face,
             float hitX, float hitY, float hitZ) {
-        return place(player.getHeldItem(hand), player, world, position, hand, face, hitX, hitY, hitZ);
+        return place(player.getItemInHand(hand), player, world, position, hand, face, hitX, hitY, hitZ);
     }
 
     public static ActionResultType place(ItemStack stack, PlayerEntity player, World world, BlockPos position,

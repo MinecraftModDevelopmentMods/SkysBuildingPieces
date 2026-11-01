@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,18 +48,22 @@ public final class RuntimeProbe {
         ran = true;
 
         try {
-            ServerWorld world = server.getWorld(DimensionType.OVERWORLD);
+            ServerWorld world = server.getLevel(World.OVERWORLD);
             String phase = System.getProperty("skysbuildingpieces.integrationPhase");
 
             if (phase == null) {
                 throw new AssertionError("Unconfigured runtime probe");
             }
 
-            CompoundNBT rules = world.getGameRules().write();
-
-            rules.putString("randomTickSpeed", "0");
-            rules.putString("doFireTick", "false");
-            world.getGameRules().read(rules);
+            // Use the same server commands as an operator; the bulk-copy helper is client-only.
+            server.getCommands().performCommand(server.createCommandSourceStack().withSuppressedOutput(),
+                    "gamerule randomTickSpeed 0");
+            server.getCommands().performCommand(server.createCommandSourceStack().withSuppressedOutput(),
+                    "gamerule doFireTick false");
+            if (world.getGameRules().getInt(net.minecraft.world.GameRules.RULE_RANDOMTICKING) != 0
+                    || world.getGameRules().getBoolean(net.minecraft.world.GameRules.RULE_DOFIRETICK)) {
+                throw new AssertionError("The disposable runtime rules were not applied");
+            }
 
             if (phase.startsWith("sylvester")) {
                 new WorldAuditProbe(world, phase.equals("sylvester-reload"));
@@ -77,7 +81,7 @@ public final class RuntimeProbe {
                 RecipeBookChecks.run(world);
 
                 try (java.io.FileWriter writer = new java.io.FileWriter(
-                        new File(world.getSaveHandler().getWorldDirectory(), phase + ".pass"))) {
+                        new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), phase + ".pass"))) {
                     writer.write("RECIPE_BOOK_PHASE_PASS " + phase + "\n");
                 }
 
@@ -111,7 +115,7 @@ public final class RuntimeProbe {
                 }
             }
 
-            File marker = new File(world.getSaveHandler().getWorldDirectory(),
+            File marker = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
                     "skysbuildingpieces-integration.properties");
             Properties result = new Properties();
 
@@ -131,16 +135,16 @@ public final class RuntimeProbe {
             }
 
             System.out.println("BUILDING_PIECES_PROBE_PASS " + phase);
-            server.initiateShutdown(false);
+            server.halt(false);
         } catch (Throwable failure) {
             ClientStatus.failure = failure;
             failure.printStackTrace();
-            server.initiateShutdown(false);
+            server.halt(false);
         }
     }
 
     private static void grid(ServerWorld world, boolean reload) throws Exception {
-        File file = new File(world.getSaveHandler().getWorldDirectory(), "runtime-grid.dat");
+        File file = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), "runtime-grid.dat");
         CompoundNBT saved = new CompoundNBT();
 
         if (reload) {
@@ -164,7 +168,7 @@ public final class RuntimeProbe {
                                 "Saved client grid lost " + block.getRegistryName() + " / " + metadata);
                     }
                 } else {
-                    world.setBlockState(position, block.getStateFromMeta(metadata), 18);
+                    world.setBlock(position, block.getStateFromMeta(metadata), 18);
                 }
 
                 number++;
@@ -176,7 +180,7 @@ public final class RuntimeProbe {
                 BlockState actual = world.getBlockState(position);
 
                 actual = ((PieceBlock) actual.getBlock()).getActualState(actual, world, position);
-                world.setBlockState(position, actual, 18);
+                world.setBlock(position, actual, 18);
                 saved.put("" + index, NBTUtil.writeBlockState(actual));
             }
             try (FileOutputStream output = new FileOutputStream(file)) {

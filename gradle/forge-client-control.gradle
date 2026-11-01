@@ -51,7 +51,7 @@ tasks.register('forgeClientControlTest', Exec) {
         environment 'FORGE_GROUP', 'net.minecraftforge'
         environment 'MC_VERSION', minecraft_version
         environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
-        environment 'assetIndex', '1.15'
+        environment 'assetIndex', '1.16'
         environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
         workingDir directory
         commandLine javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }

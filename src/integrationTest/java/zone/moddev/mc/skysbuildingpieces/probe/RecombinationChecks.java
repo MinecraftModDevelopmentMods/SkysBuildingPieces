@@ -76,19 +76,19 @@ public final class RecombinationChecks {
                         ItemStack lower = Pieces.stack(Pieces.state(material, shape, (orientation + 1) % shape.states),
                                 23);
 
-                        grid.setInventorySlotContents(upperSlot, upper);
-                        grid.setInventorySlotContents(upperSlot + size, lower);
+                        grid.setItem(upperSlot, upper);
+                        grid.setItem(upperSlot + size, lower);
 
                         String label = material + " " + shape + " orientation=" + orientation;
                         ItemStack actual = result(grid, world);
 
-                        require(ItemStack.areItemStacksEqual(expected, actual),
+                        require(ItemStack.matches(expected, actual),
                                 "two vertically stacked pieces: " + label);
 
                         for (net.minecraft.item.crafting.ICraftingRecipe recipe : world.getRecipeManager()
-                                .getRecipes(IRecipeType.CRAFTING, grid, world)) {
+                                .getRecipesFor(IRecipeType.CRAFTING, grid, world)) {
                             if (recipe.matches(grid, world)) {
-                                require(ItemStack.areItemStacksEqual(expected, recipe.getCraftingResult(grid)),
+                                require(ItemStack.matches(expected, recipe.assemble(grid)),
                                         "no conflicting recipe for " + label);
 
                                 for (ItemStack remainder : recipe.getRemainingItems(grid)) {
@@ -98,7 +98,7 @@ public final class RecombinationChecks {
                         }
 
                         actual.setCount(9);
-                        require(ItemStack.areItemStacksEqual(expected, result(grid, world)),
+                        require(ItemStack.matches(expected, result(grid, world)),
                                 "each crafting result is an independent one-item copy");
                         require(upper.getCount() == 17 && lower.getCount() == 23,
                                 "recipe lookup leaves inputs untouched");
@@ -112,12 +112,12 @@ public final class RecombinationChecks {
         CraftingInventory mixed = grid(2);
         ItemStack ingredient = Pieces.stack(source, 1);
 
-        mixed.setInventorySlotContents(0, ingredient);
+        mixed.setItem(0, ingredient);
 
         int otherMaterial = block.canonicalMeta(source) == 0 ? shape.states : 0;
 
         if (otherMaterial / shape.states < block.palette.materials.size()) {
-            mixed.setInventorySlotContents(2, Pieces.stack(block.getStateFromMeta(otherMaterial), 1));
+            mixed.setItem(2, Pieces.stack(block.getStateFromMeta(otherMaterial), 1));
             require(result(mixed, world).isEmpty(), "different materials in one palette do not recombine");
         }
 
@@ -126,19 +126,19 @@ public final class RecombinationChecks {
 
         invalid.putInt("Damage", 16);
         invalidCarrier.setTag(invalid);
-        mixed.setInventorySlotContents(2, invalidCarrier);
+        mixed.setItem(2, invalidCarrier);
         require(result(mixed, world).isEmpty(), "unconverted invalid palette carriers are rejected");
-        mixed.setInventorySlotContents(2, ingredient.copy());
-        mixed.setInventorySlotContents(1, ingredient.copy());
+        mixed.setItem(2, ingredient.copy());
+        mixed.setItem(1, ingredient.copy());
         require(result(mixed, world).isEmpty(), "an extra piece is rejected");
-        mixed.setInventorySlotContents(1, ItemStack.EMPTY);
-        mixed.setInventorySlotContents(2, ItemStack.EMPTY);
+        mixed.setItem(1, ItemStack.EMPTY);
+        mixed.setItem(2, ItemStack.EMPTY);
         // A single step may still use the existing one-for-one rotation recipe.
-        require(!ItemStack.areItemStacksEqual(expected, result(mixed, world)),
+        require(!ItemStack.matches(expected, result(mixed, world)),
                 "one piece cannot produce the larger shape");
 
         if (shape == Shape.CORNER) {
-            mixed.setInventorySlotContents(1, ingredient.copy());
+            mixed.setItem(1, ingredient.copy());
             require(result(mixed, world).isEmpty(), "corners placed horizontally do not claim the cutting pattern");
         }
 
@@ -148,15 +148,15 @@ public final class RecombinationChecks {
     static CraftingInventory grid(int size) {
         return new CraftingInventory(new Container(null, 0) {
             @Override
-            public boolean canInteractWith(net.minecraft.entity.player.PlayerEntity player) {
+            public boolean stillValid(net.minecraft.entity.player.PlayerEntity player) {
                 return true;
             }
         }, size, size);
     }
 
     private static ItemStack result(CraftingInventory grid, ServerWorld world) {
-        return world.getRecipeManager().getRecipe(IRecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.getCraftingResult(grid)).orElse(ItemStack.EMPTY);
+        return world.getRecipeManager().getRecipeFor(IRecipeType.CRAFTING, grid, world)
+                .map(recipe -> recipe.assemble(grid)).orElse(ItemStack.EMPTY);
     }
 
     private static void require(boolean condition, String message) {

@@ -44,9 +44,9 @@ public final class SharedGrassChecks {
             for (int orientation = 0; orientation < block.palette.shape.states; orientation++) {
                 BlockState grass = Pieces.state("minecraft:grass", block.palette.shape, orientation);
 
-                world.removeBlock(position.up(), false);
-                world.setBlockState(position.down(), Blocks.DIRT.getDefaultState(), 2);
-                world.setBlockState(position, grass, 2);
+                world.removeBlock(position.above(), false);
+                world.setBlock(position.below(), Blocks.DIRT.defaultBlockState(), 2);
+                world.setBlock(position, grass, 2);
 
                 int cells = block.mask(grass);
                 boolean fullFootprint = ((cells | cells >> 4) & 15) == 15;
@@ -63,7 +63,7 @@ public final class SharedGrassChecks {
                 };
 
                 tickGrass.invoke(null, world, position, grass, downward);
-                require(world.getBlockState(position.down())
+                require(world.getBlockState(position.below())
                         .getBlock() == (fullFootprint ? Blocks.DIRT : Blocks.GRASS_BLOCK),
                         "shared grass support " + block.palette.shape + "/" + orientation);
                 require(world.getBlockState(position).equals(grass), "shared tick retains orientation");
@@ -73,7 +73,7 @@ public final class SharedGrassChecks {
 
         require(checked > 0, "registered grass pieces were tested");
         world.removeBlock(position, false);
-        world.removeBlock(position.down(), false);
+        world.removeBlock(position.below(), false);
         System.out.println("BUILDING_PIECES_SHARED_GRASS_PASS states=" + checked);
     }
 

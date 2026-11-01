@@ -28,6 +28,11 @@ final class LegacyPreflight {
                 File file = files.next().toFile();
 
                 try (RandomAccessFile region = new RandomAccessFile(file, "r")) {
+                    // Native region storage creates an empty file before its first chunk write.
+                    // A nonempty short header still signals damage and must stop recovery.
+                    if (region.length() == 0) {
+                        continue;
+                    }
                     if (region.length() < 8192) {
                         throw blocked("malformed region header in " + file.getName());
                     }
@@ -217,7 +222,7 @@ final class LegacyPreflight {
                     throw blocked(registryId + " / " + material + " / " + shape + " item");
                 }
             }
-            for (String key : compoundTag.keySet()) {
+            for (String key : compoundTag.getAllKeys()) {
                 if (!key.equals("retained_tiles")) {
                     inspectStacks(compoundTag.get(key));
                 }

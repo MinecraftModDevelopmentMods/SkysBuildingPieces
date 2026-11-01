@@ -25,17 +25,17 @@ final class RecipePreviewModels {
         for (IRecipe<?> recipe : minecraft.getConnection().getRecipeManager().getRecipes()) {
             ResourceLocation id = recipe.getId();
 
-            if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isDynamic()) {
+            if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isSpecial()) {
                 continue;
             }
             for (Ingredient ingredient : recipe.getIngredients()) {
-                for (ItemStack preview : ingredient.getMatchingStacks()) {
+                for (ItemStack preview : ingredient.getItems()) {
                     checkModel(minecraft, preview, id);
                     previews++;
                 }
             }
 
-            checkModel(minecraft, recipe.getRecipeOutput(), id);
+            checkModel(minecraft, recipe.getResultItem(), id);
             previews++;
             recipes++;
         }
@@ -52,17 +52,17 @@ final class RecipePreviewModels {
         }
 
         String label = recipe + " -> " + stack.getItem().getRegistryName();
-        IBakedModel model = minecraft.getItemRenderer().getItemModelWithOverrides(stack, null, null);
-        IBakedModel missing = minecraft.getBlockRendererDispatcher().getBlockModelShapes().getModelManager()
+        IBakedModel model = minecraft.getItemRenderer().getModel(stack, null, null);
+        IBakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                 .getMissingModel();
 
-        if (model == missing || model.getParticleTexture().getName().toString().contains("missingno")) {
+        if (model == missing || model.getParticleIcon().getName().toString().contains("missingno")) {
             throw new AssertionError("Missing recipe preview model: " + label);
         }
         for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
                 Direction.WEST, Direction.EAST }) {
             for (BakedQuad quad : model.getQuads(null, face, new java.util.Random(0))) {
-                if (quad.func_187508_a().getName().toString().contains("missingno")) {
+                if (quad.getSprite().getName().toString().contains("missingno")) {
                     throw new AssertionError("Missing recipe preview texture: " + label);
                 }
             }

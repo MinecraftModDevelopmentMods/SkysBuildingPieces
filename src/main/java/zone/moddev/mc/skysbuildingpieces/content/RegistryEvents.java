@@ -64,7 +64,7 @@ public final class RegistryEvents {
             Block former = MineralogyCompat.formerBlock(mapping.key.toString());
 
             if (former != null) {
-                mapping.remap(Item.getItemFromBlock(former));
+                mapping.remap(former.asItem());
             } else if (LegacyMapping.owned(mapping.key.toString())) {
                 mapping.ignore();
             }

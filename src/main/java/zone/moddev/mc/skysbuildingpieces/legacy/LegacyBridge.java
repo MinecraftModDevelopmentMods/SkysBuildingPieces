@@ -37,11 +37,50 @@ public final class LegacyBridge {
     private static CompoundNBT registrySnapshot = new CompoundNBT();
     private static CompoundNBT laterRegistrySnapshot = new CompoundNBT();
     private static boolean registryValidated;
+    private static Path capturedDirectory;
+    private static CompoundNBT capturedRegistry = new CompoundNBT();
+    private static boolean persistenceRegistered;
+
+    public static synchronized void registerPersistence() {
+        if (persistenceRegistered) return;
+        net.minecraftforge.fml.WorldPersistenceHooks.addHook(
+                new net.minecraftforge.fml.WorldPersistenceHooks.WorldPersistenceHook() {
+                    @Override
+                    public String getModId() {
+                        return "FML";
+                    }
+
+                    @Override
+                    public CompoundNBT getDataForWriting(net.minecraft.world.storage.SaveFormat.LevelSave save,
+                            net.minecraft.world.storage.IServerConfiguration information) {
+                        synchronized (LegacyBridge.class) {
+                            Path directory = save.getWorldDir().toAbsolutePath().normalize();
+                            if (directory.equals(capturedDirectory) && !capturedRegistry.isEmpty()) {
+                                return capturedRegistry.copy();
+                            }
+                            if (worldDirectory != null && directory.equals(worldDirectory.toPath().toAbsolutePath().normalize())) {
+                                return registrySnapshot.copy();
+                            }
+                            return new CompoundNBT();
+                        }
+                    }
+
+                    @Override
+                    public void readData(net.minecraft.world.storage.SaveFormat.LevelSave save,
+                            net.minecraft.world.storage.IServerConfiguration information, CompoundNBT registry) {
+                        synchronized (LegacyBridge.class) {
+                            capturedDirectory = save.getWorldDir().toAbsolutePath().normalize();
+                            capturedRegistry = registry.copy();
+                        }
+                    }
+                });
+        persistenceRegistered = true;
+    }
 
     public static synchronized void start(MinecraftServer server) {
-        stop();
+        resetRecovery();
 
-        File level = server.getActiveAnvilConverter().getFile(server.getFolderName(), "level.dat");
+        File level = server.getWorldPath(net.minecraft.world.storage.FolderName.LEVEL_DATA_FILE).toFile();
 
         worldDirectory = level.getParentFile();
 
@@ -70,6 +109,12 @@ public final class LegacyBridge {
                 try (InputStream input = new FileInputStream(level)) {
                     registrySnapshot = CompressedStreamTools.readCompressed(input).getCompound("FML").copy();
                 }
+            }
+
+            // The native loader supplies this before any save can discard unknown root data.
+            // Keep it outside startup's recovery reset, and bind it to this exact world.
+            if (registrySnapshot.isEmpty() && worldDirectory.toPath().toAbsolutePath().normalize().equals(capturedDirectory)) {
+                registrySnapshot = capturedRegistry.copy();
             }
 
             savedIds.putAll(LegacyRegistrySources.merge(registrySnapshot, laterRegistrySnapshot));
@@ -243,8 +288,8 @@ public final class LegacyBridge {
     }
 
     private static void carryDeltas(CompoundNBT root, CompoundNBT level) {
-        // Forge 31 passes only Level to ChunkDataEvent.Load. Keep pending accounting with that data while vanilla fixes
-        // the enclosing chunk.
+        // Keep pending accounting inside Level while vanilla fixes the enclosing chunk.
+        // The native load handler unwraps that same data from Forge's chunk root.
         String[] keys = { "skysbuildingpieces_delta", "skysbuildingpieces_additional_vanilla_delta",
                 "skysbuildingpieces_module_delta", "skysbuildingpieces_additional_module_delta",
                 "skysbuildingpieces_historical_delta", "skysbuildingpieces_retired_delta" };
@@ -359,6 +404,12 @@ public final class LegacyBridge {
     }
 
     public static synchronized void stop() {
+        resetRecovery();
+        capturedDirectory = null;
+        capturedRegistry = new CompoundNBT();
+    }
+
+    private static void resetRecovery() {
         NumericStateBridge.reset();
         registrySnapshot = new CompoundNBT();
         laterRegistrySnapshot = new CompoundNBT();
@@ -394,12 +445,12 @@ public final class LegacyBridge {
         applyStacks(changes);
 
         if (prepared != stack) {
-            for (String key : new ArrayList<>(stack.keySet())) {
+            for (String key : new ArrayList<>(stack.getAllKeys())) {
                 if (!prepared.contains(key)) {
                     stack.remove(key);
                 }
             }
-            for (String key : prepared.keySet()) {
+            for (String key : prepared.getAllKeys()) {
                 stack.put(key, prepared.get(key));
             }
         }
@@ -428,7 +479,7 @@ public final class LegacyBridge {
             collectIdentity(stack, changes);
         }
 
-        for (String key : stack.keySet()) {
+        for (String key : stack.getAllKeys()) {
             if (!key.equals("retained_tiles")) {
                 collectInventories(stack.get(key), changes);
             }
@@ -443,7 +494,7 @@ public final class LegacyBridge {
                 collectStack(compound, changes);
                 return;
             }
-            for (String key : compound.keySet()) {
+            for (String key : compound.getAllKeys()) {
                 if (!key.equals("retained_tiles")) {
                     collectInventories(compound.get(key), changes);
                 }
@@ -708,7 +759,7 @@ public final class LegacyBridge {
 
         CompoundNBT additional = new CompoundNBT();
 
-        for (String module : new ArrayList<>(deltas.keySet())) {
+        for (String module : new ArrayList<>(deltas.getAllKeys())) {
             if (!pendingModules.contains(module)) {
                 additional.putLong(module, deltas.getLong(module));
                 deltas.remove(module);
@@ -774,7 +825,7 @@ public final class LegacyBridge {
             unresolved.clear();
         }
 
-        state.markDirty();
+        state.setDirty();
 
         File destination = new File(worldDirectory, "serverconfig/skysbuildingpieces-migration-report.txt");
 

@@ -1,4 +1,13 @@
 // This probe is excluded from ordinary runs and from all production artifacts.
+def auditServerLogs = { File directory, String phase ->
+    logger.lifecycle(providers.exec {
+        commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+                file('tools/native_client_log.py'), '--server', '--directory', directory,
+                '--phase', phase
+    }.standardOutput.asText.get().trim())
+}
+ext.auditNativeServerLogs = auditServerLogs
+
 def bootstrapClasses = layout.buildDirectory.dir('native-bootstrap-probe/classes')
 def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile) {
     dependsOn tasks.named('classes')
@@ -88,8 +97,11 @@ def phases = [:]
         dependsOn phase == 'fresh' ? prepare : phases.fresh
         workingDir directory
         systemProperty 'skysbuildingpieces.bootstrapPhase', phase
+        systemProperty 'skysbuildingpieces.expectMineralogySlabsDisabled',
+                providers.gradleProperty('nativeMineralogySlabsDisabled').getOrElse('false')
         project.ext.configureNativeBootstrapRun(delegate, 'runServer')
         doLast {
+            auditServerLogs(directory.get().asFile, phase)
             File marker = new File(directory.get().asFile, 'world/native-bootstrap.properties')
             if (!marker.isFile()) throw new GradleException('Native bootstrap marker is missing')
             Properties result = new Properties()
@@ -119,6 +131,7 @@ tasks.register('nativeWaterloggingTest', JavaExec) {
     systemProperty 'skysbuildingpieces.bootstrapPhase', 'water'
     project.ext.configureNativeBootstrapRun(delegate, 'runServer')
     doLast {
+        auditServerLogs(directory.get().asFile, systemProperties['skysbuildingpieces.bootstrapPhase'].toString())
         String log = new File(directory.get().asFile, 'logs/latest.log').getText('UTF-8')
         if (!log.contains('BUILDING_PIECES_WATERLOGGING_PASS') ||
                 !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS water') ||
@@ -134,6 +147,7 @@ tasks.register('nativeStagingTest', JavaExec) {
     systemProperty 'skysbuildingpieces.bootstrapPhase', 'staging'
     project.ext.configureNativeBootstrapRun(delegate, 'runServer')
     doLast {
+        auditServerLogs(directory.get().asFile, systemProperties['skysbuildingpieces.bootstrapPhase'].toString())
         String log = new File(directory.get().asFile, 'logs/latest.log').getText('UTF-8')
         if (!log.contains('BUILDING_PIECES_NATIVE_STAGING_PASS') ||
                 !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS staging') ||
@@ -179,6 +193,7 @@ def forwardPhases = [:]
         systemProperty 'skysbuildingpieces.bootstrapPhase', phase
         project.ext.configureNativeBootstrapRun(delegate, 'runServer')
         doLast {
+            auditServerLogs(forwardDirectory.get().asFile, phase)
             File log = new File(forwardDirectory.get().asFile, 'logs/latest.log')
             String text = log.isFile() ? log.getText('UTF-8') : ''
             if (!text.contains('BUILDING_PIECES_NATIVE_FORWARD_PASS') ||
@@ -215,7 +230,7 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
         if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
             copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
         }
-        // Native defaults avoid Forge 31's first-write file-watcher race. The
+        // Native defaults avoid Forge 36's first-write file-watcher race. The
         // failed first-start receipt remains part of the qualification evidence.
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
@@ -242,7 +257,7 @@ def clientPhases = [:]
             JavaExec run = tasks.getByName('runClient') as JavaExec
             File assets = file(clientAssets.get())
             File natives = file(clientNatives.get())
-            [new File(assets, 'indexes/1.15.json'), natives].each {
+            [new File(assets, 'indexes/1.16.json'), natives].each {
                 if (!it.exists()) throw new GradleException('Incomplete native client runtime: ' + it)
             }
             File classpathJar = layout.buildDirectory.file('native-bootstrap-probe/client-classpath.jar').get().asFile
@@ -255,7 +270,7 @@ def clientPhases = [:]
             launchEnvironment.putAll([
                     target: 'fmluserdevclient', MCP_MAPPINGS: "${mapping_channel}_${mapping_version}",
                     MCP_VERSION: mcp_version, FORGE_VERSION: forge_version, FORGE_GROUP: 'net.minecraftforge',
-                    MC_VERSION: minecraft_version, assetDirectory: assets.absolutePath, assetIndex: '1.15',
+                    MC_VERSION: minecraft_version, assetDirectory: assets.absolutePath, assetIndex: '1.16',
                     nativesDirectory: natives.absolutePath,
                     MOD_CLASSES: "${mod_id}%%${buildDir}/forge-run-mod-classes/main${File.pathSeparator}" +
                             "${mod_id}%%${buildDir}/forge-run-mod-classes/main"])

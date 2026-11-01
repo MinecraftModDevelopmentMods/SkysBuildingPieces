@@ -22,13 +22,13 @@ class NativeSlabStateTest {
 
     @Test
     void vanillaOrientationsKeepWaterAndMaterial() {
-        BlockState slab = Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.WATERLOGGED, true);
+        BlockState slab = Blocks.OAK_SLAB.defaultBlockState().setValue(SlabBlock.WATERLOGGED, true);
         BlockState upper = NativeSlabState.orient(slab, 0);
         BlockState lower = NativeSlabState.orient(upper, 1);
 
-        assertEquals(SlabType.TOP, upper.get(SlabBlock.TYPE));
-        assertEquals(SlabType.BOTTOM, lower.get(SlabBlock.TYPE));
-        assertTrue(lower.get(SlabBlock.WATERLOGGED));
+        assertEquals(SlabType.TOP, upper.getValue(SlabBlock.TYPE));
+        assertEquals(SlabType.BOTTOM, lower.getValue(SlabBlock.TYPE));
+        assertTrue(lower.getValue(SlabBlock.WATERLOGGED));
         assertSame(Blocks.OAK_SLAB, lower.getBlock());
     }
 }

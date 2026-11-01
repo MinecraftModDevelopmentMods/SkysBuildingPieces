@@ -45,7 +45,7 @@ public final class LegacyPolicyMod {
     }
 
     private void tiles(RegistryEvent.Register<TileEntityType<?>> event) {
-        materialType = TileEntityType.Builder.create(MaterialTile::new, BLOCKS).build(null);
+        materialType = TileEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
         materialType.setRegistryName("buildingbricks", "material");
         event.getRegistry().register(materialType);
     }
@@ -54,12 +54,12 @@ public final class LegacyPolicyMod {
         private static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
         LegacyBlock() {
-            super(Block.Properties.create(Material.ROCK));
-            setDefaultState(stateContainer.getBaseState().with(META, 0));
+            super(Block.Properties.of(Material.STONE));
+            registerDefaultState(stateDefinition.any().setValue(META, 0));
         }
 
         @Override
-        protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
             builder.add(META);
         }
 
@@ -82,15 +82,15 @@ public final class LegacyPolicyMod {
         }
 
         @Override
-        public void read(CompoundNBT tag) {
-            super.read(tag);
+        public void load(BlockState state, CompoundNBT tag) {
+            super.load(state, tag);
             retained = tag.copy();
         }
 
         @Override
-        public CompoundNBT write(CompoundNBT tag) {
+        public CompoundNBT save(CompoundNBT tag) {
             tag.merge(retained);
-            return super.write(tag);
+            return super.save(tag);
         }
     }
 }

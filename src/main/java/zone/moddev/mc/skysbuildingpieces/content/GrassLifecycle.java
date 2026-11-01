@@ -30,12 +30,12 @@ public final class GrassLifecycle {
             Set<BlockState> registered = new HashSet<>();
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {
-                for (BlockState state : block.getStateContainer().getValidStates()) {
+                for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     if (!grass(state) || !block.definition(state).id.equals("minecraft:grass")) {
                         continue;
                     }
 
-                    BlockState canonical = state.with(net.minecraft.block.SnowyDirtBlock.SNOWY, false);
+                    BlockState canonical = state.setValue(net.minecraft.block.SnowyDirtBlock.SNOWY, false);
                     BlockState dirt = counterpart(canonical, false);
 
                     if (dirt != null && registered.add(canonical)) {
@@ -48,7 +48,7 @@ public final class GrassLifecycle {
             sharedDirt = api.getMethod("tickDirt", World.class, BlockPos.class, BlockState.class, Random.class);
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException(
-                    "Install Sky's Grass Slabs 1.2.0.115021 or later for grass-piece integration", failure);
+                    "Install Sky's Grass Slabs 1.2.0.116051 or later for grass-piece integration", failure);
         }
     }
 
@@ -72,20 +72,20 @@ public final class GrassLifecycle {
         BlockState replacement = Pieces.state(toGrass ? "minecraft:grass" : "minecraft:dirt", block.palette.shape,
                 block.orientation(state));
 
-        if (replacement != null && replacement.has(SlabBlock.WATERLOGGED)) {
-            replacement = replacement.with(SlabBlock.WATERLOGGED, state.get(SlabBlock.WATERLOGGED));
+        if (replacement != null && replacement.hasProperty(SlabBlock.WATERLOGGED)) {
+            replacement = replacement.setValue(SlabBlock.WATERLOGGED, state.getValue(SlabBlock.WATERLOGGED));
         }
-        if (replacement != null && replacement.has(StairsBlock.SHAPE)) {
-            replacement = replacement.with(StairsBlock.SHAPE, state.get(StairsBlock.SHAPE));
+        if (replacement != null && replacement.hasProperty(StairsBlock.SHAPE)) {
+            replacement = replacement.setValue(StairsBlock.SHAPE, state.getValue(StairsBlock.SHAPE));
         }
 
         return replacement;
     }
 
     public static void repairSupport(World world, BlockPos position, BlockState state) {
-        if (!world.isRemote && grass(state) && coversSupport(state) && world.isBlockPresent(position.down())
-                && world.getBlockState(position.down()).getBlock() == Blocks.GRASS_BLOCK) {
-            world.setBlockState(position.down(), Blocks.DIRT.getDefaultState(), 2);
+        if (!world.isClientSide && grass(state) && coversSupport(state) && world.isLoaded(position.below())
+                && world.getBlockState(position.below()).getBlock() == Blocks.GRASS_BLOCK) {
+            world.setBlock(position.below(), Blocks.DIRT.defaultBlockState(), 2);
         }
     }
 
@@ -97,7 +97,7 @@ public final class GrassLifecycle {
     }
 
     public static void tick(World world, BlockPos position, BlockState state, Random random) {
-        if (world.isRemote || !(state.getBlock() instanceof PieceBlock)) {
+        if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
 
@@ -114,42 +114,42 @@ public final class GrassLifecycle {
         if (grass(state)) {
             repairSupport(world, position, state);
 
-            if (state.get(SlabBlock.WATERLOGGED) || !canRemainGrass(world, position)) {
+            if (state.getValue(SlabBlock.WATERLOGGED) || !canRemainGrass(world, position)) {
                 BlockState dirt = counterpart(state, false);
 
                 if (dirt != null) {
-                    world.setBlockState(position, dirt, 3);
+                    world.setBlock(position, dirt, 3);
                 }
 
                 return;
             }
-            if (!world.isAreaLoaded(position, 3) || world.getLight(position.up()) < 9) {
+            if (!world.isAreaLoaded(position, 3) || world.getMaxLocalRawBrightness(position.above()) < 9) {
                 return;
             }
             for (int attempt = 0; attempt < 4; attempt++) {
-                BlockPos target = position.add(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
+                BlockPos target = position.offset(random.nextInt(3) - 1, random.nextInt(5) - 3, random.nextInt(3) - 1);
 
-                if ((target.equals(position.down()) && coversSupport(state)) || !viableTarget(world, target)) {
+                if ((target.equals(position.below()) && coversSupport(state)) || !viableTarget(world, target)) {
                     continue;
                 }
 
                 BlockState existing = world.getBlockState(target);
-                BlockState grown = existing.getBlock() == Blocks.DIRT ? Blocks.GRASS_BLOCK.getDefaultState()
+                BlockState grown = existing.getBlock() == Blocks.DIRT ? Blocks.GRASS_BLOCK.defaultBlockState()
                         : counterpart(existing, true);
 
                 if (grown != null) {
-                    world.setBlockState(target, grown, 3);
+                    world.setBlock(target, grown, 3);
                 }
             }
         } else if (counterpart(state, true) != null && viableTarget(world, position)
                 && world.isAreaLoaded(position, 3)) {
             for (int attempt = 0; attempt < 4; attempt++) {
-                BlockPos source = position.add(random.nextInt(3) - 1, random.nextInt(5) - 1, random.nextInt(3) - 1);
+                BlockPos source = position.offset(random.nextInt(3) - 1, random.nextInt(5) - 1, random.nextInt(3) - 1);
                 BlockState neighbour = world.getBlockState(source);
 
                 if ((neighbour.getBlock() == Blocks.GRASS_BLOCK || grass(neighbour))
                         && neighbour.getFluidState().isEmpty() && canRemainGrass(world, source)) {
-                    world.setBlockState(position, counterpart(state, true), 3);
+                    world.setBlock(position, counterpart(state, true), 3);
                     break;
                 }
             }
@@ -157,14 +157,14 @@ public final class GrassLifecycle {
     }
 
     private static boolean canRemainGrass(World world, BlockPos position) {
-        BlockPos above = position.up();
+        BlockPos above = position.above();
 
-        return world.getLight(above) >= 4
-                || world.getBlockState(above).getOpacity(world, above) < world.getMaxLightLevel();
+        return world.getMaxLocalRawBrightness(above) >= 4
+                || world.getBlockState(above).getLightBlock(world, above) < world.getMaxLightLevel();
     }
 
     private static boolean viableTarget(World world, BlockPos position) {
-        if (position.getY() < 0 || position.getY() >= 256 || !world.isBlockPresent(position)) {
+        if (position.getY() < 0 || position.getY() >= 256 || !world.isLoaded(position)) {
             return false;
         }
 
@@ -173,18 +173,18 @@ public final class GrassLifecycle {
         if (state.getBlock() != Blocks.DIRT && counterpart(state, true) == null) {
             return false;
         }
-        if (!state.getFluidState().isEmpty() || state.has(SlabBlock.WATERLOGGED) && state.get(SlabBlock.WATERLOGGED)) {
+        if (!state.getFluidState().isEmpty() || state.hasProperty(SlabBlock.WATERLOGGED) && state.getValue(SlabBlock.WATERLOGGED)) {
             return false;
         }
 
-        BlockPos above = position.up();
+        BlockPos above = position.above();
         BlockState cover = world.getBlockState(above);
 
         if (grass(cover) && (state.getBlock() != Blocks.DIRT || coversSupport(cover))) {
             return false;
         }
 
-        return world.getLight(above) >= 4 && cover.getOpacity(world, above) < world.getMaxLightLevel()
+        return world.getMaxLocalRawBrightness(above) >= 4 && cover.getLightBlock(world, above) < world.getMaxLightLevel()
                 && world.getFluidState(above).isEmpty();
     }
 }

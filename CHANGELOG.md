@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.8.116051 - Minecraft 1.16.5 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.16.5.
+- Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
+- Preserve saved palette identities, older pieces and custom item data.
+- Use the matching Grass Slabs version for shared grass behaviour when installed.
+
 ## 0.3.8.115021 - Minecraft 1.15.2 (unreleased)
 
 - Bring the existing building shapes and Mineralogy pieces to Minecraft 1.15.2.

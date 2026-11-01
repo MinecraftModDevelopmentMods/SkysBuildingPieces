@@ -87,35 +87,35 @@ public final class CompatibilityChecks {
     private static void liveInventories(ServerWorld world, boolean convert) throws Exception {
         ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
 
-        player.inventory.setInventorySlotContents(0, legacy(13));
-        player.getInventoryEnderChest().setInventorySlotContents(0, legacy(11));
+        player.inventory.setItem(0, legacy(13));
+        player.getEnderChestInventory().setItem(0, legacy(11));
         MinecraftForge.EVENT_BUS.post(new EntityJoinWorldEvent(player, world));
-        identity(player.inventory.getStackInSlot(0), 13, convert);
-        identity(player.getInventoryEnderChest().getStackInSlot(0), 11, convert);
-        player.inventory.setInventorySlotContents(1, legacy(9));
-        MinecraftForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getSaveHandler().getWorldDirectory(),
-                player.getUniqueID().toString()));
-        identity(player.inventory.getStackInSlot(1), 9, convert);
+        identity(player.inventory.getItem(0), 13, convert);
+        identity(player.getEnderChestInventory().getItem(0), 11, convert);
+        player.inventory.setItem(1, legacy(9));
+        MinecraftForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
+                player.getUUID().toString()));
+        identity(player.inventory.getItem(1), 9, convert);
         world.getChunk(new BlockPos(930, 70, 930));
 
         ItemEntity drop = new ItemEntity(world, 930, 70, 930, legacy(5));
 
-        NativeLegacyChecks.require(world.addEntity(drop), "Dropped item joins the actual native world");
+        NativeLegacyChecks.require(world.addFreshEntity(drop), "Dropped item joins the actual native world");
         identity(drop.getItem(), 5, convert);
 
         BlockPos position = new BlockPos(930, 70, 932);
 
-        world.setBlockState(position.north(), Blocks.STONE.getDefaultState(), 2);
+        world.setBlock(position.north(), Blocks.STONE.defaultBlockState(), 2);
 
         ItemFrameEntity frame = new ItemFrameEntity(world, position, Direction.SOUTH);
 
-        frame.setDisplayedItem(legacy(1));
-        world.addEntity(frame);
-        identity(frame.getDisplayedItem(), 1, convert);
+        frame.setItem(legacy(1));
+        world.addFreshEntity(frame);
+        identity(frame.getItem(), 1, convert);
 
         HandlerTile tile = new HandlerTile();
 
-        tile.setWorldAndPos(world, position);
+        tile.setLevelAndPosition(world, position);
         tile.handler.setStackInSlot(0, legacy(17));
 
         Method scan = MigrationEvents.class.getDeclaredMethod("containers", TileEntity.class);
@@ -136,14 +136,14 @@ public final class CompatibilityChecks {
 
         ListNBT contents = new ListNBT();
 
-        contents.add(legacy(7).write(new CompoundNBT()));
+        contents.add(legacy(7).save(new CompoundNBT()));
         tag.put("Items", contents);
         crate.setTag(tag);
 
         ItemStack migrated = MigrationEvents.convert(crate, world);
         CompoundNBT recovered = migrated.getTag().getList("Items", 10).getCompound(0);
 
-        identity(ItemStack.read(recovered), 7, convert);
+        identity(ItemStack.of(recovered), 7, convert);
         NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && migrated.getTag().getBoolean("Sealed"),
                 "Sealed container identity and custom data");
         NativeLegacyChecks.require(MigrationEvents.convert(migrated, world) == migrated,
@@ -151,44 +151,44 @@ public final class CompatibilityChecks {
 
         CraftingInventory grid = new CraftingInventory(new Container(null, 0) {
             @Override
-            public boolean canInteractWith(PlayerEntity ignored) {
+            public boolean stillValid(PlayerEntity ignored) {
                 return true;
             }
         }, 3, 3);
 
-        grid.setInventorySlotContents(0, legacy(1));
+        grid.setItem(0, legacy(1));
 
         LegacyPieceRecipe recipe = new LegacyPieceRecipe(new ResourceLocation("skysbuildingpieces:bridge_test"));
 
         NativeLegacyChecks.require(recipe.matches(grid, world),
                 "Explicit bridge recipe works independently of replacement");
-        identity(recipe.getCraftingResult(grid), 1, true);
+        identity(recipe.assemble(grid), 1, true);
         drop.remove();
         frame.remove();
         world.removeBlock(position.north(), false);
-        player.inventory.clear();
-        player.getInventoryEnderChest().clear();
+        player.inventory.clearContent();
+        player.getEnderChestInventory().clearContent();
     }
 
     private static void newlyPlaced(ServerWorld world, boolean convert) {
         BlockPos position = new BlockPos(934, 70, 932);
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("buildingbricks:rock_step"));
-        BlockState old = block.getDefaultState().with((IntegerProperty) block.getStateContainer().getProperty("meta"),
+        BlockState old = block.defaultBlockState().setValue((IntegerProperty) block.getStateDefinition().getProperty("meta"),
                 11);
 
-        world.setBlockState(position, old, 2);
+        world.setBlock(position, old, 2);
 
-        TileEntity tile = world.getTileEntity(position);
-        CompoundNBT tag = tile.write(new CompoundNBT());
+        TileEntity tile = world.getBlockEntity(position);
+        CompoundNBT tag = tile.save(new CompoundNBT());
 
         tag.putString("material", "minecraft:stone");
         tag.putString("custom", "Keep the old tile in coverage");
-        tile.read(tag);
-        MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.getBlockSnapshot(world, position),
-                Blocks.STONE.getDefaultState(), FakePlayerFactory.getMinecraft(world)));
+        tile.load(tile.getBlockState(), tag);
+        MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
+                Blocks.STONE.defaultBlockState(), FakePlayerFactory.getMinecraft(world)));
         NativeLegacyChecks.require(world.getBlockState(position).getBlock().getRegistryName().getNamespace()
                 .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "New placement replacement policy");
-        NativeLegacyChecks.require((world.getTileEntity(position) == null) == convert,
+        NativeLegacyChecks.require((world.getBlockEntity(position) == null) == convert,
                 "Remove the material tile only after successful conversion");
         world.removeBlock(position, false);
     }
@@ -198,10 +198,10 @@ public final class CompatibilityChecks {
 
         unknown.getTag().putString("material", "missing:unknown");
 
-        CompoundNBT before = unknown.write(new CompoundNBT());
+        CompoundNBT before = unknown.save(new CompoundNBT());
         ItemStack result = MigrationEvents.convert(unknown, world);
 
-        NativeLegacyChecks.require(result.write(new CompoundNBT()).equals(before),
+        NativeLegacyChecks.require(result.save(new CompoundNBT()).equals(before),
                 "Installed legacy mod retains unsupported materials");
 
         // Horizontal soil recovery belongs to Grass Slabs and must stay outside this bridge.

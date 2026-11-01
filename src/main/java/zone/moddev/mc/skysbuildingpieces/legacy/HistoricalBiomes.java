@@ -84,7 +84,8 @@ public final class HistoricalBiomes {
         active = new Mappings(source, aliases, name -> {
             Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(name));
 
-            return biome == null ? -1 : Registry.BIOME.getId(biome);
+            return biome == null ? -1 : net.minecraftforge.fml.server.ServerLifecycleHooks.getCurrentServer().registryAccess()
+                    .registryOrThrow(Registry.BIOME_REGISTRY).getId(biome);
         });
     }
 

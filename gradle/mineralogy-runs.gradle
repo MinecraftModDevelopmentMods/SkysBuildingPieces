@@ -23,6 +23,7 @@ def configureVerification = project.ext.configureMineralogyVerificationRun
 ext.nativeOptionalDevelopmentJars = runtimeSources
 ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
     group = 'verification'
+    dependsOn project.ext.prepareOfficialMineralogyDevelopment
     doLast {
         ['mineralogy', 'orespawn'].each { mod ->
             [[file(runtimeLock.getProperty(mod + '.path')), runtimeLock.getProperty(mod + '.sha256')],
@@ -75,11 +76,16 @@ def installRuntimeMods = {
 def prepareMineralogyDevelopmentRun = tasks.register('prepareMineralogyDevelopmentRun') {
     group = 'ide'
     description = 'Checks and installs the optional Mineralogy/OreSpawn jars in the separate game folder.'
+    dependsOn project.ext.verifyNativeOptionalRuntime
     doLast { installRuntimeMods() }
 }
 
 def prepareAvailableMineralogyDevelopmentRun = tasks.register('prepareAvailableMineralogyDevelopmentRun') {
     group = 'ide'
+    dependsOn {
+        file(runtimeLock.getProperty('mineralogy.path')).isFile()
+                ? [project.ext.prepareOfficialMineralogyDevelopment] : []
+    }
     description = 'Prepares the Eclipse profile when the optional development jars are available.'
     onlyIf {
         boolean available = runtimeSources.values().every { it.isFile() }
