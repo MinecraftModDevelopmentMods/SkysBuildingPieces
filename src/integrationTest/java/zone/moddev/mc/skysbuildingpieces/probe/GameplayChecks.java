@@ -271,9 +271,13 @@ public final class GameplayChecks {
 
         // Light tickets complete through the server mailbox as well as the chunk
         // mailbox. Pump the native event loop while waiting for this exact pass.
-        lights.tryScheduleUpdate();
-        world.getServer().managedBlock(() -> (finished.isDone()
-                && world.getMaxLocalRawBrightness(position.above()) < 4) || System.nanoTime() >= deadline);
+        world.getServer().managedBlock(() -> {
+            // Pre- and post-light tasks arrive asynchronously. A single schedule
+            // call can run before either task has reached the worker's queue.
+            lights.tryScheduleUpdate();
+            return (finished.isDone() && world.getMaxLocalRawBrightness(position.above()) < 4)
+                    || System.nanoTime() >= deadline;
+        });
 
         require(finished.isDone() && world.getMaxLocalRawBrightness(position.above()) < 4,
                 "Native lighting did not finish for the grass fixture: own_pass=" + finished.isDone()
