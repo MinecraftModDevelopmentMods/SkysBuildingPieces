@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LegacyAccountingTest {
     @Test
-    void pendingAccountingTravelsWithTheLevelDataPassedToForge28LoadEvents() {
+    void pendingAccountingTravelsWithTheLevelDataPassedToForge31LoadEvents() {
         CompoundNBT root = new CompoundNBT();
         CompoundNBT level = new CompoundNBT();
 

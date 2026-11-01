@@ -147,8 +147,10 @@ class MineralogyCatalogueTest {
             checksums.load(input);
         }
         for (String name : new String[] { "materials", "palettes" }) {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(Files.readAllBytes(ASSETS.resolve("catalogue/" + name + ".json")));
+            // Check the fixed catalogue bytes without depending on the checkout's line endings.
+            byte[] canonical = new String(Files.readAllBytes(ASSETS.resolve("catalogue/" + name + ".json")),
+                    StandardCharsets.UTF_8).replace("\r\n", "\n").getBytes(StandardCharsets.UTF_8);
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(canonical);
             StringBuilder hex = new StringBuilder();
 
             for (byte value : digest) {

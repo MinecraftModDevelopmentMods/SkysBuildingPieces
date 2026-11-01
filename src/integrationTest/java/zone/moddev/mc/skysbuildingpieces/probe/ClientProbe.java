@@ -30,7 +30,7 @@ public final class ClientProbe extends ProbeProxy {
 
         Minecraft minecraft = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.mainWindow.getHandle());
+        org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getMainWindow().getHandle());
 
         if (ClientStatus.failure != null) {
             minecraft.shutdown();
@@ -53,7 +53,7 @@ public final class ClientProbe extends ProbeProxy {
         ran = true;
 
         try {
-            org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.mainWindow.getHandle());
+            org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getMainWindow().getHandle());
 
             for (net.minecraft.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
                 if (retired.getGroup() != null) {
@@ -129,7 +129,7 @@ public final class ClientProbe extends ProbeProxy {
                     for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH,
                             Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                         for (BakedQuad quad : model.getQuads(state, face, new java.util.Random(0))) {
-                            if (quad.getSprite().getName().toString().contains("missingno")) {
+                            if (quad.func_187508_a().getName().toString().contains("missingno")) {
                                 throw new AssertionError("Missing sprite " + state);
                             }
                         }
@@ -157,7 +157,7 @@ public final class ClientProbe extends ProbeProxy {
                         throw new AssertionError("Missing decoration model " + state);
                     }
                     for (BakedQuad quad : model.getQuads(state, null, new java.util.Random(0))) {
-                        if (quad.getSprite().getName().toString().contains("missingno")) {
+                        if (quad.func_187508_a().getName().toString().contains("missingno")) {
                             throw new AssertionError("Missing decoration texture " + state);
                         }
                     }
@@ -186,7 +186,7 @@ public final class ClientProbe extends ProbeProxy {
                     for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH,
                             Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                         for (BakedQuad quad : model.getQuads(state, face, new java.util.Random(0))) {
-                            if (quad.getSprite().getName().toString().contains("missingno")) {
+                            if (quad.func_187508_a().getName().toString().contains("missingno")) {
                                 throw new AssertionError("Missing recovery sprite " + state);
                             }
                         }
@@ -234,7 +234,10 @@ public final class ClientProbe extends ProbeProxy {
 
             if (client.getBlockColors().getColor(state, client.world, sample, 0) != expected
                     || client.getBlockColors().getColor(state, client.world, sample, 1) != -1
-                    || block.getRenderLayer() != net.minecraft.util.BlockRenderLayer.CUTOUT_MIPPED) {
+                    || !net.minecraft.client.renderer.RenderTypeLookup.canRenderInLayer(state,
+                            net.minecraft.client.renderer.RenderType.getCutoutMipped())
+                    || net.minecraft.client.renderer.RenderTypeLookup.canRenderInLayer(state,
+                            net.minecraft.client.renderer.RenderType.getSolid())) {
                 throw new AssertionError("Grass-piece biome tint or render layer: " + block.getRegistryName());
             }
 

@@ -17,6 +17,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ForwardFixtureContractTest {
     @Test
+    void native114FixtureLocksWetSnowyStatesAndRichInventoryData() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser().parse(new String(
+                Files.readAllBytes(root.resolve("building-pieces-1.14.4.json")), StandardCharsets.UTF_8))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("building-pieces-1.14.4.zip"));
+
+        assertEquals("named", manifest.get("kind").getAsString());
+        assertEquals("65dde80079b7096d7b4de5f22e8bdc64051bbaf7", manifest.get("source_commit").getAsString());
+        assertEquals("8A0A1DEA2A4A6C069519C7B1BCF28331186FF2DF6284DB72C2FFDB8178FC84D4",
+                manifest.get("source_jar_sha256").getAsString());
+        assertEquals("D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209", sha256(archive));
+        assertEquals(7028, manifest.getAsJsonArray("states").size());
+        assertEquals(3346, manifest.get("wet_states").getAsInt());
+        assertEquals(144, manifest.get("snowy_states").getAsInt());
+        assertEquals(7028, manifest.get("source_saved_states_verified").getAsInt());
+        assertTrue(manifest.get("source_unchanged").getAsBoolean());
+        assertEquals(1, manifest.getAsJsonArray("containers").size());
+        assertEquals(1, manifest.getAsJsonArray("entities").size());
+        assertTrue(verifyMembers(manifest, archive).contains("data/skysbuildingpieces_world_state.dat"));
+    }
+
+    @Test
     void delayedFixtureKeepsItsOriginalProvenanceAndUnopenedContent() throws Exception {
         Path root = Paths.get("src/testFixtures/worlds");
         JsonObject manifest = new JsonParser()

@@ -26,9 +26,17 @@ final class NativeForwardChecks {
                 StandardCharsets.UTF_8)) {
             fixture = new JsonParser().parse(reader).getAsJsonObject();
         }
+        com.google.gson.JsonArray loadPoints = new com.google.gson.JsonArray();
+
+        loadPoints.addAll(fixture.getAsJsonArray("states"));
+        if (fixture.has("kind") && fixture.get("kind").getAsString().equals("named")) {
+            loadPoints.addAll(fixture.getAsJsonArray("containers"));
+            loadPoints.addAll(fixture.getAsJsonArray("entities"));
+        }
+
         // Load the retained halo explicitly; deriving a connection must never make the production block force a
         // neighbouring chunk into memory.
-        for (JsonElement entry : fixture.getAsJsonArray("states")) {
+        for (JsonElement entry : loadPoints) {
             JsonObject state = entry.getAsJsonObject();
 
             if (!active(state)) {
@@ -47,7 +55,7 @@ final class NativeForwardChecks {
 
         java.util.Set<net.minecraft.world.chunk.Chunk> tracked = new java.util.LinkedHashSet<>();
 
-        for (JsonElement entry : fixture.getAsJsonArray("states")) {
+        for (JsonElement entry : loadPoints) {
             JsonObject saved = entry.getAsJsonObject();
 
             if (!active(saved)) {
@@ -66,7 +74,7 @@ final class NativeForwardChecks {
         long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
         while (pending(tracked) && System.nanoTime() < deadline) {
-            if (!world.getChunkProvider().func_217234_d()) {
+            if (!world.getChunkProvider().driveOneTask()) {
                 Thread.yield();
             }
         }
@@ -75,6 +83,10 @@ final class NativeForwardChecks {
 
         for (net.minecraft.world.chunk.Chunk chunk : tracked) {
             world.forceChunk(chunk.getPos().x, chunk.getPos().z, false);
+        }
+        if (fixture.has("kind") && fixture.get("kind").getAsString().equals("named")) {
+            namedPieces(world, fixture);
+            return;
         }
         if (fixture.has("kind") && fixture.get("kind").getAsString().equals("buildingbricks")) {
             legacyPieces(world, fixture);
@@ -145,6 +157,68 @@ final class NativeForwardChecks {
                 .isFile(), "Original registry snapshot survives in its sidecar");
         System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS states=" + checked + " derived=" + derived
                 + " item_units=" + units + " schema=1 counters=unchanged");
+    }
+
+    private static void namedPieces(ServerWorld world, JsonObject fixture) throws Exception {
+        int states = 0;
+
+        for (JsonElement value : fixture.getAsJsonArray("states")) {
+            JsonObject saved = value.getAsJsonObject();
+            BlockPos position = position(saved);
+            net.minecraft.nbt.CompoundNBT expected = net.minecraft.nbt.JsonToNBT
+                    .getTagFromJson(saved.get("state").getAsString());
+
+            require(net.minecraft.nbt.NBTUtil.writeBlockState(world.getBlockState(position)).equals(expected),
+                    "Named state changed during the native upgrade at " + position + ": "
+                            + world.getBlockState(position) + " expected " + expected);
+            states++;
+        }
+
+        int units = 0;
+
+        for (JsonElement value : fixture.getAsJsonArray("containers")) {
+            JsonObject saved = value.getAsJsonObject();
+            ChestTileEntity chest = (ChestTileEntity) world.getTileEntity(position(saved));
+
+            require(chest != null, "Named-state fixture chest is missing");
+
+            for (JsonElement item : saved.getAsJsonArray("items")) {
+                JsonObject entry = item.getAsJsonObject();
+                ItemStack expected = ItemStack.read(net.minecraft.nbt.JsonToNBT
+                        .getTagFromJson(entry.get("stack").getAsString()));
+                ItemStack actual = chest.getStackInSlot(entry.get("slot").getAsInt());
+
+                require(ItemStack.areItemStacksEqual(expected, actual),
+                        "Named-state inventory lost its identity, count or custom data: " + entry);
+                units += actual.getCount();
+            }
+        }
+
+        for (JsonElement value : fixture.getAsJsonArray("entities")) {
+            JsonObject saved = value.getAsJsonObject();
+            net.minecraft.entity.Entity entity = world.getEntityByUuid(java.util.UUID
+                    .fromString(saved.get("uuid").getAsString()));
+            ItemStack expected = ItemStack.read(net.minecraft.nbt.JsonToNBT
+                    .getTagFromJson(saved.get("stack").getAsString()));
+
+            require(entity instanceof net.minecraft.entity.item.ItemEntity
+                    && ItemStack.areItemStacksEqual(expected,
+                            ((net.minecraft.entity.item.ItemEntity) entity).getItem()),
+                    "Named-state dropped stack is missing or changed");
+            units += expected.getCount();
+        }
+
+        net.minecraft.nbt.CompoundNBT expectedState = net.minecraft.nbt.JsonToNBT
+                .getTagFromJson(fixture.get("world_state").getAsString());
+
+        require(PiecesWorldState.get(world).write(new net.minecraft.nbt.CompoundNBT()).equals(expectedState),
+                "Named-state world data, counters or unknown module fields changed");
+        System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS named_states=" + states + " item_units=" + units
+                + " waterlogging=true snow=true schema=1 counters=unchanged");
+    }
+
+    private static BlockPos position(JsonObject saved) {
+        return new BlockPos(saved.get("x").getAsInt(), saved.get("y").getAsInt(), saved.get("z").getAsInt());
     }
 
     private static void legacyPieces(ServerWorld world, JsonObject fixture) throws Exception {

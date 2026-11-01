@@ -25,7 +25,7 @@ public final class PathPieces {
                 event.getFace()) == null) {
             return;
         }
-        // Forge 28 still bypasses block activation while sneaking, even with UseBlock.ALLOW. Finish this valid action
+        // Forge 31 still bypasses block activation while sneaking, even with UseBlock.ALLOW. Finish this valid action
         // here and stop the vanilla call.
         if (event.getPlayer().isSneaking() && activate(event.getWorld(), event.getPos(), event.getPlayer(),
                 event.getItemStack(), event.getFace(), event.getHand())) {

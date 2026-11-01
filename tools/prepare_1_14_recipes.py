@@ -1,4 +1,4 @@
-"""Generate Forge 28 recipes from permanent material and shape catalogues.
+"""Generate Forge 31 recipes from permanent material and shape catalogues.
 
 The catalogue keeps source-world identities; recipes use the flattened item IDs.
 Optional inputs and matching advancements share the same Forge conditions.

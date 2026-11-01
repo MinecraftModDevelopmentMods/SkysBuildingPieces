@@ -96,7 +96,7 @@ class ContinuousGlassTest {
             System.arraycopy(compact, vertex * 7, data, vertex * stride, 7);
         }
 
-        BakedQuad source = new BakedQuad(data, 3, Direction.WEST, null, false, DefaultVertexFormats.BLOCK);
+        BakedQuad source = new BakedQuad(data, 3, Direction.WEST, null, false);
         List<BakedQuad> original = Collections.singletonList(source);
         IBakedModel base = new IBakedModel() {
             public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
@@ -109,6 +109,10 @@ class ContinuousGlassTest {
             }
 
             public boolean isGui3d() {
+                return true;
+            }
+
+            public boolean func_230044_c_() {
                 return true;
             }
 
@@ -145,10 +149,11 @@ class ContinuousGlassTest {
         assertEquals(3, trimmed.getTintIndex());
         assertEquals(Direction.WEST, trimmed.getFace());
         assertFalse(trimmed.shouldApplyDiffuseLighting());
-        assertSame(source.getSprite(), trimmed.getSprite());
-        assertSame(source.getFormat(), trimmed.getFormat());
+        assertSame(source.func_187508_a(), trimmed.func_187508_a());
+        assertEquals(stride * 4, trimmed.getVertexData().length);
         assertFalse(model.isAmbientOcclusion());
         assertTrue(model.isGui3d());
+        assertTrue(model.func_230044_c_());
         assertFalse(model.isBuiltInRenderer());
         assertSame(base.getOverrides(), model.getOverrides());
         assertSame(base.getParticleTexture(), model.getParticleTexture());

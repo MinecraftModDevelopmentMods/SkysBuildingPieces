@@ -215,7 +215,7 @@ public final class LegacyBridge {
                 short packed = (short) ((index & 15) | (index >> 8 & 15) << 4 | (index >> 4 & 15) << 8);
 
                 if (queued.add(packed)) {
-                    positions.add(new ShortNBT(packed));
+                    positions.add(ShortNBT.valueOf(packed));
                 }
             }
         }
@@ -243,7 +243,7 @@ public final class LegacyBridge {
     }
 
     private static void carryDeltas(CompoundNBT root, CompoundNBT level) {
-        // Forge 28 passes only Level to ChunkDataEvent.Load. Keep pending accounting with that data while vanilla fixes
+        // Forge 31 passes only Level to ChunkDataEvent.Load. Keep pending accounting with that data while vanilla fixes
         // the enclosing chunk.
         String[] keys = { "skysbuildingpieces_delta", "skysbuildingpieces_additional_vanilla_delta",
                 "skysbuildingpieces_module_delta", "skysbuildingpieces_additional_module_delta",

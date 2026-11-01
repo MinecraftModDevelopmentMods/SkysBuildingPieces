@@ -115,7 +115,7 @@ public final class CompatibilityChecks {
 
         HandlerTile tile = new HandlerTile();
 
-        tile.setWorld(world);
+        tile.setWorldAndPos(world, position);
         tile.handler.setStackInSlot(0, legacy(17));
 
         Method scan = MigrationEvents.class.getDeclaredMethod("containers", TileEntity.class);

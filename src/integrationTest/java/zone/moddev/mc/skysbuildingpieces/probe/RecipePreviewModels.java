@@ -62,7 +62,7 @@ final class RecipePreviewModels {
         for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
                 Direction.WEST, Direction.EAST }) {
             for (BakedQuad quad : model.getQuads(null, face, new java.util.Random(0))) {
-                if (quad.getSprite().getName().toString().contains("missingno")) {
+                if (quad.func_187508_a().getName().toString().contains("missingno")) {
                     throw new AssertionError("Missing recipe preview texture: " + label);
                 }
             }

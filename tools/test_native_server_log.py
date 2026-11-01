@@ -1,4 +1,4 @@
-"""Negative controls for the native server-config startup notice."""
+"""Negative controls for Forge 31 server completion and native settings."""
 
 from pathlib import Path
 import shutil
@@ -13,15 +13,15 @@ NOTICE = ('[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: '
 DEBUG = ('[Thread-1/DEBUG] [net.minecraftforge.fml.config.ConfigFileTypeHandler/CONFIG]: '
          'Config file forge-server.toml changed, sending notifies')
 START = '[Server thread/INFO] [MinecraftServer/]: Preparing level "world"'
-LOG = '\n'.join((NOTICE, START, 'Done (1.0s)!'))
-DETAILS = '\n'.join((DEBUG, NOTICE, START))
+LOG = '\n'.join((START, 'Done (1.0s)!'))
+DETAILS = '\n'.join((DEBUG, START, 'Done (1.0s)!'))
 
 
 class NativeServerLogTest(unittest.TestCase):
-    def test_exact_server_config_notice_is_recorded(self):
+    def test_clean_native_startup_is_accepted(self):
         receipt = classify_server(LOG, DETAILS, True)
-        self.assertEqual(receipt['native_server_config_notices'], 1)
-        self.assertEqual(receipt['notices'], [NOTICE])
+        self.assertEqual(receipt['native_server_config_notices'], 0)
+        self.assertEqual(receipt['notices'], [])
 
     def test_config_change_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -35,11 +35,9 @@ class NativeServerLogTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             classify_server('\n'.join((NOTICE, NOTICE, START)), DETAILS, True)
 
-    def test_different_config_or_watcher_thread_is_rejected(self):
-        for wrong in (DETAILS.replace('forge-server.toml', 'another-server.toml'),
-                      DETAILS.replace('[Thread-1/DEBUG]', '[Thread-2/DEBUG]')):
-            with self.subTest(debug=wrong), self.assertRaises(ValueError):
-                classify_server(LOG, wrong, True)
+    def test_previous_target_notices_are_rejected(self):
+        with self.assertRaises(ValueError):
+            classify_server(NOTICE + '\n' + LOG, DETAILS, True)
 
     def test_missing_debug_evidence_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -53,7 +51,7 @@ class NativeServerLogTest(unittest.TestCase):
 
     def test_wrong_logger_is_rejected(self):
         with self.assertRaises(ValueError):
-            classify_server(LOG.replace('ForgeConfig/CORE', 'OtherConfig/CORE'), DETAILS, True)
+            classify_server(NOTICE.replace('ForgeConfig/CORE', 'OtherConfig/CORE') + '\n' + LOG, DETAILS, True)
 
 
 class NativeServerFilesTest(unittest.TestCase):
@@ -70,8 +68,8 @@ class NativeServerFilesTest(unittest.TestCase):
         (logs / 'latest.log').write_text(LOG, encoding='utf-8')
         (logs / 'debug.log').write_text(DETAILS, encoding='utf-8')
 
-    def test_unchanged_defaults_pass_and_retain_notice(self):
-        self.assertEqual(audit_server(self.directory, 'test')['native_server_config_notices'], 1)
+    def test_unchanged_defaults_pass(self):
+        self.assertEqual(audit_server(self.directory, 'test')['native_server_config_notices'], 0)
 
     def test_changed_defaults_fail(self):
         self.config.write_text(self.config.read_text().replace('fixAdvancementLoading = true',

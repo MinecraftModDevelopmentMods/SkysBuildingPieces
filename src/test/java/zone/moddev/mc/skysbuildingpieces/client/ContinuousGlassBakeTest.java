@@ -79,6 +79,10 @@ class ContinuousGlassBakeTest {
             return true;
         }
 
+        public boolean func_230044_c_() {
+            return true;
+        }
+
         public boolean isBuiltInRenderer() {
             return false;
         }

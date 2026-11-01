@@ -52,7 +52,7 @@ def prepare = tasks.register('prepareNativeBootstrapTest') {
         if (target.canonicalFile != new File(buildDir, 'native-bootstrap-test-run').canonicalFile) {
             throw new GradleException('Bootstrap checks must stay inside the build directory')
         }
-        project.delete(target)
+        if (target.exists()) throw new GradleException('Preserve the existing bootstrap evidence before starting another run: ' + target)
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         copy { from bootstrapJar.flatMap { it.archiveFile }; into new File(target, 'mods') }
         if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
@@ -151,7 +151,7 @@ def prepareForward = tasks.register('prepareNativeForwardTest') {
         if (target.canonicalFile != new File(buildDir, 'native-forward-test-run').canonicalFile) {
             throw new GradleException('Forward checks must stay inside their build directory')
         }
-        project.delete(target)
+        if (target.exists()) throw new GradleException('Preserve the existing forward-upgrade evidence before starting another run: ' + target)
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         copy { from zipTree('src/testFixtures/worlds/building-pieces-1.12.2.zip'); into new File(target, 'world') }
         copy { from 'src/testFixtures/worlds/building-pieces-1.12.2.json'; into target; rename { 'forward-fixture.json' } }
@@ -207,7 +207,7 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
         if (target.canonicalFile != new File(buildDir, 'native-client-test-run').canonicalFile) {
             throw new GradleException('Client checks must stay inside their build directory')
         }
-        project.delete(target)
+        if (target.exists()) throw new GradleException('Preserve the existing client evidence before starting another run: ' + target)
         copy { from bootstrapJar.flatMap { it.archiveFile }; into new File(target, 'mods') }
         if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
             copy { from project.ext.nativeGrassDevelopmentJar; into new File(target, 'mods') }
@@ -215,7 +215,7 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
         if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
             copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
         }
-        // Native defaults avoid Forge 28's first-write file-watcher race. The
+        // Native defaults avoid Forge 31's first-write file-watcher race. The
         // failed first-start receipt remains part of the qualification evidence.
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
@@ -242,7 +242,7 @@ def clientPhases = [:]
             JavaExec run = tasks.getByName('runClient') as JavaExec
             File assets = file(clientAssets.get())
             File natives = file(clientNatives.get())
-            [new File(assets, 'indexes/1.14.json'), natives].each {
+            [new File(assets, 'indexes/1.15.json'), natives].each {
                 if (!it.exists()) throw new GradleException('Incomplete native client runtime: ' + it)
             }
             File classpathJar = layout.buildDirectory.file('native-bootstrap-probe/client-classpath.jar').get().asFile
@@ -255,7 +255,7 @@ def clientPhases = [:]
             launchEnvironment.putAll([
                     target: 'fmluserdevclient', MCP_MAPPINGS: "${mapping_channel}_${mapping_version}",
                     MCP_VERSION: mcp_version, FORGE_VERSION: forge_version, FORGE_GROUP: 'net.minecraftforge',
-                    MC_VERSION: minecraft_version, assetDirectory: assets.absolutePath, assetIndex: '1.14',
+                    MC_VERSION: minecraft_version, assetDirectory: assets.absolutePath, assetIndex: '1.15',
                     nativesDirectory: natives.absolutePath,
                     MOD_CLASSES: "${mod_id}%%${buildDir}/forge-run-mod-classes/main${File.pathSeparator}" +
                             "${mod_id}%%${buildDir}/forge-run-mod-classes/main"])

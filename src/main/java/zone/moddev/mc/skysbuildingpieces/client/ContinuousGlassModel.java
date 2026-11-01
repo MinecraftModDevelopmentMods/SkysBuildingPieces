@@ -10,7 +10,7 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IEnviromentBlockReader;
+import net.minecraft.world.ILightReader;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -31,7 +31,7 @@ public final class ContinuousGlassModel implements IBakedModel {
     }
 
     @Override
-    public IModelData getModelData(IEnviromentBlockReader world, BlockPos position, BlockState state,
+    public IModelData getModelData(ILightReader world, BlockPos position, BlockState state,
             IModelData tileData) {
         int joins = 0;
         PieceBlock wall = (PieceBlock) state.getBlock();
@@ -80,28 +80,34 @@ public final class ContinuousGlassModel implements IBakedModel {
         List<BakedQuad> result = new ArrayList<BakedQuad>(quads.size());
 
         for (BakedQuad quad : quads) {
-            VertexFormat format = quad.getFormat();
+            // 1.15 quads use the block vertex format; they no longer carry a format of their own.
+            VertexFormat format = DefaultVertexFormats.BLOCK;
             int position = -1;
+            int texture = -1;
 
-            for (int elementIndex = 0; elementIndex < format.getElementCount(); elementIndex++) {
-                VertexFormatElement element = format.getElement(elementIndex);
+            for (int elementIndex = 0; elementIndex < format.getElements().size(); elementIndex++) {
+                VertexFormatElement element = format.getElements().get(elementIndex);
 
                 if (element.getUsage() == VertexFormatElement.Usage.POSITION
                         && element.getType() == VertexFormatElement.Type.FLOAT) {
                     position = format.getOffset(elementIndex) / 4;
                 }
+                if (element.getUsage() == VertexFormatElement.Usage.UV
+                        && element.getType() == VertexFormatElement.Type.FLOAT && element.getIndex() == 0) {
+                    texture = format.getOffset(elementIndex) / 4;
+                }
             }
-            if (position < 0 || !format.hasUv(0)) {
+            if (position < 0 || texture < 0) {
                 result.add(quad);
                 continue;
             }
 
             int[] data = GlassWallTexture.trim(quad.getVertexData(), format.getIntegerSize(), position,
-                    format.getUvOffsetById(0) / 4, joins);
+                    texture, joins);
 
             result.add(data == quad.getVertexData() ? quad
-                    : new BakedQuad(data, quad.getTintIndex(), quad.getFace(), quad.getSprite(),
-                            quad.shouldApplyDiffuseLighting(), format));
+                    : new BakedQuad(data, quad.getTintIndex(), quad.getFace(), quad.func_187508_a(),
+                            quad.shouldApplyDiffuseLighting()));
         }
 
         List<BakedQuad> immutable = Collections.unmodifiableList(result);
@@ -124,6 +130,11 @@ public final class ContinuousGlassModel implements IBakedModel {
 
     public boolean isGui3d() {
         return original.isGui3d();
+    }
+
+    @Override
+    public boolean func_230044_c_() {
+        return original.func_230044_c_();
     }
 
     public boolean isBuiltInRenderer() {

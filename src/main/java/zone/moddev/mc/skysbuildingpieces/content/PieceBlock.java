@@ -33,7 +33,7 @@ import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.StairsShape;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -47,6 +47,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameters;
@@ -159,7 +160,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
         }
 
         Block.Properties properties = Block.Properties.create(material).hardnessAndResistance(1).sound(SoundType.STONE)
-                .variableOpacity();
+                .variableOpacity().notSolid();
 
         if (palette.group.equals("ice") || palette.group.equals("packed_ice")) {
             properties.slipperiness(.98F);
@@ -240,28 +241,8 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public boolean isSolid(BlockState state) {
-        return false;
-    }
-
-    @Override
     public int getOpacity(BlockState state, IBlockReader world, BlockPos position) {
         return 0;
-    }
-
-    @Override
-    public BlockRenderLayer getRenderLayer() {
-        if (palette.group.equals("grass")) {
-            return BlockRenderLayer.CUTOUT_MIPPED;
-        }
-        if (palette.group.equals("clear_glass")) {
-            return BlockRenderLayer.CUTOUT;
-        }
-        if (palette.group.equals("stained_glass") || palette.group.equals("ice")) {
-            return BlockRenderLayer.TRANSLUCENT;
-        }
-
-        return BlockRenderLayer.SOLID;
     }
 
     @Override
@@ -656,7 +637,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public void tick(BlockState state, World world, BlockPos position, Random random) {
+    public void tick(BlockState state, ServerWorld world, BlockPos position, Random random) {
         if (world.isRemote) {
             return;
         }
@@ -678,9 +659,10 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World world, BlockPos position, PlayerEntity player, Hand hand,
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos position, PlayerEntity player, Hand hand,
             BlockRayTraceResult hit) {
-        return PathPieces.activate(world, position, player, player.getHeldItem(hand), hit.getFace(), hand);
+        return PathPieces.activate(world, position, player, player.getHeldItem(hand), hit.getFace(), hand)
+                ? ActionResultType.SUCCESS : ActionResultType.PASS;
     }
 
     @Override
@@ -706,7 +688,7 @@ public final class PieceBlock extends Block implements IGrowable, IWaterLoggable
     }
 
     @Override
-    public void grow(World world, Random random, BlockPos position, BlockState state) {
+    public void grow(ServerWorld world, Random random, BlockPos position, BlockState state) {
         if (canGrow(world, position, state, world.isRemote)) {
             ((IGrowable) Blocks.GRASS_BLOCK).grow(world, random, position, Blocks.GRASS_BLOCK.getDefaultState());
         }

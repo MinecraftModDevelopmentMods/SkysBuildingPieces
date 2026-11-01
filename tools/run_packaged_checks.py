@@ -48,11 +48,11 @@ def manifest_classpath(destination, files):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.14.4/1.14.4.json").read_text(encoding="utf-8"))
-    forge = json.loads((runtime / "versions/1.14.4-forge-28.2.26/1.14.4-forge-28.2.26.json")
+    base = json.loads((runtime / "versions/1.15.2/1.15.2.json").read_text(encoding="utf-8"))
+    forge = json.loads((runtime / "versions/1.15.2-forge-31.2.57/1.15.2-forge-31.2.57.json")
                        .read_text(encoding="utf-8"))
-    if base["id"] != "1.14.4" or forge["inheritsFrom"] != "1.14.4":
-        raise ValueError("This launcher requires the verified Forge 28 client metadata")
+    if base["id"] != "1.15.2" or forge["inheritsFrom"] != "1.15.2":
+        raise ValueError("This launcher requires the verified Forge 31 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -65,7 +65,7 @@ def client_command(options, directory):
         if digest(path, "sha1") != artifact["sha1"].upper():
             raise ValueError("Client library checksum changed: " + library["name"])
         classpath.append(path)
-    client = runtime / "versions/1.14.4/1.14.4.jar"
+    client = runtime / "versions/1.15.2/1.15.2.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -90,8 +90,8 @@ def client_command(options, directory):
                 if "${" in value:
                     raise ValueError("Unresolved native launch argument: " + value)
                 arguments.append(value)
-    natives = runtime / "natives/forge-28.2.26"
-    if not natives.is_dir() or not (options.assets / "indexes/1.14.json").is_file():
+    natives = runtime / "natives/1.15.2-forge-31.2.57"
+    if not natives.is_dir() or not (options.assets / "indexes" / (base["assetIndex"]["id"] + ".json")).is_file():
         raise ValueError("Client natives or assets are incomplete")
     return [str(options.java), "-Xmx3g", "-Djava.library.path=" + str(natives),
             "-Dskysbuildingpieces.bootstrapPhase=" + options.phase,
@@ -177,7 +177,7 @@ def main():
             raise ValueError("Client checks need the verified asset directory")
         command = client_command(options, directory)
     else:
-        forge = options.runtime.resolve() / "forge-1.14.4-28.2.26.jar"
+        forge = options.runtime.resolve() / "forge-1.15.2-31.2.57.jar"
         command = [str(options.java), "-Xmx3g", "-Dskysbuildingpieces.bootstrapPhase=" + options.phase,
                    "-jar", str(forge), "--nogui"]
     # Do not inherit development mod output into a packaged launch.

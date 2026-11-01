@@ -32,7 +32,7 @@ public final class MigrationEvents {
         }
 
         CompoundNBT legacyTileData = event.getData();
-        // Unlike the save event, Forge 28's load event contains Level itself.
+        // Unlike the save event, Forge 31's load event contains Level itself.
         CompoundNBT level = legacyTileData;
 
         // Turning replacement off must retain existing module markers, while leaving previously unvisited chunks

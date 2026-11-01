@@ -275,7 +275,7 @@ public final class PieceItem extends Item {
     }
 
     private static boolean safe(World world, BlockPos position, BlockState target) {
-        return world.func_217350_a(target, position, ISelectionContext.dummy());
+        return world.func_226663_a_(target, position, ISelectionContext.dummy());
     }
 
     private static boolean replaceable(World world, BlockPos position, PlayerEntity player, Hand hand, ItemStack stack,

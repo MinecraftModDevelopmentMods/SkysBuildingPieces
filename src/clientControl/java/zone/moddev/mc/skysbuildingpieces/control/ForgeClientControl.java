@@ -25,7 +25,7 @@ public final class ForgeClientControl {
 
         Minecraft client = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(client.mainWindow.getHandle());
+        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getMainWindow().getHandle());
 
         if (!started) {
             started = true;
@@ -37,7 +37,7 @@ public final class ForgeClientControl {
                 throw new AssertionError("The Forge-only control contains a Sky mod");
             }
 
-            System.out.println("FORGE28_CLIENT_CONTROL_PASS joined=true sky_mods=false");
+            System.out.println("FORGE31_CLIENT_CONTROL_PASS joined=true sky_mods=false");
             client.shutdown();
         }
     }

@@ -37,7 +37,7 @@ public final class GameplayChecks {
         long trackingDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
         while (!world.getChunkProvider().canTick(position) && System.nanoTime() < trackingDeadline) {
-            if (!world.getChunkProvider().func_217234_d()) {
+            if (!world.getChunkProvider().driveOneTask()) {
                 Thread.yield();
             }
         }
@@ -237,12 +237,12 @@ public final class GameplayChecks {
 
         // checkBlock is queued after the light pass. Its propagation can still be pending when lightChunk's completion
         // callback runs.
-        while ((!finished.isDone() || lights.func_215570_a()) && System.nanoTime() < deadline) {
+        while ((!finished.isDone() || lights.hasLightWork()) && System.nanoTime() < deadline) {
             lights.func_215588_z_();
             Thread.yield();
         }
 
-        require(finished.isDone() && !lights.func_215570_a(), "Native lighting did not finish for the grass fixture");
+        require(finished.isDone() && !lights.hasLightWork(), "Native lighting did not finish for the grass fixture");
         finished.join();
     }
 

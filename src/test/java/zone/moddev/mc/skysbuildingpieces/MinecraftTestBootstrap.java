@@ -13,14 +13,14 @@ public final class MinecraftTestBootstrap {
         try {
             Class<?> loader = Class.forName("net.minecraftforge.fml.loading.FMLLoader");
 
-            set(loader, "mcVersion", "1.14.4");
-            set(loader, "mcpVersion", "20190829.143755");
-            set(loader, "forgeVersion", "28.2.26");
+            set(loader, "mcVersion", "1.15.2");
+            set(loader, "mcpVersion", "20200515.085601");
+            set(loader, "forgeVersion", "31.2.57");
             set(loader, "forgeGroup", "net.minecraftforge");
             Bootstrap.register();
             initialized = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to initialize the Forge 28 test runtime", exception);
+            throw new IllegalStateException("Unable to initialize the Forge 31 test runtime", exception);
         }
     }
 

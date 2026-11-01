@@ -1,4 +1,4 @@
-"""Negative controls for the exact Forge 28 native log classification."""
+"""Negative controls for the exact Forge 31 native log classification."""
 
 import unittest
 import json
@@ -16,11 +16,15 @@ PAYLOAD = "[Client thread/ERROR] [net.minecraftforge.fml.network.simple.IndexedM
 
 
 class NativeClientLogTest(unittest.TestCase):
-    def test_native_startup_notices_remain_in_receipt(self):
-        receipt = classify("\n".join((NOTICE, START, LOGIN, PAYLOAD)), True)
-        self.assertEqual(receipt["native_config_notices"], 1)
-        self.assertEqual(receipt["notices"], [NOTICE])
-        self.assertEqual(receipt["empty_handshakes"], 1)
+    def test_previous_target_notices_are_rejected(self):
+        with self.assertRaises(ValueError):
+            classify("\n".join((NOTICE, START, LOGIN, PAYLOAD)), True)
+
+    def test_clean_native_startup_is_accepted(self):
+        receipt = classify("\n".join((START, LOGIN)), True)
+        self.assertEqual(receipt["native_config_notices"], 0)
+        self.assertEqual(receipt["empty_handshakes"], 0)
+        self.assertEqual(receipt["notices"], [])
 
     def test_actual_config_change_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -67,9 +71,8 @@ class NativeClientFilesTest(unittest.TestCase):
         shutil.copyfile(defaults / "defaultconfigs/forge-server.toml", self.server / "forge-server.toml")
         (self.directory / "logs").mkdir()
         (self.directory / "logs/latest.log").write_text("\n".join((
-            NOTICE, START, LOGIN, PAYLOAD,
-            "[Server thread/ERROR] [net.minecraftforge.fml.network.simple.IndexedMessageCodec/SIMPLENET]: Received empty payload on channel fml:handshake",
-            "FORGE28_CLIENT_CONTROL_PASS joined=true sky_mods=false")), encoding="utf-8")
+            START, LOGIN,
+            "FORGE31_CLIENT_CONTROL_PASS joined=true sky_mods=false")), encoding="utf-8")
 
     def test_native_defaults_with_different_order_and_comments(self):
         client = self.directory / "config/forge-client.toml"
@@ -79,7 +82,7 @@ class NativeClientFilesTest(unittest.TestCase):
             encoding="utf-8")
         receipt = audit(self.directory, "control", True)
         self.assertTrue(receipt["unchanged_native_defaults"])
-        self.assertEqual(receipt["native_config_notices"], 1)
+        self.assertEqual(receipt["native_config_notices"], 0)
 
     def test_changed_default_stops_the_check(self):
         client = self.directory / "config/forge-client.toml"

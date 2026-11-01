@@ -1,4 +1,4 @@
-// A mod-free login control identifies Forge 28's empty handshake messages.
+// This login control runs without Sky mods and checks the native Forge defaults.
 def controlClasses = layout.buildDirectory.dir('forge-client-control/classes')
 def compileControl = tasks.register('compileForgeClientControl', JavaCompile) {
     source fileTree('src/clientControl/java')
@@ -26,7 +26,7 @@ tasks.register('forgeClientControlTest', Exec) {
         if (directory.canonicalFile != new File(buildDir, 'forge-client-control-run').canonicalFile) {
             throw new GradleException('Control checks must remain inside their build directory')
         }
-        delete directory
+        if (directory.exists()) throw new GradleException('Preserve the existing control evidence before starting another run: ' + directory)
         copy { from controlJar.flatMap { it.archiveFile }; into new File(directory, 'mods') }
         copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
         new File(directory, 'options.txt').text = 'lang:en_us\nfullscreen:false\nrenderDistance:2\n'
@@ -51,7 +51,7 @@ tasks.register('forgeClientControlTest', Exec) {
         environment 'FORGE_GROUP', 'net.minecraftforge'
         environment 'MC_VERSION', minecraft_version
         environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
-        environment 'assetIndex', '1.14'
+        environment 'assetIndex', '1.15'
         environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
         workingDir directory
         commandLine javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }

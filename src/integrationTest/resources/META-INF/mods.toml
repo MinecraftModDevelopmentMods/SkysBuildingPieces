@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[28,)"
+loaderVersion="[31,)"
 license="LGPL-2.1-only"
 [[mods]]
 modId="buildingpiecesprobe"
@@ -9,6 +9,6 @@ description="Build-only gameplay, recipe and upgrade checks."
 [[dependencies.buildingpiecesprobe]]
 modId="skysbuildingpieces"
 mandatory=true
-versionRange="[0.3.8.114041,)"
+versionRange="[0.3.8.115021,)"
 ordering="AFTER"
 side="BOTH"

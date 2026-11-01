@@ -48,7 +48,7 @@ public final class GrassLifecycle {
             sharedDirt = api.getMethod("tickDirt", World.class, BlockPos.class, BlockState.class, Random.class);
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException(
-                    "Install Sky's Grass Slabs 1.2.0.114041 or later for grass-piece integration", failure);
+                    "Install Sky's Grass Slabs 1.2.0.115021 or later for grass-piece integration", failure);
         }
     }
 
