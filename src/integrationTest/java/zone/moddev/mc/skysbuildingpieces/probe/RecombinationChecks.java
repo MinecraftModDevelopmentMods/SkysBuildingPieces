@@ -1,13 +1,13 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
@@ -15,7 +15,7 @@ import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
 /** Checks rebuilding larger pieces against the complete installed recipe set. */
 public final class RecombinationChecks {
-    public static void run(ServerWorld world) {
+    public static void run(ServerLevel world) {
         if (net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")) {
             return;
         }
@@ -32,7 +32,7 @@ public final class RecombinationChecks {
         }
 
         require(checks > 0, "the catalogue supplies recombination recipes");
-        System.out.println("BUILDING_PIECES_SMALL_RECOMBINATION_PASS cases=" + checks + " modules="
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_SMALL_RECOMBINATION_PASS cases=" + checks + " modules="
                 + Catalogue.INSTANCE.modules.size());
     }
 
@@ -47,16 +47,16 @@ public final class RecombinationChecks {
                 : material.equals("minecraft:dirt") ? "dirt_slab" : null;
         Item external = grassSlab == null ? null
                 : net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .getValue(new net.minecraft.util.ResourceLocation("skysgrassslabs:" + grassSlab));
+                        .getValue(new net.minecraft.resources.ResourceLocation("skysgrassslabs:" + grassSlab));
 
-        if (external != null && external != net.minecraft.item.Items.AIR) {
+        if (external != null && external != net.minecraft.world.item.Items.AIR) {
             return new ItemStack(external);
         }
 
         return Pieces.stack(Pieces.state(material, Shape.VERTICAL_SLAB, 0), 1);
     }
 
-    private static int pair(ServerWorld world, String material, Shape shape, ItemStack expected) {
+    private static int pair(ServerLevel world, String material, Shape shape, ItemStack expected) {
         BlockState source = Pieces.state(material, shape, 0);
 
         if (source == null || expected == null) {
@@ -70,7 +70,7 @@ public final class RecombinationChecks {
             for (int column = 0; column < size; column++) {
                 for (int row = 0; row < size - 1; row++) {
                     for (int orientation = 0; orientation < shape.states; orientation++) {
-                        CraftingInventory grid = grid(size);
+                        CraftingContainer grid = grid(size);
                         int upperSlot = column + row * size;
                         ItemStack upper = Pieces.stack(Pieces.state(material, shape, orientation), 17);
                         ItemStack lower = Pieces.stack(Pieces.state(material, shape, (orientation + 1) % shape.states),
@@ -85,8 +85,8 @@ public final class RecombinationChecks {
                         require(ItemStack.matches(expected, actual),
                                 "two vertically stacked pieces: " + label);
 
-                        for (net.minecraft.item.crafting.ICraftingRecipe recipe : world.getRecipeManager()
-                                .getRecipesFor(IRecipeType.CRAFTING, grid, world)) {
+                        for (net.minecraft.world.item.crafting.CraftingRecipe recipe : world.getRecipeManager()
+                                .getRecipesFor(RecipeType.CRAFTING, grid, world)) {
                             if (recipe.matches(grid, world)) {
                                 require(ItemStack.matches(expected, recipe.assemble(grid)),
                                         "no conflicting recipe for " + label);
@@ -109,7 +109,7 @@ public final class RecombinationChecks {
         }
 
         // A different slot in the same metadata palette must never become this material.
-        CraftingInventory mixed = grid(2);
+        CraftingContainer mixed = grid(2);
         ItemStack ingredient = Pieces.stack(source, 1);
 
         mixed.setItem(0, ingredient);
@@ -122,7 +122,7 @@ public final class RecombinationChecks {
         }
 
         ItemStack invalidCarrier = new ItemStack(block);
-        net.minecraft.nbt.CompoundNBT invalid = new net.minecraft.nbt.CompoundNBT();
+        net.minecraft.nbt.CompoundTag invalid = new net.minecraft.nbt.CompoundTag();
 
         invalid.putInt("Damage", 16);
         invalidCarrier.setTag(invalid);
@@ -145,17 +145,17 @@ public final class RecombinationChecks {
         return cases;
     }
 
-    static CraftingInventory grid(int size) {
-        return new CraftingInventory(new Container(null, 0) {
+    static CraftingContainer grid(int size) {
+        return new CraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
-            public boolean stillValid(net.minecraft.entity.player.PlayerEntity player) {
+            public boolean stillValid(net.minecraft.world.entity.player.Player player) {
                 return true;
             }
         }, size, size);
     }
 
-    private static ItemStack result(CraftingInventory grid, ServerWorld world) {
-        return world.getRecipeManager().getRecipeFor(IRecipeType.CRAFTING, grid, world)
+    private static ItemStack result(CraftingContainer grid, ServerLevel world) {
+        return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
                 .map(recipe -> recipe.assemble(grid)).orElse(ItemStack.EMPTY);
     }
 

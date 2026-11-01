@@ -1,12 +1,12 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
 import com.google.gson.JsonObject;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 /** A one-piece rotation keeps the original name and other custom stack data. */
@@ -21,7 +21,7 @@ public final class CuttingRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inventory) {
+    public ItemStack assemble(CraftingContainer inventory) {
         ItemStack result = super.assemble(inventory);
 
         if (preserveTag) {
@@ -42,12 +42,12 @@ public final class CuttingRecipe extends ShapedRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
     }
 
-    public static final class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>
-            implements IRecipeSerializer<CuttingRecipe> {
+    public static final class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
+            implements RecipeSerializer<CuttingRecipe> {
         private final ShapedRecipe.Serializer shaped = new ShapedRecipe.Serializer();
 
         @Override
@@ -57,14 +57,14 @@ public final class CuttingRecipe extends ShapedRecipe {
         }
 
         @Override
-        public CuttingRecipe fromNetwork(ResourceLocation id, PacketBuffer buffer) {
+        public CuttingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
             ShapedRecipe recipe = shaped.fromNetwork(id, buffer);
 
             return new CuttingRecipe(recipe, buffer.readBoolean());
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, CuttingRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, CuttingRecipe recipe) {
             shaped.toNetwork(buffer, recipe);
             buffer.writeBoolean(recipe.preserveTag);
         }

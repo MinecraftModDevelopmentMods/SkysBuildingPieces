@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:mossy_stone_brick_slab"
+            "items": [
+              "minecraft:mossy_stone_brick_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stonebrick_mossy/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stonebrick_mossy/slab_recombination"
+    ]
   }
 }

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:andesite_smooth_vertical_slab"
+            "items": [
+              "skysbuildingpieces:andesite_smooth_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/andesite_smooth/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_10_8"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/andesite_smooth/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_10_8"
+    ]
   },
   "conditions": [
     {

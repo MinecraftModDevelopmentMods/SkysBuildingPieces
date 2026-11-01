@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:wool_lime_slab"
+            "items": [
+              "skysbuildingpieces:wool_lime_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_lime/horizontal_step/step/skysbuildingpieces/cloth_slab_00_10"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_lime/horizontal_step/step/skysbuildingpieces/cloth_slab_00_10"
+    ]
   },
   "conditions": [
     {

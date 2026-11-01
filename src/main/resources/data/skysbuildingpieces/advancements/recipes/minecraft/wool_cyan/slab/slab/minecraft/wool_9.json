@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:cyan_wool"
+            "items": [
+              "minecraft:cyan_wool"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_cyan/slab/slab/minecraft/wool_9"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_cyan/slab/slab/minecraft/wool_9"
+    ]
   },
   "conditions": [
     {

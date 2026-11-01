@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:snow_block"
+            "items": [
+              "minecraft:snow_block"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/snow/stairs/stairs/minecraft/snow_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/snow/stairs/stairs/minecraft/snow_0"
+    ]
   },
   "conditions": [
     {

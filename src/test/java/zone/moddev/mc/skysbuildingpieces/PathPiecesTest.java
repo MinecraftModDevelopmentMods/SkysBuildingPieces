@@ -40,7 +40,7 @@ class PathPiecesTest {
                 JsonObject source = read("models/block/grass_" + shape + "_" + orientation + "_dry.json");
                 JsonObject path = read("models/block/grass_path_" + shape + "_" + orientation + ".json");
 
-                assertEquals("minecraft:block/grass_path_top",
+                assertEquals("minecraft:block/dirt_path_top",
                         path.getAsJsonObject("textures").get("top").getAsString());
 
                 double originalTop = top(source);

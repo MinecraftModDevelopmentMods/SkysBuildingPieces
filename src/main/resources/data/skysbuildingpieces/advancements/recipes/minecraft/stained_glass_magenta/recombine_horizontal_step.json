@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:stained_glass_magenta_horizontal_step"
+            "items": [
+              "skysbuildingpieces:stained_glass_magenta_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_magenta/recombine_horizontal_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_magenta/recombine_horizontal_step"
+    ]
   },
   "conditions": [
     {

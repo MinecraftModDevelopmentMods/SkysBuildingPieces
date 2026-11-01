@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:dark_prismarine_slab"
+            "items": [
+              "minecraft:dark_prismarine_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_dark/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_dark/slab_recombination"
+    ]
   }
 }

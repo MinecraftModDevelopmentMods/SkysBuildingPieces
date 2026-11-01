@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:cobblestone_slab"
+            "items": [
+              "minecraft:cobblestone_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/cobblestone/horizontal_step/step/minecraft/stone_slab_3"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/cobblestone/horizontal_step/step/minecraft/stone_slab_3"
+    ]
   },
   "conditions": [
     {

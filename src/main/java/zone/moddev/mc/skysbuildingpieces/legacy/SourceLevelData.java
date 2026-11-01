@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 
 /** Keeps the source biome table available after Forge's first level save. */
 final class SourceLevelData {
     private static Path sourceWorld;
-    private static CompoundNBT snapshot = new CompoundNBT();
+    private static CompoundTag snapshot = new CompoundTag();
 
     private SourceLevelData() {
     }
@@ -24,14 +24,18 @@ final class SourceLevelData {
 
         clear();
         Path level = world.resolve("level.dat");
-        CompoundNBT captured = new CompoundNBT();
+        CompoundTag captured = new CompoundTag();
 
         if (Files.isRegularFile(level)) {
             try (InputStream input = Files.newInputStream(level)) {
-                CompoundNBT root = CompressedStreamTools.readCompressed(input);
+                CompoundTag root = NbtIo.readCompressed(input);
                 captured.putInt("DataVersion", root.getCompound("Data").getInt("DataVersion"));
-                captured.put("Registry", root.getCompound("fml").getCompound("Registries")
-                        .getCompound("minecraft:biome").copy());
+                CompoundTag registries = root.getCompound("fml").getCompound("Registries");
+                CompoundTag biomes = registries.getCompound("minecraft:worldgen/biome");
+                if (biomes.isEmpty()) {
+                    biomes = registries.getCompound("minecraft:biome");
+                }
+                captured.put("Registry", biomes.copy());
             } catch (IOException failure) {
                 throw new LegacyBridge.RecoveryAbort(
                         "Cannot preserve the source biome registry. Restore the original world backup.", failure);
@@ -42,12 +46,12 @@ final class SourceLevelData {
         snapshot = captured;
     }
 
-    static synchronized CompoundNBT forWorld(Path directory) {
-        return directory.toAbsolutePath().normalize().equals(sourceWorld) ? snapshot.copy() : new CompoundNBT();
+    static synchronized CompoundTag forWorld(Path directory) {
+        return directory.toAbsolutePath().normalize().equals(sourceWorld) ? snapshot.copy() : new CompoundTag();
     }
 
     static synchronized void clear() {
         sourceWorld = null;
-        snapshot = new CompoundNBT();
+        snapshot = new CompoundTag();
     }
 }

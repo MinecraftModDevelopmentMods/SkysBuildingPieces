@@ -1,14 +1,25 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.ShortTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.WorldData;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
@@ -34,25 +45,25 @@ public final class LegacyBridge {
         return active() || ready && HistoricalFullBlocks.hasSource(savedIds);
     }
 
-    private static CompoundNBT registrySnapshot = new CompoundNBT();
-    private static CompoundNBT laterRegistrySnapshot = new CompoundNBT();
+    private static CompoundTag registrySnapshot = new CompoundTag();
+    private static CompoundTag laterRegistrySnapshot = new CompoundTag();
     private static boolean registryValidated;
     private static Path capturedDirectory;
-    private static CompoundNBT capturedRegistry = new CompoundNBT();
+    private static CompoundTag capturedRegistry = new CompoundTag();
     private static boolean persistenceRegistered;
 
     public static synchronized void registerPersistence() {
         if (persistenceRegistered) return;
-        net.minecraftforge.fml.WorldPersistenceHooks.addHook(
-                new net.minecraftforge.fml.WorldPersistenceHooks.WorldPersistenceHook() {
+        net.minecraftforge.fmllegacy.WorldPersistenceHooks.addHook(
+                new net.minecraftforge.fmllegacy.WorldPersistenceHooks.WorldPersistenceHook() {
                     @Override
                     public String getModId() {
                         return "FML";
                     }
 
                     @Override
-                    public CompoundNBT getDataForWriting(net.minecraft.world.storage.SaveFormat.LevelSave save,
-                            net.minecraft.world.storage.IServerConfiguration information) {
+                    public CompoundTag getDataForWriting(net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess save,
+                            net.minecraft.world.level.storage.WorldData information) {
                         synchronized (LegacyBridge.class) {
                             Path directory = save.getWorldDir().toAbsolutePath().normalize();
                             if (directory.equals(capturedDirectory) && !capturedRegistry.isEmpty()) {
@@ -61,13 +72,13 @@ public final class LegacyBridge {
                             if (worldDirectory != null && directory.equals(worldDirectory.toPath().toAbsolutePath().normalize())) {
                                 return registrySnapshot.copy();
                             }
-                            return new CompoundNBT();
+                            return new CompoundTag();
                         }
                     }
 
                     @Override
-                    public void readData(net.minecraft.world.storage.SaveFormat.LevelSave save,
-                            net.minecraft.world.storage.IServerConfiguration information, CompoundNBT registry) {
+                    public void readData(net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess save,
+                            net.minecraft.world.level.storage.WorldData information, CompoundTag registry) {
                         synchronized (LegacyBridge.class) {
                             capturedDirectory = save.getWorldDir().toAbsolutePath().normalize();
                             capturedRegistry = registry.copy();
@@ -79,24 +90,24 @@ public final class LegacyBridge {
     }
 
     /** Returns a copy of the original biome table and save version for this world. */
-    public static CompoundNBT sourceBiomeSnapshot(MinecraftServer server) {
-        return SourceLevelData.forWorld(server.getWorldPath(net.minecraft.world.storage.FolderName.ROOT));
+    public static CompoundTag sourceBiomeSnapshot(MinecraftServer server) {
+        return SourceLevelData.forWorld(server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT));
     }
 
     public static synchronized void start(MinecraftServer server) {
         resetRecovery();
 
-        File level = server.getWorldPath(net.minecraft.world.storage.FolderName.LEVEL_DATA_FILE).toFile();
+        File level = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.LEVEL_DATA_FILE).toFile();
 
         worldDirectory = level.getParentFile();
 
         File sidecar = new File(worldDirectory, "data/skysbuildingpieces_legacy_registry.dat");
-        CompoundNBT previous = new CompoundNBT();
+        CompoundTag previous = new CompoundTag();
 
         try {
             if (sidecar.isFile()) {
                 try (InputStream input = new FileInputStream(sidecar)) {
-                    previous = CompressedStreamTools.readCompressed(input);
+                    previous = NbtIo.readCompressed(input);
                 }
 
                 registrySnapshot = previous.contains("FML", 10) ? previous.getCompound("FML").copy() : previous.copy();
@@ -104,7 +115,7 @@ public final class LegacyBridge {
 
                 if (laterRegistrySnapshot.isEmpty() && level.isFile()) {
                     try (InputStream input = new FileInputStream(level)) {
-                        CompoundNBT current = CompressedStreamTools.readCompressed(input);
+                        CompoundTag current = NbtIo.readCompressed(input);
 
                         if (current.getCompound("Data").getInt("DataVersion") <= 1343) {
                             laterRegistrySnapshot = current.getCompound("FML").copy();
@@ -120,7 +131,7 @@ public final class LegacyBridge {
                 }
             } else if (level.isFile()) {
                 try (InputStream input = new FileInputStream(level)) {
-                    registrySnapshot = CompressedStreamTools.readCompressed(input).getCompound("FML").copy();
+                    registrySnapshot = NbtIo.readCompressed(input).getCompound("FML").copy();
                 }
             }
 
@@ -156,7 +167,7 @@ public final class LegacyBridge {
         try {
             Files.createDirectories(destination.getParent());
 
-            CompoundNBT contents = new CompoundNBT();
+            CompoundTag contents = new CompoundTag();
 
             contents.put("FML", registrySnapshot.copy());
 
@@ -167,7 +178,7 @@ public final class LegacyBridge {
             contents.put("staging", NumericStateBridge.saveStaging());
 
             try (OutputStream output = Files.newOutputStream(temporary)) {
-                CompressedStreamTools.writeCompressed(contents, output);
+                NbtIo.writeCompressed(contents, output);
             }
             try {
                 Files.move(temporary, destination, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
@@ -180,7 +191,7 @@ public final class LegacyBridge {
     }
 
     /** The coremod calls this before the chunk enters vanilla data fixing. */
-    public static void prepareLegacyChunk(CompoundNBT root) {
+    public static void prepareLegacyChunk(CompoundTag root) {
         if (!ready || root == null) {
             return;
         }
@@ -193,14 +204,14 @@ public final class LegacyBridge {
             return;
         }
 
-        CompoundNBT level = root.getCompound("Level");
-        ListNBT sections = level.getList("Sections", 10);
+        CompoundTag level = root.getCompound("Level");
+        ListTag sections = level.getList("Sections", 10);
         boolean savedBiomes = HistoricalBiomes.prepare(root);
         boolean relevant = savedInventory || savedBiomes;
         boolean legacyPieces = false;
 
         for (int index = 0; index < sections.size(); index++) {
-            CompoundNBT section = sections.getCompound(index);
+            CompoundTag section = sections.getCompound(index);
             byte[] low = section.getByteArray("Blocks");
             byte[] high = section.getByteArray("Add");
 
@@ -228,17 +239,17 @@ public final class LegacyBridge {
         level.putBoolean("SkysBuildingPiecesPreserveChunk", true);
     }
 
-    private static void queueShapeRefresh(CompoundNBT level) {
-        ListNBT refresh = level.getList("PostProcessing", 9);
+    private static void queueShapeRefresh(CompoundTag level) {
+        ListTag refresh = level.getList("PostProcessing", 9);
 
         while (refresh.size() < 16) {
-            refresh.add(new ListNBT());
+            refresh.add(new ListTag());
         }
 
-        ListNBT sections = level.getList("Sections", 10);
+        ListTag sections = level.getList("Sections", 10);
 
         for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-            CompoundNBT section = sections.getCompound(sectionIndex);
+            CompoundTag section = sections.getCompound(sectionIndex);
             byte[] blocks = section.getByteArray("Blocks");
 
             if (blocks.length != 4096) {
@@ -253,7 +264,7 @@ public final class LegacyBridge {
 
             byte[] high = section.getByteArray("Add");
             byte[] metadata = section.getByteArray("Data");
-            ListNBT positions = refresh.getList(sectionY);
+            ListTag positions = refresh.getList(sectionY);
             Set<Short> queued = new HashSet<>();
 
             for (int index = 0; index < positions.size(); index++) {
@@ -273,7 +284,7 @@ public final class LegacyBridge {
                 short packed = (short) ((index & 15) | (index >> 8 & 15) << 4 | (index >> 4 & 15) << 8);
 
                 if (queued.add(packed)) {
-                    positions.add(ShortNBT.valueOf(packed));
+                    positions.add(ShortTag.valueOf(packed));
                 }
             }
         }
@@ -281,13 +292,13 @@ public final class LegacyBridge {
         level.put("PostProcessing", refresh);
     }
 
-    public static CompoundNBT finalizeLegacyChunk(CompoundNBT root) {
+    public static CompoundTag finalizeLegacyChunk(CompoundTag root) {
         finalizeNbt(root);
 
         if (root != null && root.contains("Level", 10)) {
             HistoricalBiomes.finish(root);
 
-            CompoundNBT level = root.getCompound("Level");
+            CompoundTag level = root.getCompound("Level");
 
             carryDeltas(root, level);
 
@@ -300,7 +311,7 @@ public final class LegacyBridge {
         return root;
     }
 
-    private static void carryDeltas(CompoundNBT root, CompoundNBT level) {
+    private static void carryDeltas(CompoundTag root, CompoundTag level) {
         // Keep pending accounting inside Level while vanilla fixes the enclosing chunk.
         // The native load handler unwraps that same data from Forge's chunk root.
         String[] keys = { "skysbuildingpieces_delta", "skysbuildingpieces_additional_vanilla_delta",
@@ -321,18 +332,18 @@ public final class LegacyBridge {
     }
 
     /** Also covers player and nested inventory data before the native item fixer runs. */
-    public static void prepareNbt(CompoundNBT root) {
+    public static void prepareNbt(CompoundTag root) {
         if (ready && root != null) {
             prepareStack(root);
         }
     }
 
     /** Finish identities which would otherwise be renamed a second time by vanilla. */
-    public static CompoundNBT finalizeNbt(CompoundNBT root) {
+    public static CompoundTag finalizeNbt(CompoundTag root) {
         return finalizeNbt(root, Integer.MAX_VALUE);
     }
 
-    public static CompoundNBT finalizeNbt(CompoundNBT root, int targetVersion) {
+    public static CompoundTag finalizeNbt(CompoundTag root, int targetVersion) {
         if (ready && root != null) {
             HistoricalItems.finish(root, targetVersion);
         }
@@ -353,19 +364,19 @@ public final class LegacyBridge {
     }
 
     /** Named-state recovery stays separate from the pre-1.13 numeric bridge. */
-    private static void prepareNamedReplacements(CompoundNBT root) {
+    private static void prepareNamedReplacements(CompoundTag root) {
         if (!Catalogue.INSTANCE.hasReplacements()) {
             return;
         }
 
-        ListNBT sections = root.getCompound("Level").getList("Sections", 10);
+        ListTag sections = root.getCompound("Level").getList("Sections", 10);
         List<Runnable> changes = new ArrayList<>();
 
         for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-            ListNBT states = sections.getCompound(sectionIndex).getList("Palette", 10);
+            ListTag states = sections.getCompound(sectionIndex).getList("Palette", 10);
 
             for (int paletteIndex = 0; paletteIndex < states.size(); paletteIndex++) {
-                CompoundNBT saved = states.getCompound(paletteIndex);
+                CompoundTag saved = states.getCompound(paletteIndex);
                 PieceBlock block = palette(saved.getString("Name"));
 
                 if (block == null) {
@@ -388,10 +399,10 @@ public final class LegacyBridge {
                         continue;
                     }
 
-                    BlockState original = NBTUtil.readBlockState(saved);
+                    BlockState original = NbtUtils.readBlockState(saved);
                     BlockState target = Pieces.canonicalState(original);
-                    CompoundNBT converted = saved.copy();
-                    CompoundNBT nativeState = NBTUtil.writeBlockState(target);
+                    CompoundTag converted = saved.copy();
+                    CompoundTag nativeState = NbtUtils.writeBlockState(target);
 
                     converted.putString("Name", nativeState.getString("Name"));
 
@@ -419,14 +430,14 @@ public final class LegacyBridge {
     public static synchronized void stop() {
         resetRecovery();
         capturedDirectory = null;
-        capturedRegistry = new CompoundNBT();
+        capturedRegistry = new CompoundTag();
         SourceLevelData.clear();
     }
 
     private static void resetRecovery() {
         NumericStateBridge.reset();
-        registrySnapshot = new CompoundNBT();
-        laterRegistrySnapshot = new CompoundNBT();
+        registrySnapshot = new CompoundTag();
+        laterRegistrySnapshot = new CompoundTag();
         HistoricalBiomes.clear();
         HistoricalItems.clearNativeNames();
         registryValidated = false;
@@ -443,16 +454,16 @@ public final class LegacyBridge {
         }
     }
 
-    public static void prepareStack(CompoundNBT stack) {
+    public static void prepareStack(CompoundTag stack) {
         prepareStacks(stack);
     }
 
-    private static boolean prepareStacks(CompoundNBT stack) {
+    private static boolean prepareStacks(CompoundTag stack) {
         if (!ready) {
             return false;
         }
 
-        CompoundNBT prepared = HistoricalItems.prepareCopy(stack);
+        CompoundTag prepared = HistoricalItems.prepareCopy(stack);
         List<StackChange> changes = new ArrayList<StackChange>();
 
         collectInventories(prepared, changes);
@@ -488,7 +499,7 @@ public final class LegacyBridge {
         }
     }
 
-    private static void collectStack(CompoundNBT stack, List<StackChange> changes) {
+    private static void collectStack(CompoundTag stack, List<StackChange> changes) {
         if (stack.contains("id", 8) && stack.contains("Count", 99)) {
             collectIdentity(stack, changes);
         }
@@ -500,9 +511,9 @@ public final class LegacyBridge {
         }
     }
 
-    private static void collectInventories(INBT value, List<StackChange> changes) {
-        if (value instanceof CompoundNBT) {
-            CompoundNBT compound = (CompoundNBT) value;
+    private static void collectInventories(Tag value, List<StackChange> changes) {
+        if (value instanceof CompoundTag) {
+            CompoundTag compound = (CompoundTag) value;
 
             if (compound.contains("id", 8) && compound.contains("Count", 99)) {
                 collectStack(compound, changes);
@@ -513,8 +524,8 @@ public final class LegacyBridge {
                     collectInventories(compound.get(key), changes);
                 }
             }
-        } else if (value instanceof ListNBT) {
-            ListNBT list = (ListNBT) value;
+        } else if (value instanceof ListTag) {
+            ListTag list = (ListTag) value;
 
             for (int entryIndex = 0; entryIndex < list.size(); entryIndex++) {
                 collectInventories(list.get(entryIndex), changes);
@@ -522,7 +533,7 @@ public final class LegacyBridge {
         }
     }
 
-    private static void collectIdentity(CompoundNBT stack, List<StackChange> changes) {
+    private static void collectIdentity(CompoundTag stack, List<StackChange> changes) {
         String registry = stack.getString("id");
         PieceItem item = Pieces.pieceItem(registry);
 
@@ -530,7 +541,7 @@ public final class LegacyBridge {
             if (Catalogue.INSTANCE.materials.get(item.material).replacement() != null) {
                 BlockState canonical = Pieces.state(item.material, item.piece.palette.shape,
                         item.piece.palette.shape == Shape.SLAB ? 1 : 0);
-                net.minecraft.item.ItemStack output = Pieces.stack(canonical, 1);
+                net.minecraft.world.item.ItemStack output = Pieces.stack(canonical, 1);
 
                 if (output == null || output.isEmpty()) {
                     throw new RecoveryAbort("No inventory target for retired material " + item.material, null);
@@ -545,7 +556,7 @@ public final class LegacyBridge {
 
         if (sourcePalette != null) {
             int metadata = stack.getShort("Damage");
-            net.minecraft.item.ItemStack output = Pieces.legacyItem(sourcePalette.getRegistryName().toString(),
+            net.minecraft.world.item.ItemStack output = Pieces.legacyItem(sourcePalette.getRegistryName().toString(),
                     metadata, 1);
 
             if (output == null || output.isEmpty()) {
@@ -557,7 +568,7 @@ public final class LegacyBridge {
         }
         if (LegacyPreflight.skyOwned(registry) && !HistoricalFullBlocks.historical(registry)
                 && !net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .containsKey(new net.minecraft.util.ResourceLocation(registry))) {
+                        .containsKey(new net.minecraft.resources.ResourceLocation(registry))) {
             throw new RecoveryAbort("Cannot recover " + registry + ". Restore its Sky add-on before loading.", null);
         }
 
@@ -565,14 +576,14 @@ public final class LegacyBridge {
         // convert or count them again.
         if (HistoricalFullBlocks.historical(registry) && !stack.contains("Damage", 99)
                 && !HistoricalFullBlocks.recoveryHolder(registry) && net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .containsKey(new net.minecraft.util.ResourceLocation(registry))) {
+                        .containsKey(new net.minecraft.resources.ResourceLocation(registry))) {
             return;
         }
 
         BlockState retired = HistoricalFullBlocks.resolve(registry, stack.getShort("Damage"));
 
         if (retired != null) {
-            net.minecraft.item.ItemStack output = Pieces.stack(retired, 1);
+            net.minecraft.world.item.ItemStack output = Pieces.stack(retired, 1);
 
             if (output == null || output.isEmpty()) {
                 throw new RecoveryAbort("Recovered block has no item: " + registry, null);
@@ -585,7 +596,7 @@ public final class LegacyBridge {
             return;
         }
 
-        CompoundNBT tag = stack.getCompound("tag");
+        CompoundTag tag = stack.getCompound("tag");
         String material = LegacyMapping.material(tag.getString("material"));
         // Item damage is a dynamic material index, never a placement orientation.
         Shape shape = LegacyMapping.shape(registry, 0);
@@ -595,7 +606,7 @@ public final class LegacyBridge {
             return;
         }
 
-        net.minecraft.item.ItemStack output = Pieces.stack(target, 1);
+        net.minecraft.world.item.ItemStack output = Pieces.stack(target, 1);
 
         if (output == null) {
             throw new RecoveryAbort("Recovered piece has no item: " + registry + " / " + material, null);
@@ -606,26 +617,26 @@ public final class LegacyBridge {
     }
 
     private static final class StackChange {
-        final CompoundNBT stack;
-        final net.minecraft.item.ItemStack output;
+        final CompoundTag stack;
+        final net.minecraft.world.item.ItemStack output;
         final String module;
 
-        StackChange(CompoundNBT stack, net.minecraft.item.ItemStack output, String module) {
+        StackChange(CompoundTag stack, net.minecraft.world.item.ItemStack output, String module) {
             this.stack = stack;
             this.output = output;
             this.module = module;
         }
     }
 
-    public static void prepareChunk(World world, CompoundNBT root) {
+    public static void prepareChunk(Level world, CompoundTag root) {
         prepareChunk(world, root, true);
     }
 
-    private static void prepareChunk(World world, CompoundNBT root, boolean legacyPieces) {
+    private static void prepareChunk(Level world, CompoundTag root, boolean legacyPieces) {
         if (ready) {
             // Some containers reject missing item IDs before constructing an ItemStack. Recover saved stacks before
             // those serializers run, including inventories with names other than vanilla's Items.
-            CompoundNBT stored = root.getCompound("Level");
+            CompoundTag stored = root.getCompound("Level");
             List<StackChange> changes = new ArrayList<StackChange>();
 
             collectInventories(stored.get("TileEntities"), changes);
@@ -639,8 +650,8 @@ public final class LegacyBridge {
             return;
         }
 
-        CompoundNBT level = root.getCompound("Level");
-        CompoundNBT coverage = level.getCompound("skysbuildingpieces_coverage");
+        CompoundTag level = root.getCompound("Level");
+        CompoundTag coverage = level.getCompound("skysbuildingpieces_coverage");
         Set<String> pendingModules = new LinkedHashSet<String>();
 
         for (String module : Catalogue.INSTANCE.modules.keySet()) {
@@ -651,13 +662,13 @@ public final class LegacyBridge {
 
         boolean pendingDirt = coverage.getInt("dirt_vertical_slabs") < 1;
 
-        ListNBT tiles = level.getList("TileEntities", 10);
-        ListNBT sections = level.getList("Sections", 10);
+        ListTag tiles = level.getList("TileEntities", 10);
+        ListTag sections = level.getList("Sections", 10);
 
-        Map<Integer, CompoundNBT> materialAt = new HashMap<Integer, CompoundNBT>();
+        Map<Integer, CompoundTag> materialAt = new HashMap<Integer, CompoundTag>();
 
         for (int tileIndex = 0; tileIndex < tiles.size(); tileIndex++) {
-            CompoundNBT legacyTileData = tiles.getCompound(tileIndex);
+            CompoundTag legacyTileData = tiles.getCompound(tileIndex);
             int index = (legacyTileData.getInt("x") & 15) | ((legacyTileData.getInt("z") & 15) << 4)
                     | (legacyTileData.getInt("y") << 8);
 
@@ -668,7 +679,7 @@ public final class LegacyBridge {
         List<Conversion> decisions = new ArrayList<Conversion>();
 
         for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-            CompoundNBT section = sections.getCompound(sectionIndex);
+            CompoundTag section = sections.getCompound(sectionIndex);
             byte[] blocks = section.getByteArray("Blocks");
             byte[] blockIdHighNibbles = section.getByteArray("Add");
             byte[] data = section.getByteArray("Data");
@@ -687,7 +698,7 @@ public final class LegacyBridge {
 
                 int tilePositionKey = (blockIndex & 255)
                         | (((section.getByte("Y") & 255) * 16 + (blockIndex >> 8)) << 8);
-                CompoundNBT legacyTileData = materialAt.get(tilePositionKey);
+                CompoundTag legacyTileData = materialAt.get(tilePositionKey);
                 String material = legacyTileData == null ? "" : legacyTileData.getString("material");
                 String module = Catalogue.INSTANCE.moduleFor(LegacyMapping.material(material));
                 Shape shape = LegacyMapping.shape(registry, nibble(data, blockIndex));
@@ -704,8 +715,8 @@ public final class LegacyBridge {
             return;
         }
 
-        Set<CompoundNBT> removed = Collections.newSetFromMap(new IdentityHashMap<CompoundNBT, Boolean>());
-        ListNBT retainedTileData = coverage.getList("retained_tiles", 10);
+        Set<CompoundTag> removed = Collections.newSetFromMap(new IdentityHashMap<CompoundTag, Boolean>());
+        ListTag retainedTileData = coverage.getList("retained_tiles", 10);
 
         // Every target is now known. Commit the block states before removing their old material tiles.
         for (Conversion conversion : decisions) {
@@ -737,7 +748,7 @@ public final class LegacyBridge {
             }
         }
 
-        ListNBT retained = new ListNBT();
+        ListTag retained = new ListTag();
 
         for (int tileIndex = 0; tileIndex < tiles.size(); tileIndex++) {
             if (!removed.contains(tiles.getCompound(tileIndex))) {
@@ -747,7 +758,7 @@ public final class LegacyBridge {
 
         level.put("TileEntities", retained);
 
-        CompoundNBT deltas = new CompoundNBT();
+        CompoundTag deltas = new CompoundTag();
 
         for (String module : pendingModules) {
             coverage.putInt(module, 1);
@@ -771,7 +782,7 @@ public final class LegacyBridge {
 
         deltas.remove("vanilla");
 
-        CompoundNBT additional = new CompoundNBT();
+        CompoundTag additional = new CompoundTag();
 
         for (String module : new ArrayList<>(deltas.getAllKeys())) {
             if (!pendingModules.contains(module)) {
@@ -820,7 +831,7 @@ public final class LegacyBridge {
         packedValues[index >> 1] = (byte) ((packedValues[index >> 1] & ~(15 << shift)) | ((value & 15) << shift));
     }
 
-    public static synchronized void report(World world) {
+    public static synchronized void report(Level world) {
         if (!recoveryActive()) {
             return;
         }
@@ -869,12 +880,12 @@ public final class LegacyBridge {
     }
 
     private static final class Conversion {
-        final CompoundNBT section, tile;
+        final CompoundTag section, tile;
         final int index;
         final BlockState state;
         final String module;
 
-        Conversion(CompoundNBT section, int index, BlockState state, CompoundNBT tile, String module) {
+        Conversion(CompoundTag section, int index, BlockState state, CompoundTag tile, String module) {
             this.section = section;
             this.index = index;
             this.state = state;

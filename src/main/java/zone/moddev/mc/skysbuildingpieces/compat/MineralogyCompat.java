@@ -8,12 +8,12 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -92,7 +92,7 @@ public final class MineralogyCompat {
     }
 
     /** Older unopened inventories may outlive Forge's temporary registry aliases. */
-    public static void prepareStacks(INBT value) {
+    public static void prepareStacks(Tag value) {
         List<StackIdentity> changes = new ArrayList<StackIdentity>();
 
         collectStacks(value, changes);
@@ -103,9 +103,9 @@ public final class MineralogyCompat {
         }
     }
 
-    private static void collectStacks(INBT value, List<StackIdentity> changes) {
-        if (value instanceof CompoundNBT) {
-            CompoundNBT compound = (CompoundNBT) value;
+    private static void collectStacks(Tag value, List<StackIdentity> changes) {
+        if (value instanceof CompoundTag) {
+            CompoundTag compound = (CompoundTag) value;
 
             if (compound.contains("id", 8) && compound.contains("Count", 99)) {
                 String replacement = replacementId(compound.getString("id"));
@@ -126,8 +126,8 @@ public final class MineralogyCompat {
             for (String key : compound.getAllKeys()) {
                 collectStacks(compound.get(key), changes);
             }
-        } else if (value instanceof ListNBT) {
-            ListNBT list = (ListNBT) value;
+        } else if (value instanceof ListTag) {
+            ListTag list = (ListTag) value;
 
             for (int index = 0; index < list.size(); index++) {
                 collectStacks(list.get(index), changes);
@@ -136,10 +136,10 @@ public final class MineralogyCompat {
     }
 
     private static final class StackIdentity {
-        final CompoundNBT stack;
+        final CompoundTag stack;
         final String replacement;
 
-        StackIdentity(CompoundNBT stack, String replacement) {
+        StackIdentity(CompoundTag stack, String replacement) {
             this.stack = stack;
             this.replacement = replacement;
         }

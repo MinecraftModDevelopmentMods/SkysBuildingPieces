@@ -1,9 +1,9 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import net.minecraft.block.Block;
-import net.minecraft.state.Property;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
 import net.minecraftforge.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -67,7 +67,7 @@ final class MineralogyChecks {
                 for (int orientation = 0; orientation < palette.shape.states; orientation++) {
                     BlockState state = Pieces.state(material, palette.shape, orientation);
 
-                    require(state != null && !state.getBlock().hasTileEntity(state), "invalid rock piece");
+                    require(state != null && !state.hasBlockEntity(), "invalid rock piece");
                     require(((zone.moddev.mc.skysbuildingpieces.content.PieceBlock) state.getBlock())
                             .getMetaFromState(state) == palette.meta(material, orientation),
                             "saved material or orientation changed");
@@ -78,7 +78,7 @@ final class MineralogyChecks {
 
         require(states == 540, "not all rock states were checked");
         rawInventories();
-        System.out.println("MINERALOGY_CORE_PASS palettes=" + registered + " states=" + states + " addon=false native_slabs_disabled=" + disabled);
+        org.apache.logging.log4j.LogManager.getLogger().info("MINERALOGY_CORE_PASS palettes=" + registered + " states=" + states + " addon=false native_slabs_disabled=" + disabled);
     }
 
     private static Direction facing(BlockState state) {
@@ -92,22 +92,22 @@ final class MineralogyChecks {
     }
 
     private static void rawInventories() {
-        net.minecraft.nbt.CompoundNBT stack = new net.minecraft.nbt.CompoundNBT();
+        net.minecraft.nbt.CompoundTag stack = new net.minecraft.nbt.CompoundTag();
 
         stack.putString("id", "skysbuildingpiecesmineralogy:rock_horizontal_step_00");
         stack.putByte("Count", (byte) 37);
         stack.putShort("Damage", (short) 11);
 
-        net.minecraft.nbt.CompoundNBT tag = new net.minecraft.nbt.CompoundNBT();
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 
         tag.putString("unchanged", "custom data");
         stack.put("tag", tag);
 
-        net.minecraft.nbt.CompoundNBT expected = stack.copy();
+        net.minecraft.nbt.CompoundTag expected = stack.copy();
 
         expected.putString("id", "skysbuildingpieces:mineralogy_rock_horizontal_step_00");
 
-        net.minecraft.nbt.CompoundNBT container = new net.minecraft.nbt.CompoundNBT();
+        net.minecraft.nbt.CompoundTag container = new net.minecraft.nbt.CompoundTag();
 
         container.put("sealed_contents", stack);
         zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(container);
@@ -115,17 +115,17 @@ final class MineralogyChecks {
         zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(container);
         require(stack.equals(expected), "raw recovery is not idempotent");
 
-        net.minecraft.nbt.CompoundNBT valid = expected.copy();
+        net.minecraft.nbt.CompoundTag valid = expected.copy();
 
         valid.putString("id", "skysbuildingpiecesmineralogy:rock_horizontal_step_00");
 
-        net.minecraft.nbt.CompoundNBT invalid = valid.copy();
+        net.minecraft.nbt.CompoundTag invalid = valid.copy();
 
         invalid.putShort("Damage", (short) -1);
         container.put("valid", valid);
         container.put("invalid", invalid);
 
-        net.minecraft.nbt.CompoundNBT before = container.copy();
+        net.minecraft.nbt.CompoundTag before = container.copy();
         boolean stopped = false;
 
         try {

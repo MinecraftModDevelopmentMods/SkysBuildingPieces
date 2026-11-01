@@ -1,28 +1,28 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
 /** Optional recovery for a legacy piece obtained while its original mod is installed. */
-public final class LegacyPieceRecipe extends SpecialRecipe {
-    public static final SpecialRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SpecialRecipeSerializer<>(
+public final class LegacyPieceRecipe extends CustomRecipe {
+    public static final SimpleRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SimpleRecipeSerializer<>(
             LegacyPieceRecipe::new);
 
     public LegacyPieceRecipe(ResourceLocation id) {
         super(id);
     }
 
-    private ItemStack result(CraftingInventory inventory) {
+    private ItemStack result(CraftingContainer inventory) {
         ItemStack source = ItemStack.EMPTY;
 
         for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
@@ -76,12 +76,12 @@ public final class LegacyPieceRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInventory inventory, World world) {
+    public boolean matches(CraftingContainer inventory, Level world) {
         return !result(inventory).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inventory) {
+    public ItemStack assemble(CraftingContainer inventory) {
         return result(inventory);
     }
 
@@ -91,12 +91,12 @@ public final class LegacyPieceRecipe extends SpecialRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inventory) {
+    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inventory) {
         return NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
     }
 }

@@ -7,19 +7,107 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 import zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState;
 
 /** Loads saved source chunks through the normal Forge chunk upgrader. */
 final class NativeForwardChecks {
-    static void run(ServerWorld world) throws Exception {
+    private static final java.util.Set<net.minecraft.world.level.ChunkPos> WARMUP_CHUNKS = new java.util.LinkedHashSet<>();
+    private static final java.util.Set<java.util.UUID> WARMUP_ENTITIES = new java.util.LinkedHashSet<>();
+    private static final java.util.Properties LEGACY_DROP_IDENTITIES = new java.util.Properties();
+
+    static void prepare(ServerLevel world) {
+        WARMUP_CHUNKS.clear();
+        WARMUP_ENTITIES.clear();
+        LEGACY_DROP_IDENTITIES.clear();
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream("forward-fixture.json"),
+                StandardCharsets.UTF_8)) {
+            JsonObject fixture = new JsonParser().parse(reader).getAsJsonObject();
+            com.google.gson.JsonArray points = new com.google.gson.JsonArray();
+            points.addAll(fixture.getAsJsonArray("states"));
+            boolean named = fixture.has("kind") && fixture.get("kind").getAsString().equals("named");
+            boolean legacy = fixture.has("kind") && fixture.get("kind").getAsString().equals("buildingbricks");
+            File identities = new File("legacy-drop-identities.properties");
+            if (legacy && identities.isFile()) {
+                try (FileInputStream input = new FileInputStream(identities)) {
+                    LEGACY_DROP_IDENTITIES.load(input);
+                }
+                require(fixture.get("archive_sha256").getAsString().equals(
+                        LEGACY_DROP_IDENTITIES.getProperty("fixture_sha256")), "Legacy entity receipt belongs to another fixture");
+            }
+            if (named || legacy) {
+                points.addAll(fixture.getAsJsonArray("containers"));
+                points.addAll(fixture.getAsJsonArray("entities"));
+                for (JsonElement value : fixture.getAsJsonArray("entities")) {
+                    JsonObject saved = value.getAsJsonObject();
+                    if (!active(saved)) {
+                        continue;
+                    }
+                    if (named) {
+                        WARMUP_ENTITIES.add(java.util.UUID.fromString(saved.get("uuid").getAsString()));
+                    } else {
+                        String key = legacyDropKey(saved);
+                        if (!LEGACY_DROP_IDENTITIES.containsKey(key)) {
+                            LEGACY_DROP_IDENTITIES.setProperty(key, sourceDropIdentity(world, saved).toString());
+                        }
+                        WARMUP_ENTITIES.add(java.util.UUID.fromString(LEGACY_DROP_IDENTITIES.getProperty(key)));
+                    }
+                }
+            }
+            if (legacy) {
+                LEGACY_DROP_IDENTITIES.setProperty("fixture_sha256", fixture.get("archive_sha256").getAsString());
+                try (java.io.FileOutputStream output = new java.io.FileOutputStream(identities)) {
+                    LEGACY_DROP_IDENTITIES.store(output, "Source fixture entity identities; build-only audit receipt");
+                }
+            }
+            for (JsonElement value : points) {
+                JsonObject saved = value.getAsJsonObject();
+                if (!active(saved)) {
+                    continue;
+                }
+                net.minecraft.world.level.ChunkPos owner = new net.minecraft.world.level.ChunkPos(position(saved));
+                if (!WARMUP_CHUNKS.add(owner)) {
+                    continue;
+                }
+                world.setChunkForced(owner.x, owner.z, true);
+                world.getChunk(owner.x, owner.z);
+            }
+        } catch (Exception failure) {
+            throw new IllegalStateException("Cannot prepare the disposable forward fixture", failure);
+        }
+    }
+
+    static boolean ready(ServerLevel world) {
+        for (net.minecraft.world.level.ChunkPos chunk : WARMUP_CHUNKS) {
+            if (!world.isPositionTickingWithEntitiesLoaded(new BlockPos(chunk.x << 4, 0, chunk.z << 4))) {
+                return false;
+            }
+        }
+        for (java.util.UUID id : WARMUP_ENTITIES) {
+            if (world.getEntity(id) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static void release(ServerLevel world) {
+        for (net.minecraft.world.level.ChunkPos chunk : WARMUP_CHUNKS) {
+            world.setChunkForced(chunk.x, chunk.z, false);
+        }
+        WARMUP_CHUNKS.clear();
+        WARMUP_ENTITIES.clear();
+        LEGACY_DROP_IDENTITIES.clear();
+    }
+
+    static void run(ServerLevel world) throws Exception {
         JsonObject fixture;
 
         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(new File("forward-fixture.json")),
@@ -53,7 +141,7 @@ final class NativeForwardChecks {
             }
         }
 
-        java.util.Set<net.minecraft.world.chunk.Chunk> tracked = new java.util.LinkedHashSet<>();
+        java.util.Set<net.minecraft.world.level.chunk.LevelChunk> tracked = new java.util.LinkedHashSet<>();
 
         for (JsonElement entry : loadPoints) {
             JsonObject saved = entry.getAsJsonObject();
@@ -81,7 +169,7 @@ final class NativeForwardChecks {
 
         require(!pending(tracked), "Native chunk post-processing did not finish");
 
-        for (net.minecraft.world.chunk.Chunk chunk : tracked) {
+        for (net.minecraft.world.level.chunk.LevelChunk chunk : tracked) {
             world.setChunkForced(chunk.getPos().x, chunk.getPos().z, false);
         }
         if (fixture.has("kind") && fixture.get("kind").getAsString().equals("named")) {
@@ -102,8 +190,8 @@ final class NativeForwardChecks {
                     saved.get("z").getAsInt());
             String id = saved.get("id").getAsString();
             BlockState actual = world.getBlockState(position);
-            net.minecraft.block.Block registered = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                    .getValue(new net.minecraft.util.ResourceLocation(id));
+            net.minecraft.world.level.block.Block registered = net.minecraftforge.registries.ForgeRegistries.BLOCKS
+                    .getValue(new net.minecraft.resources.ResourceLocation(id));
 
             require(registered instanceof PieceBlock, "Permanent palette registration is missing: " + id);
 
@@ -117,7 +205,7 @@ final class NativeForwardChecks {
 
                 expected = block.getActualState(expected, world, position);
             } else {
-                expected = net.minecraft.block.Block.updateFromNeighbourShapes(expected, world, position);
+                expected = net.minecraft.world.level.block.Block.updateFromNeighbourShapes(expected, world, position);
             }
 
             require(actual.equals(expected), "Saved material, orientation and derived geometry at " + position
@@ -134,7 +222,7 @@ final class NativeForwardChecks {
 
         PathChecks.savedPieces(world, true);
 
-        ChestTileEntity chest = (ChestTileEntity) world.getBlockEntity(new BlockPos(880, 96, 886));
+        ChestBlockEntity chest = (ChestBlockEntity) world.getBlockEntity(new BlockPos(880, 96, 886));
         int units = 0;
 
         for (int slot = 0; slot < 20; slot++) {
@@ -153,22 +241,26 @@ final class NativeForwardChecks {
                 "Existing migration counters changed during palette flattening");
         require(state.unresolved.get("buildingbricks:dirt_vertical_slab / missing:unknown / VERTICAL_SLAB") == 2,
                 "Existing unresolved report is retained");
-        require(new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), "data/skysbuildingpieces_legacy_registry.dat")
+        require(new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(), "data/skysbuildingpieces_legacy_registry.dat")
                 .isFile(), "Original registry snapshot survives in its sidecar");
-        System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS states=" + checked + " derived=" + derived
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_FORWARD_PASS states=" + checked + " derived=" + derived
                 + " item_units=" + units + " schema=1 counters=unchanged");
     }
 
-    private static void namedPieces(ServerWorld world, JsonObject fixture) throws Exception {
+    private static void namedPieces(ServerLevel world, JsonObject fixture) throws Exception {
         int states = 0;
 
         for (JsonElement value : fixture.getAsJsonArray("states")) {
             JsonObject saved = value.getAsJsonObject();
             BlockPos position = position(saved);
-            net.minecraft.nbt.CompoundNBT expected = net.minecraft.nbt.JsonToNBT
+            net.minecraft.nbt.CompoundTag expected = net.minecraft.nbt.TagParser
                     .parseTag(saved.get("state").getAsString());
 
-            require(net.minecraft.nbt.NBTUtil.writeBlockState(world.getBlockState(position)).equals(expected),
+            if (expected.getString("Name").equals("minecraft:grass_path")) {
+                expected.putString("Name", "minecraft:dirt_path");
+            }
+
+            require(net.minecraft.nbt.NbtUtils.writeBlockState(world.getBlockState(position)).equals(expected),
                     "Named state changed during the native upgrade at " + position + ": "
                             + world.getBlockState(position) + " expected " + expected);
             states++;
@@ -178,13 +270,13 @@ final class NativeForwardChecks {
 
         for (JsonElement value : fixture.getAsJsonArray("containers")) {
             JsonObject saved = value.getAsJsonObject();
-            ChestTileEntity chest = (ChestTileEntity) world.getBlockEntity(position(saved));
+            ChestBlockEntity chest = (ChestBlockEntity) world.getBlockEntity(position(saved));
 
             require(chest != null, "Named-state fixture chest is missing");
 
             for (JsonElement item : saved.getAsJsonArray("items")) {
                 JsonObject entry = item.getAsJsonObject();
-                ItemStack expected = ItemStack.of(net.minecraft.nbt.JsonToNBT
+                ItemStack expected = ItemStack.of(net.minecraft.nbt.TagParser
                         .parseTag(entry.get("stack").getAsString()));
                 ItemStack actual = chest.getItem(entry.get("slot").getAsInt());
 
@@ -196,14 +288,14 @@ final class NativeForwardChecks {
 
         for (JsonElement value : fixture.getAsJsonArray("entities")) {
             JsonObject saved = value.getAsJsonObject();
-            net.minecraft.entity.Entity entity = world.getEntity(java.util.UUID
+            net.minecraft.world.entity.Entity entity = world.getEntity(java.util.UUID
                     .fromString(saved.get("uuid").getAsString()));
-            ItemStack expected = ItemStack.of(net.minecraft.nbt.JsonToNBT
+            ItemStack expected = ItemStack.of(net.minecraft.nbt.TagParser
                     .parseTag(saved.get("stack").getAsString()));
 
-            require(entity instanceof net.minecraft.entity.item.ItemEntity
+            require(entity instanceof net.minecraft.world.entity.item.ItemEntity
                     && ItemStack.matches(expected,
-                            ((net.minecraft.entity.item.ItemEntity) entity).getItem()),
+                            ((net.minecraft.world.entity.item.ItemEntity) entity).getItem()),
                     "Named-state dropped stack is missing or changed");
             units += expected.getCount();
         }
@@ -213,29 +305,38 @@ final class NativeForwardChecks {
             net.minecraftforge.common.util.FakePlayer player = net.minecraftforge.common.util.FakePlayerFactory.get(
                     world, new com.mojang.authlib.GameProfile(id, "PieceFixture"));
             require(world.getServer().getPlayerList().load(player) != null, "Saved player data is missing");
-            ItemStack shovel = ItemStack.of(net.minecraft.nbt.JsonToNBT
+            ItemStack shovel = ItemStack.of(net.minecraft.nbt.TagParser
                     .parseTag(fixture.get("player_shovel").getAsString()));
-            ItemStack nested = ItemStack.of(net.minecraft.nbt.JsonToNBT
+            ItemStack nested = ItemStack.of(net.minecraft.nbt.TagParser
                     .parseTag(fixture.get("player_nested").getAsString()));
-            require(ItemStack.matches(shovel, player.inventory.getItem(0)),
+            require(ItemStack.matches(shovel, player.getInventory().getItem(0)),
                     "Player tool lost its damage, enchantment, name or custom data");
-            require(ItemStack.matches(nested, player.inventory.getItem(1)),
+            require(ItemStack.matches(nested, player.getInventory().getItem(1)),
                     "Player nested inventory changed");
             require(ItemStack.matches(nested, player.getEnderChestInventory().getItem(0)),
                     "Ender inventory changed");
             // Save this disconnected fixture player through the native protected path.
-            net.minecraftforge.fml.common.ObfuscationReflectionHelper.findMethod(
-                    net.minecraft.server.management.PlayerList.class, "func_72391_b",
-                    net.minecraft.entity.player.ServerPlayerEntity.class)
-                    .invoke(world.getServer().getPlayerList(), player);
+            java.lang.reflect.Method save = null;
+            for (java.lang.reflect.Method candidate : net.minecraft.server.players.PlayerList.class.getDeclaredMethods()) {
+                if (java.lang.reflect.Modifier.isProtected(candidate.getModifiers())
+                        && candidate.getReturnType() == void.class
+                        && java.util.Arrays.equals(candidate.getParameterTypes(),
+                                new Class<?>[] {net.minecraft.server.level.ServerPlayer.class})) {
+                    require(save == null, "The native player-save method is ambiguous");
+                    save = candidate;
+                }
+            }
+            require(save != null, "The native player-save method is missing");
+            save.setAccessible(true);
+            save.invoke(world.getServer().getPlayerList(), player);
         }
 
-        net.minecraft.nbt.CompoundNBT expectedState = net.minecraft.nbt.JsonToNBT
+        net.minecraft.nbt.CompoundTag expectedState = net.minecraft.nbt.TagParser
                 .parseTag(fixture.get("world_state").getAsString());
 
-        require(PiecesWorldState.get(world).save(new net.minecraft.nbt.CompoundNBT()).equals(expectedState),
+        require(PiecesWorldState.get(world).save(new net.minecraft.nbt.CompoundTag()).equals(expectedState),
                 "Named-state world data, counters or unknown module fields changed");
-        System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS named_states=" + states + " item_units=" + units
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_FORWARD_PASS named_states=" + states + " item_units=" + units
                 + " waterlogging=true snow=true schema=1 counters=unchanged");
     }
 
@@ -243,7 +344,7 @@ final class NativeForwardChecks {
         return new BlockPos(saved.get("x").getAsInt(), saved.get("y").getAsInt(), saved.get("z").getAsInt());
     }
 
-    private static void legacyPieces(ServerWorld world, JsonObject fixture) throws Exception {
+    private static void legacyPieces(ServerLevel world, JsonObject fixture) throws Exception {
         int states = 0;
         java.util.Set<String> chunks = new java.util.HashSet<>();
 
@@ -270,7 +371,7 @@ final class NativeForwardChecks {
             if (expected.getBlock() instanceof PieceBlock) {
                 expected = ((PieceBlock) expected.getBlock()).getActualState(expected, world, position);
             } else {
-                expected = net.minecraft.block.Block.updateFromNeighbourShapes(expected, world, position);
+                expected = net.minecraft.world.level.block.Block.updateFromNeighbourShapes(expected, world, position);
             }
 
             require(actual.equals(expected),
@@ -291,12 +392,12 @@ final class NativeForwardChecks {
 
             BlockPos position = new BlockPos(saved.get("x").getAsInt(), saved.get("y").getAsInt(),
                     saved.get("z").getAsInt());
-            ChestTileEntity chest = (ChestTileEntity) world.getBlockEntity(position);
+            ChestBlockEntity chest = (ChestBlockEntity) world.getBlockEntity(position);
 
             require(chest != null, "Historical chest survives the native upgrade");
 
             for (JsonElement value : saved.getAsJsonArray("items")) {
-                net.minecraft.nbt.CompoundNBT original = net.minecraft.nbt.JsonToNBT
+                net.minecraft.nbt.CompoundTag original = net.minecraft.nbt.TagParser
                         .parseTag(value.getAsString());
                 int slot = original.getByte("Slot") & 255;
                 ItemStack actual = chest.getItem(slot);
@@ -317,16 +418,19 @@ final class NativeForwardChecks {
                 continue;
             }
 
-            net.minecraft.nbt.CompoundNBT original = net.minecraft.nbt.JsonToNBT
+            net.minecraft.nbt.CompoundTag original = net.minecraft.nbt.TagParser
                     .parseTag(saved.get("item").getAsString());
             double x = saved.get("x").getAsDouble();
             double y = saved.get("y").getAsDouble();
             double z = saved.get("z").getAsDouble();
-            java.util.List<net.minecraft.entity.item.ItemEntity> found = world.getEntitiesOfClass(
-                    net.minecraft.entity.item.ItemEntity.class,
-                    new net.minecraft.util.math.AxisAlignedBB(x - 8, y - 8, z - 8, x + 8, y + 8, z + 8));
+            java.util.List<net.minecraft.world.entity.item.ItemEntity> found = world.getEntitiesOfClass(
+                    net.minecraft.world.entity.item.ItemEntity.class,
+                    new net.minecraft.world.phys.AABB(x - 8, world.getMinBuildHeight(), z - 8,
+                            x + 8, world.getMaxBuildHeight(), z + 8));
 
             require(found.size() == 1, "Historical dropped stack is missing or duplicated");
+            require(found.get(0).getUUID().toString().equals(LEGACY_DROP_IDENTITIES.getProperty(legacyDropKey(saved))),
+                    "Historical dropped entity identity changed");
             recoveredItem(found.get(0).getItem(), original);
             units += found.get(0).getItem().getCount();
             expectedUnits += original.getByte("Count") & 255;
@@ -343,7 +447,7 @@ final class NativeForwardChecks {
         require(totals.blocks == states && totals.items == units && totals.chunks == chunks.size(),
                 "Historical migration counters: " + totals.blocks + "/" + totals.items + "/" + totals.chunks);
 
-        File sidecar = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
+        File sidecar = new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                 "data/skysbuildingpieces_legacy_registry.dat");
 
         require(sidecar.isFile(), "Original numeric registry survives in the Sky sidecar");
@@ -364,10 +468,10 @@ final class NativeForwardChecks {
             }
         }
         if (!unopened.isEmpty()) {
-            System.out.println("BUILDING_PIECES_DELAYED_CHUNKS_UNOPENED count=" + unopened.size());
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_DELAYED_CHUNKS_UNOPENED count=" + unopened.size());
         }
 
-        System.out.println("BUILDING_PIECES_NATIVE_FORWARD_PASS source=buildingbricks_1.10.2 states=" + states
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_FORWARD_PASS source=buildingbricks_1.10.2 states=" + states
                 + " item_units=" + units + " dropped_entities=" + drops + " schema=1");
     }
 
@@ -376,8 +480,33 @@ final class NativeForwardChecks {
                 || System.getProperty("skysbuildingpieces.bootstrapPhase", "").contains("delayed");
     }
 
-    private static net.minecraft.nbt.CompoundNBT rawChunk(ServerWorld world, int chunkX, int chunkZ) throws Exception {
-        File region = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
+    private static String legacyDropKey(JsonObject saved) {
+        return saved.get("x").getAsInt() + "," + saved.get("z").getAsInt();
+    }
+
+    private static java.util.UUID sourceDropIdentity(ServerLevel world, JsonObject saved) throws Exception {
+        net.minecraft.nbt.CompoundTag chunk = rawChunk(world, saved.get("x").getAsInt() >> 4,
+                saved.get("z").getAsInt() >> 4);
+        require(chunk.getInt("DataVersion") <= 1343, "Capture legacy entity identities before data fixing");
+        net.minecraft.nbt.CompoundTag expected = net.minecraft.nbt.TagParser.parseTag(saved.get("item").getAsString());
+        java.util.List<java.util.UUID> matches = new java.util.ArrayList<>();
+        for (net.minecraft.nbt.Tag value : chunk.getCompound("Level").getList("Entities", 10)) {
+            net.minecraft.nbt.CompoundTag entity = (net.minecraft.nbt.CompoundTag) value;
+            net.minecraft.nbt.ListTag position = entity.getList("Pos", 6);
+            if (entity.getCompound("Item").equals(expected) && position.size() == 3
+                    && Math.abs(position.getDouble(0) - saved.get("x").getAsDouble()) < 8
+                    && Math.abs(position.getDouble(2) - saved.get("z").getAsDouble()) < 8) {
+                require(entity.contains("UUIDMost", 4) && entity.contains("UUIDLeast", 4),
+                        "Legacy source drop has no stable UUID");
+                matches.add(new java.util.UUID(entity.getLong("UUIDMost"), entity.getLong("UUIDLeast")));
+            }
+        }
+        require(matches.size() == 1, "Legacy source drop is missing or ambiguous");
+        return matches.get(0);
+    }
+
+    private static net.minecraft.nbt.CompoundTag rawChunk(ServerLevel world, int chunkX, int chunkZ) throws Exception {
+        File region = new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                 "region/r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
 
         try (java.io.RandomAccessFile input = new java.io.RandomAccessFile(region, "r")) {
@@ -403,12 +532,12 @@ final class NativeForwardChecks {
                     : compression == 1 ? new java.util.zip.GZIPInputStream(bytes) : bytes;
 
             try (java.io.DataInputStream tag = new java.io.DataInputStream(bytes)) {
-                return net.minecraft.nbt.CompressedStreamTools.read(tag);
+                return net.minecraft.nbt.NbtIo.read(tag);
             }
         }
     }
 
-    private static void recoveredItem(ItemStack actual, net.minecraft.nbt.CompoundNBT original) {
+    private static void recoveredItem(ItemStack actual, net.minecraft.nbt.CompoundTag original) {
         String registry = original.getString("id");
         String material = original.getCompound("tag").getString("material");
         zone.moddev.mc.skysbuildingpieces.catalogue.Shape shape = zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping
@@ -423,8 +552,8 @@ final class NativeForwardChecks {
                 "Historical item material, name and unrelated custom data");
     }
 
-    private static boolean pending(java.util.Set<net.minecraft.world.chunk.Chunk> chunks) {
-        for (net.minecraft.world.chunk.Chunk chunk : chunks) {
+    private static boolean pending(java.util.Set<net.minecraft.world.level.chunk.LevelChunk> chunks) {
+        for (net.minecraft.world.level.chunk.LevelChunk chunk : chunks) {
             for (it.unimi.dsi.fastutil.shorts.ShortList positions : chunk.getPostProcessing()) {
                 if (positions != null && !positions.isEmpty()) {
                     return true;

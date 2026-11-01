@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:chiseled_sandstone_slab"
+            "items": [
+              "skysbuildingpieces:chiseled_sandstone_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/chiseled_sandstone/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/chiseled_sandstone/slab_recombination"
+    ]
   },
   "conditions": [
     {

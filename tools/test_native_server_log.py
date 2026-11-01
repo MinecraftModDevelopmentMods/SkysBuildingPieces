@@ -1,4 +1,4 @@
-"""Negative controls for Forge 36 server completion and native settings."""
+"""Negative controls for Forge 37 server completion and native settings."""
 
 from pathlib import Path
 import shutil
@@ -46,7 +46,9 @@ class NativeServerLogTest(unittest.TestCase):
 
     def test_unrelated_error_and_stderr_are_rejected(self):
         for extra in ('[Server thread/ERROR] [AnotherMod/]: Failed',
-                      '[STDERR/]: java.lang.AssertionError'):
+                      '[STDERR/]: java.lang.AssertionError',
+                      'java.lang.AssertionError: native fixture failed',
+                      'java.lang.IllegalStateException: native fixture failed'):
             with self.subTest(extra=extra), self.assertRaises(ValueError):
                 classify_server(LOG + '\n' + extra, DETAILS, True)
 
@@ -72,6 +74,14 @@ class NativeRegistryNoticeTest(unittest.TestCase):
     def test_exact_native_notices_and_a_clean_reload_pass(self):
         self.assertEqual(len(self.check(self.valid, self.profile)), 5)
         self.assertEqual(self.check("A clean native reload", None), [])
+
+    def test_compact_native_headers_keep_the_same_registry_boundaries(self):
+        compact = self.valid.replace(" [net.minecraftforge.registries.GameData/REGISTRIES]", "")
+        self.assertEqual(len(self.check(compact, self.profile)), 5)
+        with self.assertRaises(ValueError):
+            self.check(compact.replace("[main/ERROR]", "[Server thread/ERROR]"), self.profile)
+        with self.assertRaises(ValueError):
+            self.check(compact + "[time] [main/ERROR]: An unrelated failure", self.profile)
 
     def test_every_notice_boundary_is_enforced(self):
         candidates = [

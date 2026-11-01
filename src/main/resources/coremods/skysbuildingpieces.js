@@ -1,3 +1,5 @@
+var IntInsnNode = Java.type('org.objectweb.asm.tree.IntInsnNode');
+var LdcInsnNode = Java.type('org.objectweb.asm.tree.LdcInsnNode');
 var Opcodes = Java.type('org.objectweb.asm.Opcodes');
 var InsnList = Java.type('org.objectweb.asm.tree.InsnList');
 var InsnNode = Java.type('org.objectweb.asm.tree.InsnNode');
@@ -18,17 +20,86 @@ function hasCall(method, owner, name) {
     return false;
 }
 
+function previousOpcode(instruction) {
+    var current = instruction.getPrevious();
+    while (current !== null && current.getOpcode() < 0) {
+        current = current.getPrevious();
+    }
+    return current;
+}
+
+function integerValue(instruction) {
+    if (instruction instanceof IntInsnNode) {
+        return instruction.operand;
+    }
+    if (instruction instanceof LdcInsnNode && typeof instruction.cst === 'number') {
+        return instruction.cst;
+    }
+    return -1;
+}
+
+function replacementFor(size) {
+    // LDC also prevents older compatible transformers from mistaking the
+    // already-expanded 4,096-entry auxiliary table for the primary table.
+    return new LdcInsnNode(size);
+}
+
+
 function initializeCoreMod() {
     return {
+        'skysbuildingpieces_legacy_block_state_tables': {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraft.util.datafix.fixes.BlockStateData'
+            },
+            'transformer': function(classNode) {
+                var registerExposed = false;
+                var arraysSeen = 0;
+                for (var methodIndex = 0; methodIndex < classNode.methods.size(); ++methodIndex) {
+                    var method = classNode.methods.get(methodIndex);
+                    if (method.desc === '(ILjava/lang/String;[Ljava/lang/String;)V') {
+                        method.access = (method.access & ~(Opcodes.ACC_PRIVATE | Opcodes.ACC_PROTECTED))
+                                | Opcodes.ACC_PUBLIC;
+                        registerExposed = true;
+                    }
+                    if (method.name !== '<clinit>') {
+                        continue;
+                    }
+                    for (var instruction = method.instructions.getFirst(); instruction !== null;
+                            instruction = instruction.getNext()) {
+                        if (instruction.getOpcode() !== Opcodes.ANEWARRAY ||
+                                instruction.desc !== 'com/mojang/serialization/Dynamic') {
+                            continue;
+                        }
+                        var target = arraysSeen === 0 ? 65536 : arraysSeen === 1 ? 4096 : -1;
+                        var vanilla = arraysSeen === 0 ? 4096 : arraysSeen === 1 ? 256 : -1;
+                        var sizeInstruction = previousOpcode(instruction);
+                        var current = integerValue(sizeInstruction);
+                        if (target < 0 || (current !== vanilla && current !== target)) {
+                            throw new Error("Sky's Building Pieces found an unexpected Forge 37 " +
+                                    "BlockStateData array layout");
+                        }
+                        if (current === vanilla || !(sizeInstruction instanceof LdcInsnNode)) {
+                            method.instructions.set(sizeInstruction, replacementFor(target));
+                        }
+                        ++arraysSeen;
+                    }
+                }
+                if (!registerExposed || arraysSeen !== 2) {
+                    throw new Error("Sky's Building Pieces could not prepare Forge 37 BlockStateData");
+                }
+                return classNode;
+            }
+        },
         'skysbuildingpieces_material_hardness': {
-            'target': {'type': 'CLASS', 'name': 'net.minecraft.block.AbstractBlock$AbstractBlockState'},
+            'target': {'type': 'CLASS', 'name': 'net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase'},
             'transformer': function(type) {
                 var matches = 0;
                 var owner = 'zone/moddev/mc/skysbuildingpieces/compat/NativeStateHooks';
                 for (var index = 0; index < type.methods.size(); index++) {
                     var method = type.methods.get(index);
-                    if ((method.name !== 'getDestroySpeed' && method.name !== 'func_185887_b')
-                            || method.desc !== '(Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F') {
+                    if ((method.name !== 'getDestroySpeed' && method.name !== 'm_60800_')
+                            || method.desc !== '(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F') {
                         continue;
                     }
                     matches++;
@@ -42,8 +113,8 @@ function initializeCoreMod() {
                             hook.add(new VarInsnNode(Opcodes.ALOAD, 1));
                             hook.add(new VarInsnNode(Opcodes.ALOAD, 2));
                             hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner, 'destroySpeed',
-                                    '(FLnet/minecraft/block/AbstractBlock$AbstractBlockState;'
-                                    + 'Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F', false));
+                                    '(FLnet/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase;'
+                                    + 'Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F', false));
                             method.instructions.insertBefore(instruction, hook);
                             returns++;
                         }
@@ -52,20 +123,20 @@ function initializeCoreMod() {
                     method.maxStack = Math.max(method.maxStack, 4);
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 36 hardness method, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 37 hardness method, found " + matches);
                 }
                 return type;
             }
         },
         'skysbuildingpieces_legacy_chunk': {
-            'target': {'type': 'CLASS', 'name': 'net.minecraft.world.chunk.storage.ChunkLoader'},
+            'target': {'type': 'CLASS', 'name': 'net.minecraft.world.level.chunk.storage.ChunkStorage'},
             'transformer': function(type) {
                 var matches = 0;
                 for (var index = 0; index < type.methods.size(); index++) {
                     var method = type.methods.get(index);
-                    if (method.desc !== '(Lnet/minecraft/util/RegistryKey;'
-                            + 'Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundNBT;)'
-                            + 'Lnet/minecraft/nbt/CompoundNBT;') {
+                    if (method.desc !== '(Lnet/minecraft/resources/ResourceKey;'
+                            + 'Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;)'
+                            + 'Lnet/minecraft/nbt/CompoundTag;') {
                         continue;
                     }
                     matches++;
@@ -75,38 +146,38 @@ function initializeCoreMod() {
                     var entry = new InsnList();
                     entry.add(new VarInsnNode(Opcodes.ALOAD, 3));
                     entry.add(new MethodInsnNode(Opcodes.INVOKESTATIC, bridge, 'prepareLegacyChunk',
-                            '(Lnet/minecraft/nbt/CompoundNBT;)V', false));
+                            '(Lnet/minecraft/nbt/CompoundTag;)V', false));
                     method.instructions.insert(entry);
                     var returns = 0;
                     for (var instruction = method.instructions.getFirst(); instruction !== null;
                             instruction = instruction.getNext()) {
                         if (instruction.getOpcode() === Opcodes.ARETURN) {
                             method.instructions.insertBefore(instruction, new MethodInsnNode(Opcodes.INVOKESTATIC,
-                                    bridge, 'finalizeLegacyChunk', '(Lnet/minecraft/nbt/CompoundNBT;)'
-                                    + 'Lnet/minecraft/nbt/CompoundNBT;', false));
+                                    bridge, 'finalizeLegacyChunk', '(Lnet/minecraft/nbt/CompoundTag;)'
+                                    + 'Lnet/minecraft/nbt/CompoundTag;', false));
                             returns++;
                         }
                     }
                     if (returns === 0) {
-                        throw new Error("Sky's Building Pieces: Forge 36 chunk upgrader has no return");
+                        throw new Error("Sky's Building Pieces: Forge 37 chunk upgrader has no return");
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 36 chunk upgrader, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 37 chunk upgrader, found " + matches);
                 }
                 return type;
             }
         },
         'skysbuildingpieces_raw_inventory': {
-            'target': {'type': 'CLASS', 'name': 'net.minecraft.nbt.NBTUtil'},
+            'target': {'type': 'CLASS', 'name': 'net.minecraft.nbt.NbtUtils'},
             'transformer': function(type) {
                 var matches = 0;
                 for (var index = 0; index < type.methods.size(); index++) {
                     var method = type.methods.get(index);
                     if ((method.access & Opcodes.ACC_STATIC) === 0
                             || method.desc !== '(Lcom/mojang/datafixers/DataFixer;'
-                            + 'Lnet/minecraft/util/datafix/DefaultTypeReferences;'
-                            + 'Lnet/minecraft/nbt/CompoundNBT;II)Lnet/minecraft/nbt/CompoundNBT;') {
+                            + 'Lnet/minecraft/util/datafix/DataFixTypes;'
+                            + 'Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;') {
                         continue;
                     }
                     matches++;
@@ -114,7 +185,7 @@ function initializeCoreMod() {
                         var entry = new InsnList();
                         entry.add(new VarInsnNode(Opcodes.ALOAD, 2));
                         entry.add(new MethodInsnNode(Opcodes.INVOKESTATIC, bridge, 'prepareNbt',
-                                '(Lnet/minecraft/nbt/CompoundNBT;)V', false));
+                                '(Lnet/minecraft/nbt/CompoundTag;)V', false));
                         method.instructions.insert(entry);
                     }
                     if (!hasCall(method, bridge, 'finalizeNbt')) {
@@ -125,31 +196,31 @@ function initializeCoreMod() {
                                 var finish = new InsnList();
                                 finish.add(new VarInsnNode(Opcodes.ILOAD, 4));
                                 finish.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
-                                        bridge, 'finalizeNbt', '(Lnet/minecraft/nbt/CompoundNBT;I)'
-                                        + 'Lnet/minecraft/nbt/CompoundNBT;', false));
+                                        bridge, 'finalizeNbt', '(Lnet/minecraft/nbt/CompoundTag;I)'
+                                        + 'Lnet/minecraft/nbt/CompoundTag;', false));
                                 method.instructions.insertBefore(instruction, finish);
                                 returns++;
                             }
                         }
                         if (returns === 0) {
-                            throw new Error("Sky's Building Pieces: Forge 36 NBT updater has no return");
+                            throw new Error("Sky's Building Pieces: Forge 37 NBT updater has no return");
                         }
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 36 NBT updater, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 37 NBT updater, found " + matches);
                 }
                 return type;
             }
         },
         'skysbuildingpieces_native_slab_placement': {
-            'target': {'type': 'CLASS', 'name': 'net.minecraft.item.BlockItem'},
+            'target': {'type': 'CLASS', 'name': 'net.minecraft.world.item.BlockItem'},
             'transformer': function(type) {
                 var placement = 'zone/moddev/mc/skysbuildingpieces/content/NativeSlabPlacement';
                 var matches = 0;
                 for (var index = 0; index < type.methods.size(); index++) {
                     var method = type.methods.get(index);
-                    if (method.desc !== '(Lnet/minecraft/item/ItemUseContext;)Lnet/minecraft/util/ActionResultType;') {
+                    if (method.desc !== '(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;') {
                         continue;
                     }
                     matches++;
@@ -160,7 +231,7 @@ function initializeCoreMod() {
                     var entry = new InsnList();
                     entry.add(new VarInsnNode(Opcodes.ALOAD, 1));
                     entry.add(new MethodInsnNode(Opcodes.INVOKESTATIC, placement, 'place',
-                            '(Lnet/minecraft/item/ItemUseContext;)Lnet/minecraft/util/ActionResultType;', false));
+                            '(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;', false));
                     entry.add(new InsnNode(Opcodes.DUP));
                     entry.add(new JumpInsnNode(Opcodes.IFNULL, original));
                     entry.add(new InsnNode(Opcodes.ARETURN));

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:chiseled_stone_bricks"
+            "items": [
+              "minecraft:chiseled_stone_bricks"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stonebrick_carved/slab/step/minecraft/stonebrick_3"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stonebrick_carved/slab/step/minecraft/stonebrick_3"
+    ]
   },
   "conditions": [
     {

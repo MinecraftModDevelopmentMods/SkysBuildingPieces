@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
+            "items": [
+              "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/novaculite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_07_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/novaculite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_07_0"
+    ]
   },
   "conditions": [
     {

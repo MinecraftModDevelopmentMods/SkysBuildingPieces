@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:nether_brick_slab"
+            "items": [
+              "minecraft:nether_brick_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/nether_brick/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/nether_brick/slab_recombination"
+    ]
   }
 }

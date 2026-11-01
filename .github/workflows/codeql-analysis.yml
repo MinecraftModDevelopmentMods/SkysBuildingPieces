@@ -3,11 +3,11 @@ name: CodeQL
 on:
   push:
     branches:
-      - master-1.16.5
+      - master-1.17.1
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.16.5
+      - master-1.17.1
   schedule:
     - cron: '47 7 * * 4'
 
@@ -53,11 +53,14 @@ jobs:
           java-version: ${{ steps.target.outputs.java_setup_version }}
 
       - name: Pin production Java
-        if: steps.target.outputs.java_version == '8'
+        shell: bash
         run: |
-          echo "SGS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-          echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-          echo "STS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          set -euo pipefail
+          java_version="${{ steps.target.outputs.java_version }}"
+          [[ "$java_version" =~ ^[0-9]+$ ]]
+          for prefix in SGS SBP STS; do
+            echo "${prefix}_JAVA${java_version}_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          done
 
       - name: Install Java for Gradle
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5

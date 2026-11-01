@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:podzol"
+            "items": [
+              "minecraft:podzol"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/dirt_podzol/stairs/stairs/minecraft/dirt_2"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/dirt_podzol/stairs/stairs/minecraft/dirt_2"
+    ]
   },
   "conditions": [
     {

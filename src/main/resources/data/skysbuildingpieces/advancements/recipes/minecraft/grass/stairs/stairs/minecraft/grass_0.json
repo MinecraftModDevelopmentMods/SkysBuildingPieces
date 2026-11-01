@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:grass_block"
+            "items": [
+              "minecraft:grass_block"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/grass/stairs/stairs/minecraft/grass_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/grass/stairs/stairs/minecraft/grass_0"
+    ]
   },
   "conditions": [
     {

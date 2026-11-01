@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:limestone_slab"
+            "items": [
+              "mineralogy:limestone_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/limestone/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/limestone/slab_recombination"
+    ]
   },
   "conditions": [
     {

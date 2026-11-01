@@ -1,4 +1,4 @@
-"""Check Forge 36 completion, native settings and unexpected errors."""
+"""Check Forge 37 completion, native settings and unexpected errors."""
 
 import argparse
 import gzip
@@ -30,7 +30,7 @@ def audit_complete_logs(directory):
 
 
 def classify(log, unchanged_defaults):
-    """The Forge-only 1.16 client control completes without severe notices."""
+    """Require a complete client login without severe notices."""
     lines = log.splitlines()
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = next((index for index, line in enumerate(lines)
@@ -58,7 +58,7 @@ def audit(directory, phase, control=False):
     if not unchanged:
         raise ValueError("Native Forge settings differ from the controlled defaults")
     receipt = classify(log, unchanged)
-    required = (("FORGE36_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
+    required = (("FORGE37_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
                 ("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED", "SKY_RECIPE_PREVIEW_MODELS_PASS",
                  "BUILDING_PIECES_CONTINUOUS_GLASS_PASS", "BUILDING_PIECES_COLOURS_PASS"))
     if any(marker not in log for marker in required):
@@ -76,7 +76,7 @@ def audit(directory, phase, control=False):
 
 
 def classify_server(log, debug, unchanged_defaults, profile=None):
-    """The Forge-only 1.16 server control completes without severe notices."""
+    """Require unchanged defaults and a complete native server start."""
     lines = log.splitlines()
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = any('Preparing level ' in line or 'Preparing start region for dimension ' in line
@@ -116,4 +116,4 @@ if __name__ == "__main__":
     options = parser.parse_args()
     result = (audit_server(options.directory, options.phase) if options.server else
               audit(options.directory, options.phase, options.control))
-    print("FORGE36_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))
+    print("FORGE37_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))

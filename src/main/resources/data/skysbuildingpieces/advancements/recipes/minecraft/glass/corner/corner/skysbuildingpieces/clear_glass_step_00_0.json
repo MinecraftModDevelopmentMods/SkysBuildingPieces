@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:glass_step"
+            "items": [
+              "skysbuildingpieces:glass_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/glass/corner/corner/skysbuildingpieces/clear_glass_step_00_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/glass/corner/corner/skysbuildingpieces/clear_glass_step_00_0"
+    ]
   },
   "conditions": [
     {

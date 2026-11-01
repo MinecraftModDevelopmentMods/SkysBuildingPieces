@@ -1,25 +1,25 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Method;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.item.ItemFrameEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -35,7 +35,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.content.LegacyPieceRecipe;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
-import zone.moddev.mc.skysbuildingpieces.legacy.LegacyTestScope;
+import zone.moddev.mc.skysbuildingpieces.probe.legacy.LegacyTestScope;
 import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 
 /** Real native events with an explicitly labelled build-only legacy policy mod. */
@@ -51,7 +51,7 @@ public final class CompatibilityChecks {
         return stack;
     }
 
-    public static void run(ServerWorld world) throws Exception {
+    public static void run(ServerLevel world) throws Exception {
         if (!ModList.get().isLoaded("buildingbricks")) {
             throw new AssertionError("Installed-mod policy checks require their build-only fixture");
         }
@@ -69,7 +69,7 @@ public final class CompatibilityChecks {
             SkysBuildingPieces.forceReplace = original;
         }
 
-        System.out.println(
+        org.apache.logging.log4j.LogManager.getLogger().info(
                 "BUILDING_PIECES_COMPATIBILITY_PASS installed_fixture=true replacement_off=true replacement_on=true");
     }
 
@@ -84,18 +84,18 @@ public final class CompatibilityChecks {
                 "Complete unrelated custom data is retained");
     }
 
-    private static void liveInventories(ServerWorld world, boolean convert) throws Exception {
-        ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
+    private static void liveInventories(ServerLevel world, boolean convert) throws Exception {
+        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
 
-        player.inventory.setItem(0, legacy(13));
+        player.getInventory().setItem(0, legacy(13));
         player.getEnderChestInventory().setItem(0, legacy(11));
         MinecraftForge.EVENT_BUS.post(new EntityJoinWorldEvent(player, world));
-        identity(player.inventory.getItem(0), 13, convert);
+        identity(player.getInventory().getItem(0), 13, convert);
         identity(player.getEnderChestInventory().getItem(0), 11, convert);
-        player.inventory.setItem(1, legacy(9));
-        MinecraftForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
+        player.getInventory().setItem(1, legacy(9));
+        MinecraftForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                 player.getUUID().toString()));
-        identity(player.inventory.getItem(1), 9, convert);
+        identity(player.getInventory().getItem(1), 9, convert);
         world.getChunk(new BlockPos(930, 70, 930));
 
         ItemEntity drop = new ItemEntity(world, 930, 70, 930, legacy(5));
@@ -107,41 +107,41 @@ public final class CompatibilityChecks {
 
         world.setBlock(position.north(), Blocks.STONE.defaultBlockState(), 2);
 
-        ItemFrameEntity frame = new ItemFrameEntity(world, position, Direction.SOUTH);
+        ItemFrame frame = new ItemFrame(world, position, Direction.SOUTH);
 
         frame.setItem(legacy(1));
         world.addFreshEntity(frame);
         identity(frame.getItem(), 1, convert);
 
-        HandlerTile tile = new HandlerTile();
+        HandlerTile tile = new HandlerTile(position);
 
-        tile.setLevelAndPosition(world, position);
+        tile.setLevel(world);
         tile.handler.setStackInSlot(0, legacy(17));
 
-        Method scan = MigrationEvents.class.getDeclaredMethod("containers", TileEntity.class);
+        Method scan = MigrationEvents.class.getDeclaredMethod("containers", BlockEntity.class);
 
         scan.setAccessible(true);
         scan.invoke(null, tile);
         identity(tile.handler.getStackInSlot(0), 17, convert);
 
-        CompoundNBT once = tile.handler.serializeNBT();
+        CompoundTag once = tile.handler.serializeNBT();
 
         scan.invoke(null, tile);
         NativeLegacyChecks.require(once.equals(tile.handler.serializeNBT()), "Shared handler faces convert only once");
 
         ItemStack crate = new ItemStack(Blocks.CHEST);
-        CompoundNBT tag = new CompoundNBT();
+        CompoundTag tag = new CompoundTag();
 
         tag.putBoolean("Sealed", true);
 
-        ListNBT contents = new ListNBT();
+        ListTag contents = new ListTag();
 
-        contents.add(legacy(7).save(new CompoundNBT()));
+        contents.add(legacy(7).save(new CompoundTag()));
         tag.put("Items", contents);
         crate.setTag(tag);
 
         ItemStack migrated = MigrationEvents.convert(crate, world);
-        CompoundNBT recovered = migrated.getTag().getList("Items", 10).getCompound(0);
+        CompoundTag recovered = migrated.getTag().getList("Items", 10).getCompound(0);
 
         identity(ItemStack.of(recovered), 7, convert);
         NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && migrated.getTag().getBoolean("Sealed"),
@@ -149,9 +149,9 @@ public final class CompatibilityChecks {
         NativeLegacyChecks.require(MigrationEvents.convert(migrated, world) == migrated,
                 "Live nested inventory is idempotent");
 
-        CraftingInventory grid = new CraftingInventory(new Container(null, 0) {
+        CraftingContainer grid = new CraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
-            public boolean stillValid(PlayerEntity ignored) {
+            public boolean stillValid(Player ignored) {
                 return true;
             }
         }, 3, 3);
@@ -163,14 +163,14 @@ public final class CompatibilityChecks {
         NativeLegacyChecks.require(recipe.matches(grid, world),
                 "Explicit bridge recipe works independently of replacement");
         identity(recipe.assemble(grid), 1, true);
-        drop.remove();
-        frame.remove();
+        drop.discard();
+        frame.discard();
         world.removeBlock(position.north(), false);
-        player.inventory.clearContent();
+        player.getInventory().clearContent();
         player.getEnderChestInventory().clearContent();
     }
 
-    private static void newlyPlaced(ServerWorld world, boolean convert) {
+    private static void newlyPlaced(ServerLevel world, boolean convert) {
         BlockPos position = new BlockPos(934, 70, 932);
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("buildingbricks:rock_step"));
         BlockState old = block.defaultBlockState().setValue((IntegerProperty) block.getStateDefinition().getProperty("meta"),
@@ -178,12 +178,12 @@ public final class CompatibilityChecks {
 
         world.setBlock(position, old, 2);
 
-        TileEntity tile = world.getBlockEntity(position);
-        CompoundNBT tag = tile.save(new CompoundNBT());
+        BlockEntity tile = world.getBlockEntity(position);
+        CompoundTag tag = tile.save(new CompoundTag());
 
         tag.putString("material", "minecraft:stone");
         tag.putString("custom", "Keep the old tile in coverage");
-        tile.load(tile.getBlockState(), tag);
+        tile.load(tag);
         MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
                 Blocks.STONE.defaultBlockState(), FakePlayerFactory.getMinecraft(world)));
         NativeLegacyChecks.require(world.getBlockState(position).getBlock().getRegistryName().getNamespace()
@@ -193,19 +193,19 @@ public final class CompatibilityChecks {
         world.removeBlock(position, false);
     }
 
-    private static void unknownMaterial(ServerWorld world) {
+    private static void unknownMaterial(ServerLevel world) {
         ItemStack unknown = legacy(3);
 
         unknown.getTag().putString("material", "missing:unknown");
 
-        CompoundNBT before = unknown.save(new CompoundNBT());
+        CompoundTag before = unknown.save(new CompoundTag());
         ItemStack result = MigrationEvents.convert(unknown, world);
 
-        NativeLegacyChecks.require(result.save(new CompoundNBT()).equals(before),
+        NativeLegacyChecks.require(result.save(new CompoundTag()).equals(before),
                 "Installed legacy mod retains unsupported materials");
 
         // Horizontal soil recovery belongs to Grass Slabs and must stay outside this bridge.
-        CompoundNBT soil = NativeLegacyChecks.stack("minecraft:dirt", 7);
+        CompoundTag soil = NativeLegacyChecks.stack("minecraft:dirt", 7);
 
         soil.putString("id", "buildingbricks:dirt_slab");
         before = soil.copy();
@@ -213,12 +213,12 @@ public final class CompatibilityChecks {
         NativeLegacyChecks.require(soil.equals(before), "Core must not take ownership of horizontal soil slabs");
     }
 
-    public static final class HandlerTile extends TileEntity {
+    public static final class HandlerTile extends BlockEntity {
         final ItemStackHandler handler = new ItemStackHandler(2);
         private final LazyOptional<ItemStackHandler> optional = LazyOptional.of(() -> handler);
 
-        HandlerTile() {
-            super(TileEntityType.CHEST);
+        HandlerTile(BlockPos position) {
+            super(BlockEntityType.CHEST, position, Blocks.CHEST.defaultBlockState());
         }
 
         @Override

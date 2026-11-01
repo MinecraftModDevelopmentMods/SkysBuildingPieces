@@ -1,30 +1,32 @@
-package zone.moddev.mc.skysbuildingpieces.legacy;
+package zone.moddev.mc.skysbuildingpieces.probe.legacy;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerLevel;
+import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
+import zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState;
 
 /** Keeps synthetic source registries separate from the running disposable world. */
 public final class LegacyTestScope implements AutoCloseable {
     public static final int STEP_ID = 3500;
     public static final int DIRT_ID = 3501;
     private final Map<Integer, String> originalIds;
-    private final ListNBT originalStaging;
+    private final ListTag originalStaging;
     private final boolean originalValidation;
     private final PiecesWorldState totals;
-    private final CompoundNBT originalTotals;
-    private final ServerWorld world;
+    private final CompoundTag originalTotals;
+    private final ServerLevel world;
 
     @SuppressWarnings("unchecked")
-    public LegacyTestScope(ServerWorld world) throws Exception {
+    public LegacyTestScope(ServerLevel world) throws Exception {
         this.world = world;
         LegacyBridge.report(world);
         totals = PiecesWorldState.get(world);
-        originalTotals = totals.save(new CompoundNBT());
+        originalTotals = totals.save(new CompoundTag());
 
         Map<Integer, String> ids = (Map<Integer, String>) field("savedIds").get(null);
 
@@ -37,10 +39,10 @@ public final class LegacyTestScope implements AutoCloseable {
         ids.put(DIRT_ID, "buildingbricks:dirt_vertical_slab");
         // These are source-world numbers, deliberately unrelated to today's registry.
         ids.put(256, "othermod:occupied_source_number");
-        NumericStateBridge.begin(ids, new ListNBT());
+        NumericStateBridge.begin(ids, new ListTag());
     }
 
-    public static BlockState staged(CompoundNBT section, int index) {
+    public static BlockState staged(CompoundTag section, int index) {
         int number = section.getByteArray("Blocks")[index] & 255
                 | LegacyBridge.nibble(section.getByteArray("Add"), index) << 8;
         int encoded = number << 4 | LegacyBridge.nibble(section.getByteArray("Data"), index);

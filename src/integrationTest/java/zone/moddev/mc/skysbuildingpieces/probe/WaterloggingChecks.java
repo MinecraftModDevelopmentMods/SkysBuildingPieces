@@ -1,18 +1,18 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.util.Random;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
@@ -24,13 +24,13 @@ public final class WaterloggingChecks {
     private WaterloggingChecks() {
     }
 
-    public static void run(ServerWorld world) {
+    public static void run(ServerLevel world) {
         BlockPos position = new BlockPos(1158, 180, 1158);
 
         world.setBlock(position.below(), Blocks.STONE.defaultBlockState(), 2);
         world.removeBlock(position.above(), false);
 
-        ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
         int tested = 0;
         int decays = 0;
 
@@ -63,10 +63,10 @@ public final class WaterloggingChecks {
                         "An already wet piece rejects another water placement");
                 require(world.getLiquidTicks().hasScheduledTick(position, Fluids.WATER),
                         "Waterlogging schedules the native fluid tick");
-                require(block.takeLiquid(world, position, wet) == Fluids.WATER
+                require(block.pickupBlock(world, position, wet).is(Items.WATER_BUCKET)
                         && !world.getBlockState(position).getValue(SlabBlock.WATERLOGGED),
                         "Bucket pickup leaves the same dry piece");
-                require(block.takeLiquid(world, position, world.getBlockState(position)) == Fluids.EMPTY,
+                require(block.pickupBlock(world, position, world.getBlockState(position)).isEmpty(),
                         "Water cannot be collected twice");
 
                 if (material.equals("minecraft:grass") || material.equals("minecraft:grass_path")) {
@@ -76,10 +76,10 @@ public final class WaterloggingChecks {
 
                     shovel.setDamageValue(7);
 
-                    CompoundNBT before = shovel.save(new CompoundNBT());
+                    CompoundTag before = shovel.save(new CompoundTag());
 
-                    require(!PathPieces.activate(world, position, player, shovel, Direction.UP, Hand.MAIN_HAND)
-                            && before.equals(shovel.save(new CompoundNBT())),
+                    require(!PathPieces.activate(world, position, player, shovel, Direction.UP, InteractionHand.MAIN_HAND)
+                            && before.equals(shovel.save(new CompoundTag())),
                             "Wet pieces cannot consume shovel durability");
 
                     BlockState current = world.getBlockState(position);
@@ -105,7 +105,7 @@ public final class WaterloggingChecks {
 
         world.removeBlock(position, false);
         world.removeBlock(position.below(), false);
-        System.out.println("BUILDING_PIECES_WATERLOGGING_PASS states=" + tested + " decays=" + decays);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WATERLOGGING_PASS states=" + tested + " decays=" + decays);
     }
 
     private static void require(boolean condition, String message) {

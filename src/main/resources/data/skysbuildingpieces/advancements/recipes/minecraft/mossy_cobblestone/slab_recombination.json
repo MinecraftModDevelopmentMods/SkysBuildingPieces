@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:mossy_cobblestone_slab"
+            "items": [
+              "minecraft:mossy_cobblestone_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/mossy_cobblestone/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/mossy_cobblestone/slab_recombination"
+    ]
   }
 }

@@ -402,11 +402,19 @@
         "recipes": [
           {
             "output": 6,
-            "ingredients": ["xxx", "x", "FULL"]
+            "ingredients": [
+              "xxx",
+              "x",
+              "FULL"
+            ]
           },
           {
             "output": 1,
-            "ingredients": ["xx", "x", "STEP"]
+            "ingredients": [
+              "xx",
+              "x",
+              "STEP"
+            ]
           }
         ]
       }
@@ -2762,13 +2770,13 @@
     "hardness": 0.65,
     "normalHarvest": "minecraft:dirt",
     "textures": {
-      "top": "minecraft:block/grass_path_top",
-      "side": "minecraft:block/grass_path_side",
+      "top": "minecraft:block/dirt_path_top",
+      "side": "minecraft:block/dirt_path_side",
       "bottom": "minecraft:block/dirt"
     },
     "blocks": {
       "full": {
-        "id": "minecraft:grass_path"
+        "id": "minecraft:dirt_path"
       },
       "slab": {
         "id": "skysgrassslabs:path_slab",

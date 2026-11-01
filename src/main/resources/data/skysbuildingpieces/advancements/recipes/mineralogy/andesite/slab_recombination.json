@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:andesite_slab"
+            "items": [
+              "mineralogy:andesite_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/andesite/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/andesite/slab_recombination"
+    ]
   },
   "conditions": [
     {

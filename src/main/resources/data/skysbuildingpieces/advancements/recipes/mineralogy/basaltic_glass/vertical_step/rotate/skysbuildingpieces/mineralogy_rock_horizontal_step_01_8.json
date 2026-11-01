@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_basaltic_glass_horizontal_step"
+            "items": [
+              "skysbuildingpieces:mineralogy_basaltic_glass_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/basaltic_glass/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_01_8"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/basaltic_glass/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_01_8"
+    ]
   },
   "conditions": [
     {

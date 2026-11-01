@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.8.117011 - Minecraft 1.17.1 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.17.1.
+- Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
+- Show recipes in the recipe book when their matching ingredients are collected.
+- Keep saved palettes, orientations and custom item data when upgrading.
+
 ## 0.3.8.116051 - Minecraft 1.16.5 (unreleased)
 
 - Bring the existing building shapes and Mineralogy pieces to Minecraft 1.16.5.

@@ -1,20 +1,25 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.BakedModel;
+
 import java.util.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContinuousGlassBakeTest {
     @Test
     void onlyWallBlockVariantsAreWrappedAndAliasesStayShared() {
-        Map<ResourceLocation, IBakedModel> registry = new LinkedHashMap<ResourceLocation, IBakedModel>();
-        IBakedModel base = new EmptyModel();
-        IBakedModel missing = new EmptyModel();
+        Map<ResourceLocation, BakedModel> registry = new LinkedHashMap<ResourceLocation, BakedModel>();
+        BakedModel base = new EmptyModel();
+        BakedModel missing = new EmptyModel();
 
         ModelResourceLocation wall = key("clear_glass_wall_00", "connections=10,meta=0,up=false");
         ModelResourceLocation alias = key("clear_glass_wall_00", "connections=10,meta=1,up=false");
@@ -34,7 +39,7 @@ class ContinuousGlassBakeTest {
 
         ContinuousGlassModel.install(registry, missing, targets);
 
-        IBakedModel wrapped = registry.get(wall);
+        BakedModel wrapped = registry.get(wall);
 
         assertTrue(wrapped instanceof ContinuousGlassModel);
         assertSame(wrapped, registry.get(alias));
@@ -49,12 +54,12 @@ class ContinuousGlassBakeTest {
     void aResourceReloadUsesTheNewBaseModel() {
         ModelResourceLocation key = key("clear_glass_wall_00", "connections=10,meta=0,up=false");
         Set<String> targets = Collections.singleton("skysbuildingpieces:clear_glass_wall_00");
-        Map<ResourceLocation, IBakedModel> registry = new LinkedHashMap<ResourceLocation, IBakedModel>();
+        Map<ResourceLocation, BakedModel> registry = new LinkedHashMap<ResourceLocation, BakedModel>();
 
         registry.put(key, new EmptyModel());
         ContinuousGlassModel.install(registry, null, targets);
 
-        IBakedModel previous = registry.get(key);
+        BakedModel previous = registry.get(key);
 
         registry.put(key, new EmptyModel());
         ContinuousGlassModel.install(registry, null, targets);
@@ -66,7 +71,7 @@ class ContinuousGlassBakeTest {
         return new ModelResourceLocation("skysbuildingpieces:" + block, variant);
     }
 
-    private static final class EmptyModel implements IBakedModel {
+    private static final class EmptyModel implements BakedModel {
         public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
             return Collections.emptyList();
         }
@@ -91,12 +96,12 @@ class ContinuousGlassBakeTest {
             return null;
         }
 
-        public ItemCameraTransforms getTransforms() {
+        public ItemTransforms getTransforms() {
             return null;
         }
 
-        public ItemOverrideList getOverrides() {
-            return ItemOverrideList.EMPTY;
+        public ItemOverrides getOverrides() {
+            return ItemOverrides.EMPTY;
         }
     }
 }

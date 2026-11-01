@@ -4,14 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -19,7 +19,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
@@ -28,6 +28,8 @@ import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 public final class RuntimeProbe {
     private MinecraftServer server;
     private boolean ran;
+    private int startupTicks;
+    private boolean needsGameplay;
 
     public RuntimeProbe() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -37,6 +39,13 @@ public final class RuntimeProbe {
     @SubscribeEvent
     public void started(FMLServerStartedEvent event) {
         server = event.getServer();
+        String phase = System.getProperty("skysbuildingpieces.integrationPhase", "");
+        needsGameplay = !(phase.startsWith("sylvester") || phase.startsWith("retired-rocks-")
+                || phase.startsWith("bop-legacy-") || phase.equals("path-upgrade")
+                || phase.startsWith("recipe-book-") || phase.startsWith("legacy-"));
+        if (needsGameplay) {
+            GameplayChecks.prepare(server.getLevel(Level.OVERWORLD));
+        }
     }
 
     @SubscribeEvent
@@ -45,10 +54,19 @@ public final class RuntimeProbe {
             return;
         }
 
+        if (needsGameplay && (++startupTicks < 20 || !GameplayChecks.ready(server.getLevel(Level.OVERWORLD)))) {
+            if (startupTicks > 1200) {
+                org.apache.logging.log4j.LogManager.getLogger().error("The gameplay fixture never finished loading");
+                ran = true;
+                server.halt(false);
+            }
+            return;
+        }
+
         ran = true;
 
         try {
-            ServerWorld world = server.getLevel(World.OVERWORLD);
+            ServerLevel world = server.getLevel(Level.OVERWORLD);
             String phase = System.getProperty("skysbuildingpieces.integrationPhase");
 
             if (phase == null) {
@@ -60,8 +78,8 @@ public final class RuntimeProbe {
                     "gamerule randomTickSpeed 0");
             server.getCommands().performCommand(server.createCommandSourceStack().withSuppressedOutput(),
                     "gamerule doFireTick false");
-            if (world.getGameRules().getInt(net.minecraft.world.GameRules.RULE_RANDOMTICKING) != 0
-                    || world.getGameRules().getBoolean(net.minecraft.world.GameRules.RULE_DOFIRETICK)) {
+            if (world.getGameRules().getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING) != 0
+                    || world.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOFIRETICK)) {
                 throw new AssertionError("The disposable runtime rules were not applied");
             }
 
@@ -73,19 +91,19 @@ public final class RuntimeProbe {
                 String helper = phase.startsWith("retired-rocks-") ? "RetiredRockUpgrade" : "BopLegacyFixture";
 
                 Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe." + helper)
-                        .getMethod("run", ServerWorld.class, String.class).invoke(null, world, phase);
+                        .getMethod("run", ServerLevel.class, String.class).invoke(null, world, phase);
             } else if (phase.equals("path-upgrade")) {
                 PathChecks.savedPieces(world, true);
-                System.out.println("BUILDING_PIECES_PATH_UPGRADE_PASS");
+                org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PATH_UPGRADE_PASS");
             } else if (phase.startsWith("recipe-book-")) {
                 RecipeBookChecks.run(world);
 
                 try (java.io.FileWriter writer = new java.io.FileWriter(
-                        new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), phase + ".pass"))) {
+                        new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(), phase + ".pass"))) {
                     writer.write("RECIPE_BOOK_PHASE_PASS " + phase + "\n");
                 }
 
-                System.out.println("RECIPE_BOOK_PHASE_PASS " + phase);
+                org.apache.logging.log4j.LogManager.getLogger().info("RECIPE_BOOK_PHASE_PASS " + phase);
             } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
             } else {
@@ -105,7 +123,7 @@ public final class RuntimeProbe {
                 }
                 if (ModList.get().isLoaded("skysbuildingpiecesbop") && !phase.startsWith("client")) {
                     Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks")
-                            .getMethod("run", ServerWorld.class).invoke(null, world);
+                            .getMethod("run", ServerLevel.class).invoke(null, world);
                 }
                 if (phase.startsWith("client")) {
                     grid(world, phase.endsWith("reload"));
@@ -115,7 +133,7 @@ public final class RuntimeProbe {
                 }
             }
 
-            File marker = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
+            File marker = new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                     "skysbuildingpieces-integration.properties");
             Properties result = new Properties();
 
@@ -134,22 +152,26 @@ public final class RuntimeProbe {
                 result.store(output, "Disposable runtime checks");
             }
 
-            System.out.println("BUILDING_PIECES_PROBE_PASS " + phase);
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PROBE_PASS " + phase);
             server.halt(false);
         } catch (Throwable failure) {
             ClientStatus.failure = failure;
-            failure.printStackTrace();
+            org.apache.logging.log4j.LogManager.getLogger().error("Runtime check failed", failure);
             server.halt(false);
+        } finally {
+            if (needsGameplay) {
+                GameplayChecks.release(server.getLevel(Level.OVERWORLD));
+            }
         }
     }
 
-    private static void grid(ServerWorld world, boolean reload) throws Exception {
-        File file = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), "runtime-grid.dat");
-        CompoundNBT saved = new CompoundNBT();
+    private static void grid(ServerLevel world, boolean reload) throws Exception {
+        File file = new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(), "runtime-grid.dat");
+        CompoundTag saved = new CompoundTag();
 
         if (reload) {
             try (FileInputStream input = new FileInputStream(file)) {
-                saved = CompressedStreamTools.readCompressed(input);
+                saved = NbtIo.readCompressed(input);
             }
         }
 
@@ -162,7 +184,7 @@ public final class RuntimeProbe {
                 BlockPos position = new BlockPos(500 + (number & 63), 180 + (number >> 6 & 15), 500 + (number >> 10));
 
                 if (reload) {
-                    if (!NBTUtil.writeBlockState(world.getBlockState(position))
+                    if (!NbtUtils.writeBlockState(world.getBlockState(position))
                             .equals(saved.getCompound("" + number))) {
                         throw new AssertionError(
                                 "Saved client grid lost " + block.getRegistryName() + " / " + metadata);
@@ -181,13 +203,13 @@ public final class RuntimeProbe {
 
                 actual = ((PieceBlock) actual.getBlock()).getActualState(actual, world, position);
                 world.setBlock(position, actual, 18);
-                saved.put("" + index, NBTUtil.writeBlockState(actual));
+                saved.put("" + index, NbtUtils.writeBlockState(actual));
             }
             try (FileOutputStream output = new FileOutputStream(file)) {
-                CompressedStreamTools.writeCompressed(saved, output);
+                NbtIo.writeCompressed(saved, output);
             }
         }
 
-        System.out.println("BUILDING_PIECES_CLIENT_WORLD_PASS reload=" + reload + " states=" + number);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CLIENT_WORLD_PASS reload=" + reload + " states=" + number);
     }
 }

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:light_blue_stained_glass"
+            "items": [
+              "minecraft:light_blue_stained_glass"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_light_blue/stairs/stairs/minecraft/stained_glass_3"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_light_blue/stairs/stairs/minecraft/stained_glass_3"
+    ]
   },
   "conditions": [
     {

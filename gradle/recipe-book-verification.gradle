@@ -7,7 +7,7 @@ def prepareBook = tasks.register('prepareRecipeBookTest') {
         if (directory.canonicalFile != new File(buildDir, 'recipe-book-test-run').canonicalFile) {
             throw new GradleException('Recipe-book verification must stay inside the build directory')
         }
-        delete directory
+        if (directory.exists()) throw new GradleException('Preserve the existing recipe-book evidence: ' + directory)
         copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
         copy {
             from tasks.named('integrationTestModJar', Jar).flatMap { it.archiveFile }

@@ -3,8 +3,8 @@ package zone.moddev.mc.skysbuildingpieces.api;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Version 1 catalogue API. Register an add-on during mod construction. */
@@ -39,18 +39,18 @@ public final class BuildingPiecesApi {
 
     /** Register only this contributor's blocks and items from its native registry events. */
     public static void registerBlocks(String namespace,
-            net.minecraftforge.registries.IForgeRegistry<net.minecraft.block.Block> registry) {
+            net.minecraftforge.registries.IForgeRegistry<net.minecraft.world.level.block.Block> registry) {
         Pieces.registerNamespaceBlocks(namespace, registry);
     }
 
     public static void registerItems(String namespace,
-            net.minecraftforge.registries.IForgeRegistry<net.minecraft.item.Item> registry) {
+            net.minecraftforge.registries.IForgeRegistry<net.minecraft.world.item.Item> registry) {
         Pieces.registerNamespaceItems(namespace, registry);
     }
 
     /** Register during item registration when a full block has one item per saved variant. */
-    public static void registerStateItems(net.minecraft.block.Block block,
-            java.util.function.Function<BlockState, net.minecraft.item.Item> items) {
+    public static void registerStateItems(net.minecraft.world.level.block.Block block,
+            java.util.function.Function<BlockState, net.minecraft.world.item.Item> items) {
         Pieces.registerStateItems(block, items);
     }
 

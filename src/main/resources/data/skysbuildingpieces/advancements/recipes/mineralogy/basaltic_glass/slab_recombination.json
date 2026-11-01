@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:basaltic_glass_slab"
+            "items": [
+              "mineralogy:basaltic_glass_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/basaltic_glass/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/basaltic_glass/slab_recombination"
+    ]
   },
   "conditions": [
     {

@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Face-local centre/edge selection, independent of any other mod's placement handlers. */

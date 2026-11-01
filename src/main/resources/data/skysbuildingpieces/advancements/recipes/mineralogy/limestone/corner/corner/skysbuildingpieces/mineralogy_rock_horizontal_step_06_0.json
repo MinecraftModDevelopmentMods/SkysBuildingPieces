@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_limestone_horizontal_step"
+            "items": [
+              "skysbuildingpieces:mineralogy_limestone_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/limestone/corner/corner/skysbuildingpieces/mineralogy_rock_horizontal_step_06_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/limestone/corner/corner/skysbuildingpieces/mineralogy_rock_horizontal_step_06_0"
+    ]
   },
   "conditions": [
     {

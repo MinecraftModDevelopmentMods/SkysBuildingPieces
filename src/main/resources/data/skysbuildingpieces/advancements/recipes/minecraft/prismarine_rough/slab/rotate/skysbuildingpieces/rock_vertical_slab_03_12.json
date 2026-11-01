@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
+            "items": [
+              "skysbuildingpieces:prismarine_rough_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_rough/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_12"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_rough/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_12"
+    ]
   },
   "conditions": [
     {

@@ -5,19 +5,19 @@ import com.google.gson.JsonObject;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.Half;
-import net.minecraft.state.properties.StairsShape;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -204,9 +204,9 @@ public final class Pieces {
                 Direction facing = new Direction[] { Direction.EAST, Direction.WEST, Direction.SOUTH,
                         Direction.NORTH }[orientation & 3];
 
-                return nativePiece.setValue(StairsBlock.FACING, facing)
-                        .setValue(StairsBlock.HALF, orientation < 4 ? Half.BOTTOM : Half.TOP)
-                        .setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT);
+                return nativePiece.setValue(StairBlock.FACING, facing)
+                        .setValue(StairBlock.HALF, orientation < 4 ? Half.BOTTOM : Half.TOP)
+                        .setValue(StairBlock.SHAPE, StairsShape.STRAIGHT);
             }
 
             return nativePiece;
@@ -248,7 +248,7 @@ public final class Pieces {
         int orientation = source.getMetaFromState(state) % source.palette.shape.states;
         BlockState result = state(material.id, source.palette.shape, orientation);
 
-        if (result == null || result.getBlock().hasTileEntity(result)) {
+        if (result == null || result.hasBlockEntity()) {
             throw new IllegalStateException("No safe replacement geometry for " + material.id);
         }
         for (Map.Entry<Property<?>, Comparable<?>> property : state.getValues().entrySet()) {
@@ -281,8 +281,8 @@ public final class Pieces {
 
         state = canonicalState(state);
 
-        if (state.hasProperty(net.minecraft.block.SlabBlock.TYPE)
-                && state.getValue(net.minecraft.block.SlabBlock.TYPE) == net.minecraft.state.properties.SlabType.DOUBLE) {
+        if (state.hasProperty(net.minecraft.world.level.block.SlabBlock.TYPE)
+                && state.getValue(net.minecraft.world.level.block.SlabBlock.TYPE) == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE) {
             return null; // A native double slab has no distinct full-block inventory item.
         }
 

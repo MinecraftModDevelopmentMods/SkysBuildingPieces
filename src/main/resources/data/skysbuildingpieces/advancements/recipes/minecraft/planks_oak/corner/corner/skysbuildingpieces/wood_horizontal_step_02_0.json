@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:planks_oak_horizontal_step"
+            "items": [
+              "skysbuildingpieces:planks_oak_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/planks_oak/corner/corner/skysbuildingpieces/wood_horizontal_step_02_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/planks_oak/corner/corner/skysbuildingpieces/wood_horizontal_step_02_0"
+    ]
   },
   "conditions": [
     {

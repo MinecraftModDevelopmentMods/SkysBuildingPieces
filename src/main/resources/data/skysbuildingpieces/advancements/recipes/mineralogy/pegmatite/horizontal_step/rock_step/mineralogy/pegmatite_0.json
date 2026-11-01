@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:pegmatite"
+            "items": [
+              "mineralogy:pegmatite"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/pegmatite/horizontal_step/rock_step/mineralogy/pegmatite_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/pegmatite/horizontal_step/rock_step/mineralogy/pegmatite_0"
+    ]
   },
   "conditions": [
     {

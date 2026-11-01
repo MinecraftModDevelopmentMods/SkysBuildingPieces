@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_granite_corner"
+            "items": [
+              "skysbuildingpieces:mineralogy_granite_corner"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/granite/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/granite/recombine_corner"
+    ]
   },
   "conditions": [
     {

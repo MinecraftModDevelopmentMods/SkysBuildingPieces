@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysgrassslabs:grass_slab"
+            "items": [
+              "skysgrassslabs:grass_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/grass/horizontal_step/step/buildingbricks/grass_slab_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/grass/horizontal_step/step/buildingbricks/grass_slab_0"
+    ]
   },
   "conditions": [
     {

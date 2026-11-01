@@ -1,16 +1,17 @@
 package zone.moddev.mc.skysbuildingpieces.compatprobe;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -21,7 +22,7 @@ public final class LegacyPolicyMod {
     private static final String[] NAMES = { "rock_step", "wood_vertical_slab", "glass_slab", "dirt_stairs",
             "wood_corner", "rock_wall", "ice_pane", "dirt_vertical_slab" };
     private static final Block[] BLOCKS = new Block[NAMES.length];
-    private static TileEntityType<MaterialTile> materialType;
+    private static BlockEntityType<MaterialTile> materialType;
 
     public LegacyPolicyMod() {
         for (int index = 0; index < NAMES.length; index++) {
@@ -30,7 +31,7 @@ public final class LegacyPolicyMod {
 
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, this::blocks);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::items);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(TileEntityType.class, this::tiles);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(BlockEntityType.class, this::tiles);
     }
 
     private void blocks(RegistryEvent.Register<Block> event) {
@@ -44,13 +45,13 @@ public final class LegacyPolicyMod {
         }
     }
 
-    private void tiles(RegistryEvent.Register<TileEntityType<?>> event) {
-        materialType = TileEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
+    private void tiles(RegistryEvent.Register<BlockEntityType<?>> event) {
+        materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
         materialType.setRegistryName("buildingbricks", "material");
         event.getRegistry().register(materialType);
     }
 
-    public static final class LegacyBlock extends Block {
+    public static final class LegacyBlock extends Block implements EntityBlock {
         private static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
         LegacyBlock() {
@@ -59,36 +60,31 @@ public final class LegacyPolicyMod {
         }
 
         @Override
-        protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             builder.add(META);
         }
 
         @Override
-        public boolean hasTileEntity(BlockState state) {
-            return true;
-        }
-
-        @Override
-        public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-            return new MaterialTile();
+        public BlockEntity newBlockEntity(BlockPos position, BlockState state) {
+            return new MaterialTile(position, state);
         }
     }
 
-    public static final class MaterialTile extends TileEntity {
-        private CompoundNBT retained = new CompoundNBT();
+    public static final class MaterialTile extends BlockEntity {
+        private CompoundTag retained = new CompoundTag();
 
-        public MaterialTile() {
-            super(materialType);
+        public MaterialTile(BlockPos position, BlockState state) {
+            super(materialType, position, state);
         }
 
         @Override
-        public void load(BlockState state, CompoundNBT tag) {
-            super.load(state, tag);
+        public void load(CompoundTag tag) {
+            super.load(tag);
             retained = tag.copy();
         }
 
         @Override
-        public CompoundNBT save(CompoundNBT tag) {
+        public CompoundTag save(CompoundTag tag) {
             tag.merge(retained);
             return super.save(tag);
         }

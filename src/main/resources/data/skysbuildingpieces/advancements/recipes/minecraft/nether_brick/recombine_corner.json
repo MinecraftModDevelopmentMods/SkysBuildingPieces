@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:nether_brick_corner"
+            "items": [
+              "skysbuildingpieces:nether_brick_corner"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/nether_brick/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/nether_brick/recombine_corner"
+    ]
   },
   "conditions": [
     {

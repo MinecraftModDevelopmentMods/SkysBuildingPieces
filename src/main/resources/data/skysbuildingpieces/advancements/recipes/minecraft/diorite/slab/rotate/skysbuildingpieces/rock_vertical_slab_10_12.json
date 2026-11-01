@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:diorite_vertical_slab"
+            "items": [
+              "skysbuildingpieces:diorite_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/diorite/slab/rotate/skysbuildingpieces/rock_vertical_slab_10_12"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/diorite/slab/rotate/skysbuildingpieces/rock_vertical_slab_10_12"
+    ]
   },
   "conditions": [
     {

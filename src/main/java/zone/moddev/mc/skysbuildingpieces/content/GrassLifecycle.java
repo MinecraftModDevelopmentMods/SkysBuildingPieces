@@ -4,12 +4,12 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.Level;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.ModList;
 
 /** Standalone grass rules with an optional shared Grass Slabs lifecycle. */
@@ -35,7 +35,7 @@ public final class GrassLifecycle {
                         continue;
                     }
 
-                    BlockState canonical = state.setValue(net.minecraft.block.SnowyDirtBlock.SNOWY, false);
+                    BlockState canonical = state.setValue(net.minecraft.world.level.block.SnowyDirtBlock.SNOWY, false);
                     BlockState dirt = counterpart(canonical, false);
 
                     if (dirt != null && registered.add(canonical)) {
@@ -44,11 +44,11 @@ public final class GrassLifecycle {
                 }
             }
 
-            sharedGrass = api.getMethod("tickGrass", World.class, BlockPos.class, BlockState.class, Random.class);
-            sharedDirt = api.getMethod("tickDirt", World.class, BlockPos.class, BlockState.class, Random.class);
+            sharedGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, Random.class);
+            sharedDirt = api.getMethod("tickDirt", Level.class, BlockPos.class, BlockState.class, Random.class);
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException(
-                    "Install Sky's Grass Slabs 1.2.0.116051 or later for grass-piece integration", failure);
+                    "Install Sky's Grass Slabs 1.2.0.117011 or later for grass-piece integration", failure);
         }
     }
 
@@ -75,14 +75,14 @@ public final class GrassLifecycle {
         if (replacement != null && replacement.hasProperty(SlabBlock.WATERLOGGED)) {
             replacement = replacement.setValue(SlabBlock.WATERLOGGED, state.getValue(SlabBlock.WATERLOGGED));
         }
-        if (replacement != null && replacement.hasProperty(StairsBlock.SHAPE)) {
-            replacement = replacement.setValue(StairsBlock.SHAPE, state.getValue(StairsBlock.SHAPE));
+        if (replacement != null && replacement.hasProperty(StairBlock.SHAPE)) {
+            replacement = replacement.setValue(StairBlock.SHAPE, state.getValue(StairBlock.SHAPE));
         }
 
         return replacement;
     }
 
-    public static void repairSupport(World world, BlockPos position, BlockState state) {
+    public static void repairSupport(Level world, BlockPos position, BlockState state) {
         if (!world.isClientSide && grass(state) && coversSupport(state) && world.isLoaded(position.below())
                 && world.getBlockState(position.below()).getBlock() == Blocks.GRASS_BLOCK) {
             world.setBlock(position.below(), Blocks.DIRT.defaultBlockState(), 2);
@@ -96,7 +96,7 @@ public final class GrassLifecycle {
         return ((occupied & 15) | (occupied >>> 4 & 15)) == 15;
     }
 
-    public static void tick(World world, BlockPos position, BlockState state, Random random) {
+    public static void tick(Level world, BlockPos position, BlockState state, Random random) {
         if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
@@ -156,14 +156,14 @@ public final class GrassLifecycle {
         }
     }
 
-    private static boolean canRemainGrass(World world, BlockPos position) {
+    private static boolean canRemainGrass(Level world, BlockPos position) {
         BlockPos above = position.above();
 
         return world.getMaxLocalRawBrightness(above) >= 4
                 || world.getBlockState(above).getLightBlock(world, above) < world.getMaxLightLevel();
     }
 
-    private static boolean viableTarget(World world, BlockPos position) {
+    private static boolean viableTarget(Level world, BlockPos position) {
         if (position.getY() < 0 || position.getY() >= 256 || !world.isLoaded(position)) {
             return false;
         }

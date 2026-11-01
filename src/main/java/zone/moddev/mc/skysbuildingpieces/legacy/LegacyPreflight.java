@@ -1,5 +1,11 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.Level;
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -70,31 +76,31 @@ final class LegacyPreflight {
                                 throw blocked("unknown region compression in " + file.getName());
                             }
 
-                            CompoundNBT root;
+                            CompoundTag root;
 
                             try (DataInputStream input = new DataInputStream(bytes)) {
-                                root = CompressedStreamTools.read(input);
+                                root = NbtIo.read(input);
                             }
 
-                            CompoundNBT level = root.getCompound("Level");
+                            CompoundTag level = root.getCompound("Level");
 
                             HistoricalBiomes.validate(root);
 
                             {
-                                Map<Integer, CompoundNBT> tiles = new HashMap<Integer, CompoundNBT>();
-                                ListNBT tileList = level.getList("TileEntities", 10);
+                                Map<Integer, CompoundTag> tiles = new HashMap<Integer, CompoundTag>();
+                                ListTag tileList = level.getList("TileEntities", 10);
 
                                 for (int tileIndex = 0; tileIndex < tileList.size(); tileIndex++) {
-                                    CompoundNBT compoundTag = tileList.getCompound(tileIndex);
+                                    CompoundTag compoundTag = tileList.getCompound(tileIndex);
 
                                     tiles.put((compoundTag.getInt("x") & 15) | ((compoundTag.getInt("z") & 15) << 4)
                                             | (compoundTag.getInt("y") << 8), compoundTag);
                                 }
 
-                                ListNBT sections = level.getList("Sections", 10);
+                                ListTag sections = level.getList("Sections", 10);
 
                                 for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-                                    CompoundNBT section = sections.getCompound(sectionIndex);
+                                    CompoundTag section = sections.getCompound(sectionIndex);
 
                                     if (!section.contains("Blocks", 7)) {
                                         continue; // Named 1.13+ states do not use the numeric bridge.
@@ -117,7 +123,7 @@ final class LegacyPreflight {
                                         }
 
                                         String name = registryIds.get(blockId);
-                                        CompoundNBT tile = tiles.get((blockIndex & 255)
+                                        CompoundTag tile = tiles.get((blockIndex & 255)
                                                 | (((section.getByte("Y") & 255) * 16 + (blockIndex >> 8)) << 8));
 
                                         zone.moddev.mc.skysbuildingpieces.content.PieceBlock palette = LegacyBridge
@@ -169,7 +175,7 @@ final class LegacyPreflight {
 
         if (levelFile.isFile()) {
             try (InputStream input = new FileInputStream(levelFile)) {
-                stacks(CompressedStreamTools.readCompressed(input));
+                stacks(NbtIo.readCompressed(input));
             }
         }
 
@@ -179,19 +185,19 @@ final class LegacyPreflight {
         if (files != null) {
             for (File file : files) {
                 try (InputStream input = new FileInputStream(file)) {
-                    stacks(CompressedStreamTools.readCompressed(input));
+                    stacks(NbtIo.readCompressed(input));
                 }
             }
         }
     }
 
-    private static void stacks(INBT value) {
-        inspectStacks(value instanceof CompoundNBT ? HistoricalItems.prepareCopy((CompoundNBT) value) : value);
+    private static void stacks(Tag value) {
+        inspectStacks(value instanceof CompoundTag ? HistoricalItems.prepareCopy((CompoundTag) value) : value);
     }
 
-    private static void inspectStacks(INBT value) {
-        if (value instanceof CompoundNBT) {
-            CompoundNBT compoundTag = (CompoundNBT) value;
+    private static void inspectStacks(Tag value) {
+        if (value instanceof CompoundTag) {
+            CompoundTag compoundTag = (CompoundTag) value;
             String registryId = compoundTag.getString("id");
 
             if (compoundTag.contains("Count", 99)) {
@@ -204,7 +210,7 @@ final class LegacyPreflight {
                 }
                 if (skyOwned(registryId) && palette == null && !HistoricalFullBlocks.historical(registryId)
                         && !net.minecraftforge.registries.ForgeRegistries.ITEMS
-                                .containsKey(new net.minecraft.util.ResourceLocation(registryId))) {
+                                .containsKey(new net.minecraft.resources.ResourceLocation(registryId))) {
                     throw blocked(registryId + " item; restore its Sky add-on and dependencies");
                 }
                 if (!net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")
@@ -227,8 +233,8 @@ final class LegacyPreflight {
                     inspectStacks(compoundTag.get(key));
                 }
             }
-        } else if (value instanceof ListNBT) {
-            ListNBT list = (ListNBT) value;
+        } else if (value instanceof ListTag) {
+            ListTag list = (ListTag) value;
 
             for (int entryIndex = 0; entryIndex < list.size(); entryIndex++) {
                 inspectStacks(list.get(entryIndex));

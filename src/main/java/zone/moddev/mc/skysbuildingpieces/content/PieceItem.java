@@ -1,23 +1,23 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -44,7 +44,7 @@ public final class PieceItem extends Item {
     }
 
     @Override
-    public ITextComponent getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         ItemStack full = Pieces.stack(Pieces.nativeState(Catalogue.INSTANCE.materials.get(material), "full"), 1);
 
         if (full == null) {
@@ -60,20 +60,20 @@ public final class PieceItem extends Item {
     }
 
     @Override
-    public int getBurnTime(ItemStack stack) {
+    public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
         return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
 
         if (player == null || context.getItemInHand().isEmpty()) {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
 
         BlockPos position = context.getClickedPos();
-        Vector3d hit = context.getClickLocation();
+        Vec3 hit = context.getClickLocation();
         Shape shape = piece.palette.shape;
 
         if (shape == Shape.VERTICAL_SLAB && Pieces.state(material, Shape.SLAB, 1) != null) {
@@ -85,10 +85,10 @@ public final class PieceItem extends Item {
                 material, shape);
     }
 
-    static ActionResultType place(ItemStack stack, PlayerEntity player, World world, BlockPos position, Hand hand,
+    static InteractionResult place(ItemStack stack, Player player, Level world, BlockPos position, InteractionHand hand,
             Direction face, float hitX, float hitY, float hitZ, String materialId, Shape shape) {
         if (stack == null || stack.isEmpty()) {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
 
         float targetX = hitX;
@@ -100,7 +100,7 @@ public final class PieceItem extends Item {
         // Vanilla slabs call a matching half replaceable. Join it before asking the placement context whether this cell
         // can accept a new block.
         if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ)) {
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         if (!replaceable(world, position, player, hand, stack, face, hitX, hitY, hitZ)) {
             position = position.relative(face);
@@ -111,12 +111,12 @@ public final class PieceItem extends Item {
 
             if (combine(world, position, existingState, materialId, shape, player, stack, face, targetX, targetY,
                     targetZ)) {
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
         if (!player.mayUseItemAt(position, face, stack)
                 || !replaceable(world, position, player, hand, stack, face, targetX, targetY, targetZ)) {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
 
         int horizontalRotation = closest(hitX, hitZ);
@@ -171,25 +171,25 @@ public final class PieceItem extends Item {
         }
         // Check the chosen orientation, not the block's default collision box.
         if (target == null || !target.canSurvive(world, position) || !safe(world, position, target)) {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
         if (!world.setBlock(position, target, 3)) {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
 
         target.getBlock().setPlacedBy(world, position, target, player, stack);
         finish(world, position, target, player, stack);
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public boolean canPlaceBlockOnSide(World world, BlockPos position, Direction side, PlayerEntity player,
+    public boolean canPlaceBlockOnSide(Level world, BlockPos position, Direction side, Player player,
             ItemStack itemStack) {
         return player.mayUseItemAt(position, side, itemStack);
     }
 
     /** Combine occupied cells only when their union is a supported shape of the same material. */
-    private static boolean combine(World world, BlockPos position, BlockState existingState, String material,
-            Shape shape, PlayerEntity player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ) {
+    private static boolean combine(Level world, BlockPos position, BlockState existingState, String material,
+            Shape shape, Player player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ) {
         if (!player.mayUseItemAt(position, face, stack) || shape == Shape.WALL || shape == Shape.PANE) {
             return false;
         }
@@ -274,33 +274,33 @@ public final class PieceItem extends Item {
         return true;
     }
 
-    private static boolean safe(World world, BlockPos position, BlockState target) {
-        return world.isUnobstructed(target, position, ISelectionContext.empty());
+    private static boolean safe(Level world, BlockPos position, BlockState target) {
+        return world.isUnobstructed(target, position, CollisionContext.empty());
     }
 
-    private static boolean replaceable(World world, BlockPos position, PlayerEntity player, Hand hand, ItemStack stack,
+    private static boolean replaceable(Level world, BlockPos position, Player player, InteractionHand hand, ItemStack stack,
             Direction face, float hitX, float hitY, float hitZ) {
-        BlockRayTraceResult hit = new BlockRayTraceResult(
-                new Vector3d(position.getX() + hitX, position.getY() + hitY, position.getZ() + hitZ), face, position,
+        BlockHitResult hit = new BlockHitResult(
+                new Vec3(position.getX() + hitX, position.getY() + hitY, position.getZ() + hitZ), face, position,
                 false);
 
         return new PlacementContext(world, player, hand, stack, hit).replacingClickedOnBlock();
     }
 
-    private static final class PlacementContext extends BlockItemUseContext {
-        PlacementContext(World world, PlayerEntity player, Hand hand, ItemStack stack, BlockRayTraceResult hit) {
+    private static final class PlacementContext extends BlockPlaceContext {
+        PlacementContext(Level world, Player player, InteractionHand hand, ItemStack stack, BlockHitResult hit) {
             super(world, player, hand, stack, hit);
         }
     }
 
-    private static void finish(World world, BlockPos position, BlockState target, PlayerEntity player,
+    private static void finish(Level world, BlockPos position, BlockState target, Player player,
             ItemStack stack) {
-        net.minecraft.block.SoundType sound = target.getBlock().getSoundType(target, world, position, player);
+        net.minecraft.world.level.block.SoundType sound = target.getBlock().getSoundType(target, world, position, player);
 
-        world.playSound(player, position, sound.getPlaceSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1) / 2,
+        world.playSound(player, position, sound.getPlaceSound(), SoundSource.BLOCKS, (sound.getVolume() + 1) / 2,
                 sound.getPitch() * .8f);
 
-        if (!player.abilities.instabuild) {
+        if (!player.getAbilities().instabuild) {
             stack.shrink(1);
         }
     }

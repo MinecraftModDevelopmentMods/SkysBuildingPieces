@@ -1,10 +1,10 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.core.Direction;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 

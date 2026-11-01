@@ -2,10 +2,10 @@ package zone.moddev.mc.skysbuildingpieces.legacy;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class NumericStateBridgeTest {
 
         snapshot.put(256, "othermod:saved_block");
         snapshot.put(258, "othermod:another_saved_block");
-        NumericStateBridge.begin(snapshot, new ListNBT());
+        NumericStateBridge.begin(snapshot, new ListTag());
 
         int states = 0;
         Map<BlockState, Integer> encoded = new LinkedHashMap<>();
@@ -44,7 +44,7 @@ class NumericStateBridgeTest {
             states++;
         }
 
-        ListNBT stored = NumericStateBridge.saveStaging();
+        ListTag stored = NumericStateBridge.saveStaging();
 
         assertEquals(states, stored.size());
 
@@ -68,7 +68,7 @@ class NumericStateBridgeTest {
     void partialStagingNumberIsReusedAfterReload() {
         Map<Integer, String> snapshot = new LinkedHashMap<>();
 
-        NumericStateBridge.begin(snapshot, new ListNBT());
+        NumericStateBridge.begin(snapshot, new ListTag());
 
         int first = NumericStateBridge.encode(Blocks.GOLD_BLOCK.defaultBlockState());
 
@@ -88,7 +88,7 @@ class NumericStateBridgeTest {
             snapshot.put(number, "othermod:block_" + number);
         }
 
-        NumericStateBridge.begin(snapshot, new ListNBT());
+        NumericStateBridge.begin(snapshot, new ListTag());
 
         LegacyBridge.RecoveryAbort failure = assertThrows(LegacyBridge.RecoveryAbort.class,
                 () -> NumericStateBridge.encode(Blocks.STONE.defaultBlockState()));
@@ -103,10 +103,10 @@ class NumericStateBridgeTest {
                 root -> root.getCompound("BlockState").getString("Name").equals("missing:retired_native_log"),
                 root -> root.getCompound("BlockState").putString("Name", "minecraft:birch_log"));
 
-        CompoundNBT state = new CompoundNBT();
-        CompoundNBT properties = new CompoundNBT();
-        CompoundNBT entry = new CompoundNBT();
-        ListNBT saved = new ListNBT();
+        CompoundTag state = new CompoundTag();
+        CompoundTag properties = new CompoundTag();
+        CompoundTag entry = new CompoundTag();
+        ListTag saved = new ListTag();
 
         properties.putString("axis", "z");
         state.putString("Name", "missing:retired_native_log");
@@ -115,12 +115,12 @@ class NumericStateBridgeTest {
         entry.put("state", state);
         saved.add(entry);
 
-        ListNBT before = saved.copy();
+        ListTag before = saved.copy();
 
         NumericStateBridge.begin(new LinkedHashMap<>(), saved);
 
-        CompoundNBT restored = NumericStateBridge.saveStaging().getCompound(0);
-        CompoundNBT expected = state.copy();
+        CompoundTag restored = NumericStateBridge.saveStaging().getCompound(0);
+        CompoundTag expected = state.copy();
 
         expected.putString("Name", "minecraft:birch_log");
         assertEquals(2000 << 4 | 7, restored.getInt("encoded"));
@@ -134,16 +134,16 @@ class NumericStateBridgeTest {
 
         snapshot.put(256, "othermod:saved_block");
 
-        CompoundNBT entry = new CompoundNBT();
+        CompoundTag entry = new CompoundTag();
 
         entry.putInt("encoded", 256 << 4);
-        entry.put("state", net.minecraft.nbt.NBTUtil.writeBlockState(Blocks.GOLD_BLOCK.defaultBlockState()));
+        entry.put("state", net.minecraft.nbt.NbtUtils.writeBlockState(Blocks.GOLD_BLOCK.defaultBlockState()));
 
-        ListNBT conflict = new ListNBT();
+        ListTag conflict = new ListTag();
 
         conflict.add(entry);
         assertThrows(LegacyBridge.RecoveryAbort.class, () -> NumericStateBridge.begin(snapshot, conflict));
         snapshot.put(4096, "othermod:invalid");
-        assertThrows(LegacyBridge.RecoveryAbort.class, () -> NumericStateBridge.begin(snapshot, new ListNBT()));
+        assertThrows(LegacyBridge.RecoveryAbort.class, () -> NumericStateBridge.begin(snapshot, new ListTag()));
     }
 }

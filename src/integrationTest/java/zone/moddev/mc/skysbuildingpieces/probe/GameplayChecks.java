@@ -1,36 +1,63 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+
+import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
-import net.minecraft.block.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.*;
 import net.minecraft.nbt.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.*;
+import net.minecraft.resources.*;
+import net.minecraft.core.*;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
 /** Real world placement and collision checks, isolated from the saved palette grid. */
 public final class GameplayChecks {
-    private static ActionResultType use(ItemStack stack, ServerPlayerEntity player, ServerWorld world, BlockPos pos,
-            Hand hand, Direction face, float hitX, float hitY, float hitZ) {
-        player.setItemInHand(hand, stack);
-        return stack.useOn(new ItemUseContext(player, hand, new BlockRayTraceResult(
-                new Vector3d(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ), face, pos, false)));
+    private static final BlockPos FIXTURE_POSITION = new BlockPos(-500, 90, -500);
+
+    public static void prepare(ServerLevel world) {
+        world.setChunkForced(FIXTURE_POSITION.getX() >> 4, FIXTURE_POSITION.getZ() >> 4, true);
+        world.getChunkAt(FIXTURE_POSITION);
     }
 
-    public static void run(ServerWorld world) {
-        ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
+    public static boolean ready(ServerLevel world) {
+        return world.isPositionTickingWithEntitiesLoaded(FIXTURE_POSITION);
+    }
 
-        player.abilities.instabuild = false;
+    public static void release(ServerLevel world) {
+        world.setChunkForced(FIXTURE_POSITION.getX() >> 4, FIXTURE_POSITION.getZ() >> 4, false);
+    }
 
-        BlockPos position = new BlockPos(-500, 90, -500);
+    private static InteractionResult use(ItemStack stack, ServerPlayer player, ServerLevel world, BlockPos pos,
+            InteractionHand hand, Direction face, float hitX, float hitY, float hitZ) {
+        player.setItemInHand(hand, stack);
+        return stack.useOn(new UseOnContext(player, hand, new BlockHitResult(
+                new Vec3(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ), face, pos, false)));
+    }
+
+    public static void run(ServerLevel world) {
+        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+
+        player.getAbilities().instabuild = false;
+
+        BlockPos position = FIXTURE_POSITION;
 
         // Native lighting retains data for tracked chunks. Keep this distant fixture tracked while the tests exercise
         // it during a real server tick.
@@ -38,13 +65,14 @@ public final class GameplayChecks {
 
         long trackingDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
-        while (!world.getChunkSource().isTickingChunk(position) && System.nanoTime() < trackingDeadline) {
+        long chunkPosition = new net.minecraft.world.level.ChunkPos(position).toLong();
+        while (!world.getChunkSource().isPositionTicking(chunkPosition) && System.nanoTime() < trackingDeadline) {
             if (!world.getChunkSource().pollTask()) {
                 Thread.yield();
             }
         }
 
-        require(world.getChunkSource().isTickingChunk(position), "Native gameplay fixture never became a ticking chunk");
+        require(world.getChunkSource().isPositionTicking(chunkPosition), "Native gameplay fixture never became a ticking chunk");
 
         world.removeBlock(position.above(), false);
         world.removeBlock(position, false);
@@ -57,11 +85,11 @@ public final class GameplayChecks {
             world.removeBlock(position, false);
             player.setShiftKeyDown(false);
 
-            ActionResultType result = use(item, player, world, position, Hand.MAIN_HAND, Direction.UP, .25f, .1f, .25f);
+            InteractionResult result = use(item, player, world, position, InteractionHand.MAIN_HAND, Direction.UP, .25f, .1f, .25f);
 
             // Vanilla items consume the action on the server; Sky items retain their explicit success result.
-            boolean nativeConsumption = result == ActionResultType.CONSUME && !(item.getItem() instanceof PieceItem);
-            require((result == ActionResultType.SUCCESS || nativeConsumption) && item.getCount() == 1,
+            boolean nativeConsumption = result == InteractionResult.CONSUME && !(item.getItem() instanceof PieceItem);
+            require((result == InteractionResult.SUCCESS || nativeConsumption) && item.getCount() == 1,
                     "own placement and consumption " + pieceBlock.getRegistryName() + " item="
                             + item.getItem().getRegistryName() + " result=" + result + " count=" + item.getCount()
                             + " placed=" + world.getBlockState(position));
@@ -87,7 +115,7 @@ public final class GameplayChecks {
 
             require(world.getBlockEntity(position) == null, "pieces never need tiles");
 
-            List<AxisAlignedBB> boxes = pieceBlock.boxes(pieceBlock.getActualState(state, world, position));
+            List<AABB> boxes = pieceBlock.boxes(pieceBlock.getActualState(state, world, position));
 
             require(!boxes.isEmpty(), "collision boxes");
 
@@ -114,14 +142,14 @@ public final class GameplayChecks {
 
         ItemStack slab = Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 0), 2);
 
-        require(use(slab, player, world, position, Hand.MAIN_HAND, Direction.UP, .25f, .75f,
-                .25f) == ActionResultType.SUCCESS, "matching slabs combine");
+        require(use(slab, player, world, position, InteractionHand.MAIN_HAND, Direction.UP, .25f, .75f,
+                .25f) == InteractionResult.SUCCESS, "matching slabs combine");
         require(world.getBlockState(position).getBlock() == Blocks.GLASS && slab.getCount() == 1,
                 "normalized full block without duplication");
         world.setBlock(position, Pieces.state("minecraft:glass", Shape.SLAB, 0), 2);
         slab = Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 1), 2);
-        require(use(slab, player, world, position, Hand.MAIN_HAND, Direction.DOWN, .25f, .5f,
-                .25f) == ActionResultType.SUCCESS && world.getBlockState(position).getBlock() == Blocks.GLASS
+        require(use(slab, player, world, position, InteractionHand.MAIN_HAND, Direction.DOWN, .25f, .5f,
+                .25f) == InteractionResult.SUCCESS && world.getBlockState(position).getBlock() == Blocks.GLASS
                 && slab.getCount() == 1, "top slab combines on its lower face");
 
         for (int orientation = 0; orientation < 4; orientation++) {
@@ -133,8 +161,8 @@ public final class GameplayChecks {
             float hitX = face.getAxis() == Direction.Axis.X ? .5f : .25f;
             float hitZ = face.getAxis() == Direction.Axis.Z ? .5f : .25f;
 
-            require(use(vertical, player, world, position, Hand.MAIN_HAND, face, hitX, .25f,
-                    hitZ) == ActionResultType.SUCCESS && world.getBlockState(position).getBlock() == Blocks.GLASS
+            require(use(vertical, player, world, position, InteractionHand.MAIN_HAND, face, hitX, .25f,
+                    hitZ) == InteractionResult.SUCCESS && world.getBlockState(position).getBlock() == Blocks.GLASS
                     && vertical.getCount() == 1, "vertical slab internal boundary " + orientation);
         }
         // Unlike materials must not replace an occupied piece.
@@ -155,8 +183,8 @@ public final class GameplayChecks {
             float hitX = face.getAxis() == Direction.Axis.X ? .5f : .25f;
             float hitZ = face.getAxis() == Direction.Axis.Z ? .5f : .25f;
 
-            require(use(vertical, player, world, position, Hand.MAIN_HAND, face, hitX, .25f,
-                    hitZ) == ActionResultType.SUCCESS
+            require(use(vertical, player, world, position, InteractionHand.MAIN_HAND, face, hitX, .25f,
+                    hitZ) == InteractionResult.SUCCESS
                     && world.getBlockState(position).equals(Blocks.DIRT.defaultBlockState()) && vertical.getCount() == 1,
                     "vertical dirt full-block combination " + orientation);
         }
@@ -168,7 +196,7 @@ public final class GameplayChecks {
 
         ItemStack other = Pieces.stack(Pieces.state("minecraft:ice", Shape.SLAB, 0), 2);
 
-        use(other, player, world, position, Hand.MAIN_HAND, Direction.UP, .25f, .75f, .25f);
+        use(other, player, world, position, InteractionHand.MAIN_HAND, Direction.UP, .25f, .75f, .25f);
         require(world.getBlockState(position).equals(original) && other.getCount() == 2,
                 "unlike combination rejected unchanged");
         slabPlacement(world, position, player);
@@ -226,15 +254,15 @@ public final class GameplayChecks {
         require(!((PieceBlock) grass.getBlock()).getActualState(grass, world, position).getValue(GrassBlock.SNOWY),
                 "snow visual clears");
         world.removeBlock(position, false);
-        System.out.println("BUILDING_PIECES_GAMEPLAY_PASS " + placed + " palettes");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_GAMEPLAY_PASS " + placed + " palettes");
         materialPhysics(world, position, player);
         world.setChunkForced(position.getX() >> 4, position.getZ() >> 4, false);
     }
 
-    private static void settleLighting(ServerWorld world, BlockPos position) {
+    private static void settleLighting(ServerLevel world, BlockPos position) {
         // Lighting moved to a worker thread in 1.14. Finish that work before manually ticking grass; a tick immediately
         // after placement sees old light.
-        net.minecraft.world.server.ServerWorldLightManager lights = world.getChunkSource().getLightEngine();
+        net.minecraft.server.level.ThreadedLevelLightEngine lights = world.getChunkSource().getLightEngine();
 
         lights.checkBlock(position.above());
 
@@ -258,7 +286,7 @@ public final class GameplayChecks {
         finished.join();
     }
 
-    private static void slabPlacement(ServerWorld world, BlockPos position, ServerPlayerEntity player) {
+    private static void slabPlacement(ServerLevel world, BlockPos position, ServerPlayer player) {
         int checked = 0;
 
         // Real BlockItem calls against a solid neighbour: centre plus four edges, all six faces, every custom
@@ -309,8 +337,8 @@ public final class GameplayChecks {
                                 // slab, whose placement belongs to BuildingBricks while that mod is installed.
                                 ItemStack stack = ownSlab(block, block.palette.materials.get(slot));
 
-                                require(use(stack, player, world, anchor, Hand.MAIN_HAND, face, hitX, hitY,
-                                        hitZ) == ActionResultType.SUCCESS,
+                                require(use(stack, player, world, anchor, InteractionHand.MAIN_HAND, face, hitX, hitY,
+                                        hitZ) == InteractionResult.SUCCESS,
                                         "slab face/edge placement " + face + " " + click);
                                 require(world.getBlockState(position)
                                         .equals(Pieces.state(block.palette.materials.get(slot), slabShape(expected),
@@ -337,8 +365,8 @@ public final class GameplayChecks {
 
                 ItemStack stack = Pieces.stack(Pieces.state("minecraft:glass", held, 0), 2);
 
-                require(use(stack, player, world, position, Hand.MAIN_HAND, occupied.getOpposite(), .5f, .5f,
-                        .5f) == ActionResultType.SUCCESS, "cross-orientation slab combination");
+                require(use(stack, player, world, position, InteractionHand.MAIN_HAND, occupied.getOpposite(), .5f, .5f,
+                        .5f) == InteractionResult.SUCCESS, "cross-orientation slab combination");
                 require(world.getBlockState(position).getBlock() == Blocks.GLASS && stack.getCount() == 1,
                         "six-way combination normalizes exactly once");
             }
@@ -352,44 +380,44 @@ public final class GameplayChecks {
 
         ItemStack stack = Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 1), 2);
 
-        require(use(stack, player, world, position, Hand.MAIN_HAND, Direction.UP, .5f, 1,
-                .5f) == ActionResultType.SUCCESS && world.getBlockState(position.above()).getBlock() == Blocks.GLASS
+        require(use(stack, player, world, position, InteractionHand.MAIN_HAND, Direction.UP, .5f, 1,
+                .5f) == InteractionResult.SUCCESS && world.getBlockState(position.above()).getBlock() == Blocks.GLASS
                 && stack.getCount() == 1, "adjacent slab combination uses destination coordinates");
         clearAround(world, position);
         world.setBlock(position.below(), Blocks.STONE.defaultBlockState(), 2);
         stack = Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 1), 2);
-        player.abilities.mayBuild = false;
+        player.getAbilities().mayBuild = false;
 
         try {
-            require(use(stack, player, world, position.below(), Hand.MAIN_HAND, Direction.UP, .5f, 1,
-                    .5f) != ActionResultType.SUCCESS && world.isEmptyBlock(position) && stack.getCount() == 2,
+            require(use(stack, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .5f, 1,
+                    .5f) != InteractionResult.SUCCESS && world.isEmptyBlock(position) && stack.getCount() == 2,
                     "denied placement does not change the world or consume a slab");
         } finally {
-            player.abilities.mayBuild = true;
+            player.getAbilities().mayBuild = true;
         }
 
-        net.minecraft.entity.item.ArmorStandEntity stand = new net.minecraft.entity.item.ArmorStandEntity(
-                net.minecraft.entity.EntityType.ARMOR_STAND, world);
+        net.minecraft.world.entity.decoration.ArmorStand stand = new net.minecraft.world.entity.decoration.ArmorStand(
+                net.minecraft.world.entity.EntityType.ARMOR_STAND, world);
 
         stand.setPos(position.getX() + .25, position.getY(), position.getZ() + .5);
         require(world.addFreshEntity(stand), "collision fixture joins world");
 
         try {
-            require(use(stack, player, world, position.below(), Hand.MAIN_HAND, Direction.UP, .1f, 1,
-                    .5f) == ActionResultType.FAIL && world.isEmptyBlock(position) && stack.getCount() == 2,
+            require(use(stack, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .1f, 1,
+                    .5f) == InteractionResult.FAIL && world.isEmptyBlock(position) && stack.getCount() == 2,
                     "occupied selected half rejects placement without consumption");
             stand.setPos(position.getX() + .75, position.getY(), position.getZ() + .5);
-            require(use(stack, player, world, position.below(), Hand.MAIN_HAND, Direction.UP, .1f, 1,
-                    .5f) == ActionResultType.SUCCESS
+            require(use(stack, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .1f, 1,
+                    .5f) == InteractionResult.SUCCESS
                     && world.getBlockState(position).equals(Pieces.state("minecraft:glass", Shape.VERTICAL_SLAB, 1))
                     && stack.getCount() == 1, "empty selected half permits placement next to an entity");
         } finally {
-            stand.remove();
+            stand.discard();
             world.removeEntity(stand, false);
         }
 
         clearAround(world, position);
-        System.out.println(
+        org.apache.logging.log4j.LogManager.getLogger().info(
                 "BUILDING_PIECES_SLAB_PLACEMENT_PASS " + checked + " face/edge/sneak cases and 12 combinations");
     }
 
@@ -401,7 +429,7 @@ public final class GameplayChecks {
         return occupied == Direction.UP ? 0 : occupied == Direction.DOWN ? 1 : occupied.get2DDataValue();
     }
 
-    private static void clearAround(ServerWorld world, BlockPos position) {
+    private static void clearAround(ServerLevel world, BlockPos position) {
         world.removeBlock(position, false);
 
         for (Direction face : Direction.values()) {
@@ -409,15 +437,39 @@ public final class GameplayChecks {
         }
     }
 
-    private static net.minecraft.inventory.CraftingInventory grid() {
-        return new net.minecraft.inventory.CraftingInventory(new net.minecraft.inventory.container.Container(null, 0) {
-            public boolean stillValid(net.minecraft.entity.player.PlayerEntity player) {
+    private static net.minecraft.world.inventory.CraftingContainer grid() {
+        return new net.minecraft.world.inventory.CraftingContainer(new net.minecraft.world.inventory.AbstractContainerMenu(null, 0) {
+            public boolean stillValid(net.minecraft.world.entity.player.Player player) {
                 return true;
             }
         }, 3, 3);
     }
 
-    private static void materialPhysics(ServerWorld world, BlockPos position, ServerPlayerEntity player) {
+    private static void verifyHarvesting(ServerLevel world, BlockPos position, ServerPlayer player,
+            BlockState piece, BlockState full) {
+        ItemStack held = player.getMainHandItem();
+        try {
+            for (Item tool : new Item[] {Items.WOODEN_PICKAXE, Items.STONE_PICKAXE,
+                    Items.IRON_PICKAXE, Items.DIAMOND_PICKAXE, Items.IRON_AXE, Items.IRON_SHOVEL}) {
+                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(tool));
+                require(piece.canHarvestBlock(world, position, player) == full.canHarvestBlock(world, position, player),
+                        "Material harvest requirements changed: " + piece + " with " + tool);
+                float pieceHardness = piece.getDestroySpeed(world, position);
+                float fullHardness = full.getDestroySpeed(world, position);
+                float expected = full.getDestroyProgress(player, world, position);
+                if (pieceHardness >= 0 && fullHardness > 0) {
+                    expected = expected * fullHardness / pieceHardness;
+                }
+                float actual = piece.getDestroyProgress(player, world, position);
+                require(Float.compare(actual, expected) == 0 || Math.abs(actual - expected) < 0.00001F,
+                        "Material mining progress changed: " + piece + " with " + tool);
+            }
+        } finally {
+            player.setItemInHand(InteractionHand.MAIN_HAND, held);
+        }
+    }
+
+    private static void materialPhysics(ServerLevel world, BlockPos position, ServerPlayer player) {
         for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
             for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
                 for (int orientation = 0; orientation < pieceBlock.palette.shape.states; orientation++) {
@@ -426,14 +478,8 @@ public final class GameplayChecks {
                     Catalogue.MaterialDef materialDefinition = pieceBlock.definition(state);
 
                     world.setBlock(position, state, 2);
-                    require(pieceBlock.getHarvestTool(state) == null || pieceBlock.getHarvestTool(state)
-                            .equals(materialDefinition.type.equals("rock") || materialDefinition.type.equals("metal")
-                                    ? net.minecraftforge.common.ToolType.PICKAXE
-                                    : materialDefinition.type.equals("wood") ? net.minecraftforge.common.ToolType.AXE
-                                            : net.minecraftforge.common.ToolType.SHOVEL),
-                            "harvest class");
-
                     BlockState nativeFull = Pieces.nativeState(materialDefinition, "full");
+                    verifyHarvesting(world, position, player, state, nativeFull);
                     int actualFire = pieceBlock.getFlammability(state, world, position, Direction.UP);
                     int actualSpread = pieceBlock.getFireSpreadSpeed(state, world, position, Direction.UP);
 
@@ -454,7 +500,7 @@ public final class GameplayChecks {
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
-                    silkTool.enchant(net.minecraft.enchantment.Enchantments.SILK_TOUCH, 1);
+                    silkTool.enchant(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, 1);
 
                     BlockState silkState = materialDefinition.type.equals("path")
                             ? Pieces.state("minecraft:dirt", pieceBlock.palette.shape, orientation)
@@ -494,7 +540,7 @@ public final class GameplayChecks {
         }
 
         world.removeBlock(position, false);
-        System.out.println("BUILDING_PIECES_MATERIAL_PHYSICS_PASS");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_MATERIAL_PHYSICS_PASS");
     }
 
     private static ItemStack expectedDrop(String material, PieceBlock block, BlockState state) {
@@ -523,7 +569,7 @@ public final class GameplayChecks {
         return Pieces.stack(state, 1);
     }
 
-    private static void nativeSlabs(ServerWorld world, BlockPos position, ServerPlayerEntity player) {
+    private static void nativeSlabs(ServerLevel world, BlockPos position, ServerPlayer player) {
         int checked = 0;
 
         for (PieceBlock block : Pieces.BLOCKS.values()) {
@@ -548,8 +594,8 @@ public final class GameplayChecks {
                 float hitX = occupied == Direction.WEST ? .1f : occupied == Direction.EAST ? .9f : .5f;
                 float hitZ = occupied == Direction.NORTH ? .1f : occupied == Direction.SOUTH ? .9f : .5f;
 
-                require(use(stack, player, world, position.below(), Hand.MAIN_HAND, Direction.UP, hitX, 1,
-                        hitZ) == ActionResultType.SUCCESS
+                require(use(stack, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, hitX, 1,
+                        hitZ) == InteractionResult.SUCCESS
                         && world.getBlockState(position).equals(
                                 Pieces.state("minecraft:dirt", Shape.VERTICAL_SLAB, occupied.get2DDataValue()))
                         && stack.getCount() == 1, "regular dirt slab places vertically");
@@ -562,15 +608,15 @@ public final class GameplayChecks {
 
         ItemStack oak = new ItemStack(Blocks.OAK_SLAB, 2);
 
-        player.setItemInHand(Hand.MAIN_HAND, oak);
+        player.setItemInHand(InteractionHand.MAIN_HAND, oak);
 
         PlacementVeto veto = new PlacementVeto();
 
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(veto);
 
         try {
-            require(use(oak, player, world, position.below(), Hand.MAIN_HAND, Direction.UP, .1f, 1,
-                    .5f) != ActionResultType.SUCCESS && veto.seen && world.isEmptyBlock(position) && oak.getCount() == 2,
+            require(use(oak, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .1f, 1,
+                    .5f) != InteractionResult.SUCCESS && veto.seen && world.isEmptyBlock(position) && oak.getCount() == 2,
                     "Forge placement protection rolls back the exact native slab placement");
         } finally {
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);
@@ -578,24 +624,24 @@ public final class GameplayChecks {
 
         clearAround(world, position);
         world.setBlock(position, Blocks.OAK_TRAPDOOR.defaultBlockState(), 2);
-        player.setItemInHand(Hand.MAIN_HAND, oak);
+        player.setItemInHand(InteractionHand.MAIN_HAND, oak);
         player.setShiftKeyDown(false);
-        require(player.gameMode.useItemOn(player, world, oak, Hand.MAIN_HAND,
-                new BlockRayTraceResult(new Vector3d(position.getX() + .1, position.getY() + 1, position.getZ() + .5),
-                        Direction.UP, position, false)) == ActionResultType.CONSUME
+        require(player.gameMode.useItemOn(player, world, oak, InteractionHand.MAIN_HAND,
+                new BlockHitResult(new Vec3(position.getX() + .1, position.getY() + 1, position.getZ() + .5),
+                        Direction.UP, position, false)) == InteractionResult.CONSUME
                 && world.isEmptyBlock(position.above()) && oak.getCount() == 2
                 && world.getBlockState(position).getValue(TrapDoorBlock.OPEN),
                 "block activation takes priority and happens exactly once");
-        player.setItemInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 
         if (net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")) {
             BlockState unchanged = world.getBlockState(position);
 
-            require(NativeSlabPlacement.place(oak, player, world, position, Hand.MAIN_HAND, Direction.UP,
+            require(NativeSlabPlacement.place(oak, player, world, position, InteractionHand.MAIN_HAND, Direction.UP,
                     .1f, 1, .5f) == null && world.getBlockState(position).equals(unchanged) && oak.getCount() == 2,
                     "installed BuildingBricks retains native slab placement without a Sky write or item consumption");
             clearAround(world, position);
-            System.out.println("BUILDING_PIECES_NATIVE_SLAB_POLICY_PASS installed=true hook=unchanged");
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_SLAB_POLICY_PASS installed=true hook=unchanged");
             return;
         }
         for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
@@ -608,7 +654,7 @@ public final class GameplayChecks {
             if (nativeSlab == null) {
                 continue;
             }
-            for (Hand hand : Hand.values()) {
+            for (InteractionHand hand : InteractionHand.values()) {
                 for (Direction occupied : Direction.values()) {
                     clearAround(world, position);
 
@@ -626,12 +672,12 @@ public final class GameplayChecks {
                     }
 
                     ItemStack stack = Pieces.stack(nativeSlab, 3);
-                    net.minecraft.nbt.CompoundNBT tag = new net.minecraft.nbt.CompoundNBT();
+                    net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 
                     tag.putString("custom_label", "Preserved slab");
                     stack.setTag(tag);
                     player.setItemInHand(hand, stack);
-                    ActionResultType placement = use(stack, player, world, anchor, hand, face, hitX,
+                    InteractionResult placement = use(stack, player, world, anchor, hand, face, hitX,
                             face == Direction.UP ? 1 : 0, hitZ);
                     require(placement.consumesAction(), "native slab placement consumes the action " + material.id
                             + " result=" + placement);
@@ -652,7 +698,7 @@ public final class GameplayChecks {
 
         clearAround(world, position);
         player.setShiftKeyDown(false);
-        System.out.println("BUILDING_PIECES_NATIVE_SLABS_PASS cases=" + checked + " creative=hidden drops=regular");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_SLABS_PASS cases=" + checked + " creative=hidden drops=regular");
     }
 
     private static ItemStack ownSlab(PieceBlock block, String material) {

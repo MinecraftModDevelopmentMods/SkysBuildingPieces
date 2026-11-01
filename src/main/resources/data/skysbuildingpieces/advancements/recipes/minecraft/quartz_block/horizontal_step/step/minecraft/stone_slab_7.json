@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:quartz_slab"
+            "items": [
+              "minecraft:quartz_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/quartz_block/horizontal_step/step/minecraft/stone_slab_7"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/quartz_block/horizontal_step/step/minecraft/stone_slab_7"
+    ]
   },
   "conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:cut_red_sandstone_slab"
+            "items": [
+              "minecraft:cut_red_sandstone_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/smooth_red_sandstone/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/smooth_red_sandstone/slab_recombination"
+    ]
   }
 }

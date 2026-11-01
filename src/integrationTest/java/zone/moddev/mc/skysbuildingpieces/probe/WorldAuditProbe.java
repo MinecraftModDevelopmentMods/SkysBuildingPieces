@@ -3,8 +3,8 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.TickEvent;
@@ -19,7 +19,7 @@ public final class WorldAuditProbe {
     private final int batch = Integer.getInteger("skysbuildingpieces.auditBatch", 4);
     private int settleTicks;
 
-    public WorldAuditProbe(ServerWorld world, boolean reload) throws IOException {
+    public WorldAuditProbe(ServerLevel world, boolean reload) throws IOException {
         this.server = world.getServer();
         this.reload = reload;
 
@@ -30,14 +30,14 @@ public final class WorldAuditProbe {
 
         int registryCount = 0;
 
-        for (net.minecraft.block.Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValues()) {
+        for (net.minecraft.world.level.block.Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValues()) {
             registryCount++;
         }
 
         System.out
                 .println("BUILDING_PIECES_WORLD_REGISTRY registered=" + registryCount + " legacy_numeric_limit=false");
 
-        Path root = world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile().toPath();
+        Path root = world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile().toPath();
 
         try (java.util.stream.Stream<Path> paths = Files.walk(root)) {
             Iterator<Path> files = paths.filter(path -> Files.isRegularFile(path)
@@ -90,7 +90,7 @@ public final class WorldAuditProbe {
         }
 
         MinecraftForge.EVENT_BUS.register(this);
-        System.out.println("BUILDING_PIECES_WORLD_AUDIT_INDEX " + chunks.size());
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WORLD_AUDIT_INDEX " + chunks.size());
     }
 
     @SubscribeEvent
@@ -101,20 +101,20 @@ public final class WorldAuditProbe {
         try {
             for (int entryIndex = 0; entryIndex < batch && next < chunks.size(); entryIndex++) {
                 int[] point = chunks.get(next++);
-                ServerWorld world = server.getLevel(point[0] == 0 ? net.minecraft.world.World.OVERWORLD
-                        : point[0] == -1 ? net.minecraft.world.World.NETHER : net.minecraft.world.World.END);
-                Chunk chunk = world.getChunk(point[1], point[2]);
+                ServerLevel world = server.getLevel(point[0] == 0 ? net.minecraft.world.level.Level.OVERWORLD
+                        : point[0] == -1 ? net.minecraft.world.level.Level.NETHER : net.minecraft.world.level.Level.END);
+                LevelChunk chunk = world.getChunk(point[1], point[2]);
 
                 world.getChunkSource().save(false);
             }
             // A whole-world scan must not outrun the legacy asynchronous save queue.
             if (next % 256 == 0 || next == chunks.size()) {
-                for (ServerWorld savedWorld : server.getAllLevels()) {
+                for (ServerLevel savedWorld : server.getAllLevels()) {
                     savedWorld.getChunkSource().save(true);
                 }
             }
             if (next % 2048 == 0) {
-                System.out.println("BUILDING_PIECES_WORLD_AUDIT_PROGRESS " + next + " / " + chunks.size());
+                org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WORLD_AUDIT_PROGRESS " + next + " / " + chunks.size());
             }
             if (next == chunks.size()) {
                 // Let deferred inventory scans and asynchronous writes settle before checking counters and asking the
@@ -123,7 +123,7 @@ public final class WorldAuditProbe {
                     return;
                 }
 
-                ServerWorld world = server.getLevel(net.minecraft.world.World.OVERWORLD);
+                ServerLevel world = server.getLevel(net.minecraft.world.level.Level.OVERWORLD);
                 long blocks = 0;
                 long items = 0;
 
@@ -161,7 +161,7 @@ public final class WorldAuditProbe {
                                         + (retired == null ? "missing" : retired.blocks + " / " + retired.items));
                             }
 
-                            System.out.println("BUILDING_PIECES_RETIRED_WORLD_PASS blocks=" + retired.blocks + " items="
+                            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RETIRED_WORLD_PASS blocks=" + retired.blocks + " items="
                                     + retired.items + " reload=" + reload);
                         }
                         if (System.getProperty("skysbuildingpieces.auditDecorationBlocks") != null) {
@@ -175,12 +175,12 @@ public final class WorldAuditProbe {
                                                 : decorations.blocks + " / " + decorations.items));
                             }
 
-                            System.out.println("BUILDING_PIECES_DECORATION_WORLD_PASS blocks=" + decorations.blocks
+                            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_DECORATION_WORLD_PASS blocks=" + decorations.blocks
                                     + " items=" + decorations.items + " reload=" + reload);
                         }
                     }
                 } else {
-                    File root = world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile();
+                    File root = world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile();
 
                     if (new File(root, "data/skysbuildingpieces_world_state.dat").exists()
                             || new File(root, "serverconfig/skysbuildingpieces-migration-report.txt").exists()) {
@@ -195,18 +195,18 @@ public final class WorldAuditProbe {
                 result.setProperty("items", Long.toString(items));
                 result.setProperty("reload", Boolean.toString(reload));
 
-                try (OutputStream output = new FileOutputStream(new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(),
+                try (OutputStream output = new FileOutputStream(new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                         reload ? "building-pieces-reload-pass.properties" : "building-pieces-fresh-pass.properties"))) {
                     result.store(output, "Disposable world qualification");
                 }
 
-                System.out.println(
+                org.apache.logging.log4j.LogManager.getLogger().info(
                         "BUILDING_PIECES_WORLD_AUDIT_PASS blocks=" + blocks + " items=" + items + " reload=" + reload);
                 MinecraftForge.EVENT_BUS.unregister(this);
                 server.halt(false);
             }
         } catch (Throwable failure) {
-            failure.printStackTrace();
+            org.apache.logging.log4j.LogManager.getLogger().error("Runtime check failed", failure);
             server.halt(false);
         }
     }

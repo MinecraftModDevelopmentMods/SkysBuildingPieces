@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.ToIntFunction;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 
 /** Internal bridge for biome numbers stored in pre-flattening chunks. */
 public final class HistoricalBiomes {
@@ -37,7 +37,7 @@ public final class HistoricalBiomes {
         MODULES.put(namespace, Collections.unmodifiableMap(checked));
     }
 
-    static synchronized void begin(CompoundNBT snapshot) {
+    static synchronized void begin(CompoundTag snapshot) {
         Map<Integer, String> source = new LinkedHashMap<>();
         Map<String, String> aliases = new LinkedHashMap<>();
 
@@ -45,10 +45,10 @@ public final class HistoricalBiomes {
 
         java.util.Set<Integer> numbers = new java.util.HashSet<>();
         java.util.Set<String> names = new java.util.HashSet<>();
-        ListNBT entries = snapshot.getCompound("Registries").getCompound("minecraft:biomes").getList("ids", 10);
+        ListTag entries = snapshot.getCompound("Registries").getCompound("minecraft:biomes").getList("ids", 10);
 
         for (int index = 0; index < entries.size(); index++) {
-            CompoundNBT entry = entries.getCompound(index);
+            CompoundTag entry = entries.getCompound(index);
 
             if (!entry.contains("K", 8) || !entry.contains("V", 99)) {
                 throw blocked("invalid source biome registration: " + entry);
@@ -82,7 +82,7 @@ public final class HistoricalBiomes {
 
         active = new Mappings(source, aliases, name -> {
             // Numeric IDs belong to the world's biome instances, which can differ from Forge's registration objects.
-            Registry<Biome> current = net.minecraftforge.fml.server.ServerLifecycleHooks.getCurrentServer()
+            Registry<Biome> current = net.minecraftforge.fmllegacy.server.ServerLifecycleHooks.getCurrentServer()
                     .registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
             Biome biome = current.get(new ResourceLocation(name));
 
@@ -90,11 +90,11 @@ public final class HistoricalBiomes {
         });
     }
 
-    static void validate(CompoundNBT root) {
+    static void validate(CompoundTag root) {
         translate(root);
     }
 
-    static boolean prepare(CompoundNBT root) {
+    static boolean prepare(CompoundTag root) {
         int[] biomes = translate(root);
 
         if (biomes == null) {
@@ -105,12 +105,12 @@ public final class HistoricalBiomes {
         return true;
     }
 
-    private static int[] translate(CompoundNBT root) {
+    private static int[] translate(CompoundTag root) {
         if (active.source.isEmpty() || root.getInt("DataVersion") > 1343 || !root.contains("Level", 10)) {
             return null;
         }
 
-        CompoundNBT level = root.getCompound("Level");
+        CompoundTag level = root.getCompound("Level");
 
         if (!level.contains("Biomes")) {
             return null;
@@ -123,8 +123,8 @@ public final class HistoricalBiomes {
         return active.translate(level.getByteArray("Biomes"));
     }
 
-    static void finish(CompoundNBT root) {
-        CompoundNBT level = root.getCompound("Level");
+    static void finish(CompoundTag root) {
+        CompoundTag level = root.getCompound("Level");
 
         if (!level.contains(PENDING)) {
             return;

@@ -148,7 +148,7 @@ def prepare(resources, native_recipes=(), tags=None):
             advancement = {
                 'criteria': {
                     'has_ingredient': {'trigger': 'minecraft:inventory_changed',
-                                       'conditions': {'items': [{'item': ingredient}]}},
+                                       'conditions': {'items': [{'items': [ingredient]}]}},
                     'has_the_recipe': {'trigger': 'minecraft:recipe_unlocked',
                                        'conditions': {'recipe': 'skysbuildingpieces:' + path}}},
                 'requirements': [['has_ingredient', 'has_the_recipe']],

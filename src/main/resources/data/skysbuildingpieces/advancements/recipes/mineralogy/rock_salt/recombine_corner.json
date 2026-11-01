@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_rock_salt_corner"
+            "items": [
+              "skysbuildingpieces:mineralogy_rock_salt_corner"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/rock_salt/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/rock_salt/recombine_corner"
+    ]
   },
   "conditions": [
     {

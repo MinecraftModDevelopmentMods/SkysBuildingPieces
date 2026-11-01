@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 /** Raw-item recovery and selected native names which must survive vanilla's fixers. */
 public final class HistoricalItems {
@@ -17,7 +17,7 @@ public final class HistoricalItems {
     private HistoricalItems() {
     }
 
-    public static void register(String module, Predicate<CompoundNBT> relevant, Consumer<CompoundNBT> recovery) {
+    public static void register(String module, Predicate<CompoundTag> relevant, Consumer<CompoundTag> recovery) {
         if (LegacyBridge.ready) {
             throw new IllegalStateException("Item recovery registration has finished");
         }
@@ -26,11 +26,11 @@ public final class HistoricalItems {
     }
 
     /** No copy or traversal is added to standalone runs without contributors. */
-    static CompoundNBT prepareCopy(CompoundNBT root) {
+    static CompoundTag prepareCopy(CompoundTag root) {
         return RECOVERIES.prepareCopy(root);
     }
 
-    static void finish(CompoundNBT root, int targetVersion) {
+    static void finish(CompoundTag root, int targetVersion) {
         // ChunkLoader first fixes old chunks to 1493, then to the current version. Keep selected names through that
         // intermediate tag, since the stone slab rename runs at 1802.
         if (targetVersion < 1802) {
@@ -41,7 +41,7 @@ public final class HistoricalItems {
         }
     }
 
-    static void preserveNativeItem(CompoundNBT stack) {
+    static void preserveNativeItem(CompoundTag stack) {
         String name = stack.getString("id");
         if (name.equals("minecraft:stone_slab") || name.equals("minecraft:stone_stairs")) {
             stack.putString(NATIVE_ITEM_ID, name);
@@ -53,29 +53,29 @@ public final class HistoricalItems {
         nativeItems = false;
     }
 
-    static void restoreNativeTargets(CompoundNBT root) {
-        List<CompoundNBT> stacks = new ArrayList<>();
-        List<CompoundNBT> states = new ArrayList<>();
+    static void restoreNativeTargets(CompoundTag root) {
+        List<CompoundTag> stacks = new ArrayList<>();
+        List<CompoundTag> states = new ArrayList<>();
 
         collectNativeTargets(root, stacks, states, 0);
 
-        for (CompoundNBT stack : stacks) {
+        for (CompoundTag stack : stacks) {
             stack.putString("id", stack.getString(NATIVE_ITEM_ID));
             stack.remove(NATIVE_ITEM_ID);
         }
-        for (CompoundNBT state : states) {
+        for (CompoundTag state : states) {
             state.putString("Name", state.getString(NumericStateBridge.NATIVE_STATE_ID));
             state.remove(NumericStateBridge.NATIVE_STATE_ID);
         }
     }
 
-    private static void collectNativeTargets(net.minecraft.nbt.INBT value, List<CompoundNBT> stacks,
-            List<CompoundNBT> states, int depth) {
+    private static void collectNativeTargets(net.minecraft.nbt.Tag value, List<CompoundTag> stacks,
+            List<CompoundTag> states, int depth) {
         if (depth > 64) {
             throw new LegacyBridge.RecoveryAbort("Saved native item nesting exceeds 64 levels", null);
         }
-        if (value instanceof CompoundNBT) {
-            CompoundNBT compound = (CompoundNBT) value;
+        if (value instanceof CompoundTag) {
+            CompoundTag compound = (CompoundTag) value;
 
             if (compound.contains(NATIVE_ITEM_ID)) {
                 // These current names also had different meanings before flattening. Restore only identities which
@@ -92,7 +92,7 @@ public final class HistoricalItems {
                 stacks.add(compound);
             }
             if (compound.contains(NumericStateBridge.NATIVE_STATE_ID)) {
-                CompoundNBT properties = compound.getCompound("Properties");
+                CompoundTag properties = compound.getCompound("Properties");
                 String half = properties.getString("type");
                 String water = properties.getString("waterlogged");
 
@@ -108,8 +108,8 @@ public final class HistoricalItems {
             for (String key : compound.getAllKeys()) {
                 collectNativeTargets(compound.get(key), stacks, states, depth + 1);
             }
-        } else if (value instanceof net.minecraft.nbt.ListNBT) {
-            for (net.minecraft.nbt.INBT child : (net.minecraft.nbt.ListNBT) value) {
+        } else if (value instanceof net.minecraft.nbt.ListTag) {
+            for (net.minecraft.nbt.Tag child : (net.minecraft.nbt.ListTag) value) {
                 collectNativeTargets(child, stacks, states, depth + 1);
             }
         }
@@ -122,7 +122,7 @@ public final class HistoricalItems {
             return !entries.isEmpty();
         }
 
-        synchronized void register(String module, Predicate<CompoundNBT> relevant, Consumer<CompoundNBT> recovery) {
+        synchronized void register(String module, Predicate<CompoundTag> relevant, Consumer<CompoundTag> recovery) {
             if (module == null || !module.matches("[a-z][a-z0-9_]*") || relevant == null || recovery == null
                     || entries.containsKey(module)) {
                 throw new IllegalArgumentException("Invalid or duplicate item recovery module: " + module);
@@ -131,7 +131,7 @@ public final class HistoricalItems {
             entries.put(module, new Entry(module, relevant, recovery));
         }
 
-        CompoundNBT prepareCopy(CompoundNBT root) {
+        CompoundTag prepareCopy(CompoundTag root) {
             List<Entry> snapshot;
 
             synchronized (this) {
@@ -157,7 +157,7 @@ public final class HistoricalItems {
                 return root;
             }
 
-            CompoundNBT result = root.copy();
+            CompoundTag result = root.copy();
 
             for (Entry entry : matching) {
                 try {
@@ -178,10 +178,10 @@ public final class HistoricalItems {
 
     private static final class Entry {
         final String module;
-        final Predicate<CompoundNBT> relevant;
-        final Consumer<CompoundNBT> recovery;
+        final Predicate<CompoundTag> relevant;
+        final Consumer<CompoundTag> recovery;
 
-        Entry(String module, Predicate<CompoundNBT> relevant, Consumer<CompoundNBT> recovery) {
+        Entry(String module, Predicate<CompoundTag> relevant, Consumer<CompoundTag> recovery) {
             this.module = module;
             this.relevant = relevant;
             this.recovery = recovery;

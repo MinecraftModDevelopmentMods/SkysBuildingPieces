@@ -3,9 +3,9 @@ package zone.moddev.mc.skysbuildingpieces.legacy;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.ListTag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -28,7 +28,7 @@ class SourceLevelDataTest {
         SourceLevelData.capture(directory);
         assertArrayEquals(source, Files.readAllBytes(directory.resolve("level.dat")));
 
-        CompoundNBT expected = SourceLevelData.forWorld(directory);
+        CompoundTag expected = SourceLevelData.forWorld(directory);
         writeLevel(directory, 2586, 400, "biomesoplenty:tropic_beach");
         SourceLevelData.capture(directory);
         assertEquals(1976, expected.getInt("DataVersion"));
@@ -63,26 +63,26 @@ class SourceLevelDataTest {
     }
 
     private void writeLevel(Path world, int version, int number, String name) throws Exception {
-        CompoundNBT root = new CompoundNBT();
-        CompoundNBT data = new CompoundNBT();
+        CompoundTag root = new CompoundTag();
+        CompoundTag data = new CompoundTag();
         data.putInt("DataVersion", version);
         root.put("Data", data);
 
-        CompoundNBT entry = new CompoundNBT();
+        CompoundTag entry = new CompoundTag();
         entry.putString("K", name);
         entry.putInt("V", number);
-        ListNBT entries = new ListNBT();
+        ListTag entries = new ListTag();
         entries.add(entry);
-        CompoundNBT registry = new CompoundNBT();
+        CompoundTag registry = new CompoundTag();
         registry.put("ids", entries);
-        CompoundNBT registries = new CompoundNBT();
+        CompoundTag registries = new CompoundTag();
         registries.put("minecraft:biome", registry);
-        CompoundNBT forge = new CompoundNBT();
+        CompoundTag forge = new CompoundTag();
         forge.put("Registries", registries);
         root.put("fml", forge);
 
         try (OutputStream output = Files.newOutputStream(world.resolve("level.dat"))) {
-            CompressedStreamTools.writeCompressed(root, output);
+            NbtIo.writeCompressed(root, output);
         }
     }
 }

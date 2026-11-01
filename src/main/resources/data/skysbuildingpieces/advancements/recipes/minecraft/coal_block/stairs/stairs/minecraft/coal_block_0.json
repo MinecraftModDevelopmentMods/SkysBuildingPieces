@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:coal_block"
+            "items": [
+              "minecraft:coal_block"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/coal_block/stairs/stairs/minecraft/coal_block_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/coal_block/stairs/stairs/minecraft/coal_block_0"
+    ]
   },
   "conditions": [
     {

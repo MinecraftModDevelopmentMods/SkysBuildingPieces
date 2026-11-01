@@ -41,7 +41,7 @@ class RecipeAdvancementContractTest {
                 String input = recipe.getAsJsonObject("key").getAsJsonObject("X").get("item").getAsString();
 
                 assertEquals(input, criteria.getAsJsonObject("has_ingredient").getAsJsonObject("conditions")
-                        .getAsJsonArray("items").get(0).getAsJsonObject().get("item").getAsString());
+                        .getAsJsonArray("items").get(0).getAsJsonObject().getAsJsonArray("items").get(0).getAsString());
                 assertEquals(1, advancement.getAsJsonArray("requirements").size());
                 assertEquals(criteria.size(),
                         advancement.getAsJsonArray("requirements").get(0).getAsJsonArray().size());

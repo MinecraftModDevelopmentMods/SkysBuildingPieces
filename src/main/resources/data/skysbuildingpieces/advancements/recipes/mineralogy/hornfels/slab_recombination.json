@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:hornfels_slab"
+            "items": [
+              "mineralogy:hornfels_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/hornfels/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/hornfels/slab_recombination"
+    ]
   },
   "conditions": [
     {

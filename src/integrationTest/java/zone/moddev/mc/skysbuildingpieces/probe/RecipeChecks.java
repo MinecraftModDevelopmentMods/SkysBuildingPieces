@@ -2,21 +2,21 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.util.HashSet;
 import java.util.Set;
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.CuttingRecipe;
@@ -25,18 +25,18 @@ import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
 /** Check real crafting results, every matching recipe and client decoding. */
 public final class RecipeChecks {
-    public static int run(ServerWorld world) {
+    public static int run(ServerLevel world) {
         int recipes = 0;
         int variants = 0;
         Set<Item> obtainable = new HashSet<>();
 
-        for (IRecipe<?> entry : world.getRecipeManager().getRecipes()) {
+        for (Recipe<?> entry : world.getRecipeManager().getRecipes()) {
             if (!entry.getId().getNamespace().startsWith("skysbuildingpieces") || entry.isSpecial()) {
                 continue;
             }
 
-            if (entry instanceof net.minecraft.item.crafting.ShapelessRecipe) {
-                net.minecraft.item.crafting.ShapelessRecipe recipe = (net.minecraft.item.crafting.ShapelessRecipe) entry;
+            if (entry instanceof net.minecraft.world.item.crafting.ShapelessRecipe) {
+                net.minecraft.world.item.crafting.ShapelessRecipe recipe = (net.minecraft.world.item.crafting.ShapelessRecipe) entry;
 
                 require(recipe.getId().getNamespace().equals("skysbuildingpiecesbop")
                         && recipe.getId().getPath().startsWith("restore_") && recipe.getIngredients().size() == 1,
@@ -44,7 +44,7 @@ public final class RecipeChecks {
 
                 for (int size : new int[] { 2, 3 }) {
                     for (int slot = 0; slot < size * size; slot++) {
-                        CraftingInventory grid = grid(size);
+                        CraftingContainer grid = grid(size);
                         ItemStack input = recipe.getIngredients().get(0).getItems()[0].copy();
 
                         input.setCount(17);
@@ -76,7 +76,7 @@ public final class RecipeChecks {
                 for (int rowOffset = 0; rowOffset <= size - recipe.getRecipeHeight(); rowOffset++) {
                     for (int columnOffset = 0; columnOffset <= size - recipe.getRecipeWidth(); columnOffset++) {
                         for (boolean mirror : new boolean[] { false, true }) {
-                            CraftingInventory grid = grid(size);
+                            CraftingContainer grid = grid(size);
 
                             for (int row = 0; row < recipe.getRecipeHeight(); row++) {
                                 for (int column = 0; column < recipe.getRecipeWidth(); column++) {
@@ -133,7 +133,7 @@ public final class RecipeChecks {
                                 grid.setItem(empty, ItemStack.EMPTY);
                             }
                             if (recipe instanceof CuttingRecipe) {
-                                CompoundNBT tag = new CompoundNBT();
+                                CompoundTag tag = new CompoundTag();
 
                                 tag.putString("custom_label", "Saved vertical piece");
                                 tag.putLong("custom_number", 1234567890123L);
@@ -170,7 +170,7 @@ public final class RecipeChecks {
         nativeRecipe(world, "nether_brick_fence", Items.NETHER_BRICK_FENCE, 6);
         templates(world);
         require(recipes > 1000, "The native catalogue is incomplete");
-        System.out.println("BUILDING_PIECES_CRAFTING_PASS recipes=" + recipes + " variants=" + variants
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CRAFTING_PASS recipes=" + recipes + " variants=" + variants
                 + " conflicts=0 templates=retired network=true");
         return recipes;
     }
@@ -196,21 +196,21 @@ public final class RecipeChecks {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static void network(ICraftingRecipe recipe) {
-        IRecipeSerializer serializer = recipe.getSerializer();
-        PacketBuffer buffer = new PacketBuffer(io.netty.buffer.Unpooled.buffer());
+    private static void network(CraftingRecipe recipe) {
+        RecipeSerializer serializer = recipe.getSerializer();
+        FriendlyByteBuf buffer = new FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
 
         try {
             serializer.toNetwork(buffer, recipe);
 
-            IRecipe decoded = serializer.fromNetwork(recipe.getId(), buffer);
+            Recipe decoded = serializer.fromNetwork(recipe.getId(), buffer);
 
             require(decoded.getId().equals(recipe.getId()) && !decoded.isSpecial(),
                     "Network recipe identity and visibility");
             require(ItemStack.matches(decoded.getResultItem(), recipe.getResultItem()),
                     "Network result changed: " + recipe.getId());
 
-            CraftingInventory grid = grid(3);
+            CraftingContainer grid = grid(3);
 
             int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeWidth()
                     : recipe.getIngredients().size();
@@ -233,10 +233,10 @@ public final class RecipeChecks {
         }
     }
 
-    private static void nativeRecipe(ServerWorld world, String path, Item output, int count) {
-        IRecipe<?> recipe = world.getRecipeManager().byKey(new ResourceLocation("minecraft", path))
+    private static void nativeRecipe(ServerLevel world, String path, Item output, int count) {
+        Recipe<?> recipe = world.getRecipeManager().byKey(new ResourceLocation("minecraft", path))
                 .orElseThrow(() -> new AssertionError("Missing native recipe: " + path));
-        CraftingInventory grid = grid(3);
+        CraftingContainer grid = grid(3);
         int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeWidth() : 3;
 
         for (int index = 0; index < recipe.getIngredients().size(); index++) {
@@ -251,14 +251,14 @@ public final class RecipeChecks {
         assertManager(grid, world, new ItemStack(output, count), "native " + path);
     }
 
-    private static void templates(ServerWorld world) {
+    private static void templates(ServerLevel world) {
         for (Item retired : Pieces.RETIRED_TEMPLATES.values()) {
-            for (IRecipe<?> recipe : world.getRecipeManager().getRecipes()) {
+            for (Recipe<?> recipe : world.getRecipeManager().getRecipes()) {
                 require(recipe.getResultItem().getItem() != retired, "Retired templates must not be craftable");
             }
 
-            CraftingInventory grid = grid(2);
-            CompoundNBT custom = new CompoundNBT();
+            CraftingContainer grid = grid(2);
+            CompoundTag custom = new CompoundTag();
 
             custom.putString("custom_label", "Old template");
             custom.putLong("custom_number", 1234567890123L);
@@ -273,7 +273,7 @@ public final class RecipeChecks {
             paper.setTag(custom.copy());
             assertManager(grid, world, paper, "retired template recycling");
 
-            ICraftingRecipe recycling = world.getRecipeManager().getRecipeFor(IRecipeType.CRAFTING, grid, world).get();
+            CraftingRecipe recycling = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world).get();
 
             for (ItemStack remainder : recycling.getRemainingItems(grid)) {
                 require(remainder.isEmpty(), "Recycling consumes the retired template");
@@ -284,19 +284,19 @@ public final class RecipeChecks {
         }
     }
 
-    private static void assertManager(CraftingInventory grid, ServerWorld world, ItemStack expected, String label) {
-        ItemStack actual = world.getRecipeManager().getRecipeFor(IRecipeType.CRAFTING, grid, world)
+    private static void assertManager(CraftingContainer grid, ServerLevel world, ItemStack expected, String label) {
+        ItemStack actual = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
                 .map(recipe -> recipe.assemble(grid)).orElse(ItemStack.EMPTY);
 
         require(ItemStack.matches(expected, actual), "Crafting manager selects " + label);
 
-        for (ICraftingRecipe recipe : world.getRecipeManager().getRecipesFor(IRecipeType.CRAFTING, grid, world)) {
+        for (CraftingRecipe recipe : world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, grid, world)) {
             require(ItemStack.matches(expected, recipe.assemble(grid)),
                     "Conflicting recipe for " + label + ": " + recipe.getId());
         }
     }
 
-    static CraftingInventory grid(int size) {
+    static CraftingContainer grid(int size) {
         return RecombinationChecks.grid(size);
     }
 

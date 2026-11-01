@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:andesite"
+            "items": [
+              "mineralogy:andesite"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/andesite/horizontal_step/rock_step/mineralogy/andesite_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/andesite/horizontal_step/rock_step/mineralogy/andesite_0"
+    ]
   },
   "conditions": [
     {

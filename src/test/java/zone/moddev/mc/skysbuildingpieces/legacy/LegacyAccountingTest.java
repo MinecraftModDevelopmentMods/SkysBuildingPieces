@@ -1,15 +1,15 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LegacyAccountingTest {
     @Test
     void nativeRootAndDirectLevelExposeTheSameAccountingAndCoverageData() {
-        CompoundNBT root = new CompoundNBT();
-        CompoundNBT level = new CompoundNBT();
-        CompoundNBT markers = new CompoundNBT();
+        CompoundTag root = new CompoundTag();
+        CompoundTag level = new CompoundTag();
+        CompoundTag markers = new CompoundTag();
         markers.putInt("vanilla", 1);
         level.put("skysbuildingpieces_coverage", markers);
         root.put("Level", level);
@@ -26,8 +26,8 @@ class LegacyAccountingTest {
 
     @Test
     void pendingAccountingTravelsWithTheLevelDataPassedToForge36LoadEvents() {
-        CompoundNBT root = new CompoundNBT();
-        CompoundNBT level = new CompoundNBT();
+        CompoundTag root = new CompoundTag();
+        CompoundTag level = new CompoundTag();
 
         level.putString("future_addon_note", "Keep unknown data");
         root.put("Level", level);
@@ -35,7 +35,7 @@ class LegacyAccountingTest {
         root.putLong("skysbuildingpieces_additional_vanilla_delta", 4);
         root.putLong("skysbuildingpieces_retired_delta", 7);
 
-        CompoundNBT modules = new CompoundNBT();
+        CompoundTag modules = new CompoundTag();
 
         modules.putLong("biomesoplenty", 601);
         root.put("skysbuildingpieces_module_delta", modules.copy());
@@ -51,7 +51,7 @@ class LegacyAccountingTest {
         assertFalse(root.contains("skysbuildingpieces_delta"));
         assertEquals("Keep unknown data", level.getString("future_addon_note"));
 
-        CompoundNBT once = root.copy();
+        CompoundTag once = root.copy();
 
         LegacyBridge.finalizeLegacyChunk(root);
         assertEquals(once, root, "The native before-return hook must be idempotent");
@@ -59,15 +59,15 @@ class LegacyAccountingTest {
 
     @Test
     void conflictingAccountingStopsBeforeMovingAnyFields() {
-        CompoundNBT root = new CompoundNBT();
-        CompoundNBT level = new CompoundNBT();
+        CompoundTag root = new CompoundTag();
+        CompoundTag level = new CompoundTag();
 
         root.put("Level", level);
         root.putLong("skysbuildingpieces_delta", 26);
         root.putLong("skysbuildingpieces_retired_delta", 7);
         level.putLong("skysbuildingpieces_retired_delta", 8);
 
-        CompoundNBT before = root.copy();
+        CompoundTag before = root.copy();
 
         assertThrows(LegacyBridge.RecoveryAbort.class, () -> LegacyBridge.finalizeLegacyChunk(root));
         assertEquals(before, root);

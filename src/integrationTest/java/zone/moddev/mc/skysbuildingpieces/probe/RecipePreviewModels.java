@@ -4,14 +4,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.world.item.ItemStack;
 
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 
 /** Checks every ingredient picture the recipe book can cycle through. */
 final class RecipePreviewModels {
@@ -22,7 +22,7 @@ final class RecipePreviewModels {
         int recipes = 0;
         int previews = 0;
 
-        for (IRecipe<?> recipe : minecraft.getConnection().getRecipeManager().getRecipes()) {
+        for (Recipe<?> recipe : minecraft.getConnection().getRecipeManager().getRecipes()) {
             ResourceLocation id = recipe.getId();
 
             if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isSpecial()) {
@@ -43,7 +43,7 @@ final class RecipePreviewModels {
             throw new AssertionError("Client did not receive the complete native recipe catalogue: " + recipes);
         }
 
-        System.out.println("SKY_RECIPE_PREVIEW_MODELS_PASS recipes=" + recipes + " previews=" + previews);
+        org.apache.logging.log4j.LogManager.getLogger().info("SKY_RECIPE_PREVIEW_MODELS_PASS recipes=" + recipes + " previews=" + previews);
     }
 
     private static void checkModel(Minecraft minecraft, ItemStack stack, ResourceLocation recipe) {
@@ -52,8 +52,8 @@ final class RecipePreviewModels {
         }
 
         String label = recipe + " -> " + stack.getItem().getRegistryName();
-        IBakedModel model = minecraft.getItemRenderer().getModel(stack, null, null);
-        IBakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
+        BakedModel model = minecraft.getItemRenderer().getModel(stack, null, null, 0);
+        BakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                 .getMissingModel();
 
         if (model == missing || model.getParticleIcon().getName().toString().contains("missingno")) {

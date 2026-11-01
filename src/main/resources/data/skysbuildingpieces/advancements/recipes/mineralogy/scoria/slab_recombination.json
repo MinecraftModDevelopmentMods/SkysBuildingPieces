@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:scoria_slab"
+            "items": [
+              "mineralogy:scoria_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/scoria/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/scoria/slab_recombination"
+    ]
   },
   "conditions": [
     {

@@ -1,19 +1,19 @@
-name: Sky's Building Pieces 1.16 CI
+name: Sky's Building Pieces 1.17 CI
 
 on:
   push:
     branches:
-      - master-1.16.5
+      - master-1.17.1
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.16.5
+      - master-1.17.1
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.16-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-1.17-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -32,11 +32,21 @@ jobs:
           distribution: temurin
           java-version: '25.0.3+9.0.LTS'
 
-      - name: Install pinned Java 8 compilation toolchain
+      - name: Install Java 8 for legacy fixture launchers
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '8.0.502+7'
+
+      - name: Install pinned Java 16 compilation toolchain
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '16.0.2+7'
+
+      - name: Pin production Java
+        run: |
+          echo "SBP_JAVA16_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
 
       - name: Install pinned Java 17 Gradle runtime
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -57,7 +67,7 @@ jobs:
           gradle_args=(
             classes test
             --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_16_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -72,7 +82,7 @@ jobs:
           gradle_args=(
             classes test
             --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_16_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -94,6 +104,7 @@ jobs:
           set -euo pipefail
           value() { sed -n "s/^$1=//p" gradle.properties; }
           echo "java_setup_version=$(value java_toolchain_version)" >> "$GITHUB_OUTPUT"
+          echo "java_version=$(value java_version)" >> "$GITHUB_OUTPUT"
           echo "gradle_java_version=$(value gradle_java_toolchain_version)" >> "$GITHUB_OUTPUT"
 
       - name: Install pinned Java 25 ForgeGradle Mavenizer runtime
@@ -102,11 +113,21 @@ jobs:
           distribution: temurin
           java-version: '25.0.3+9.0.LTS'
 
-      - name: Install Java 8 toolchain
+      - name: Install target production toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: ${{ steps.target.outputs.java_setup_version }}
+
+      - name: Pin production Java for coordinated builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          java_version="${{ steps.target.outputs.java_version }}"
+          [[ "$java_version" =~ ^[0-9]+$ ]]
+          for prefix in SGS SBP STS; do
+            echo "${prefix}_JAVA${java_version}_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          done
 
       - name: Install Java 17 for Gradle
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -151,7 +172,7 @@ jobs:
         run: >-
           ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
           verifyEclipseProductionClasspath --no-daemon --stacktrace
-          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_16_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
           -Dorg.gradle.java.installations.auto-detect=false
           -Dorg.gradle.java.installations.auto-download=false
 
@@ -161,13 +182,13 @@ jobs:
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.16.5-${{ github.sha }}
+          name: SkysBuildingPieces-1.17.1-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.8.116051.jar
-            build/libs/SkysBuildingPieces-0.3.8.116051-sources.jar
-            build/libs/SkysBuildingPieces-0.3.8.116051-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.8.117011.jar
+            build/libs/SkysBuildingPieces-0.3.8.117011-sources.jar
+            build/libs/SkysBuildingPieces-0.3.8.117011-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -175,7 +196,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.16.5-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-1.17.1-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

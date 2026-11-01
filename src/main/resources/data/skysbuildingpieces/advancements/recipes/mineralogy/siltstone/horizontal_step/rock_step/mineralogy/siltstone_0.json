@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:siltstone"
+            "items": [
+              "mineralogy:siltstone"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/siltstone/horizontal_step/rock_step/mineralogy/siltstone_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/siltstone/horizontal_step/rock_step/mineralogy/siltstone_0"
+    ]
   },
   "conditions": [
     {

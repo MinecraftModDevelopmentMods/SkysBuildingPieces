@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:grass_step"
+            "items": [
+              "skysbuildingpieces:grass_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/grass/corner/corner/skysbuildingpieces/grass_step_00_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/grass/corner/corner/skysbuildingpieces/grass_step_00_0"
+    ]
   },
   "conditions": [
     {

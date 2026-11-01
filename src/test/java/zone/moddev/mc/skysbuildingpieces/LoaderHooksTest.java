@@ -23,16 +23,16 @@ class LoaderHooksTest {
     private static Map<String, String> targets() {
         Map<String, String> targets = new LinkedHashMap<>();
 
-        targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/chunk/storage/ChunkLoader");
-        targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/nbt/NBTUtil");
-        targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/item/BlockItem");
+        targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/level/chunk/storage/ChunkStorage");
+        targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/nbt/NbtUtils");
+        targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/world/item/BlockItem");
         return targets;
     }
 
     private ScriptEngine engine() throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        assertNotNull(engine, "Forge 36 transformers and their tests require the production Java 8 runtime");
+        assertNotNull(engine, "Forge 37 transformers and their tests require the production Java 16 runtime");
         engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
                 StandardCharsets.UTF_8));
         return engine;
@@ -73,7 +73,7 @@ class LoaderHooksTest {
     }
 
     @Test
-    void realForge36MethodsMatchAndEveryReturnIsWrapped() throws Exception {
+    void realForge37MethodsMatchAndEveryReturnIsWrapped() throws Exception {
         for (Map.Entry<String, String> target : targets().entrySet()) {
             ScriptEngine engine = engine();
             ClassNode node = original(target.getValue());
@@ -81,7 +81,7 @@ class LoaderHooksTest {
 
             if (target.getKey().endsWith("legacy_chunk")) {
                 for (MethodNode method : node.methods) {
-                    if (method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundNBT;)")) {
+                    if (method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;)")) {
                         for (AbstractInsnNode instruction : method.instructions.toArray()) {
                             if (instruction.getOpcode() == Opcodes.ARETURN) {
                                 returns++;
@@ -103,8 +103,8 @@ class LoaderHooksTest {
 
                 for (MethodNode method : node.methods) {
                     if (method.desc.equals(
-                            "(Lcom/mojang/datafixers/DataFixer;" + "Lnet/minecraft/util/datafix/DefaultTypeReferences;"
-                                    + "Lnet/minecraft/nbt/CompoundNBT;II)Lnet/minecraft/nbt/CompoundNBT;")) {
+                            "(Lcom/mojang/datafixers/DataFixer;" + "Lnet/minecraft/util/datafix/DataFixTypes;"
+                                    + "Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;")) {
                         for (AbstractInsnNode instruction : method.instructions.toArray()) {
                             if (instruction.getOpcode() == Opcodes.ARETURN) {
                                 inventoryReturns++;
@@ -112,7 +112,7 @@ class LoaderHooksTest {
                             if (instruction instanceof MethodInsnNode
                                     && ((MethodInsnNode) instruction).name.equals("finalizeNbt")) {
                                 MethodInsnNode finish = (MethodInsnNode) instruction;
-                                assertEquals("(Lnet/minecraft/nbt/CompoundNBT;I)Lnet/minecraft/nbt/CompoundNBT;",
+                                assertEquals("(Lnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/nbt/CompoundTag;",
                                         finish.desc);
                                 assertTrue(finish.getPrevious() instanceof VarInsnNode);
                                 VarInsnNode version = (VarInsnNode) finish.getPrevious();

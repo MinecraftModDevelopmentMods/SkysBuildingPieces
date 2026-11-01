@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_marble_horizontal_step"
+            "items": [
+              "skysbuildingpieces:mineralogy_marble_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/marble/recombine_horizontal_step"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/marble/recombine_horizontal_step"
+    ]
   },
   "conditions": [
     {

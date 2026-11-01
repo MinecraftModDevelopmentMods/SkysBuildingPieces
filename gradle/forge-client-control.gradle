@@ -14,52 +14,25 @@ def controlJar = tasks.register('forgeClientControlJar', Jar) {
     from 'src/clientControl/resources'
 }
 
-tasks.register('forgeClientControlTest', Exec) {
+tasks.register('forgeClientControlTest', JavaExec) {
     dependsOn controlJar
-    dependsOn {
-        JavaExec run = tasks.getByName('runClient') as JavaExec
-        run.taskDependencies.getDependencies(run)
-    }
+    workingDir layout.buildDirectory.dir('forge-client-control-run')
+    project.ext.configureNativeBootstrapRun(delegate, 'runClient', false)
     doFirst {
-        JavaExec run = tasks.getByName('runClient') as JavaExec
-        File directory = new File(buildDir, 'forge-client-control-run')
+        File directory = workingDir
         if (directory.canonicalFile != new File(buildDir, 'forge-client-control-run').canonicalFile) {
             throw new GradleException('Control checks must remain inside their build directory')
         }
         if (directory.exists()) throw new GradleException('Preserve the existing control evidence before starting another run: ' + directory)
         copy { from controlJar.flatMap { it.archiveFile }; into new File(directory, 'mods') }
         copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
-        new File(directory, 'options.txt').text = 'lang:en_us\nfullscreen:false\nrenderDistance:2\n'
+        new File(directory, 'options.txt').text = 'lang:en_us\nfullscreen:false\nrenderDistance:2\npauseOnLostFocus:false\n'
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
             new File(directory, it).text = '[]\n'
         }
-        Set<File> excluded = (sourceSets.main.output.files + [new File(buildDir, 'forge-run-mod-classes/main')])
-                .collect { it.canonicalFile } as Set<File>
-        File classpathJar = new File(buildDir, 'forge-client-control/classpath.jar')
-        java.util.jar.Manifest manifest = new java.util.jar.Manifest()
-        manifest.mainAttributes.put(java.util.jar.Attributes.Name.MANIFEST_VERSION, '1.0')
-        manifest.mainAttributes.put(java.util.jar.Attributes.Name.CLASS_PATH,
-                run.classpath.files.findAll { !excluded.contains(it.canonicalFile) }
-                        .collect { it.toURI().toASCIIString() }.join(' '))
-        classpathJar.withOutputStream { new java.util.jar.JarOutputStream(it, manifest).close() }
-        environment new LinkedHashMap<>(run.environment)
-        environment 'MOD_CLASSES', ''
-        environment 'target', 'fmluserdevclient'
-        environment 'MCP_MAPPINGS', "${mapping_channel}_${mapping_version}"
-        environment 'MCP_VERSION', mcp_version
-        environment 'FORGE_VERSION', forge_version
-        environment 'FORGE_GROUP', 'net.minecraftforge'
-        environment 'MC_VERSION', minecraft_version
-        environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
-        environment 'assetIndex', '1.16'
-        environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
-        workingDir directory
-        commandLine javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
-                .get().executablePath.asFile.absolutePath, '-Xmx2g', '-cp', classpathJar.absolutePath,
-                'net.minecraftforge.userdev.LaunchTesting'
     }
     doLast {
-        File directory = new File(buildDir, 'forge-client-control-run')
+        File directory = workingDir
         logger.lifecycle(providers.exec {
             commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
                     file('tools/native_client_log.py'), '--directory', directory,

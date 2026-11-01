@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:polished_diorite_slab"
+            "items": [
+              "minecraft:polished_diorite_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/diorite_smooth/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/diorite_smooth/slab_recombination"
+    ]
   }
 }

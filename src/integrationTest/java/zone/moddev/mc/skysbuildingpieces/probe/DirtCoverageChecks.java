@@ -1,30 +1,30 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
-import zone.moddev.mc.skysbuildingpieces.legacy.LegacyTestScope;
+import zone.moddev.mc.skysbuildingpieces.probe.legacy.LegacyTestScope;
 import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 import zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState;
 
 /** New coverage revisits old chunks without counting earlier work again. */
 public final class DirtCoverageChecks {
-    public static void run(ServerWorld world) {
-        Chunk testChunk = world.getChunk(90, 90);
+    public static void run(ServerLevel world) {
+        LevelChunk testChunk = world.getChunk(90, 90);
         PiecesWorldState totals = PiecesWorldState.get(world);
         long blocks = totals.blocks;
         long chunks = totals.chunks;
 
         for (int orientation = 0; orientation < 4; orientation++) {
-            CompoundNBT raw = NativeLegacyChecks.chunk(LegacyTestScope.DIRT_ID, orientation, "minecraft:dirt");
-            CompoundNBT level = raw.getCompound("Level");
-            CompoundNBT coverage = new CompoundNBT();
+            CompoundTag raw = NativeLegacyChecks.chunk(LegacyTestScope.DIRT_ID, orientation, "minecraft:dirt");
+            CompoundTag level = raw.getCompound("Level");
+            CompoundTag coverage = new CompoundTag();
 
             coverage.putInt("vanilla", 1);
             coverage.putInt("biomesoplenty", 1);
@@ -53,22 +53,22 @@ public final class DirtCoverageChecks {
 
             LegacyBridge.finalizeLegacyChunk(raw);
             events.load(
-                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.chunk.ChunkStatus.Type.LEVELCHUNK));
+                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
             NativeLegacyChecks.require(totals.blocks == blocks + orientation + 1 && totals.chunks == chunks,
                     "New dirt coverage must not count the chunk twice");
 
-            CompoundNBT once = raw.copy();
+            CompoundTag once = raw.copy();
 
             LegacyBridge.prepareChunk(world, raw);
             NativeLegacyChecks.require(raw.equals(once), "Dirt coverage reload idempotence");
         }
 
-        CompoundNBT item = NativeLegacyChecks.stack("minecraft:dirt", 9);
+        CompoundTag item = NativeLegacyChecks.stack("minecraft:dirt", 9);
 
         item.putString("id", "buildingbricks:dirt_vertical_slab");
         item.putShort("Damage", (short) 30000);
 
-        CompoundNBT custom = item.getCompound("tag").copy();
+        CompoundTag custom = item.getCompound("tag").copy();
 
         LegacyBridge.prepareStack(item);
         NativeLegacyChecks.require(
@@ -76,10 +76,10 @@ public final class DirtCoverageChecks {
                         && item.getCompound("tag").equals(custom),
                 "Vertical dirt inventory identity, count and complete custom data");
 
-        CompoundNBT once = item.copy();
+        CompoundTag once = item.copy();
 
         LegacyBridge.prepareStack(item);
         NativeLegacyChecks.require(item.equals(once), "Vertical dirt item reload idempotence");
-        System.out.println("BUILDING_PIECES_DIRT_COVERAGE_PASS orientations=4 no_repeat_chunk_count=true");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_DIRT_COVERAGE_PASS orientations=4 no_repeat_chunk_count=true");
     }
 }

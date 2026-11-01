@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:end_stone"
+            "items": [
+              "minecraft:end_stone"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"
+    ]
   },
   "conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:glass"
+            "items": [
+              "minecraft:glass"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/glass/wall/wall/minecraft/glass_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/glass/wall/wall/minecraft/glass_0"
+    ]
   },
   "conditions": [
     {

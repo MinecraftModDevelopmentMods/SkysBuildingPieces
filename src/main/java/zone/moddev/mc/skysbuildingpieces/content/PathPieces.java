@@ -1,17 +1,16 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import java.util.Set;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,12 +24,12 @@ public final class PathPieces {
                 event.getFace()) == null) {
             return;
         }
-        // Forge 36 still bypasses block activation while sneaking, even with UseBlock.ALLOW. Finish this valid action
-        // here and stop the vanilla call.
+        // Sneaking bypasses block activation. Finish this valid use here so the
+        // shovel acts once, including when a step sits above grass.
         if (event.getPlayer().isShiftKeyDown() && activate(event.getWorld(), event.getPos(), event.getPlayer(),
                 event.getItemStack(), event.getFace(), event.getHand())) {
             event.setCanceled(true);
-            event.setCancellationResult(net.minecraft.util.ActionResultType.SUCCESS);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
             return;
         }
 
@@ -38,8 +37,8 @@ public final class PathPieces {
         event.setUseItem(Event.Result.DENY);
     }
 
-    public static boolean activate(World world, BlockPos position, PlayerEntity player, ItemStack shovel,
-            Direction face, net.minecraft.util.Hand hand) {
+    public static boolean activate(Level world, BlockPos position, Player player, ItemStack shovel,
+            Direction face, net.minecraft.world.InteractionHand hand) {
         BlockState path = target(world, position, player, shovel, face);
 
         if (path == null) {
@@ -59,27 +58,25 @@ public final class PathPieces {
 
         if (grassPiece && world.isLoaded(support) && world.getBlockState(support).getBlock() == Blocks.GRASS_BLOCK
                 && player.mayUseItemAt(support, Direction.UP, shovel)) {
-            world.setBlock(support, Blocks.GRASS_PATH.defaultBlockState(), 3);
+            world.setBlock(support, Blocks.DIRT_PATH.defaultBlockState(), 3);
         }
 
-        world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1, 1);
+        world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1, 1);
 
-        if (!player.abilities.instabuild) {
+        if (!player.getAbilities().instabuild) {
             shovel.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
         }
 
         return true;
     }
 
-    private static BlockState target(World world, BlockPos position, PlayerEntity player, ItemStack shovel,
+    private static BlockState target(Level world, BlockPos position, Player player, ItemStack shovel,
             Direction face) {
         if (player == null || shovel == null || shovel.isEmpty() || face == null || face == Direction.DOWN) {
             return null;
         }
 
-        Set<ToolType> tools = shovel.getItem().getToolTypes(shovel);
-
-        if (tools == null || !tools.contains(ToolType.SHOVEL) || !world.isEmptyBlock(position.above())
+        if (!shovel.canPerformAction(ToolActions.SHOVEL_FLATTEN) || !world.isEmptyBlock(position.above())
                 || !player.mayUseItemAt(position, face, shovel)) {
             return null;
         }
@@ -109,7 +106,7 @@ public final class PathPieces {
         return dirt.setValue(SlabBlock.WATERLOGGED, path.getValue(SlabBlock.WATERLOGGED));
     }
 
-    static void checkCover(World world, BlockPos position, BlockState state) {
+    static void checkCover(Level world, BlockPos position, BlockState state) {
         if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }

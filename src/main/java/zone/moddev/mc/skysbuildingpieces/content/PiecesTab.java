@@ -3,17 +3,17 @@ package zone.moddev.mc.skysbuildingpieces.content;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Keep new pieces and the native shapes they reuse together in one tab. */
-public final class PiecesTab extends ItemGroup {
+public final class PiecesTab extends CreativeModeTab {
     public static final PiecesTab INSTANCE = new PiecesTab();
 
     private PiecesTab() {

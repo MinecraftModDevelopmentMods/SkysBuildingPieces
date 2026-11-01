@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:packed_ice_step"
+            "items": [
+              "skysbuildingpieces:packed_ice_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/packed_ice/corner/corner/skysbuildingpieces/packed_ice_step_00_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/packed_ice/corner/corner/skysbuildingpieces/packed_ice_step_00_0"
+    ]
   },
   "conditions": [
     {

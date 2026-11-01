@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:brick_slab"
+            "items": [
+              "minecraft:brick_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/bricks/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/bricks/slab_recombination"
+    ]
   }
 }

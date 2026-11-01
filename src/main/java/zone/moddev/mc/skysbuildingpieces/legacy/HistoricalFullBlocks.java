@@ -1,8 +1,12 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.Level;
+
 import java.util.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.*;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -104,8 +108,8 @@ public final class HistoricalFullBlocks {
         if (STATES.containsKey(name)) {
             BlockState state = meta >= 0 && meta < 16 ? STATES.get(name).apply(meta) : null;
 
-            if (state == null || state.getBlock() instanceof net.minecraft.block.AirBlock
-                    || state.getBlock().hasTileEntity(state)) {
+            if (state == null || state.getBlock() instanceof net.minecraft.world.level.block.AirBlock
+                    || state.hasBlockEntity()) {
                 throw new LegacyBridge.RecoveryAbort("World upgrade stopped: no safe target for " + name + " / " + meta
                         + ". Restore the original modpack and use a backup.", null);
             }
@@ -122,20 +126,20 @@ public final class HistoricalFullBlocks {
 
         BlockState state = Pieces.nativeState(Catalogue.INSTANCE.materials.get(materials[meta]), "full");
 
-        if (state == null || state.getBlock().hasTileEntity(state)) {
+        if (state == null || state.hasBlockEntity()) {
             throw new LegacyBridge.RecoveryAbort("No safe full-block target for " + name + " / " + meta, null);
         }
 
         return state;
     }
 
-    public static void prepareChunk(CompoundNBT root, Map<Integer, String> savedIds) {
+    public static void prepareChunk(CompoundTag root, Map<Integer, String> savedIds) {
         if (!hasSource(savedIds)) {
             return;
         }
 
-        CompoundNBT level = root.getCompound("Level");
-        CompoundNBT coverage = level.getCompound("skysbuildingpieces_coverage");
+        CompoundTag level = root.getCompound("Level");
+        CompoundTag coverage = level.getCompound("skysbuildingpieces_coverage");
 
         Set<String> pending = new LinkedHashSet<>();
 
@@ -149,10 +153,10 @@ public final class HistoricalFullBlocks {
         }
 
         List<Change> changes = new ArrayList<>();
-        ListNBT sections = level.getList("Sections", 10);
+        ListTag sections = level.getList("Sections", 10);
 
         for (int s = 0; s < sections.size(); s++) {
-            CompoundNBT section = sections.getCompound(s);
+            CompoundTag section = sections.getCompound(s);
             byte[] blockIdLowBytes = section.getByteArray("Blocks");
             byte[] high = section.getByteArray("Add");
             byte[] meta = section.getByteArray("Data");
@@ -198,7 +202,7 @@ public final class HistoricalFullBlocks {
             change.section.putByteArray("Data", meta);
         }
 
-        CompoundNBT deltas = new CompoundNBT();
+        CompoundTag deltas = new CompoundTag();
 
         for (String module : pending) {
             coverage.putInt(module, 1);
@@ -220,12 +224,12 @@ public final class HistoricalFullBlocks {
     }
 
     private static final class Change {
-        final CompoundNBT section;
+        final CompoundTag section;
         final int index;
         final BlockState state;
         final String module;
 
-        Change(CompoundNBT section, int index, BlockState state, String module) {
+        Change(CompoundTag section, int index, BlockState state, String module) {
             this.section = section;
             this.index = index;
             this.state = state;

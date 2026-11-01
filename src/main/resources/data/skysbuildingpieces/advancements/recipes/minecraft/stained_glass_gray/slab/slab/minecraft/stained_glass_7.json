@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:gray_stained_glass"
+            "items": [
+              "minecraft:gray_stained_glass"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_gray/slab/slab/minecraft/stained_glass_7"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_gray/slab/slab/minecraft/stained_glass_7"
+    ]
   },
   "conditions": [
     {

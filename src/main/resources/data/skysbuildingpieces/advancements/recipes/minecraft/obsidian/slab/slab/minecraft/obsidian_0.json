@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:obsidian"
+            "items": [
+              "minecraft:obsidian"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/obsidian/slab/slab/minecraft/obsidian_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/obsidian/slab/slab/minecraft/obsidian_0"
+    ]
   },
   "conditions": [
     {

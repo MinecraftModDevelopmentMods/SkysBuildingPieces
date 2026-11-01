@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:stone_slab_vertical_slab"
+            "items": [
+              "skysbuildingpieces:stone_slab_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stone_slab/slab/rotate/skysbuildingpieces/rock_vertical_slab_10_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stone_slab/slab/rotate/skysbuildingpieces/rock_vertical_slab_10_0"
+    ]
   },
   "conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:tuff"
+            "items": [
+              "mineralogy:tuff"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/tuff/horizontal_step/rock_step/mineralogy/tuff_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/tuff/horizontal_step/rock_step/mineralogy/tuff_0"
+    ]
   },
   "conditions": [
     {

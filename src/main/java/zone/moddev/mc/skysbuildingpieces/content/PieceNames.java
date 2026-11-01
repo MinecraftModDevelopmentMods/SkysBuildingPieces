@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /** Compose translated material and shape names without baking in the server's language. */
 final class PieceNames {
@@ -24,9 +24,9 @@ final class PieceNames {
     private PieceNames() {
     }
 
-    static ITextComponent displayName(String namespace, String material, String shape, ITextComponent nativeName) {
+    static Component displayName(String namespace, String material, String shape, Component nativeName) {
         String materialKey = "material." + namespace + "." + material.replace(':', '.');
-        ITextComponent materialName = hasTranslation(namespace, materialKey) ? new TranslationTextComponent(materialKey)
+        Component materialName = hasTranslation(namespace, materialKey) ? new TranslatableComponent(materialKey)
                 : nativeName;
         String shapeKey = "pieces." + namespace + "." + shape;
 
@@ -34,7 +34,7 @@ final class PieceNames {
             shapeKey = "pieces.skysbuildingpieces." + shape;
         }
 
-        return new TranslationTextComponent(shapeKey, materialName);
+        return new TranslatableComponent(shapeKey, materialName);
     }
 
     private static boolean hasTranslation(String namespace, String key) {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:quartz_block_horizontal_step"
+            "items": [
+              "skysbuildingpieces:quartz_block_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/quartz_block/corner/corner/skysbuildingpieces/rock_horizontal_step_09_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/quartz_block/corner/corner/skysbuildingpieces/rock_horizontal_step_09_0"
+    ]
   },
   "conditions": [
     {

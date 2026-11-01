@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:novaculite_slab"
+            "items": [
+              "mineralogy:novaculite_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/novaculite/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/novaculite/slab_recombination"
+    ]
   },
   "conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:shale"
+            "items": [
+              "mineralogy:shale"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/shale/horizontal_step/rock_step/mineralogy/shale_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/shale/horizontal_step/rock_step/mineralogy/shale_0"
+    ]
   },
   "conditions": [
     {

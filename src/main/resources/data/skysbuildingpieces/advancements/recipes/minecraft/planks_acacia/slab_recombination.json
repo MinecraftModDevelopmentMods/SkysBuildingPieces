@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:acacia_slab"
+            "items": [
+              "minecraft:acacia_slab"
+            ]
           }
         ]
       }
@@ -18,9 +20,14 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/planks_acacia/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/planks_acacia/slab_recombination"
+    ]
   }
 }

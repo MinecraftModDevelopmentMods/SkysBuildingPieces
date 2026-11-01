@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:magenta_terracotta"
+            "items": [
+              "minecraft:magenta_terracotta"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_magenta/stairs/stairs/minecraft/stained_hardened_clay_2"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_magenta/stairs/stairs/minecraft/stained_hardened_clay_2"
+    ]
   },
   "conditions": [
     {

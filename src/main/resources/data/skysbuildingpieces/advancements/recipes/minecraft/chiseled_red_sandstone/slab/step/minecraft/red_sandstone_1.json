@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:chiseled_red_sandstone"
+            "items": [
+              "minecraft:chiseled_red_sandstone"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/step/minecraft/red_sandstone_1"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/step/minecraft/red_sandstone_1"
+    ]
   },
   "conditions": [
     {

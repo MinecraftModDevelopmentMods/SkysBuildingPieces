@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:purpur_block_horizontal_step"
+            "items": [
+              "skysbuildingpieces:purpur_block_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/purpur_block/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_08_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/purpur_block/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_08_0"
+    ]
   },
   "conditions": [
     {

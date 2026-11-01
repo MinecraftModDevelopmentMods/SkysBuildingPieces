@@ -1,11 +1,11 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
 
 /** Keeps migration totals and preserves saved fields this version does not interpret. */
-public final class PiecesWorldState extends WorldSavedData {
+public final class PiecesWorldState extends SavedData {
     public static final String NAME = "skysbuildingpieces_world_state";
     public long blocks, items, chunks;
     public final java.util.Map<String, Long> unresolved = new java.util.TreeMap<String, Long>();
@@ -48,18 +48,17 @@ public final class PiecesWorldState extends WorldSavedData {
         }
     }
 
-    private CompoundNBT retained = new CompoundNBT();
+    private CompoundTag retained = new CompoundTag();
 
     public PiecesWorldState() {
-        super(NAME);
+        super();
     }
 
     public PiecesWorldState(String name) {
-        super(name);
+        super();
     }
 
-    @Override
-    public void load(CompoundNBT compoundTag) {
+    public void load(CompoundTag compoundTag) {
         int schema = compoundTag.getInt("schema_version");
 
         if (schema != 1) {
@@ -73,7 +72,7 @@ public final class PiecesWorldState extends WorldSavedData {
         retained = compoundTag.copy();
         unresolved.clear();
 
-        CompoundNBT issues = compoundTag.getCompound("unresolved");
+        CompoundTag issues = compoundTag.getCompound("unresolved");
 
         for (String key : issues.getAllKeys()) {
             unresolved.put(key, issues.getLong(key));
@@ -81,10 +80,10 @@ public final class PiecesWorldState extends WorldSavedData {
 
         modules.clear();
 
-        CompoundNBT savedModules = compoundTag.getCompound("modules");
+        CompoundTag savedModules = compoundTag.getCompound("modules");
 
         for (String key : savedModules.getAllKeys()) {
-            CompoundNBT saved = savedModules.getCompound(key);
+            CompoundTag saved = savedModules.getCompound(key);
             Totals moduleTotals = totals(key);
 
             moduleTotals.blocks = saved.getLong("blocks");
@@ -94,14 +93,14 @@ public final class PiecesWorldState extends WorldSavedData {
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compoundTag) {
+    public CompoundTag save(CompoundTag compoundTag) {
         compoundTag.merge(retained);
         compoundTag.putInt("schema_version", 1);
         compoundTag.putLong("vanilla_blocks", blocks);
         compoundTag.putLong("vanilla_items", items);
         compoundTag.putLong("vanilla_chunks", chunks);
 
-        CompoundNBT issues = new CompoundNBT();
+        CompoundTag issues = new CompoundTag();
 
         for (java.util.Map.Entry<String, Long> entry : unresolved.entrySet()) {
             issues.putLong(entry.getKey(), entry.getValue());
@@ -109,10 +108,10 @@ public final class PiecesWorldState extends WorldSavedData {
 
         compoundTag.put("unresolved", issues);
 
-        CompoundNBT savedModules = compoundTag.getCompound("modules");
+        CompoundTag savedModules = compoundTag.getCompound("modules");
 
         for (java.util.Map.Entry<String, Totals> entry : modules.entrySet()) {
-            CompoundNBT saved = savedModules.getCompound(entry.getKey());
+            CompoundTag saved = savedModules.getCompound(entry.getKey());
 
             saved.putLong("blocks", entry.getValue().blocks);
             saved.putLong("items", entry.getValue().items);
@@ -126,14 +125,21 @@ public final class PiecesWorldState extends WorldSavedData {
         return compoundTag;
     }
 
-    public static PiecesWorldState get(World world) {
+    public static PiecesWorldState get(Level world) {
         if (world.getServer() != null) {
-            world = world.getServer().getLevel(World.OVERWORLD);
+            world = world.getServer().getLevel(Level.OVERWORLD);
         }
-        if (!(world instanceof net.minecraft.world.server.ServerWorld)) {
+        if (!(world instanceof net.minecraft.server.level.ServerLevel)) {
             throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
-        return ((net.minecraft.world.server.ServerWorld) world).getDataStorage().computeIfAbsent(PiecesWorldState::new, NAME);
+        return ((net.minecraft.server.level.ServerLevel) world).getDataStorage()
+                .computeIfAbsent(PiecesWorldState::fromTag, PiecesWorldState::new, NAME);
+    }
+
+    private static PiecesWorldState fromTag(CompoundTag tag) {
+        PiecesWorldState state = new PiecesWorldState();
+        state.load(tag);
+        return state;
     }
 }

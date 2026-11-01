@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:prismarine_dark_vertical_step"
+            "items": [
+              "skysbuildingpieces:prismarine_dark_vertical_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_dark/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_03_8"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_dark/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_03_8"
+    ]
   },
   "conditions": [
     {

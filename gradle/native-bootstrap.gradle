@@ -28,7 +28,7 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/WaterloggingChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/DirtCoverageChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/CoverageContributor.java')
-    source fileTree('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/legacy')
+    source fileTree('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/legacy')
     classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
     destinationDirectory = bootstrapClasses
 }
@@ -230,56 +230,24 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
         if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
             copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
         }
-        // Native defaults avoid Forge 36's first-write file-watcher race. The
+        // Native defaults avoid Forge 37's first-write file-watcher race. The
         // failed first-start receipt remains part of the qualification evidence.
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
             new File(target, it).text = '[]\n'
         }
-        new File(target, 'options.txt').text = 'lang:en_us\nfullscreen:false\nrenderDistance:2\n'
+        new File(target, 'options.txt').text = 'lang:en_us\nfullscreen:false\nrenderDistance:2\npauseOnLostFocus:false\n'
     }
 }
-def clientAssets = providers.gradleProperty('forgeClientAssets').orElse(
-        new File(gradle.gradleUserHomeDir, 'caches/forge_gradle/assets').absolutePath)
-def clientNatives = providers.gradleProperty('forgeClientNatives').orElse(
-        new File(gradle.gradleUserHomeDir,
-                "caches/minecraftforge/forgegradle/slime-launcher/cache/net/minecraftforge/forge/${minecraft_version}-${forge_version}/natives").absolutePath)
-def clientJava = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
+// ForgeGradle supplies BootstrapLauncher and its module path. Keep the
+// build-only probe in this disposable mods folder, outside ordinary runs.
 def clientPhases = [:]
 ['client-fresh', 'client-reload'].each { phase ->
-    clientPhases[phase] = tasks.register('native' + phase.split('-').collect { it.capitalize() }.join('') + 'Process', Exec) {
+    clientPhases[phase] = tasks.register('native' + phase.split('-').collect { it.capitalize() }.join('') + 'Process', JavaExec) {
         dependsOn phase == 'client-fresh' ? prepareClient : clientPhases['client-fresh']
-        dependsOn {
-            JavaExec run = tasks.getByName('runClient') as JavaExec
-            run.taskDependencies.getDependencies(run)
-        }
-        doFirst {
-            JavaExec run = tasks.getByName('runClient') as JavaExec
-            File assets = file(clientAssets.get())
-            File natives = file(clientNatives.get())
-            [new File(assets, 'indexes/1.16.json'), natives].each {
-                if (!it.exists()) throw new GradleException('Incomplete native client runtime: ' + it)
-            }
-            File classpathJar = layout.buildDirectory.file('native-bootstrap-probe/client-classpath.jar').get().asFile
-            java.util.jar.Manifest manifest = new java.util.jar.Manifest()
-            manifest.mainAttributes.put(java.util.jar.Attributes.Name.MANIFEST_VERSION, '1.0')
-            manifest.mainAttributes.put(java.util.jar.Attributes.Name.CLASS_PATH,
-                    run.classpath.files.collect { it.toURI().toASCIIString() }.join(' '))
-            classpathJar.withOutputStream { new java.util.jar.JarOutputStream(it, manifest).close() }
-            Map<String, Object> launchEnvironment = new LinkedHashMap<>(run.environment)
-            launchEnvironment.putAll([
-                    target: 'fmluserdevclient', MCP_MAPPINGS: "${mapping_channel}_${mapping_version}",
-                    MCP_VERSION: mcp_version, FORGE_VERSION: forge_version, FORGE_GROUP: 'net.minecraftforge',
-                    MC_VERSION: minecraft_version, assetDirectory: assets.absolutePath, assetIndex: '1.16',
-                    nativesDirectory: natives.absolutePath,
-                    MOD_CLASSES: "${mod_id}%%${buildDir}/forge-run-mod-classes/main${File.pathSeparator}" +
-                            "${mod_id}%%${buildDir}/forge-run-mod-classes/main"])
-            workingDir clientDirectory
-            environment launchEnvironment
-            commandLine clientJava.get().executablePath.asFile.absolutePath, '-Xmx2g',
-                    '-Dskysbuildingpieces.bootstrapPhase=' + phase,
-                    '-cp', classpathJar.absolutePath, 'net.minecraftforge.userdev.LaunchTesting'
-        }
+        workingDir clientDirectory
+        systemProperty 'skysbuildingpieces.bootstrapPhase', phase
+        project.ext.configureNativeBootstrapRun(delegate, 'runClient')
         doLast {
             logger.lifecycle(providers.exec {
                 commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
@@ -289,4 +257,5 @@ def clientPhases = [:]
         }
     }
 }
+
 tasks.register('nativeClientTest') { dependsOn clientPhases['client-reload'] }

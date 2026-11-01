@@ -2,12 +2,12 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Method;
 import java.util.Random;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -17,14 +17,14 @@ public final class SharedGrassChecks {
     private SharedGrassChecks() {
     }
 
-    public static void run(ServerWorld world) throws ReflectiveOperationException {
+    public static void run(ServerLevel world) throws ReflectiveOperationException {
         if (!ModList.get().isLoaded("skysgrassslabs")) {
             return;
         }
 
         Class<?> api = Class.forName("zone.moddev.mc.skysgrassslabs.api.GrassSlabsApi");
-        Method coversSupport = api.getMethod("coversSupport", BlockState.class, IBlockReader.class, BlockPos.class);
-        Method tickGrass = api.getMethod("tickGrass", World.class, BlockPos.class, BlockState.class, Random.class);
+        Method coversSupport = api.getMethod("coversSupport", BlockState.class, BlockGetter.class, BlockPos.class);
+        Method tickGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, Random.class);
         BlockPos position = new BlockPos(-500, 220, -500);
 
         world.setDayTime(6000);
@@ -74,7 +74,7 @@ public final class SharedGrassChecks {
         require(checked > 0, "registered grass pieces were tested");
         world.removeBlock(position, false);
         world.removeBlock(position.below(), false);
-        System.out.println("BUILDING_PIECES_SHARED_GRASS_PASS states=" + checked);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_SHARED_GRASS_PASS states=" + checked);
     }
 
     private static void require(boolean condition, String message) {

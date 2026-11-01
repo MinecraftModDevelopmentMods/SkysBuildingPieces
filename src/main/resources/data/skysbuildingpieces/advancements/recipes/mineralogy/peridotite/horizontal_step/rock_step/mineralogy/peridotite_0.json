@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:peridotite"
+            "items": [
+              "mineralogy:peridotite"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/peridotite/horizontal_step/rock_step/mineralogy/peridotite_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/peridotite/horizontal_step/rock_step/mineralogy/peridotite_0"
+    ]
   },
   "conditions": [
     {

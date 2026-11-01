@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:stained_glass_pink_vertical_step"
+            "items": [
+              "skysbuildingpieces:stained_glass_pink_vertical_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_pink/recombine_vertical_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_pink/recombine_vertical_step"
+    ]
   },
   "conditions": [
     {

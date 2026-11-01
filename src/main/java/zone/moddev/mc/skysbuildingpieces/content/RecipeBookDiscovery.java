@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.ICriterionInstance;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
-import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,16 +31,16 @@ public final class RecipeBookDiscovery {
 
     @SubscribeEvent
     public static void crafted(PlayerEvent.ItemCraftedEvent event) {
-        if (!(event.getPlayer() instanceof ServerPlayerEntity) || event.getCrafting().isEmpty()) {
+        if (!(event.getPlayer() instanceof ServerPlayer) || event.getCrafting().isEmpty()) {
             return;
         }
 
-        ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
-        PlayerInventory ingredient = new PlayerInventory(player);
+        ServerPlayer player = (ServerPlayer) event.getPlayer();
+        Inventory ingredient = new Inventory(player);
 
         ingredient.setItem(0, event.getCrafting().copy());
 
-        for (IRecipe<?> recipe : player.getServer().getRecipeManager().getRecipes()) {
+        for (Recipe<?> recipe : player.getServer().getRecipeManager().getRecipes()) {
             ResourceLocation id = recipe.getId();
 
             if (!OWNERS.contains(id.getNamespace()) || recipe.isSpecial()
@@ -68,15 +68,15 @@ public final class RecipeBookDiscovery {
             Criterion recipeCriterion = advancement.getCriteria().get("has_the_recipe");
 
             if (recipeCriterion == null
-                    || !(recipeCriterion.getTrigger() instanceof RecipeUnlockedTrigger.Instance)
-                    || !((RecipeUnlockedTrigger.Instance) recipeCriterion.getTrigger()).matches(recipe)) {
+                    || !(recipeCriterion.getTrigger() instanceof RecipeUnlockedTrigger.TriggerInstance)
+                    || !((RecipeUnlockedTrigger.TriggerInstance) recipeCriterion.getTrigger()).matches(recipe)) {
                 continue;
             }
             for (Map.Entry<String, Criterion> criterion : advancement.getCriteria().entrySet()) {
-                ICriterionInstance predicate = criterion.getValue().getTrigger();
+                CriterionTriggerInstance predicate = criterion.getValue().getTrigger();
 
-                if (predicate instanceof InventoryChangeTrigger.Instance
-                        && ((InventoryChangeTrigger.Instance) predicate).matches(ingredient, event.getCrafting(),
+                if (predicate instanceof InventoryChangeTrigger.TriggerInstance
+                        && ((InventoryChangeTrigger.TriggerInstance) predicate).matches(ingredient, event.getCrafting(),
                                 event.getCrafting().getCount() >= event.getCrafting().getMaxStackSize() ? 1 : 0,
                                 ingredient.getContainerSize() - 1, 1)) {
                     player.getAdvancements().award(advancement, criterion.getKey());

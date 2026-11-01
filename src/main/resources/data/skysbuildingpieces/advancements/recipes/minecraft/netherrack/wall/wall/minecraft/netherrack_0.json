@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:netherrack"
+            "items": [
+              "minecraft:netherrack"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/netherrack/wall/wall/minecraft/netherrack_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/netherrack/wall/wall/minecraft/netherrack_0"
+    ]
   },
   "conditions": [
     {

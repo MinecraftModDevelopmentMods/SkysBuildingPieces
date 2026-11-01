@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:light_blue_wool"
+            "items": [
+              "minecraft:light_blue_wool"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_light_blue/stairs/stairs/minecraft/wool_3"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_light_blue/stairs/stairs/minecraft/wool_3"
+    ]
   },
   "conditions": [
     {

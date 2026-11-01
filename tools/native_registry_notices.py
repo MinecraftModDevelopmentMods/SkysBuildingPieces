@@ -49,8 +49,8 @@ def audit_text(text, profile=None):
     for line in text.splitlines():
         if not re.search(r"/(?:ERROR|FATAL)\]|\[STDERR[/\]]", line):
             continue
-        message = re.fullmatch(r"\[[^\r\n]+\] \[main/ERROR\] "
-                               r"\[net\.minecraftforge\.registries\.GameData/REGISTRIES\]: (.+)", line)
+        message = re.fullmatch(r"\[[^\r\n]+\] \[main/ERROR\]"
+                               r"(?: \[net\.minecraftforge\.registries\.GameData/REGISTRIES\])?: (.+)", line)
         if message and message[1] in headers and message[1] not in seen:
             seen.add(message[1])
         else:
@@ -60,7 +60,8 @@ def audit_text(text, profile=None):
     for problem in ("Encountered an unexpected exception", "Exception stopping the server",
                     "MissingModsException", "NoSuchMethodError", "NoClassDefFoundError",
                     "ExceptionInInitializerError", "cascading worldgen lag", "Unable to load model",
-                    "Unable to load blockstate", "outside of the generating region"):
+                    "Unable to load blockstate", "outside of the generating region",
+                    "java.lang.AssertionError", "java.lang.IllegalStateException:"):
         if problem in text:
             raise ValueError("Unexpected native failure: " + problem)
     return sorted(headers)

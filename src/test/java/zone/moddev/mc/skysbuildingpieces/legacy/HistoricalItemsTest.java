@@ -2,15 +2,15 @@ package zone.moddev.mc.skysbuildingpieces.legacy;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import org.junit.jupiter.api.Test;
 
 final class HistoricalItemsTest {
     @Test
     void standaloneAndUnrelatedDataKeepTheirOriginalObject() {
         HistoricalItems.Registry registry = new HistoricalItems.Registry();
-        CompoundNBT original = stack("minecraft:stone");
+        CompoundTag original = stack("minecraft:stone");
 
         assertSame(original, registry.prepareCopy(original));
         registry.register("test_material", root -> root.getString("id").equals("old:basket"), root -> fail());
@@ -24,21 +24,21 @@ final class HistoricalItemsTest {
         registry.register("test_material", root -> root.contains("Inventory"),
                 root -> root.getList("Inventory", 10).getCompound(0).putString("id", "new:basket"));
 
-        CompoundNBT original = new CompoundNBT();
-        ListNBT inventory = new ListNBT();
-        CompoundNBT item = stack("old:basket");
+        CompoundTag original = new CompoundTag();
+        ListTag inventory = new ListTag();
+        CompoundTag item = stack("old:basket");
 
         item.putByte("Slot", (byte) 17);
         inventory.add(item);
         original.put("Inventory", inventory);
 
-        CompoundNBT before = original.copy();
-        CompoundNBT recovered = registry.prepareCopy(original);
+        CompoundTag before = original.copy();
+        CompoundTag recovered = registry.prepareCopy(original);
 
         assertEquals(before, original);
         assertEquals("new:basket", recovered.getList("Inventory", 10).getCompound(0).getString("id"));
 
-        CompoundNBT expected = before.copy();
+        CompoundTag expected = before.copy();
 
         expected.getList("Inventory", 10).getCompound(0).putString("id", "new:basket");
         assertEquals(expected, recovered);
@@ -53,8 +53,8 @@ final class HistoricalItemsTest {
             throw new IllegalStateException("duplicate basket slot 4");
         });
 
-        CompoundNBT original = stack("old:basket");
-        CompoundNBT before = original.copy();
+        CompoundTag original = stack("old:basket");
+        CompoundTag before = original.copy();
         LegacyBridge.RecoveryAbort failure = assertThrows(LegacyBridge.RecoveryAbort.class,
                 () -> registry.prepareCopy(original));
 
@@ -86,20 +86,20 @@ final class HistoricalItemsTest {
             throw new IllegalStateException("unknown nested plant");
         }, root -> fail());
 
-        CompoundNBT original = stack("old:basket");
-        CompoundNBT before = original.copy();
+        CompoundTag original = stack("old:basket");
+        CompoundTag before = original.copy();
 
         assertThrows(LegacyBridge.RecoveryAbort.class, () -> registry.prepareCopy(original));
         assertEquals(before, original);
     }
 
-    private static CompoundNBT stack(String identifier) {
-        CompoundNBT result = new CompoundNBT();
+    private static CompoundTag stack(String identifier) {
+        CompoundTag result = new CompoundTag();
 
         result.putString("id", identifier);
         result.putByte("Count", (byte) 1);
 
-        CompoundNBT tag = new CompoundNBT();
+        CompoundTag tag = new CompoundTag();
 
         tag.putString("CustomName", "A saved basket");
         tag.putString("Unrelated", "Keep this");

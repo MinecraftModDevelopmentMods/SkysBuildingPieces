@@ -28,13 +28,18 @@ public final class CoremodOrderChecks {
         List<String> scripts = Arrays.asList(sky, mineralogy, grass);
 
         for (boolean reverse : new boolean[] { false, true }) {
-            ClassNode node = new ClassNode();
-
-            try (InputStream input = CoremodOrderChecks.class.getClassLoader()
-                    .getResourceAsStream("net/minecraft/world/chunk/storage/ChunkLoader.class")) {
-                require(input != null, "Native Forge chunk storage is missing");
-                new ClassReader(input).accept(node, 0);
+            ClassNode tables = nativeClass("net/minecraft/util/datafix/fixes/BlockStateData");
+            for (int index = 0; index < scripts.size(); index++) {
+                apply(scripts.get(reverse ? scripts.size() - index - 1 : index), tables);
             }
+            verifyTables(tables);
+            int tableInstructions = tables.methods.stream().mapToInt(method -> method.instructions.size()).sum();
+            apply(sky, tables);
+            verifyTables(tables);
+            require(tableInstructions == tables.methods.stream().mapToInt(method -> method.instructions.size()).sum(),
+                    "Repeated Sky transformation changes the combined state tables");
+
+            ClassNode node = nativeClass("net/minecraft/world/level/chunk/storage/ChunkStorage");
             for (int index = 0; index < scripts.size(); index++) {
                 apply(scripts.get(reverse ? scripts.size() - index - 1 : index), node);
             }
@@ -48,7 +53,7 @@ public final class CoremodOrderChecks {
             int methods = 0;
 
             for (MethodNode method : node.methods) {
-                if (!method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundNBT;)")) {
+                if (!method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;)")) {
                     continue;
                 }
 
@@ -77,7 +82,50 @@ public final class CoremodOrderChecks {
             require(methods == 1, "Expected one native chunk-upgrade method");
         }
 
-        System.out.println("BUILDING_PIECES_COREMOD_ORDER_PASS orders=2 actual_scripts=true stack_verification=true");
+        System.out.println("BUILDING_PIECES_COREMOD_ORDER_PASS orders=2 targets=2 actual_scripts=true stack_verification=true");
+    }
+
+    private static ClassNode nativeClass(String name) throws Exception {
+        try (InputStream input = CoremodOrderChecks.class.getClassLoader().getResourceAsStream(name + ".class")) {
+            require(input != null, "Native Forge class is missing: " + name);
+            ClassNode node = new ClassNode();
+            new ClassReader(input).accept(node, 0);
+            return node;
+        }
+    }
+
+    private static void verifyTables(ClassNode node) throws Exception {
+        int arrays = 0;
+        int registrationMethods = 0;
+        int[] expected = {65536, 4096};
+        for (MethodNode method : node.methods) {
+            if (method.desc.equals("(ILjava/lang/String;[Ljava/lang/String;)V")) {
+                require((method.access & Opcodes.ACC_PUBLIC) != 0, "Legacy state registration is not accessible");
+                registrationMethods++;
+            }
+            if (!method.name.equals("<clinit>")) {
+                continue;
+            }
+            for (AbstractInsnNode instruction : method.instructions.toArray()) {
+                if (!(instruction instanceof org.objectweb.asm.tree.TypeInsnNode)
+                        || instruction.getOpcode() != Opcodes.ANEWARRAY
+                        || !((org.objectweb.asm.tree.TypeInsnNode) instruction).desc.equals("com/mojang/serialization/Dynamic")) {
+                    continue;
+                }
+                AbstractInsnNode size = instruction.getPrevious();
+                while (size != null && size.getOpcode() < 0) {
+                    size = size.getPrevious();
+                }
+                require(arrays < expected.length && size instanceof org.objectweb.asm.tree.LdcInsnNode,
+                        "Unexpected expanded state table layout");
+                Object value = ((org.objectweb.asm.tree.LdcInsnNode) size).cst;
+                require(value instanceof Number && ((Number) value).intValue() == expected[arrays],
+                        "A companion changed the expanded state table size");
+                arrays++;
+            }
+            new Analyzer<>(new BasicVerifier()).analyze(node.name, method);
+        }
+        require(arrays == 2 && registrationMethods == 1, "Both legacy tables and registration method must survive");
     }
 
     private static String script(String file, String namespace) throws Exception {
@@ -112,17 +160,17 @@ public final class CoremodOrderChecks {
     private static void apply(String script, ClassNode node) throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        require(engine != null, "These native transformers run under Java 8");
+        require(engine != null, "These native transformers require Nashorn on Java 16");
         engine.eval(script);
         engine.put("candidate", node);
+        engine.put("targetName", node.name.replace('/', '.'));
 
         Object count = engine.eval("var definitions = initializeCoreMod(); var matches = 0;"
                 + "for (var key in definitions) { var definition = definitions[key];"
-                + "if (definition.target.type === 'CLASS' && definition.target.name ==="
-                + "'net.minecraft.world.chunk.storage.ChunkLoader') {"
+                + "if (definition.target.type === 'CLASS' && String(definition.target.name) === String(targetName)) {"
                 + "definition.transformer(candidate); matches++; }} matches;");
 
-        require(((Number) count).intValue() == 1, "Expected one chunk transformer in the pinned script");
+        require(((Number) count).intValue() == 1, "Expected one matching transformer in the pinned script");
     }
 
     private static int calls(MethodNode method, String namespace, String name) {

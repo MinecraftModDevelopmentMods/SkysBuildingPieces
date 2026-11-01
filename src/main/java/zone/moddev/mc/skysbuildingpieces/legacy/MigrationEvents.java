@@ -1,18 +1,25 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkAccess;
+
 import java.util.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.item.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.*;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.*;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.*;
@@ -21,20 +28,20 @@ import net.minecraftforge.items.*;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 
 public final class MigrationEvents {
-    private static World level(net.minecraft.world.IWorld world) {
-        if (world instanceof World) return (World) world;
-        if (world instanceof net.minecraft.world.ISeedReader) {
-            return ((net.minecraft.world.ISeedReader) world).getLevel();
+    private static Level level(net.minecraft.world.level.LevelAccessor world) {
+        if (world instanceof Level) return (Level) world;
+        if (world instanceof net.minecraft.world.level.WorldGenLevel) {
+            return ((net.minecraft.world.level.WorldGenLevel) world).getLevel();
         }
         throw new LegacyBridge.RecoveryAbort("Expected a loaded server world for piece migration", null);
     }
 
     private int ticks;
-    private final java.util.Queue<Chunk> pending = new java.util.concurrent.ConcurrentLinkedQueue<Chunk>();
-    private final Map<net.minecraft.world.chunk.IChunk, CompoundNBT> coverage = Collections
-            .synchronizedMap(new WeakHashMap<net.minecraft.world.chunk.IChunk, CompoundNBT>());
+    private final java.util.Queue<LevelChunk> pending = new java.util.concurrent.ConcurrentLinkedQueue<LevelChunk>();
+    private final Map<net.minecraft.world.level.chunk.ChunkAccess, CompoundTag> coverage = Collections
+            .synchronizedMap(new WeakHashMap<net.minecraft.world.level.chunk.ChunkAccess, CompoundTag>());
 
-    static CompoundNBT chunkLevel(CompoundNBT data) {
+    static CompoundTag chunkLevel(CompoundTag data) {
         // Forge 36 supplies the whole chunk root. Retain direct-Level handling for fixtures.
         return data.contains("Level", 10) ? data.getCompound("Level") : data;
     }
@@ -45,8 +52,8 @@ public final class MigrationEvents {
             return;
         }
 
-        CompoundNBT legacyTileData = chunkLevel(event.getData());
-        CompoundNBT level = legacyTileData;
+        CompoundTag legacyTileData = chunkLevel(event.getData());
+        CompoundTag level = legacyTileData;
 
         // Turning replacement off must retain existing module markers, while leaving previously unvisited chunks
         // entirely unmarked.
@@ -68,7 +75,7 @@ public final class MigrationEvents {
         }
         if (legacyTileData.contains("skysbuildingpieces_historical_delta", 10)) {
             PiecesWorldState state = PiecesWorldState.get(level(event.getWorld()));
-            CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_historical_delta");
+            CompoundTag deltas = legacyTileData.getCompound("skysbuildingpieces_historical_delta");
 
             for (String module : deltas.getAllKeys()) {
                 state.addChunk(module, deltas.getLong(module));
@@ -82,7 +89,7 @@ public final class MigrationEvents {
             return;
         }
         if (!coverage.containsKey(event.getChunk())) {
-            coverage.put(event.getChunk(), new CompoundNBT());
+            coverage.put(event.getChunk(), new CompoundTag());
         }
 
         // Raw recovery changes the compound before constructing the Chunk. That constructor does not know it must
@@ -107,7 +114,7 @@ public final class MigrationEvents {
         }
         if (legacyTileData.contains("skysbuildingpieces_module_delta", 10)) {
             PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
-            CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_module_delta");
+            CompoundTag deltas = legacyTileData.getCompound("skysbuildingpieces_module_delta");
 
             for (String module : deltas.getAllKeys()) {
                 worldState.addChunk(module, deltas.getLong(module));
@@ -118,7 +125,7 @@ public final class MigrationEvents {
         }
         if (legacyTileData.contains("skysbuildingpieces_additional_module_delta", 10)) {
             PiecesWorldState worldState = PiecesWorldState.get(level(event.getWorld()));
-            CompoundNBT deltas = legacyTileData.getCompound("skysbuildingpieces_additional_module_delta");
+            CompoundTag deltas = legacyTileData.getCompound("skysbuildingpieces_additional_module_delta");
 
             for (String module : deltas.getAllKeys()) {
                 worldState.addBlocks(module, deltas.getLong(module));
@@ -128,8 +135,8 @@ public final class MigrationEvents {
             legacyTileData.remove("skysbuildingpieces_additional_module_delta");
         }
 
-        if (event.getChunk() instanceof Chunk) {
-            pending.add((Chunk) event.getChunk());
+        if (event.getChunk() instanceof LevelChunk) {
+            pending.add((LevelChunk) event.getChunk());
         }
 
         LegacyBridge.report(level(event.getWorld()));
@@ -141,14 +148,14 @@ public final class MigrationEvents {
             return;
         }
         for (int count = 0; count < 8; count++) {
-            Chunk chunk = pending.poll();
+            LevelChunk chunk = pending.poll();
 
             if (chunk == null) {
                 break;
             }
-            for (TileEntity tile : new ArrayList<TileEntity>(chunk.getBlockEntities().values())) {
+            for (BlockEntity tile : new ArrayList<BlockEntity>(chunk.getBlockEntities().values())) {
                 // Unopened loot containers must not have their loot generated by migration.
-                CompoundNBT raw = tile.save(new CompoundNBT());
+                CompoundTag raw = tile.save(new CompoundTag());
 
                 if (raw.contains("LootTable", 8)) {
                     continue;
@@ -158,11 +165,11 @@ public final class MigrationEvents {
             }
         }
         if (++ticks % 100 == 0 && LegacyBridge.hasPendingReport()) {
-            net.minecraft.server.MinecraftServer server = net.minecraftforge.fml.server.ServerLifecycleHooks
+            net.minecraft.server.MinecraftServer server = net.minecraftforge.fmllegacy.server.ServerLifecycleHooks
                     .getCurrentServer();
 
             if (server != null) {
-                LegacyBridge.report(server.getLevel(World.OVERWORLD));
+                LegacyBridge.report(server.getLevel(Level.OVERWORLD));
             }
         }
     }
@@ -176,17 +183,17 @@ public final class MigrationEvents {
             LegacyBridge.report(level(event.getWorld()));
         }
 
-        pending.removeIf(chunk -> chunk instanceof Chunk && ((Chunk) chunk).getLevel() == event.getWorld());
+        pending.removeIf(chunk -> chunk instanceof LevelChunk && ((LevelChunk) chunk).getLevel() == event.getWorld());
 
         synchronized (coverage) {
             coverage.keySet()
-                    .removeIf(chunk -> chunk instanceof Chunk && ((Chunk) chunk).getLevel() == event.getWorld());
+                    .removeIf(chunk -> chunk instanceof LevelChunk && ((LevelChunk) chunk).getLevel() == event.getWorld());
         }
     }
 
     @SubscribeEvent
     public void save(ChunkDataEvent.Save event) {
-        CompoundNBT chunkCoverage = coverage.get(event.getChunk());
+        CompoundTag chunkCoverage = coverage.get(event.getChunk());
 
         if (chunkCoverage != null) {
             event.getData().getCompound("Level").put("skysbuildingpieces_coverage", chunkCoverage.copy());
@@ -207,28 +214,28 @@ public final class MigrationEvents {
             return;
         }
 
-        TileEntity tile = event.getWorld().getBlockEntity(position);
+        BlockEntity tile = event.getWorld().getBlockEntity(position);
 
         if (tile == null) {
             return;
         }
 
-        CompoundNBT legacyTileData = tile.save(new CompoundNBT());
+        CompoundTag legacyTileData = tile.save(new CompoundTag());
         Shape shape = LegacyMapping.shape(registryId, LegacyMapping.metadata(existingState));
         BlockState target = LegacyBridge.resolve(registryId,
                 LegacyMapping.material(legacyTileData.getString("material")), shape,
                 LegacyMapping.orientation(shape, LegacyMapping.metadata(existingState)));
 
         if (target != null && event.getWorld().setBlock(position, target, 3)) {
-            net.minecraft.world.chunk.IChunk chunk = event.getWorld().getChunk(position);
-            CompoundNBT chunkCoverage = coverage.get(chunk);
+            net.minecraft.world.level.chunk.ChunkAccess chunk = event.getWorld().getChunk(position);
+            CompoundTag chunkCoverage = coverage.get(chunk);
 
             if (chunkCoverage == null) {
-                chunkCoverage = new CompoundNBT();
+                chunkCoverage = new CompoundTag();
                 coverage.put(chunk, chunkCoverage);
             }
 
-            ListNBT retained = chunkCoverage.getList("retained_tiles", 10);
+            ListTag retained = chunkCoverage.getList("retained_tiles", 10);
 
             retained.add(legacyTileData.copy());
             chunkCoverage.put("retained_tiles", retained);
@@ -249,10 +256,10 @@ public final class MigrationEvents {
 
         Entity entity = event.getEntity();
 
-        if (entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
 
-            inventory(player.inventory);
+            inventory(player.getInventory());
             inventory(player.getEnderChestInventory());
         }
         if (entity instanceof ItemEntity) {
@@ -260,8 +267,8 @@ public final class MigrationEvents {
 
             item.setItem(convert(item.getItem(), event.getWorld()));
         }
-        if (entity instanceof ItemFrameEntity) {
-            ItemFrameEntity itemFrame = (ItemFrameEntity) entity;
+        if (entity instanceof ItemFrame) {
+            ItemFrame itemFrame = (ItemFrame) entity;
             ItemStack original = itemFrame.getItem();
             ItemStack updated = convert(original, event.getWorld());
 
@@ -271,20 +278,20 @@ public final class MigrationEvents {
                 itemFrame.setItem(updated, false);
             }
         }
-        if (entity instanceof IInventory) {
-            inventory((IInventory) entity);
+        if (entity instanceof Container) {
+            inventory((Container) entity);
         }
     }
 
     @SubscribeEvent
     public void player(PlayerEvent.LoadFromFile event) {
         if (LegacyBridge.recoveryActive()) {
-            inventory(event.getPlayer().inventory);
+            inventory(event.getPlayer().getInventory());
             inventory(event.getPlayer().getEnderChestInventory());
         }
     }
 
-    private static void inventory(IInventory inventory) {
+    private static void inventory(Container inventory) {
         for (int slotIndex = 0; slotIndex < inventory.getContainerSize(); slotIndex++) {
             ItemStack legacyStack = inventory.getItem(slotIndex);
             ItemStack updated = convert(legacyStack, null);
@@ -296,9 +303,9 @@ public final class MigrationEvents {
         }
     }
 
-    private static void containers(TileEntity tile) {
-        if (tile instanceof IInventory) {
-            inventory((IInventory) tile);
+    private static void containers(BlockEntity tile) {
+        if (tile instanceof Container) {
+            inventory((Container) tile);
         }
 
         Set<IItemHandler> handled = Collections.newSetFromMap(new IdentityHashMap<IItemHandler, Boolean>());
@@ -324,13 +331,13 @@ public final class MigrationEvents {
         }
     }
 
-    public static ItemStack convert(ItemStack legacyStack, net.minecraft.world.World world) {
+    public static ItemStack convert(ItemStack legacyStack, net.minecraft.world.level.Level world) {
         if (legacyStack == null || legacyStack.isEmpty() || !LegacyBridge.ready) {
             return legacyStack;
         }
 
-        CompoundNBT before = legacyStack.save(new CompoundNBT());
-        CompoundNBT legacyTileData = before.copy();
+        CompoundTag before = legacyStack.save(new CompoundTag());
+        CompoundTag legacyTileData = before.copy();
 
         LegacyBridge.prepareStack(legacyTileData);
 

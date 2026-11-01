@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:lime_terracotta"
+            "items": [
+              "minecraft:lime_terracotta"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_lime/slab/slab/minecraft/stained_hardened_clay_5"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_lime/slab/slab/minecraft/stained_hardened_clay_5"
+    ]
   },
   "conditions": [
     {

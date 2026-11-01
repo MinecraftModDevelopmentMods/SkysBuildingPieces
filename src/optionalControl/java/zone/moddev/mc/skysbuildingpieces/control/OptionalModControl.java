@@ -3,7 +3,7 @@ package zone.moddev.mc.skysbuildingpieces.control;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
 
 /** A dependency-only startup control, launched without any Sky content. */
 @Mod("optionalmodcontrol")
@@ -18,7 +18,7 @@ public final class OptionalModControl {
             throw new AssertionError("Dependency control contains the wrong mods");
         }
 
-        System.out.println("OPTIONAL_MOD_CONTROL_STARTED sky_mods=false");
-        event.getServer().initiateShutdown(false);
+        org.apache.logging.log4j.LogManager.getLogger().info("OPTIONAL_MOD_CONTROL_STARTED sky_mods=false");
+        event.getServer().halt(false);
     }
 }

@@ -6,11 +6,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.FolderName;
-import net.minecraftforge.fml.WorldPersistenceHooks;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.fmllegacy.WorldPersistenceHooks;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 /** Exercises the real persistence callbacks without changing production registration. */
@@ -53,41 +53,41 @@ final class PersistenceOrderChecks {
                 hooks.set(positions.get(index), selected.get(index));
             }
             field.set(null, hooks);
-            System.out.println("BUILDING_PIECES_PERSISTENCE_ORDER_SET " + order + " actual_hooks=3");
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PERSISTENCE_ORDER_SET " + order + " actual_hooks=3");
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException("Cannot arrange the native persistence callbacks", failure);
         }
     }
 
-    static void verify(ServerWorld world) throws Exception {
+    static void verify(ServerLevel world) throws Exception {
         File original = new File("source-level.dat");
         if (!original.isFile() || System.getProperty("skysbuildingpieces.persistenceOrder", "").isEmpty()) {
             return;
         }
-        CompoundNBT expected = read(original).getCompound("FML");
+        CompoundTag expected = read(original).getCompound("FML");
         if (expected.isEmpty()) {
             return; // Named source fixtures do not need a pre-flattening registry snapshot.
         }
-        File directory = world.getServer().getWorldPath(FolderName.ROOT).toFile();
+        File directory = world.getServer().getWorldPath(LevelResource.ROOT).toFile();
         world.getServer().saveAllChunks(true, true, true);
-        CompoundNBT saved = read(new File(directory, "level.dat")).getCompound("FML");
+        CompoundTag saved = read(new File(directory, "level.dat")).getCompound("FML");
         require(saved.equals(expected), "The complete uppercase registry snapshot changed");
-        CompoundNBT blocks = expected.getCompound("Registries").getCompound("minecraft:blocks");
+        CompoundTag blocks = expected.getCompound("Registries").getCompound("minecraft:blocks");
         require(!blocks.isEmpty(), "The source must contain a real numeric registry");
         for (String name : new String[] { "mineralogy", "skysgrassslabs" }) {
-            CompoundNBT sidecar = read(new File(directory, "data/" + name + "_legacy_registry.dat"));
+            CompoundTag sidecar = read(new File(directory, "data/" + name + "_legacy_registry.dat"));
             require(sidecar.getCompound("Blocks").equals(blocks), name + " lost its independent sidecar");
         }
-        CompoundNBT core = read(new File(directory, "data/skysbuildingpieces_legacy_registry.dat"));
+        CompoundTag core = read(new File(directory, "data/skysbuildingpieces_legacy_registry.dat"));
         require(core.getCompound("FML").equals(expected), "Building Pieces lost its complete sidecar");
-        System.out.println("BUILDING_PIECES_PERSISTENCE_ORDER_PASS "
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PERSISTENCE_ORDER_PASS "
                 + System.getProperty("skysbuildingpieces.persistenceOrder") + " actual_hooks=3 sidecars=3 ids="
                 + blocks.getList("ids", 10).size() + " complete_uppercase_snapshot=true");
     }
 
-    private static CompoundNBT read(File file) throws Exception {
+    private static CompoundTag read(File file) throws Exception {
         try (FileInputStream input = new FileInputStream(file)) {
-            return CompressedStreamTools.readCompressed(input);
+            return NbtIo.readCompressed(input);
         }
     }
 

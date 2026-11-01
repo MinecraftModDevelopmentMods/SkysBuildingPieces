@@ -2,15 +2,15 @@ package zone.moddev.mc.skysbuildingpieces.legacy;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 
 /** Keep the old registry while adding IDs introduced during a later 1.12 save. */
 final class LegacyRegistrySources {
     private LegacyRegistrySources() {
     }
 
-    static Map<Integer, String> merge(CompoundNBT original, CompoundNBT later) {
+    static Map<Integer, String> merge(CompoundTag original, CompoundTag later) {
         Map<Integer, String> result = read(original);
 
         for (Map.Entry<Integer, String> entry : read(later).entrySet()) {
@@ -29,12 +29,12 @@ final class LegacyRegistrySources {
         return result;
     }
 
-    private static Map<Integer, String> read(CompoundNBT registry) {
+    private static Map<Integer, String> read(CompoundTag registry) {
         Map<Integer, String> result = new LinkedHashMap<>();
-        ListNBT ids = registry.getCompound("Registries").getCompound("minecraft:blocks").getList("ids", 10);
+        ListTag ids = registry.getCompound("Registries").getCompound("minecraft:blocks").getList("ids", 10);
 
         for (int index = 0; index < ids.size(); index++) {
-            CompoundNBT entry = ids.getCompound(index);
+            CompoundTag entry = ids.getCompound(index);
 
             if (!entry.contains("V", 99) || !entry.contains("K", 8)) {
                 throw new LegacyBridge.RecoveryAbort("Malformed saved registry entry: " + entry, null);

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:siltstone_slab"
+            "items": [
+              "mineralogy:siltstone_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/siltstone/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/siltstone/slab_recombination"
+    ]
   },
   "conditions": [
     {

@@ -1,18 +1,27 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+
+import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
-import net.minecraft.block.WallBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.TorchBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.TorchBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.*;
+import net.minecraft.core.*;
+import net.minecraft.resources.*;
+import net.minecraft.core.*;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayerFactory;
 
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -20,7 +29,7 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 
 /** Real collision and connection checks for the shared wall profile. */
 public final class PresentationChecks {
-    public static void run(ServerWorld world) {
+    public static void run(ServerLevel world) {
         torches(world);
 
         BlockPos pos = new BlockPos(-520, 90, -520);
@@ -69,7 +78,7 @@ public final class PresentationChecks {
                                 "posts follow ends, corners, junctions and overhead support");
                         require(block.getMetaFromState(actual) == material, "connections do not change saved metadata");
 
-                        List<AxisAlignedBB> actualBoxes = block.boxes(actual);
+                        List<AABB> actualBoxes = block.boxes(actual);
                         List<WallGeometry.Bounds> expected = WallGeometry.boxes(connections, post);
 
                         require(actualBoxes.size() == expected.size(), "wall box count");
@@ -78,7 +87,7 @@ public final class PresentationChecks {
                             WallGeometry.Bounds bounds = expected.get(entryIndex);
 
                             require(actualBoxes.get(entryIndex)
-                                    .equals(new AxisAlignedBB(bounds.minX / 16.0, bounds.minY / 16.0,
+                                    .equals(new AABB(bounds.minX / 16.0, bounds.minY / 16.0,
                                             bounds.minZ / 16.0, bounds.maxX / 16.0, bounds.maxY / 16.0,
                                             bounds.maxZ / 16.0)),
                                     "glass mesh and collision agree");
@@ -112,10 +121,10 @@ public final class PresentationChecks {
                 "different glass colours retain their boundary");
         world.setBlock(pos.north(), blue, 2);
 
-        BlockRayTraceResult high = trace(blue, world, pos, new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
-                new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1));
-        BlockRayTraceResult low = trace(blue, world, pos, new Vector3d(pos.getX() + .5, pos.getY() + .7, pos.getZ() - 1),
-                new Vector3d(pos.getX() + .5, pos.getY() + .7, pos.getZ() + 1));
+        BlockHitResult high = trace(blue, world, pos, new Vec3(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
+                new Vec3(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1));
+        BlockHitResult low = trace(blue, world, pos, new Vec3(pos.getX() + .5, pos.getY() + .7, pos.getZ() - 1),
+                new Vec3(pos.getX() + .5, pos.getY() + .7, pos.getZ() + 1));
 
         require(high != null && high.getLocation().z == pos.getZ() + .25, "ray passes above the lower arm to the post");
         require(low != null && low.getLocation().z == pos.getZ(), "ray hits the lower connection");
@@ -128,8 +137,8 @@ public final class PresentationChecks {
         require(!straight.getValue(WallBlock.UP), "straight runs have no post");
         require(straight.getShape(world, pos).bounds().maxY == 13 / 16.0,
                 "straight selection follows the lower wall");
-        require(trace(blue, world, pos, new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
-                new Vector3d(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1)) == null,
+        require(trace(blue, world, pos, new Vec3(pos.getX() + .5, pos.getY() + .9, pos.getZ() - 1),
+                new Vec3(pos.getX() + .5, pos.getY() + .9, pos.getZ() + 1)) == null,
                 "no invisible selectable post in a straight run");
         world.removeBlock(pos.south(), false);
         require(blueWall.getActualState(blue, world, pos).getValue(WallBlock.UP),
@@ -152,7 +161,7 @@ public final class PresentationChecks {
         require(checked == materials * 32, "all wall materials, connection profiles and overhead states");
         require(coveredMaterials.contains("minecraft:gold_block") && coveredMaterials.contains("minecraft:packed_ice"),
                 "gold and packed ice are covered");
-        System.out.println("BUILDING_PIECES_PRESENTATION_PASS wall_profiles=" + checked);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PRESENTATION_PASS wall_profiles=" + checked);
     }
 
     public static void names() {
@@ -167,7 +176,7 @@ public final class PresentationChecks {
 
         ItemStack named = Pieces.stack(Pieces.state("minecraft:gold_block", Shape.WALL, 0), 1);
 
-        named.setHoverName(new net.minecraft.util.text.StringTextComponent("My Wall"));
+        named.setHoverName(new net.minecraft.network.chat.TextComponent("My Wall"));
         require(named.getHoverName().getString().equals("My Wall"), "custom item names are preserved");
 
         int checked = 0;
@@ -200,10 +209,10 @@ public final class PresentationChecks {
                     .getHoverName().getString().equals("Redwood Step"), "BOP wood display name");
         }
 
-        System.out.println("BUILDING_PIECES_NAMES_PASS states=" + checked);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NAMES_PASS states=" + checked);
     }
 
-    public static void connectedGlass(ServerWorld world) {
+    public static void connectedGlass(ServerLevel world) {
         BlockPos pos = new BlockPos(-528, 90, -528);
         Direction[] sides = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
         List<BlockState> materials = new ArrayList<BlockState>();
@@ -291,15 +300,15 @@ public final class PresentationChecks {
         }
 
         require(checked == 2533, "every connection combination and clear/stained colour pair");
-        System.out.println("BUILDING_PIECES_CONTINUOUS_GLASS_PASS cases=" + checked);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CONTINUOUS_GLASS_PASS cases=" + checked);
     }
 
-    private static void torches(ServerWorld world) {
+    private static void torches(ServerLevel world) {
         BlockPos pos = new BlockPos(-524, 90, -524);
         Direction[] sides = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
-        ServerPlayerEntity player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
 
-        player.abilities.instabuild = false;
+        player.getAbilities().instabuild = false;
 
         int checked = 0;
 
@@ -329,10 +338,10 @@ public final class PresentationChecks {
 
                         ItemStack stack = new ItemStack(Item.byBlock(torch), 2);
 
-                        player.setItemInHand(Hand.MAIN_HAND, stack);
-                        require(stack.useOn(new ItemUseContext(player, Hand.MAIN_HAND,
-                                new BlockRayTraceResult(new Vector3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
-                                        Direction.UP, pos, false))) == ActionResultType.CONSUME,
+                        player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+                        require(stack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+                                new BlockHitResult(new Vec3(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
+                                        Direction.UP, pos, false))) == InteractionResult.CONSUME,
                                 "torch places on wall");
 
                         BlockState placed = world.getBlockState(pos.above());
@@ -370,24 +379,24 @@ public final class PresentationChecks {
             world.removeBlock(pos.relative(side), false);
         }
 
-        System.out.println("BUILDING_PIECES_WALL_TORCH_PASS cases=" + checked);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WALL_TORCH_PASS cases=" + checked);
     }
 
-    private static boolean visible(PieceBlock block, BlockState state, ServerWorld world, BlockPos position,
+    private static boolean visible(PieceBlock block, BlockState state, ServerLevel world, BlockPos position,
             Direction side) {
         return !block.skipRendering(block.getActualState(state, world, position),
                 world.getBlockState(position.relative(side)), side);
     }
 
-    private static BlockRayTraceResult trace(BlockState state, ServerWorld world, BlockPos position, Vector3d start,
-            Vector3d end) {
+    private static BlockHitResult trace(BlockState state, ServerLevel world, BlockPos position, Vec3 start,
+            Vec3 end) {
         PieceBlock block = (PieceBlock) state.getBlock();
 
         return block.getActualState(state, world, position).getShape(world, position).clip(start, end, position);
     }
 
     @SuppressWarnings("unchecked")
-    private static int joins(ServerWorld world, BlockPos position, BlockState state) {
+    private static int joins(ServerLevel world, BlockPos position, BlockState state) {
         try {
             Class<?> type = zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel.class;
             java.lang.reflect.Field field = type.getDeclaredField("JOINS");
@@ -414,9 +423,9 @@ public final class PresentationChecks {
         }
     }
 
-    public static void gallery(ServerWorld world) {
+    public static void gallery(ServerLevel world) {
         world.setDayTime(6000);
-        world.getGameRules().getRule(net.minecraft.world.GameRules.RULE_DAYLIGHT).set(false, world.getServer());
+        world.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DAYLIGHT).set(false, world.getServer());
 
         for (int blockX = 0; blockX <= 12; blockX++) {
             for (int blockZ = 0; blockZ <= 11; blockZ++) {

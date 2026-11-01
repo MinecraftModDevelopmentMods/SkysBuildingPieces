@@ -1,16 +1,23 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.BakedModel;
+
 import java.util.*;
 import java.util.concurrent.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.*;
-import net.minecraft.util.Direction;
+import com.mojang.blaze3d.vertex.*;
+import net.minecraft.core.Direction;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -20,18 +27,18 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
 /** Removes repeated glass borders at matching joins without changing the wall geometry. */
-public final class ContinuousGlassModel implements IBakedModel {
+public final class ContinuousGlassModel implements BakedModel {
     private static final ModelProperty<Integer> JOINS = new ModelProperty<>(
             joins -> joins != null && joins >= 0 && joins < 16);
-    private final IBakedModel original;
+    private final BakedModel original;
     private final ConcurrentMap<QuadKey, List<BakedQuad>> cache = new ConcurrentHashMap<QuadKey, List<BakedQuad>>();
 
-    public ContinuousGlassModel(IBakedModel original) {
+    public ContinuousGlassModel(BakedModel original) {
         this.original = original;
     }
 
     @Override
-    public IModelData getModelData(IBlockDisplayReader world, BlockPos position, BlockState state,
+    public IModelData getModelData(BlockAndTintGetter world, BlockPos position, BlockState state,
             IModelData tileData) {
         int joins = 0;
         PieceBlock wall = (PieceBlock) state.getBlock();
@@ -81,7 +88,7 @@ public final class ContinuousGlassModel implements IBakedModel {
 
         for (BakedQuad quad : quads) {
             // 1.15 quads use the block vertex format; they no longer carry a format of their own.
-            VertexFormat format = DefaultVertexFormats.BLOCK;
+            VertexFormat format = DefaultVertexFormat.BLOCK;
             int position = -1;
             int texture = -1;
 
@@ -145,11 +152,11 @@ public final class ContinuousGlassModel implements IBakedModel {
         return original.getParticleIcon();
     }
 
-    public ItemCameraTransforms getTransforms() {
+    public ItemTransforms getTransforms() {
         return original.getTransforms();
     }
 
-    public ItemOverrideList getOverrides() {
+    public ItemOverrides getOverrides() {
         return original.getOverrides();
     }
 
@@ -188,8 +195,8 @@ public final class ContinuousGlassModel implements IBakedModel {
         }
     }
 
-    static void install(Map<ResourceLocation, IBakedModel> registry, IBakedModel missing, Set<String> walls) {
-        IdentityHashMap<IBakedModel, ContinuousGlassModel> wrapped = new IdentityHashMap<IBakedModel, ContinuousGlassModel>();
+    static void install(Map<ResourceLocation, BakedModel> registry, BakedModel missing, Set<String> walls) {
+        IdentityHashMap<BakedModel, ContinuousGlassModel> wrapped = new IdentityHashMap<BakedModel, ContinuousGlassModel>();
 
         for (ResourceLocation key : new ArrayList<>(registry.keySet())) {
             if (!(key instanceof ModelResourceLocation)
@@ -198,7 +205,7 @@ public final class ContinuousGlassModel implements IBakedModel {
                 continue;
             }
 
-            IBakedModel model = registry.get(key);
+            BakedModel model = registry.get(key);
 
             if (model == null || model == missing || model instanceof ContinuousGlassModel) {
                 continue;

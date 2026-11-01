@@ -20,7 +20,7 @@ def preparePolicy = tasks.register('prepareLegacyPolicyTest') {
         if (directory.canonicalFile != new File(buildDir, 'legacy-policy-test-run').canonicalFile) {
             throw new GradleException('Policy checks must remain inside their build directory')
         }
-        delete directory
+        if (directory.exists()) throw new GradleException('Preserve the existing policy evidence before another run: ' + directory)
         copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
         copy {
             from policyJar.flatMap { it.archiveFile }
@@ -75,20 +75,17 @@ def controlJar = tasks.register('optionalModControlJar', Jar) {
     from controlClasses
     from 'src/optionalControl/resources'
 }
-tasks.register('captureDisabledMineralogyControl', Exec) {
-    description = 'Captures dependency-only startup errors; this does not qualify the disabled profile.'
+tasks.register('captureDisabledMineralogyControl', JavaExec) {
+    description = 'Checks optional mods on their own while Mineralogy slabs are disabled.'
     dependsOn controlJar, project.ext.verifyNativeOptionalRuntime
-    dependsOn {
-        JavaExec run = tasks.getByName('runServer') as JavaExec
-        run.taskDependencies.getDependencies(run)
-    }
+    workingDir layout.buildDirectory.dir('optional-disabled-control-run')
+    project.ext.configureNativeBootstrapRun(delegate, 'runServer', false)
     doFirst {
-        JavaExec run = tasks.getByName('runServer') as JavaExec
-        File directory = new File(buildDir, 'optional-disabled-control-run')
+        File directory = workingDir
         if (directory.canonicalFile != new File(buildDir, 'optional-disabled-control-run').canonicalFile) {
             throw new GradleException('Dependency control must remain inside its build directory')
         }
-        delete directory
+        if (directory.exists()) throw new GradleException('Preserve the existing dependency control evidence: ' + directory)
         copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
         copy {
             from controlJar.flatMap { it.archiveFile }, project.ext.nativeOptionalDevelopmentJars.values()
@@ -101,52 +98,16 @@ tasks.register('captureDisabledMineralogyControl', Exec) {
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
             new File(directory, it).text = '[]\n'
         }
-        new File(directory, 'server.properties').text = '''level-name=world
-level-seed=4815162342
-online-mode=false
-server-ip=127.0.0.1
-server-port=0
-generate-structures=false
-spawn-animals=false
-spawn-monsters=false
-'''
-        Set<File> excluded = (sourceSets.main.output.files + [new File(buildDir, 'forge-run-mod-classes/main')])
-                .collect { it.canonicalFile } as Set<File>
-        File classpathJar = new File(buildDir, 'optional-control/classpath.jar')
-        java.util.jar.Manifest manifest = new java.util.jar.Manifest()
-        manifest.mainAttributes.put(java.util.jar.Attributes.Name.MANIFEST_VERSION, '1.0')
-        manifest.mainAttributes.put(java.util.jar.Attributes.Name.CLASS_PATH,
-                run.classpath.files.findAll { !excluded.contains(it.canonicalFile) }
-                        .collect { it.toURI().toASCIIString() }.join(' '))
-        classpathJar.withOutputStream { new java.util.jar.JarOutputStream(it, manifest).close() }
-        environment new LinkedHashMap<>(run.environment)
-        environment 'MOD_CLASSES', ''
-        environment 'target', 'fmluserdevserver'
-        environment 'MCP_MAPPINGS', "${mapping_channel}_${mapping_version}"
-        environment 'MCP_VERSION', mcp_version
-        environment 'FORGE_VERSION', forge_version
-        environment 'FORGE_GROUP', 'net.minecraftforge'
-        environment 'MC_VERSION', minecraft_version
-        workingDir directory
-        commandLine javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
-                .get().executablePath.asFile.absolutePath, '-Xmx2g', '-cp', classpathJar.absolutePath,
-                'net.minecraftforge.userdev.LaunchTesting'
+        new File(directory, 'server.properties').text = 'level-name=world\nonline-mode=false\nserver-ip=127.0.0.1\nserver-port=0\nspawn-animals=false\nspawn-monsters=false\n'
     }
     doLast {
-        File directory = new File(buildDir, 'optional-disabled-control-run')
+        File directory = workingDir
+        project.ext.auditNativeServerLogs(directory, 'disabled-control')
         String text = new File(directory, 'logs/latest.log').getText('UTF-8')
-        if (!text.contains('OPTIONAL_MOD_CONTROL_STARTED sky_mods=false') || !text.contains('Done (') ||
-                text.contains('[STDERR/') || !fileTree(new File(directory, 'crash-reports')).isEmpty()) {
+        if (!text.contains('OPTIONAL_MOD_CONTROL_STARTED sky_mods=false') || !text.contains('Done (')) {
             throw new GradleException('Dependency control failed to reach a normal startup')
         }
-        List<String> errors = text.readLines().findAll { it =~ /\/(?:ERROR|FATAL)\]/ }
-        if (errors.isEmpty()) {
-            throw new GradleException('Dependency control did not reproduce the observed errors')
-        }
-        // This is a diagnostic receipt, not an error allowance. Preserve every
-        // severe message; the actual combined profile still rejects them all.
-        new File(directory, 'dependency-errors.txt').text = errors.join('\n') + '\n'
-        logger.lifecycle('DEPENDENCY_CONTROL_CAPTURED errors={} sky_mods=false; disabled profile remains unqualified', errors.size())
+        logger.lifecycle('DISABLED_MINERALOGY_CONTROL_PASS errors=0 sky_mods=false')
     }
 }
 

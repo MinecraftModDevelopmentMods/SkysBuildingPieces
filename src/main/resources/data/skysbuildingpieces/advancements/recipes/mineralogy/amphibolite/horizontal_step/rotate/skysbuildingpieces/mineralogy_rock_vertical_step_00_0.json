@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_amphibolite_vertical_step"
+            "items": [
+              "skysbuildingpieces:mineralogy_amphibolite_vertical_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/amphibolite/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_00_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/amphibolite/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_00_0"
+    ]
   },
   "conditions": [
     {

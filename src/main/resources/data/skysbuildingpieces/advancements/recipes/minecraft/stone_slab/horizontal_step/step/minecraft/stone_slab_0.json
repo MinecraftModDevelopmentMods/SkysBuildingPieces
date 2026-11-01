@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:smooth_stone_slab"
+            "items": [
+              "minecraft:smooth_stone_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stone_slab/horizontal_step/step/minecraft/stone_slab_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stone_slab/horizontal_step/step/minecraft/stone_slab_0"
+    ]
   },
   "conditions": [
     {

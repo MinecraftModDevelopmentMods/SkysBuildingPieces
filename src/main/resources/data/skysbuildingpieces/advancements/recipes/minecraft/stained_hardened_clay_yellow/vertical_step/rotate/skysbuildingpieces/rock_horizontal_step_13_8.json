@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:stained_hardened_clay_yellow_horizontal_step"
+            "items": [
+              "skysbuildingpieces:stained_hardened_clay_yellow_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_yellow/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_13_8"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_yellow/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_13_8"
+    ]
   },
   "conditions": [
     {

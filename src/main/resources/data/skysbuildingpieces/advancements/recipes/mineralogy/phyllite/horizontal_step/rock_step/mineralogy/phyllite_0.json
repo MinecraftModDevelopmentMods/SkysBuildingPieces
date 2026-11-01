@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "mineralogy:phyllite"
+            "items": [
+              "mineralogy:phyllite"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/phyllite/horizontal_step/rock_step/mineralogy/phyllite_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/phyllite/horizontal_step/rock_step/mineralogy/phyllite_0"
+    ]
   },
   "conditions": [
     {

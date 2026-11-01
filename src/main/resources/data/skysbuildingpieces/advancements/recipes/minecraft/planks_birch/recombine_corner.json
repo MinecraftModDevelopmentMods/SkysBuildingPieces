@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:planks_birch_corner"
+            "items": [
+              "skysbuildingpieces:planks_birch_corner"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/planks_birch/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/planks_birch/recombine_corner"
+    ]
   },
   "conditions": [
     {

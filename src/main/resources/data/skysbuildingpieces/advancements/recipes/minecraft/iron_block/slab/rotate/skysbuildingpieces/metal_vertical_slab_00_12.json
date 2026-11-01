@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:iron_block_vertical_slab"
+            "items": [
+              "skysbuildingpieces:iron_block_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/iron_block/slab/rotate/skysbuildingpieces/metal_vertical_slab_00_12"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/iron_block/slab/rotate/skysbuildingpieces/metal_vertical_slab_00_12"
+    ]
   },
   "conditions": [
     {

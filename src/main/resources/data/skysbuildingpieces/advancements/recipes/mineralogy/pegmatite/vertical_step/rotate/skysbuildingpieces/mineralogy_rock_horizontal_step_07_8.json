@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:mineralogy_pegmatite_horizontal_step"
+            "items": [
+              "skysbuildingpieces:mineralogy_pegmatite_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/pegmatite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_07_8"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/pegmatite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_07_8"
+    ]
   },
   "conditions": [
     {

@@ -1,8 +1,8 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.16.5 and Forge 36.2.34. Run the included Gradle
-wrapper with Java 17. Compilation and Minecraft use Java 8; the pinned production
-toolchain is Temurin 8.0.502+7. ForgeGradle uses Java 25 for its Mavenizer tool.
+This branch targets Minecraft 1.17.1 and Forge 37.1.1. Run the included Gradle
+wrapper with Java 17. Compilation and Minecraft use Java 16; the pinned production
+toolchain is Temurin 16.0.2+7. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
 the command path, or pass `-PpythonExecutable=<python executable>` to Gradle.
 
@@ -27,7 +27,7 @@ and exclude test classes.
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs116/SkysGrassSlabs` checkout,
+Build that exact commit in the sibling `SkysGrassSlabs117/SkysGrassSlabs` checkout,
 or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
 match their pinned hashes. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.

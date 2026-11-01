@@ -17,6 +17,41 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ForwardFixtureContractTest {
     @Test
+    void native116FixtureKeepsAllPiecesAndTheRenamedVanillaPath() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser().parse(Files.readString(root.resolve("building-pieces-1.16.5.json")))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("building-pieces-1.16.5.zip"));
+
+        assertEquals("7842655cc4c06b4556207c0fba7ec7ba7c802289", manifest.get("source_commit").getAsString());
+        assertEquals("B4DC9F16E5CF42902B93667B9E95EC846B66E2A3C488CC7CF48D9FBA3B477C41",
+                manifest.get("source_jar_sha256").getAsString());
+        assertEquals("B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F", sha256(archive));
+        assertEquals(7029, manifest.getAsJsonArray("states").size());
+        assertEquals(7029, manifest.get("source_saved_states_verified").getAsInt());
+        assertEquals(3346, manifest.get("wet_states").getAsInt());
+        assertEquals(144, manifest.get("snowy_states").getAsInt());
+        assertTrue(manifest.get("source_unchanged").getAsBoolean());
+        assertTrue(manifest.get("player_shovel").getAsString().contains("Enchantments"));
+        assertTrue(manifest.get("player_nested").getAsString().contains("Items"));
+        assertEquals(1, manifest.getAsJsonArray("entities").size());
+
+        boolean nativePath = false;
+        for (com.google.gson.JsonElement value : manifest.getAsJsonArray("states")) {
+            JsonObject state = value.getAsJsonObject();
+            if (state.get("x").getAsInt() == 832 && state.get("y").getAsInt() == 160
+                    && state.get("z").getAsInt() == 512) {
+                assertTrue(state.get("state").getAsString().contains("minecraft:grass_path"));
+                nativePath = true;
+            }
+        }
+        assertTrue(nativePath, "The source needs a real vanilla path to exercise its native rename");
+        Set<String> members = verifyMembers(manifest, archive);
+        assertTrue(members.contains("playerdata/" + manifest.get("player").getAsString() + ".dat"));
+        assertTrue(members.contains("data/skysbuildingpieces_world_state.dat"));
+    }
+
+    @Test
     void native115FixtureKeepsEveryStateAndBothPlayerInventories() throws Exception {
         Path root = Paths.get("src/testFixtures/worlds");
         JsonObject manifest = new JsonParser().parse(new String(

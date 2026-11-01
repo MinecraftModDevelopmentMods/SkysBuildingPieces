@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:purpur_pillar"
+            "items": [
+              "minecraft:purpur_pillar"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/purpur_pillar/wall/wall/minecraft/purpur_pillar_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/purpur_pillar/wall/wall/minecraft/purpur_pillar_0"
+    ]
   },
   "conditions": [
     {

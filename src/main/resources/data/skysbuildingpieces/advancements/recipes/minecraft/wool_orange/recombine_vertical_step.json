@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "skysbuildingpieces:wool_orange_vertical_step"
+            "items": [
+              "skysbuildingpieces:wool_orange_vertical_step"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_orange/recombine_vertical_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_orange/recombine_vertical_step"
+    ]
   },
   "conditions": [
     {

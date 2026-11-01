@@ -4,28 +4,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -34,8 +34,12 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
 /** Early native checks complement the complete gameplay and upgrade harness. */
 @Mod("buildingpiecesbootstrap")
 public final class RuntimeBootstrap {
+    private MinecraftServer pendingServer;
+    private int startupTicks;
+
     public RuntimeBootstrap() {
         MinecraftForge.EVENT_BUS.addListener(this::started);
+        MinecraftForge.EVENT_BUS.addListener(this::tick);
         net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
                 .addListener(PersistenceOrderChecks::ready);
         net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
@@ -43,10 +47,43 @@ public final class RuntimeBootstrap {
     }
 
     private void started(FMLServerStartedEvent event) {
-        MinecraftServer server = event.getServer();
-        ServerWorld world = server.getLevel(World.OVERWORLD);
+        pendingServer = event.getServer();
+        startupTicks = 0;
+        if (System.getProperty("skysbuildingpieces.bootstrapPhase", "").startsWith("forward")) {
+            NativeForwardChecks.prepare(pendingServer.getLevel(Level.OVERWORLD));
+        } else {
+            GameplayChecks.prepare(pendingServer.getLevel(Level.OVERWORLD));
+        }
+    }
+
+    private void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || pendingServer == null) {
+            return;
+        }
+        if (++startupTicks < 20) {
+            return;
+        }
+        ServerLevel world = pendingServer.getLevel(Level.OVERWORLD);
+        boolean forward = System.getProperty("skysbuildingpieces.bootstrapPhase", "").startsWith("forward");
+        if (!(forward ? NativeForwardChecks.ready(world) : GameplayChecks.ready(world))) {
+            if (startupTicks > 1200) {
+                org.apache.logging.log4j.LogManager.getLogger().error("The native fixture never finished loading its chunks and entities");
+                pendingServer.halt(false);
+                pendingServer = null;
+            }
+            return;
+        }
+        MinecraftServer server = pendingServer;
+        pendingServer = null;
+        // Entity storage is asynchronous in 1.17. Run after normal server ticks
+        // make the fixture visible, keeping every collision assertion intact.
+        audit(server);
+    }
+
+    private void audit(MinecraftServer server) {
+        ServerLevel world = server.getLevel(Level.OVERWORLD);
         String phase = System.getProperty("skysbuildingpieces.bootstrapPhase", "");
-        File root = server.getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile();
+        File root = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile();
 
         try {
             require(phase.equals("fresh") || phase.equals("reload") || phase.startsWith("forward")
@@ -61,7 +98,7 @@ public final class RuntimeBootstrap {
                 WaterloggingChecks.run(world);
             } else if (phase.equals("staging")) {
                 stacks = legacyStacks();
-                zone.moddev.mc.skysbuildingpieces.legacy.NativeStagingChecks.run(world);
+                zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
             } else {
@@ -108,36 +145,42 @@ public final class RuntimeBootstrap {
             }
 
             PersistenceOrderChecks.verify(world);
-            System.out.println("BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase + " recipes=" + recipes
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase + " recipes=" + recipes
                     + " legacy_stacks=" + stacks);
             server.halt(false);
         } catch (Throwable failure) {
-            failure.printStackTrace();
+            org.apache.logging.log4j.LogManager.getLogger().error("Building Pieces native checks failed", failure);
             ClientStatus.failure = failure;
             // World creation waits for server readiness on the render thread.
             // Report a failed probe there too, so it exits instead of waiting forever.
             net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> net.minecraft.client.Minecraft.getInstance().delayCrash(
-                            net.minecraft.crash.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
+                            net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
             server.halt(false);
+        } finally {
+            if (phase.startsWith("forward")) {
+                NativeForwardChecks.release(world);
+            } else {
+                GameplayChecks.release(world);
+            }
         }
     }
 
-    private static void clientGrid(ServerWorld world, boolean reload) throws Exception {
-        File file = new File(world.getServer().getWorldPath(net.minecraft.world.storage.FolderName.ROOT).toFile(), "native-client-grid.dat");
-        CompoundNBT saved = new CompoundNBT();
+    private static void clientGrid(ServerLevel world, boolean reload) throws Exception {
+        File file = new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(), "native-client-grid.dat");
+        CompoundTag saved = new CompoundTag();
 
         if (reload) {
             try (FileInputStream input = new FileInputStream(file)) {
-                saved = CompressedStreamTools.readCompressed(input);
+                saved = NbtIo.readCompressed(input);
             }
         }
 
-        CompoundNBT rules = world.getGameRules().createTag();
+        CompoundTag rules = world.getGameRules().createTag();
 
         rules.putString("randomTickSpeed", "0");
-        world.getGameRules().assignFrom(new net.minecraft.world.GameRules(
-                new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NBTDynamicOps.INSTANCE, rules)), world.getServer());
+        world.getGameRules().assignFrom(new net.minecraft.world.level.GameRules(
+                new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NbtOps.INSTANCE, rules)), world.getServer());
 
         int number = 0;
 
@@ -149,7 +192,7 @@ public final class RuntimeBootstrap {
                 String key = Integer.toString(number++);
 
                 if (reload) {
-                    require(NBTUtil.writeBlockState(world.getBlockState(position)).equals(saved.getCompound(key)),
+                    require(NbtUtils.writeBlockState(world.getBlockState(position)).equals(saved.getCompound(key)),
                             "Client world reload lost " + block.getRegistryName() + " / " + metadata);
                 } else {
                     world.setBlock(position, block.getStateFromMeta(metadata), 18);
@@ -166,20 +209,20 @@ public final class RuntimeBootstrap {
 
                 state = block.getActualState(state, world, position);
                 world.setBlock(position, state, 18);
-                saved.put(Integer.toString(index), NBTUtil.writeBlockState(state));
+                saved.put(Integer.toString(index), NbtUtils.writeBlockState(state));
             }
             try (FileOutputStream output = new FileOutputStream(file)) {
-                CompressedStreamTools.writeCompressed(saved, output);
+                NbtIo.writeCompressed(saved, output);
             }
         }
 
-        System.out.println("BUILDING_PIECES_CLIENT_WORLD_PASS reload=" + reload + " states=" + number);
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CLIENT_WORLD_PASS reload=" + reload + " states=" + number);
     }
 
-    private static CraftingInventory grid() {
-        return new CraftingInventory(new Container(null, 0) {
+    private static CraftingContainer grid() {
+        return new CraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
-            public boolean stillValid(PlayerEntity player) {
+            public boolean stillValid(Player player) {
                 return true;
             }
         }, 3, 3);
@@ -187,20 +230,20 @@ public final class RuntimeBootstrap {
 
     private static int legacyStacks() {
         int checked = 0;
-        java.util.Set<net.minecraft.item.Item> nativeItems = new java.util.HashSet<>();
+        java.util.Set<net.minecraft.world.item.Item> nativeItems = new java.util.HashSet<>();
 
         for (PieceBlock block : Pieces.BLOCKS.values()) {
             int assigned = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < assigned; metadata++) {
-                CompoundNBT raw = new CompoundNBT();
+                CompoundTag raw = new CompoundTag();
 
                 raw.putString("id", block.getRegistryName().toString());
                 raw.putShort("Damage", (short) metadata);
                 raw.putByte("Count", (byte) 17);
                 raw.putByte("Slot", (byte) 4);
 
-                CompoundNBT custom = new CompoundNBT();
+                CompoundTag custom = new CompoundTag();
 
                 custom.putString("Note", "Keep this custom data");
                 raw.put("tag", custom);
@@ -219,16 +262,16 @@ public final class RuntimeBootstrap {
                     // Native item names can have an older meaning. Check the chosen target after both the direct
                     // fixer and the chunk loader's intermediate-version route, not only our own raw conversion.
                     for (boolean intermediate : new boolean[] { false, true }) {
-                        CompoundNBT fixed = new CompoundNBT();
-                        ListNBT inventory = new ListNBT();
+                        CompoundTag fixed = new CompoundTag();
+                        ListTag inventory = new ListTag();
                         inventory.add(raw.copy());
                         fixed.put("Inventory", inventory);
                         if (intermediate) {
-                            fixed = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
-                                    net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, fixed, 1343, 1493);
+                            fixed = NbtUtils.update(net.minecraft.util.datafix.DataFixers.getDataFixer(),
+                                    net.minecraft.util.datafix.DataFixTypes.PLAYER, fixed, 1343, 1493);
                         }
-                        fixed = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
-                                net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, fixed,
+                        fixed = NbtUtils.update(net.minecraft.util.datafix.DataFixers.getDataFixer(),
+                                net.minecraft.util.datafix.DataFixTypes.PLAYER, fixed,
                                 intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
                         ItemStack saved = ItemStack.of(fixed);
                         require(saved.getItem() == expected.getItem() && saved.getCount() == 17
@@ -238,7 +281,7 @@ public final class RuntimeBootstrap {
                     }
                 }
 
-                CompoundNBT before = raw.copy();
+                CompoundTag before = raw.copy();
 
                 LegacyBridge.prepareStack(raw);
                 require(raw.equals(before), "Legacy item conversion must be idempotent");
@@ -246,27 +289,27 @@ public final class RuntimeBootstrap {
             }
         }
 
-        System.out.println("BUILDING_PIECES_NATIVE_ITEM_FIXERS_PASS identities=" + nativeItems.size() + " pipelines=2");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_ITEM_FIXERS_PASS identities=" + nativeItems.size() + " pipelines=2");
         return checked;
     }
 
     private static void rawPlayer() {
         PieceBlock block = Pieces.BLOCKS.values().iterator().next();
         int metadata = block.palette.shape.states - 1;
-        CompoundNBT source = new CompoundNBT();
-        ListNBT inventory = new ListNBT();
-        CompoundNBT stack = new CompoundNBT();
+        CompoundTag source = new CompoundTag();
+        ListTag inventory = new ListTag();
+        CompoundTag stack = new CompoundTag();
 
         stack.putString("id", block.getRegistryName().toString());
         stack.putShort("Damage", (short) metadata);
         stack.putByte("Count", (byte) 23);
         stack.putByte("Slot", (byte) 7);
 
-        CompoundNBT custom = new CompoundNBT();
+        CompoundTag custom = new CompoundTag();
 
         custom.putString("Keep", "Unrelated custom data");
 
-        CompoundNBT display = new CompoundNBT();
+        CompoundTag display = new CompoundTag();
 
         display.putString("Name", "Named legacy piece");
         custom.put("display", display);
@@ -274,9 +317,9 @@ public final class RuntimeBootstrap {
         inventory.add(stack);
         source.put("Inventory", inventory);
 
-        CompoundNBT upgraded = NBTUtil.update(net.minecraft.util.datafix.DataFixesManager.getDataFixer(),
-                net.minecraft.util.datafix.DefaultTypeReferences.PLAYER, source, 1343, 1976);
-        CompoundNBT saved = upgraded.getList("Inventory", 10).getCompound(0);
+        CompoundTag upgraded = NbtUtils.update(net.minecraft.util.datafix.DataFixers.getDataFixer(),
+                net.minecraft.util.datafix.DataFixTypes.PLAYER, source, 1343, 1976);
+        CompoundTag saved = upgraded.getList("Inventory", 10).getCompound(0);
         ItemStack actual = ItemStack.of(saved);
         ItemStack expected = Pieces.legacyItem(block.getRegistryName().toString(), metadata, 23);
 
@@ -285,7 +328,7 @@ public final class RuntimeBootstrap {
         require(actual.hasTag() && actual.getTag().getString("Keep").equals("Unrelated custom data")
                 && actual.getHoverName().getString().equals("Named legacy piece") && saved.getByte("Slot") == 7,
                 "Player data fixing must preserve the custom name, slot and unrelated data");
-        System.out.println("BUILDING_PIECES_RAW_PLAYER_FIXER_PASS");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RAW_PLAYER_FIXER_PASS");
     }
 
     private static void require(boolean condition, String message) {

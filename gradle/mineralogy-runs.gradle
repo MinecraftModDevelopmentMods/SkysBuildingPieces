@@ -182,12 +182,12 @@ def prepareMineralogyIntegrationTest = tasks.register('prepareMineralogyIntegrat
         if (directory.canonicalFile != expected.canonicalFile) {
             throw new GradleException('Refusing to clear a Mineralogy verification directory outside the build output')
         }
-        project.delete(directory)
+        if (directory.exists()) throw new GradleException('Preserve the existing Mineralogy verification evidence: ' + directory)
         if (providers.gradleProperty('testNativeSlabs').getOrElse('true') == 'false') {
             File configDirectory = new File(directory, 'config')
             configDirectory.mkdirs()
-            new File(configDirectory, 'mineralogy.cfg').setText(
-                    'options {\n    B:GENERATE_ROCKSLAB=false\n}\n', 'UTF-8')
+            new File(configDirectory, 'mineralogy-common.toml').setText(
+                    '[options]\nGENERATE_ROCKSLAB=false\n', 'UTF-8')
         }
         copy {
             from new File(gameDirectory.asFile, 'mods')

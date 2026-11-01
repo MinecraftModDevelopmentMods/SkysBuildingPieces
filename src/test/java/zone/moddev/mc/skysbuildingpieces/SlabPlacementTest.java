@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.SlabPlacement;

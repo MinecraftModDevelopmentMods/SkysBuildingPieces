@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:polished_diorite"
+            "items": [
+              "minecraft:polished_diorite"
+            ]
           }
         ]
       }
@@ -18,10 +20,15 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/diorite_smooth/wall/wall/minecraft/stone_4"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/diorite_smooth/wall/wall/minecraft/stone_4"
+    ]
   },
   "conditions": [
     {
