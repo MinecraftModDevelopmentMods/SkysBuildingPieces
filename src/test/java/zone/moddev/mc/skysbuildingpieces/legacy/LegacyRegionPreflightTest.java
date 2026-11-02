@@ -18,7 +18,7 @@ class LegacyRegionPreflightTest {
         Path directory = Files.createDirectories(world.resolve("region"));
         Path file = directory.resolve("r.0.0.mca");
 
-        try (RegionFile nativeRegion = new RegionFile(file.toFile(), directory.toFile(), false)) {
+        try (RegionFile nativeRegion = new RegionFile(file, directory, false)) {
             assertEquals(0, Files.size(file));
             assertNull(nativeRegion.getChunkDataInputStream(new ChunkPos(0, 0)));
             assertDoesNotThrow(() -> LegacyPreflight.validate(world.toFile(), Collections.emptyMap()));

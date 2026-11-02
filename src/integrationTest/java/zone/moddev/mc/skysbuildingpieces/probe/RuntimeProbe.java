@@ -19,7 +19,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
@@ -32,6 +32,8 @@ public final class RuntimeProbe {
     private boolean needsGameplay;
 
     public RuntimeProbe() {
+        PathChecks.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus(),
+                "buildingpiecesprobe");
         PersistenceRegistrationChecks.register(
                 net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.register(this);
@@ -39,7 +41,7 @@ public final class RuntimeProbe {
     }
 
     @SubscribeEvent
-    public void started(FMLServerStartedEvent event) {
+    public void started(ServerStartedEvent event) {
         server = event.getServer();
         String phase = System.getProperty("skysbuildingpieces.integrationPhase", "");
         needsGameplay = !(phase.startsWith("sylvester") || phase.startsWith("retired-rocks-")

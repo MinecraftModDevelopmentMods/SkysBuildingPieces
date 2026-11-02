@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.ToIntFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.biome.Biome;
 /** Internal bridge for biome numbers stored in pre-flattening chunks. */
 public final class HistoricalBiomes {
     private static final String PENDING = "skysbuildingpieces_biomes";
+    private static final String PENDING_NAMES = "skysbuildingpieces_biome_names";
     private static final Map<String, Map<String, String>> MODULES = new LinkedHashMap<>();
     private static volatile Mappings active = new Mappings(Collections.emptyMap(), Collections.emptyMap(), name -> -1);
 
@@ -82,7 +84,7 @@ public final class HistoricalBiomes {
 
         active = new Mappings(source, aliases, name -> {
             // Numeric IDs belong to the world's biome instances, which can differ from Forge's registration objects.
-            Registry<Biome> current = net.minecraftforge.fmllegacy.server.ServerLifecycleHooks.getCurrentServer()
+            Registry<Biome> current = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer()
                     .registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
             Biome biome = current.get(new ResourceLocation(name));
 
@@ -101,7 +103,17 @@ public final class HistoricalBiomes {
             return false;
         }
 
-        root.getCompound("Level").putIntArray(PENDING, biomes);
+        CompoundTag level = root.getCompound("Level");
+        byte[] saved = level.getByteArray("Biomes");
+        ListTag names = new ListTag();
+        for (byte value : saved) {
+            String source = active.source.get(value & 255);
+            names.add(StringTag.valueOf(source == null ? "" : active.aliases.getOrDefault(source, source)));
+        }
+        // Keep identities as well as numbers: 1.18's native fixer only knows the
+        // vanilla numeric table when it builds the section biome palettes.
+        level.putIntArray(PENDING, biomes);
+        level.put(PENDING_NAMES, names);
         return true;
     }
 
@@ -124,19 +136,88 @@ public final class HistoricalBiomes {
     }
 
     static void finish(CompoundTag root) {
-        CompoundTag level = root.getCompound("Level");
+        CompoundTag level = MigrationEvents.chunkLevel(root);
 
         if (!level.contains(PENDING)) {
+            if (level.contains(PENDING_NAMES)) {
+                throw blocked("incomplete pending biome recovery");
+            }
             return;
         }
         if (!level.contains(PENDING, 11) || level.getIntArray(PENDING).length != 256) {
             throw blocked("invalid pending biome recovery");
         }
 
-        // Vanilla's biome fixer recognises only vanilla's old numbers. Restore the selected mod biomes afterwards,
-        // using today's full integer IDs.
-        level.putIntArray("Biomes", level.getIntArray(PENDING));
+        if (root.contains("Level", 10)) {
+            // Retain the intermediate format for callers completing an older
+            // fixing stage. Ordinary 1.18 chunk loads use the section path below.
+            level.putIntArray("Biomes", level.getIntArray(PENDING));
+        } else {
+            restoreSectionBiomes(level);
+        }
         level.remove(PENDING);
+        level.remove(PENDING_NAMES);
+    }
+
+    private static void restoreSectionBiomes(CompoundTag chunk) {
+        ListTag names = chunk.getList(PENDING_NAMES, 8);
+        ListTag sections = chunk.getList("sections", 10);
+        if (names.size() != 256 || sections.isEmpty()) {
+            throw blocked("missing names or sections for pending biome recovery");
+        }
+
+        java.util.List<Runnable> changes = new java.util.ArrayList<>();
+        for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
+            CompoundTag section = sections.getCompound(sectionIndex);
+            CompoundTag nativeBiomes = section.getCompound("biomes");
+            ListTag palette = nativeBiomes.getList("palette", 8);
+            int bits = 32 - Integer.numberOfLeadingZeros(palette.size() - 1);
+            if (palette.isEmpty() || palette.size() > 64) {
+                throw blocked("invalid native biome palette in section " + section.getByte("Y"));
+            }
+            int perLong = bits == 0 ? 64 : 64 / bits;
+            long[] packed = nativeBiomes.getLongArray("data");
+            if (bits > 0 && packed.length != (64 + perLong - 1) / perLong) {
+                throw blocked("invalid native biome storage in section " + section.getByte("Y"));
+            }
+
+            Map<String, Integer> indices = new LinkedHashMap<>();
+            int[] cells = new int[64];
+            for (int cell = 0; cell < cells.length; cell++) {
+                int oldIndex = bits == 0 ? 0
+                        : (int) (packed[cell / perLong] >>> (cell % perLong * bits) & ((1L << bits) - 1));
+                if (oldIndex >= palette.size()) {
+                    throw blocked("out-of-range native biome palette entry");
+                }
+                // Match vanilla's old two-dimensional-to-quart sampling exactly.
+                int column = (cell & 3) * 4 + 2;
+                int row = (cell >> 2 & 3) * 4 + 2;
+                String replacement = names.getString(row * 16 + column);
+                String name = replacement.isEmpty() ? palette.getString(oldIndex) : replacement;
+                cells[cell] = indices.computeIfAbsent(name, ignored -> indices.size());
+            }
+
+            CompoundTag restored = nativeBiomes.copy();
+            ListTag restoredPalette = new ListTag();
+            indices.keySet().forEach(name -> restoredPalette.add(StringTag.valueOf(name)));
+            restored.put("palette", restoredPalette);
+            int restoredBits = 32 - Integer.numberOfLeadingZeros(indices.size() - 1);
+            if (restoredBits == 0) {
+                restored.remove("data");
+            } else {
+                int restoredPerLong = 64 / restoredBits;
+                long[] restoredData = new long[(64 + restoredPerLong - 1) / restoredPerLong];
+                for (int cell = 0; cell < cells.length; cell++) {
+                    restoredData[cell / restoredPerLong] |= (long) cells[cell]
+                            << (cell % restoredPerLong * restoredBits);
+                }
+                restored.putLongArray("data", restoredData);
+            }
+            changes.add(() -> section.put("biomes", restored));
+        }
+
+        // Validate every section before replacing any of them.
+        changes.forEach(Runnable::run);
     }
 
     static void clear() {

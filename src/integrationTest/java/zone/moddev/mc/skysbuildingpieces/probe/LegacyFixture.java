@@ -64,7 +64,7 @@ public final class LegacyFixture {
 
                 require(tile != null, "real material tile " + legacyId);
 
-                CompoundTag compoundTag = tile.save(new CompoundTag());
+                CompoundTag compoundTag = tile.saveWithFullMetadata();
 
                 compoundTag.putString("material", material);
                 compoundTag.putString("fixture_note", "material identity, not item damage");
@@ -106,7 +106,7 @@ public final class LegacyFixture {
 
                     BlockEntity tile = world.getBlockEntity(pos(entryIndex));
 
-                    require(tile != null && tile.save(new CompoundTag()).getString("material").equals(material),
+                    require(tile != null && tile.saveWithFullMetadata().getString("material").equals(material),
                             "default material identity");
                 }
             }

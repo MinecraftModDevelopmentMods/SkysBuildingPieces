@@ -26,6 +26,7 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/MineralogyChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeLegacyChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeBiomeChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/WaterloggingChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/DirtCoverageChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/CoverageContributor.java')
@@ -231,7 +232,7 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
         if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
             copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
         }
-        // Native defaults avoid Forge 37's first-write file-watcher race. The
+        // Native defaults avoid Forge 40's first-write file-watcher race. The
         // failed first-start receipt remains part of the qualification evidence.
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {

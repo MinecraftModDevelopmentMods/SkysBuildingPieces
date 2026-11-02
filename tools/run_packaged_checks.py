@@ -48,7 +48,7 @@ def manifest_classpath(destination, files):
 
 
 def argument_file(java, directory, phase, arguments):
-    # Java 16 argument files avoid Windows' command-line length limit. Quoting
+    # Java 17 argument files avoid Windows' command-line length limit. Quoting
     # each argument also preserves paths containing spaces.
     source = Path(__file__).resolve().parent.parent / "src/bootstrapTest/native-log4j2.xml"
     logging = directory / "native-log4j2.xml"
@@ -64,15 +64,15 @@ def argument_file(java, directory, phase, arguments):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.17.1/1.17.1.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.18.2/1.18.2.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.17.1-forge-37.1.1", "forge-37.1.1")]
+                for name in ("1.18.2-forge-40.3.0", "forge-40.3.0")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 37.1.1 profile")
+        raise ValueError("The installed client has no Forge 40.3.0 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.17.1" or forge["inheritsFrom"] != "1.17.1":
-        raise ValueError("This launcher requires the verified Forge 37 client metadata")
+    if base["id"] != "1.18.2" or forge["inheritsFrom"] != "1.18.2":
+        raise ValueError("This launcher requires the verified Forge 40 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -87,7 +87,7 @@ def client_command(options, directory):
         if digest(path, "sha1") != artifact["sha1"].upper():
             raise ValueError("Client library checksum changed: " + library["name"])
         classpath.append(path)
-    client = runtime / "versions/1.17.1/1.17.1.jar"
+    client = runtime / "versions/1.18.2/1.18.2.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -124,7 +124,7 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/minecraftforge/forge/1.17.1-37.1.1" / filename
+    source = runtime / "libraries/net/minecraftforge/forge/1.18.2-40.3.0" / filename
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
     for argument in shlex.split(source.read_text(encoding="utf-8")):
@@ -176,6 +176,9 @@ def prepare(options, directory):
                     raise ValueError("Unsafe fixture archive path: " + name)
             archive.extractall(directory / "world")
         shutil.copyfile(options.fixture.with_suffix(".json"), directory / "forward-fixture.json")
+        biomes = options.fixture.with_suffix(".biomes.json")
+        if biomes.is_file():
+            shutil.copyfile(biomes, directory / "forward-biomes.json")
         shutil.copyfile(directory / "world/level.dat", directory / "source-level.dat")
 
 

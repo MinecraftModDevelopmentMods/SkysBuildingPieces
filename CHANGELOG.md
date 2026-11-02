@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.8.118021 - Minecraft 1.18.2 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.18.2.
+- Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
+- Keep saved palettes, orientations, inventories and custom item data when upgrading.
+- Preserve recovery progress in the new chunk format, including add-on coverage.
+- Use the matching Grass Slabs version for shared grass behaviour when installed.
+
 ## 0.3.8.117011 - Minecraft 1.17.1 (unreleased)
 
 - Bring the existing building shapes and Mineralogy pieces to Minecraft 1.17.1.

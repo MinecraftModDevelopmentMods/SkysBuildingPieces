@@ -61,7 +61,7 @@ public final class WaterloggingChecks {
                 require(!block.canPlaceLiquid(world, position, wet, Fluids.WATER)
                         && !block.placeLiquid(world, position, wet, Fluids.WATER.getSource(false)),
                         "An already wet piece rejects another water placement");
-                require(world.getLiquidTicks().hasScheduledTick(position, Fluids.WATER),
+                require(world.getFluidTicks().hasScheduledTick(position, Fluids.WATER),
                         "Waterlogging schedules the native fluid tick");
                 require(block.pickupBlock(world, position, wet).is(Items.WATER_BUCKET)
                         && !world.getBlockState(position).getValue(SlabBlock.WATERLOGGED),

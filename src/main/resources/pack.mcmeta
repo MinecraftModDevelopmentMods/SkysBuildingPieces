@@ -1,6 +1,8 @@
 {
   "pack": {
-    "pack_format": 7,
-    "description": "Sky's Building Pieces resources"
+    "pack_format": 9,
+    "description": "Sky's Building Pieces resources",
+    "forge:resource_pack_format": 8,
+    "forge:data_pack_format": 9
   }
 }

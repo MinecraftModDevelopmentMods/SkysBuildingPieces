@@ -1,4 +1,4 @@
-"""Negative controls for the exact Forge 37 native log classification."""
+"""Negative controls for the exact Forge 40 native log classification."""
 
 import unittest
 import json
@@ -74,7 +74,7 @@ class NativeClientFilesTest(unittest.TestCase):
         (self.directory / "logs").mkdir()
         (self.directory / "logs/latest.log").write_text("\n".join((
             START, LOGIN,
-            "FORGE37_CLIENT_CONTROL_PASS joined=true sky_mods=false")), encoding="utf-8")
+            "FORGE40_CLIENT_CONTROL_PASS joined=true sky_mods=false")), encoding="utf-8")
 
     def test_native_defaults_with_different_order_and_comments(self):
         client = self.directory / "config/forge-client.toml"
@@ -89,9 +89,9 @@ class NativeClientFilesTest(unittest.TestCase):
     def test_changed_default_stops_the_check(self):
         client = self.directory / "config/forge-client.toml"
         original = client.read_text(encoding="utf-8")
-        self.assertIn("selectiveResourceReloadEnabled = true", original)
-        client.write_text(original.replace("selectiveResourceReloadEnabled = true",
-                                           "selectiveResourceReloadEnabled = false"), encoding="utf-8")
+        self.assertIn("showLoadWarnings = true", original)
+        client.write_text(original.replace("showLoadWarnings = true",
+                                           "showLoadWarnings = false"), encoding="utf-8")
         with self.assertRaises(ValueError):
             audit(self.directory, "control", True)
 

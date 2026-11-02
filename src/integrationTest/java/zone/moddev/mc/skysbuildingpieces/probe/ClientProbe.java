@@ -234,20 +234,21 @@ public final class ClientProbe extends ProbeProxy {
                 if (new File(minecraft.gameDirectory, "saves/building-pieces-world/level.dat").isFile()) {
                     minecraft.loadLevel("building-pieces-world");
                 } else {
-                    net.minecraft.core.RegistryAccess.RegistryHolder registries =
-                            net.minecraft.core.RegistryAccess.builtin();
+                    net.minecraft.core.RegistryAccess.Writable registries =
+                            net.minecraft.core.RegistryAccess.builtinCopy();
                     net.minecraft.core.Registry<net.minecraft.world.level.dimension.DimensionType> dimensions =
                             registries.registryOrThrow(net.minecraft.core.Registry.DIMENSION_TYPE_REGISTRY);
                     net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> biomes =
                             registries.registryOrThrow(net.minecraft.core.Registry.BIOME_REGISTRY);
                     net.minecraft.world.level.levelgen.WorldGenSettings defaults =
-                            net.minecraft.world.level.levelgen.WorldGenSettings.makeDefault(dimensions, biomes,
-                                    registries.registryOrThrow(net.minecraft.core.Registry.NOISE_GENERATOR_SETTINGS_REGISTRY));
+                            net.minecraft.world.level.levelgen.WorldGenSettings.makeDefault(registries);
                     net.minecraft.world.level.levelgen.WorldGenSettings generator =
                             new net.minecraft.world.level.levelgen.WorldGenSettings(4815162342L, false, false,
                                     net.minecraft.world.level.levelgen.WorldGenSettings.withOverworld(dimensions,
                                             defaults.dimensions(), new net.minecraft.world.level.levelgen.FlatLevelSource(
-                                                    net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings.getDefault(biomes))));
+                                                    registries.registryOrThrow(net.minecraft.core.Registry.STRUCTURE_SET_REGISTRY),
+                                                    net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings.getDefault(biomes,
+                                                            registries.registryOrThrow(net.minecraft.core.Registry.STRUCTURE_SET_REGISTRY)))));
                     net.minecraft.world.level.LevelSettings settings = new net.minecraft.world.level.LevelSettings(
                             "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE, false,
                             net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.GameRules(),

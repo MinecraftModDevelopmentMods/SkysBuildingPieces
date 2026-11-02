@@ -16,7 +16,7 @@ public final class CoverageContributor {
     @SubscribeEvent(
             priority = EventPriority.LOW)
     public void load(ChunkDataEvent.Load event) {
-        CompoundTag coverage = event.getData().getCompound("skysbuildingpieces_coverage");
+        CompoundTag coverage = contents(event.getData()).getCompound("skysbuildingpieces_coverage");
         int version = coverage.getInt("later_addon");
 
         if (version < 1) {
@@ -36,7 +36,7 @@ public final class CoverageContributor {
             return;
         }
 
-        CompoundTag level = event.getData().getCompound("Level");
+        CompoundTag level = contents(event.getData());
         CompoundTag coverage = level.getCompound("skysbuildingpieces_coverage");
 
         coverage.putInt("later_addon", version);
@@ -51,41 +51,54 @@ public final class CoverageContributor {
         MinecraftForge.EVENT_BUS.register(contributor);
 
         try {
-            CompoundTag root = new CompoundTag();
-            CompoundTag level = new CompoundTag();
-            CompoundTag coverage = new CompoundTag();
+            for (boolean wrapped : new boolean[] {true, false}) {
+                int previousVisits = contributor.visits;
+                CompoundTag root = new CompoundTag();
+                CompoundTag level = new CompoundTag();
+                CompoundTag coverage = new CompoundTag();
 
-            root.put("Level", level);
-            coverage.putInt("vanilla", 1);
-            level.put("skysbuildingpieces_coverage", coverage);
-            MinecraftForge.EVENT_BUS
-                    .post(new ChunkDataEvent.Load(chunk, level, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                if (wrapped) {
+                    root.put("Level", level);
+                } else {
+                    root = level;
+                }
+                coverage.putInt("vanilla", 1);
+                level.put("skysbuildingpieces_coverage", coverage);
+                MinecraftForge.EVENT_BUS
+                        .post(new ChunkDataEvent.Load(chunk, root, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
 
-            if (contributor.visits != 1) {
-                throw new AssertionError("Core coverage must not skip a later add-on");
+                if (contributor.visits != previousVisits + 1) {
+                    throw new AssertionError("Core coverage must not skip a later add-on");
+                }
+
+                CompoundTag saved = new CompoundTag();
+
+                if (wrapped) {
+                    saved.put("Level", new CompoundTag());
+                }
+                MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, chunk.getLevel(), saved));
+
+                CompoundTag markers = contents(saved).getCompound("skysbuildingpieces_coverage");
+
+                if (markers.getInt("vanilla") != 1 || markers.getInt("later_addon") != 1) {
+                    throw new AssertionError("Independent markers must survive both save handlers");
+                }
+
+                MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved,
+                        net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+
+                if (contributor.visits != previousVisits + 1) {
+                    throw new AssertionError("Later add-on coverage must be reload idempotent");
+                }
+
             }
-
-            CompoundTag saved = new CompoundTag();
-
-            saved.put("Level", new CompoundTag());
-            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, chunk.getLevel(), saved));
-
-            CompoundTag markers = saved.getCompound("Level").getCompound("skysbuildingpieces_coverage");
-
-            if (markers.getInt("vanilla") != 1 || markers.getInt("later_addon") != 1) {
-                throw new AssertionError("Independent markers must survive both save handlers");
-            }
-
-            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved.getCompound("Level"),
-                    net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
-
-            if (contributor.visits != 1) {
-                throw new AssertionError("Later add-on coverage must be reload idempotent");
-            }
-
-            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload");
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload schemas=2");
         } finally {
             MinecraftForge.EVENT_BUS.unregister(contributor);
         }
+    }
+
+    private static CompoundTag contents(CompoundTag root) {
+        return root.contains("Level", 10) ? root.getCompound("Level") : root;
     }
 }

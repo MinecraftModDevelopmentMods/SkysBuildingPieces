@@ -26,7 +26,22 @@ import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
 /** Uses the normal server interaction path, so duplicate shovel use cannot pass unnoticed. */
 public final class PathChecks {
+    private static Item compatibleShovel;
+
     private PathChecks() {
+    }
+
+    public static void register(net.minecraftforge.eventbus.api.IEventBus modBus, String namespace) {
+        // Test tools follow the same registration lifecycle as a real mod's items.
+        modBus.addGenericListener(Item.class, (net.minecraftforge.event.RegistryEvent.Register<Item> event) -> {
+            compatibleShovel = new Item(new Item.Properties().defaultDurability(50)) {
+                @Override
+                public boolean canPerformAction(ItemStack stack, net.minecraftforge.common.ToolAction action) {
+                    return action == net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN;
+                }
+            };
+            event.getRegistry().register(compatibleShovel.setRegistryName(namespace, "flattening_tool"));
+        });
     }
 
     public static void run(ServerLevel world) {
@@ -153,16 +168,9 @@ public final class PathChecks {
         require(shovel.getDamageValue() == 0 && !world.getBlockState(position).equals(corner), "creative shovel durability");
         player.getAbilities().instabuild = false;
 
-        Item compatible = new Item(new Item.Properties().defaultDurability(50)) {
-            @Override
-            public boolean canPerformAction(ItemStack stack, net.minecraftforge.common.ToolAction action) {
-                return action == net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN;
-            }
-        };
-
         world.setBlock(position, corner, 2);
 
-        ItemStack custom = new ItemStack(compatible);
+        ItemStack custom = new ItemStack(compatibleShovel);
 
         click(world, player, position, custom, InteractionHand.MAIN_HAND, Direction.UP);
         require(custom.getDamageValue() == 1 && !world.getBlockState(position).equals(corner), "registered shovel support");

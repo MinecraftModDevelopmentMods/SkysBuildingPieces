@@ -34,6 +34,9 @@ final class NativeForwardChecks {
             points.addAll(fixture.getAsJsonArray("states"));
             boolean named = fixture.has("kind") && fixture.get("kind").getAsString().equals("named");
             boolean legacy = fixture.has("kind") && fixture.get("kind").getAsString().equals("buildingbricks");
+            if (named) {
+                NativeBiomeChecks.prepare(world, WARMUP_CHUNKS);
+            }
             File identities = new File("legacy-drop-identities.properties");
             if (legacy && identities.isFile()) {
                 try (FileInputStream input = new FileInputStream(identities)) {
@@ -86,7 +89,7 @@ final class NativeForwardChecks {
 
     static boolean ready(ServerLevel world) {
         for (net.minecraft.world.level.ChunkPos chunk : WARMUP_CHUNKS) {
-            if (!world.isPositionTickingWithEntitiesLoaded(new BlockPos(chunk.x << 4, 0, chunk.z << 4))) {
+            if (!world.areEntitiesLoaded(chunk.toLong()) || !world.getChunkSource().isPositionTicking(chunk.toLong())) {
                 return false;
             }
         }
@@ -248,6 +251,7 @@ final class NativeForwardChecks {
     }
 
     private static void namedPieces(ServerLevel world, JsonObject fixture) throws Exception {
+        NativeBiomeChecks.verify(world);
         int states = 0;
 
         for (JsonElement value : fixture.getAsJsonArray("states")) {

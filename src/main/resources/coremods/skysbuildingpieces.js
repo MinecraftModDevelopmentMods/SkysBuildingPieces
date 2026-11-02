@@ -47,6 +47,50 @@ function replacementFor(size) {
 
 function initializeCoreMod() {
     return {
+        'skysbuildingpieces_legacy_level_registry': {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraftforge.common.ForgeHooks'
+            },
+            'transformer': function(classNode) {
+                var readMethods = 0;
+                var writeMethods = 0;
+                var owner = 'zone/moddev/mc/skysbuildingpieces/legacy/LegacyBridge';
+                for (var index = 0; index < classNode.methods.size(); ++index) {
+                    var method = classNode.methods.get(index);
+                    var reading = method.name === 'readAdditionalLevelSaveData' &&
+                            method.desc === '(Lnet/minecraft/nbt/CompoundTag;Ljava/nio/file/Path;)V';
+                    var writing = method.name === 'writeAdditionalLevelSaveData' &&
+                            method.desc === '(Lnet/minecraft/world/level/storage/WorldData;' +
+                                    'Lnet/minecraft/nbt/CompoundTag;)V';
+                    if (!reading && !writing) continue;
+                    if (reading) ++readMethods;
+                    else ++writeMethods;
+                    var callback = reading ? 'captureLegacyLevelData' : 'writeLegacyLevelData';
+                    var existingCalls = 0;
+                    for (var instruction = method.instructions.getFirst(); instruction !== null;
+                            instruction = instruction.getNext()) {
+                        if (instruction instanceof MethodInsnNode && instruction.owner === owner &&
+                                instruction.name === callback) ++existingCalls;
+                    }
+                    if (existingCalls > 1) {
+                        throw new Error("Sky's Building Pieces found duplicate Forge 40 level hooks");
+                    }
+                    if (existingCalls === 1) continue;
+                    var prefix = new InsnList();
+                    prefix.add(new VarInsnNode(Opcodes.ALOAD, reading ? 0 : 1));
+                    if (reading) prefix.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                    prefix.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner, callback,
+                            reading ? '(Lnet/minecraft/nbt/CompoundTag;Ljava/nio/file/Path;)V' :
+                                    '(Lnet/minecraft/nbt/CompoundTag;)V', false));
+                    method.instructions.insert(prefix);
+                }
+                if (readMethods !== 1 || writeMethods !== 1) {
+                    throw new Error("Sky's Building Pieces could not find the exact Forge 40 level methods");
+                }
+                return classNode;
+            }
+        },
         'skysbuildingpieces_legacy_block_state_tables': {
             'target': {
                 'type': 'CLASS',
@@ -76,7 +120,7 @@ function initializeCoreMod() {
                         var sizeInstruction = previousOpcode(instruction);
                         var current = integerValue(sizeInstruction);
                         if (target < 0 || (current !== vanilla && current !== target)) {
-                            throw new Error("Sky's Building Pieces found an unexpected Forge 37 " +
+                            throw new Error("Sky's Building Pieces found an unexpected Forge 40 " +
                                     "BlockStateData array layout");
                         }
                         if (current === vanilla || !(sizeInstruction instanceof LdcInsnNode)) {
@@ -86,7 +130,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (!registerExposed || arraysSeen !== 2) {
-                    throw new Error("Sky's Building Pieces could not prepare Forge 37 BlockStateData");
+                    throw new Error("Sky's Building Pieces could not prepare Forge 40 BlockStateData");
                 }
                 return classNode;
             }
@@ -123,49 +167,81 @@ function initializeCoreMod() {
                     method.maxStack = Math.max(method.maxStack, 4);
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 37 hardness method, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 40 hardness method, found " + matches);
                 }
                 return type;
             }
         },
         'skysbuildingpieces_legacy_chunk': {
-            'target': {'type': 'CLASS', 'name': 'net.minecraft.world.level.chunk.storage.ChunkStorage'},
-            'transformer': function(type) {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraft.world.level.chunk.storage.ChunkStorage'
+            },
+            'transformer': function(classNode) {
+                var patched = false;
                 var matches = 0;
-                for (var index = 0; index < type.methods.size(); index++) {
-                    var method = type.methods.get(index);
-                    if (method.desc !== '(Lnet/minecraft/resources/ResourceKey;'
-                            + 'Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;)'
-                            + 'Lnet/minecraft/nbt/CompoundTag;') {
+                for (var methodIndex = 0; methodIndex < classNode.methods.size(); ++methodIndex) {
+                    var method = classNode.methods.get(methodIndex);
+                    if (method.desc !== '(Lnet/minecraft/resources/ResourceKey;' +
+                            'Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;Ljava/util/Optional;)' +
+                            'Lnet/minecraft/nbt/CompoundTag;') {
                         continue;
                     }
-                    matches++;
-                    if (hasCall(method, bridge, 'prepareLegacyChunk')) {
-                        continue;
-                    }
-                    var entry = new InsnList();
-                    entry.add(new VarInsnNode(Opcodes.ALOAD, 3));
-                    entry.add(new MethodInsnNode(Opcodes.INVOKESTATIC, bridge, 'prepareLegacyChunk',
-                            '(Lnet/minecraft/nbt/CompoundTag;)V', false));
-                    method.instructions.insert(entry);
+
+                    ++matches;
+                    var owner = 'zone/moddev/mc/skysbuildingpieces/legacy/LegacyBridge';
+                    var preparations = 0;
+                    var finalizations = 0;
                     var returns = 0;
-                    for (var instruction = method.instructions.getFirst(); instruction !== null;
-                            instruction = instruction.getNext()) {
-                        if (instruction.getOpcode() === Opcodes.ARETURN) {
-                            method.instructions.insertBefore(instruction, new MethodInsnNode(Opcodes.INVOKESTATIC,
-                                    bridge, 'finalizeLegacyChunk', '(Lnet/minecraft/nbt/CompoundTag;)'
-                                    + 'Lnet/minecraft/nbt/CompoundTag;', false));
-                            returns++;
+                    for (var existing = method.instructions.getFirst(); existing !== null;
+                            existing = existing.getNext()) {
+                        if (existing.getOpcode() === Opcodes.ARETURN) {
+                            ++returns;
+                        }
+                        if (existing instanceof MethodInsnNode && existing.owner === owner) {
+                            if (existing.name === 'prepareLegacyChunk') ++preparations;
+                            if (existing.name === 'finalizeLegacyChunk') ++finalizations;
                         }
                     }
                     if (returns === 0) {
-                        throw new Error("Sky's Building Pieces: Forge 37 chunk upgrader has no return");
+                        throw new Error("Sky's Building Pieces found no Forge 40 chunk return");
                     }
+                    if (preparations !== 0 || finalizations !== 0) {
+                        if (preparations !== 1 || finalizations !== returns) {
+                            throw new Error("Sky's Building Pieces found a partial Forge 40 chunk patch");
+                        }
+                        patched = true;
+                        continue;
+                    }
+
+                    var prefix = new InsnList();
+                    prefix.add(new VarInsnNode(Opcodes.ALOAD, 3));
+                    prefix.add(new MethodInsnNode(
+                            Opcodes.INVOKESTATIC,
+                            owner,
+                            'prepareLegacyChunk',
+                            '(Lnet/minecraft/nbt/CompoundTag;)V',
+                            false));
+                    method.instructions.insert(prefix);
+
+                    for (var instruction = method.instructions.getFirst(); instruction !== null;
+                            instruction = instruction.getNext()) {
+                        if (instruction.getOpcode() === Opcodes.ARETURN) {
+                            method.instructions.insertBefore(instruction, new MethodInsnNode(
+                                    Opcodes.INVOKESTATIC,
+                                    owner,
+                                    'finalizeLegacyChunk',
+                                    '(Lnet/minecraft/nbt/CompoundTag;)' +
+                                    'Lnet/minecraft/nbt/CompoundTag;',
+                                    false));
+                        }
+                    }
+                    patched = true;
                 }
-                if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 37 chunk upgrader, found " + matches);
+                if (!patched || matches !== 1) {
+                    throw new Error("Sky's Building Pieces could not patch Forge 40 ChunkStorage");
                 }
-                return type;
+                return classNode;
             }
         },
         'skysbuildingpieces_raw_inventory': {
@@ -203,12 +279,12 @@ function initializeCoreMod() {
                             }
                         }
                         if (returns === 0) {
-                            throw new Error("Sky's Building Pieces: Forge 37 NBT updater has no return");
+                            throw new Error("Sky's Building Pieces: Forge 40 NBT updater has no return");
                         }
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 37 NBT updater, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 40 NBT updater, found " + matches);
                 }
                 return type;
             }

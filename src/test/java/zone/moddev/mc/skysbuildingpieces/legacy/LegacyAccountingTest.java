@@ -6,6 +6,40 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LegacyAccountingTest {
     @Test
+    void flattenedChunkKeepsItsPendingAccountingAndFinishesOnlySupportedRecovery() {
+        CompoundTag chunk = new CompoundTag();
+        chunk.putString("Status", "minecraft:heightmaps");
+        chunk.putBoolean("SkysBuildingPiecesPreserveChunk", true);
+        chunk.putLong("skysbuildingpieces_delta", 26);
+        chunk.putLong("skysbuildingpieces_additional_vanilla_delta", 4);
+        CompoundTag modules = new CompoundTag();
+        modules.putLong("biomesoplenty", 601);
+        chunk.put("skysbuildingpieces_module_delta", modules);
+        CompoundTag coverage = new CompoundTag();
+        coverage.putInt("vanilla", 1);
+        chunk.put("skysbuildingpieces_coverage", coverage);
+        chunk.putString("future_addon_note", "Keep unknown data");
+
+        LegacyBridge.finalizeLegacyChunk(chunk);
+
+        assertEquals("full", chunk.getString("Status"));
+        assertFalse(chunk.contains("SkysBuildingPiecesPreserveChunk"));
+        assertEquals(26, chunk.getLong("skysbuildingpieces_delta"));
+        assertEquals(4, chunk.getLong("skysbuildingpieces_additional_vanilla_delta"));
+        assertEquals(modules, chunk.getCompound("skysbuildingpieces_module_delta"));
+        assertEquals(coverage, chunk.getCompound("skysbuildingpieces_coverage"));
+        assertEquals("Keep unknown data", chunk.getString("future_addon_note"));
+        CompoundTag once = chunk.copy();
+        LegacyBridge.finalizeLegacyChunk(chunk);
+        assertEquals(once, chunk, "Returning through a second wrapper must be harmless");
+
+        CompoundTag unrelated = new CompoundTag();
+        unrelated.putString("Status", "minecraft:heightmaps");
+        LegacyBridge.finalizeLegacyChunk(unrelated);
+        assertEquals("minecraft:heightmaps", unrelated.getString("Status"));
+    }
+
+    @Test
     void nativeRootAndDirectLevelExposeTheSameAccountingAndCoverageData() {
         CompoundTag root = new CompoundTag();
         CompoundTag level = new CompoundTag();

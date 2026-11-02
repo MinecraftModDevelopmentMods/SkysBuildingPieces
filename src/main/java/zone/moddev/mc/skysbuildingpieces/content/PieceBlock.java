@@ -614,7 +614,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     public BlockState updateShape(BlockState state, Direction side, BlockState neighbour, LevelAccessor world,
             BlockPos position, BlockPos neighbourPos) {
         if (state.getValue(SlabBlock.WATERLOGGED)) {
-            world.getLiquidTicks().scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            world.scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         }
 
         return getActualState(state, world, position);

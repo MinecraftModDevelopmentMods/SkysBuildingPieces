@@ -19,7 +19,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.BasicVerifier;
 
-/** Applies the actual pinned scripts to native bytecode in both mod orders. */
+/** Applies the three pinned scripts in every order to the actual target classes. */
 public final class CoremodOrderChecks {
     public static void main(String[] arguments) throws Exception {
         String sky = new String(Files.readAllBytes(Paths.get(arguments[0])), StandardCharsets.UTF_8);
@@ -27,10 +27,11 @@ public final class CoremodOrderChecks {
         String grass = script(arguments[2], "skysgrassslabs");
         List<String> scripts = Arrays.asList(sky, mineralogy, grass);
 
-        for (boolean reverse : new boolean[] { false, true }) {
+        int[][] orders = {{0, 1, 2}, {0, 2, 1}, {1, 0, 2}, {1, 2, 0}, {2, 0, 1}, {2, 1, 0}};
+        for (int[] order : orders) {
             ClassNode tables = nativeClass("net/minecraft/util/datafix/fixes/BlockStateData");
-            for (int index = 0; index < scripts.size(); index++) {
-                apply(scripts.get(reverse ? scripts.size() - index - 1 : index), tables);
+            for (int index : order) {
+                apply(scripts.get(index), tables);
             }
             verifyTables(tables);
             int tableInstructions = tables.methods.stream().mapToInt(method -> method.instructions.size()).sum();
@@ -40,8 +41,8 @@ public final class CoremodOrderChecks {
                     "Repeated Sky transformation changes the combined state tables");
 
             ClassNode node = nativeClass("net/minecraft/world/level/chunk/storage/ChunkStorage");
-            for (int index = 0; index < scripts.size(); index++) {
-                apply(scripts.get(reverse ? scripts.size() - index - 1 : index), node);
+            for (int index : order) {
+                apply(scripts.get(index), node);
             }
 
             int before = node.methods.stream().mapToInt(method -> method.instructions.size()).sum();
@@ -53,7 +54,8 @@ public final class CoremodOrderChecks {
             int methods = 0;
 
             for (MethodNode method : node.methods) {
-                if (!method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;)")) {
+                if (!method.desc.equals("(Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Supplier;"
+                        + "Lnet/minecraft/nbt/CompoundTag;Ljava/util/Optional;)Lnet/minecraft/nbt/CompoundTag;")) {
                     continue;
                 }
 
@@ -80,9 +82,33 @@ public final class CoremodOrderChecks {
             }
 
             require(methods == 1, "Expected one native chunk-upgrade method");
+
+            ClassNode level = nativeClass("net/minecraftforge/common/ForgeHooks");
+            for (int index : order) {
+                apply(scripts.get(index), level);
+            }
+            int levelInstructions = level.methods.stream().mapToInt(method -> method.instructions.size()).sum();
+            apply(sky, level);
+            require(levelInstructions == level.methods.stream().mapToInt(method -> method.instructions.size()).sum(),
+                    "Repeated Sky transformation changes the level wrappers");
+            for (String namespace : new String[] {"skysbuildingpieces", "mineralogy", "skysgrassslabs"}) {
+                int readers = 0;
+                int writers = 0;
+                for (MethodNode method : level.methods) {
+                    readers += calls(method, namespace, "captureLegacyLevelData");
+                    writers += calls(method, namespace, "writeLegacyLevelData");
+                    if (calls(method, namespace, "captureLegacyLevelData") > 0
+                            || calls(method, namespace, "writeLegacyLevelData") > 0) {
+                        new Analyzer<>(new BasicVerifier()).analyze(level.name, method);
+                    }
+                }
+                require(readers == 1, "Missing or repeated level capture: " + namespace);
+                require(writers == (namespace.equals("mineralogy") ? 0 : 1),
+                        "Missing or repeated level writer: " + namespace);
+            }
         }
 
-        System.out.println("BUILDING_PIECES_COREMOD_ORDER_PASS orders=2 targets=2 actual_scripts=true stack_verification=true");
+        System.out.println("BUILDING_PIECES_COREMOD_ORDER_PASS orders=6 targets=3 actual_scripts=true stack_verification=true");
     }
 
     private static ClassNode nativeClass(String name) throws Exception {
@@ -160,7 +186,7 @@ public final class CoremodOrderChecks {
     private static void apply(String script, ClassNode node) throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        require(engine != null, "These native transformers require Nashorn on Java 16");
+        require(engine != null, "Forge's Nashorn script engine is missing from the test runtime");
         engine.eval(script);
         engine.put("candidate", node);
         engine.put("targetName", node.name.replace('/', '.'));

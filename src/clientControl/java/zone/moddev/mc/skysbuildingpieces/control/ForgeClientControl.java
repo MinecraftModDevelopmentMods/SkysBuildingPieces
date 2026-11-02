@@ -64,7 +64,7 @@ public final class ForgeClientControl {
                 throw new AssertionError("The Forge-only control contains a Sky mod");
             }
 
-            org.apache.logging.log4j.LogManager.getLogger().info("FORGE37_CLIENT_CONTROL_PASS joined=true sky_mods=false");
+            org.apache.logging.log4j.LogManager.getLogger().info("FORGE40_CLIENT_CONTROL_PASS joined=true sky_mods=false");
             client.stop();
         }
     }

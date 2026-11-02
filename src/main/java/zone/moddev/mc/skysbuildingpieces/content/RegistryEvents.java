@@ -26,6 +26,9 @@ public final class RegistryEvents {
     @SubscribeEvent(
             priority = EventPriority.LOWEST)
     public static void blocks(RegistryEvent.Register<Block> event) {
+        SkysBuildingPieces.HOLDER = new Block(Block.Properties.of(net.minecraft.world.level.material.Material.STONE)
+                .strength(-1.0F, 3_600_000.0F));
+        SkysBuildingPieces.HOLDER.setRegistryName(SkysBuildingPieces.ID, "legacy_piece_holder");
         Pieces.registerBlocks(event.getRegistry());
         event.getRegistry().register(SkysBuildingPieces.HOLDER);
     }

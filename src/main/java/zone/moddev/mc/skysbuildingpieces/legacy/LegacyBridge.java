@@ -21,6 +21,8 @@ import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
@@ -53,40 +55,40 @@ public final class LegacyBridge {
     private static boolean persistenceRegistered;
 
     public static synchronized void registerPersistence() {
-        if (persistenceRegistered) return;
-        net.minecraftforge.fmllegacy.WorldPersistenceHooks.addHook(
-                new net.minecraftforge.fmllegacy.WorldPersistenceHooks.WorldPersistenceHook() {
-                    @Override
-                    public String getModId() {
-                        return "FML";
-                    }
+        if (!persistenceRegistered) {
+            // ForgeHooks captures raw data; this event starts recovery once the
+            // server and its live registries are available.
+            MinecraftForge.EVENT_BUS.addListener((ServerAboutToStartEvent event) -> start(event.getServer()));
+            persistenceRegistered = true;
+        }
+    }
 
-                    @Override
-                    public CompoundTag getDataForWriting(net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess save,
-                            net.minecraft.world.level.storage.WorldData information) {
-                        synchronized (LegacyBridge.class) {
-                            Path directory = save.getWorldDir().toAbsolutePath().normalize();
-                            if (directory.equals(capturedDirectory) && !capturedRegistry.isEmpty()) {
-                                return capturedRegistry.copy();
-                            }
-                            if (worldDirectory != null && directory.equals(worldDirectory.toPath().toAbsolutePath().normalize())) {
-                                return registrySnapshot.copy();
-                            }
-                            return new CompoundTag();
-                        }
-                    }
+    /** Capture the untouched registry and biome source before an early level save. */
+    public static synchronized void captureLegacyLevelData(CompoundTag root, Path directory) {
+        if (root == null || directory == null) {
+            return;
+        }
+        Path normalized = directory.toAbsolutePath().normalize();
+        if (Files.isRegularFile(normalized) || normalized.getFileName().toString().equals("level.dat")
+                || normalized.getFileName().toString().equals("level.dat_old")) {
+            normalized = normalized.getParent();
+        }
+        capturedDirectory = normalized;
+        capturedRegistry = root.getCompound("FML").copy();
+        SourceLevelData.capture(normalized);
+    }
 
-                    @Override
-                    public void readData(net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess save,
-                            net.minecraft.world.level.storage.WorldData information, CompoundTag registry) {
-                        synchronized (LegacyBridge.class) {
-                            capturedDirectory = save.getWorldDir().toAbsolutePath().normalize();
-                            capturedRegistry = registry.copy();
-                            SourceLevelData.capture(capturedDirectory);
-                        }
-                    }
-                });
-        persistenceRegistered = true;
+    /** Preserve the complete uppercase snapshot for chunks not opened on this start. */
+    public static synchronized void writeLegacyLevelData(CompoundTag root) {
+        if (root == null) {
+            return;
+        }
+        if (!capturedRegistry.isEmpty()) {
+            root.put("FML", capturedRegistry.copy());
+        } else if (!registrySnapshot.isEmpty() && worldDirectory != null
+                && worldDirectory.toPath().toAbsolutePath().normalize().equals(capturedDirectory)) {
+            root.put("FML", registrySnapshot.copy());
+        }
     }
 
     /** Returns a copy of the original biome table and save version for this world. */
@@ -295,12 +297,16 @@ public final class LegacyBridge {
     public static CompoundTag finalizeLegacyChunk(CompoundTag root) {
         finalizeNbt(root);
 
-        if (root != null && root.contains("Level", 10)) {
+        if (root != null) {
             HistoricalBiomes.finish(root);
 
-            CompoundTag level = root.getCompound("Level");
+            CompoundTag level = MigrationEvents.chunkLevel(root);
 
-            carryDeltas(root, level);
+            // Older chunks wrap their contents in Level. Since 1.18 the chunk
+            // itself carries these fields, so there is nothing to move.
+            if (level != root) {
+                carryDeltas(root, level);
+            }
 
             if (level.getBoolean("SkysBuildingPiecesPreserveChunk")) {
                 level.putString("Status", "full");

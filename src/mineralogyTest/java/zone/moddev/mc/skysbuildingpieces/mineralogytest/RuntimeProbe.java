@@ -15,7 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
@@ -43,7 +43,7 @@ public final class RuntimeProbe {
     }
 
     @Mod.EventHandler
-    public void started(FMLServerStartedEvent event) {
+    public void started(ServerStartedEvent event) {
         server = net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
     }
 

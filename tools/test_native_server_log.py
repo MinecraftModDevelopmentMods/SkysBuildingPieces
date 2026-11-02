@@ -1,4 +1,4 @@
-"""Negative controls for Forge 37 server completion and native settings."""
+"""Negative controls for Forge 40 server completion and native settings."""
 
 from pathlib import Path
 import shutil
@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 from native_client_log import audit_server, classify_server
+from native_registry_notices import audit_biome_proof
 
 
 NOTICE = ('[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: '
@@ -72,12 +73,12 @@ class NativeRegistryNoticeTest(unittest.TestCase):
         self.valid += prefix + "There are unidentified mappings in this world - we are going to attempt to process anyway\n"
 
     def test_exact_native_notices_and_a_clean_reload_pass(self):
-        self.assertEqual(len(self.check(self.valid, self.profile)), 5)
+        self.assertEqual(len(self.check(self.valid, self.profile)), len(self.profile["mappings"]) + 1)
         self.assertEqual(self.check("A clean native reload", None), [])
 
     def test_compact_native_headers_keep_the_same_registry_boundaries(self):
         compact = self.valid.replace(" [net.minecraftforge.registries.GameData/REGISTRIES]", "")
-        self.assertEqual(len(self.check(compact, self.profile)), 5)
+        self.assertEqual(len(self.check(compact, self.profile)), len(self.profile["mappings"]) + 1)
         with self.assertRaises(ValueError):
             self.check(compact.replace("[main/ERROR]", "[Server thread/ERROR]"), self.profile)
         with self.assertRaises(ValueError):
@@ -103,6 +104,21 @@ class NativeRegistryNoticeTest(unittest.TestCase):
         for index, (text, profile) in enumerate(candidates):
             with self.subTest(boundary=index), self.assertRaises(ValueError):
                 self.check(text, profile)
+
+
+class NativeBiomeProofTest(unittest.TestCase):
+    def test_complete_native_volume_is_required(self):
+        profile = {"native_biome_contract": {"source": "1.17.1", "checked_cells": 982016,
+                                             "renamed_cells": 18240}}
+        marker = "BUILDING_PIECES_NATIVE_BIOME_PASS source=1.17.1 cells=982016 renamed=18240"
+        audit_biome_proof("[Server thread/INFO]: " + marker, profile)
+        for text in ["", marker.replace("982016", "982015"), marker.replace("18240", "182400"),
+                     marker.replace("1.17.1", "1.16.5"), marker + " incomplete"]:
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                audit_biome_proof(text, profile)
+
+    def test_no_biome_notices_need_no_biome_exception(self):
+        audit_biome_proof("A normal fresh world", None)
 
 
 class NativeServerFilesTest(unittest.TestCase):

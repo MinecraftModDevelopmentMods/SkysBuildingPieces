@@ -24,7 +24,16 @@
         }
       },
       "saved_uses": 0,
-      "inspected_nbt_records": 785
+      "inspected_nbt_records": 777,
+      "non_biome_saved_uses": 0,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.biomes.json",
+        "sha256": "B2DCB2A7D49F46821E14C06766495417FED924DC04C08870E529F86CD2630EBD",
+        "source": "1.14.4",
+        "checked_cells": 795648,
+        "renamed_cells": 0
+      },
+      "legacy_biome_registry": "minecraft:biome"
     },
     "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525": {
       "fixture": "src/testFixtures/worlds/building-pieces-1.15.2.zip",
@@ -49,8 +58,129 @@
           "minecraft:music.nether": 420
         }
       },
-      "saved_uses": 0,
-      "inspected_nbt_records": 787
+      "saved_uses": 14400,
+      "inspected_nbt_records": 777,
+      "non_biome_saved_uses": 0,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.biomes.json",
+        "sha256": "716A1CFF7B790B499B32AEDD2B7B20469C79F6161BF55C84F9FC14860F9B27AF",
+        "source": "1.15.2",
+        "checked_cells": 795648,
+        "renamed_cells": 14400
+      },
+      "legacy_biome_registry": "minecraft:biome"
+    },
+    "B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F": {
+      "mappings": {
+        "minecraft:worldgen/biome": {
+          "minecraft:badlands_plateau": 39,
+          "minecraft:bamboo_jungle_hills": 169,
+          "minecraft:birch_forest_hills": 28,
+          "minecraft:dark_forest_hills": 157,
+          "minecraft:deep_warm_ocean": 47,
+          "minecraft:desert_hills": 17,
+          "minecraft:desert_lakes": 130,
+          "minecraft:giant_spruce_taiga": 160,
+          "minecraft:giant_spruce_taiga_hills": 161,
+          "minecraft:giant_tree_taiga": 32,
+          "minecraft:giant_tree_taiga_hills": 33,
+          "minecraft:gravelly_mountains": 131,
+          "minecraft:jungle_edge": 23,
+          "minecraft:jungle_hills": 22,
+          "minecraft:modified_badlands_plateau": 167,
+          "minecraft:modified_gravelly_mountains": 162,
+          "minecraft:modified_jungle": 149,
+          "minecraft:modified_jungle_edge": 151,
+          "minecraft:modified_wooded_badlands_plateau": 166,
+          "minecraft:mountain_edge": 20,
+          "minecraft:mountains": 3,
+          "minecraft:mushroom_field_shore": 15,
+          "minecraft:shattered_savanna": 163,
+          "minecraft:shattered_savanna_plateau": 164,
+          "minecraft:snowy_mountains": 13,
+          "minecraft:snowy_taiga_hills": 31,
+          "minecraft:snowy_taiga_mountains": 158,
+          "minecraft:snowy_tundra": 12,
+          "minecraft:stone_shore": 25,
+          "minecraft:swamp_hills": 134,
+          "minecraft:taiga_hills": 19,
+          "minecraft:taiga_mountains": 133,
+          "minecraft:tall_birch_forest": 155,
+          "minecraft:tall_birch_hills": 156,
+          "minecraft:wooded_badlands_plateau": 38,
+          "minecraft:wooded_hills": 18,
+          "minecraft:wooded_mountains": 34
+        }
+      },
+      "fixture": "src/testFixtures/worlds/building-pieces-1.16.5.zip",
+      "sha256": "B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F",
+      "source_jar_sha256": "B4DC9F16E5CF42902B93667B9E95EC846B66E2A3C488CC7CF48D9FBA3B477C41",
+      "saved_uses": 14400,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 778,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.biomes.json",
+        "sha256": "93CDCB3346343BFEBBDD86C2BA173A00181450145928E37FBDA6D2BAB8B42C37",
+        "source": "1.16.5",
+        "checked_cells": 796672,
+        "renamed_cells": 14400
+      }
+    },
+    "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67": {
+      "mappings": {
+        "minecraft:worldgen/biome": {
+          "minecraft:badlands_plateau": 39,
+          "minecraft:bamboo_jungle_hills": 169,
+          "minecraft:birch_forest_hills": 28,
+          "minecraft:dark_forest_hills": 157,
+          "minecraft:deep_warm_ocean": 47,
+          "minecraft:desert_hills": 17,
+          "minecraft:desert_lakes": 130,
+          "minecraft:giant_spruce_taiga": 160,
+          "minecraft:giant_spruce_taiga_hills": 161,
+          "minecraft:giant_tree_taiga": 32,
+          "minecraft:giant_tree_taiga_hills": 33,
+          "minecraft:gravelly_mountains": 131,
+          "minecraft:jungle_edge": 23,
+          "minecraft:jungle_hills": 22,
+          "minecraft:modified_badlands_plateau": 167,
+          "minecraft:modified_gravelly_mountains": 162,
+          "minecraft:modified_jungle": 149,
+          "minecraft:modified_jungle_edge": 151,
+          "minecraft:modified_wooded_badlands_plateau": 166,
+          "minecraft:mountain_edge": 20,
+          "minecraft:mountains": 3,
+          "minecraft:mushroom_field_shore": 15,
+          "minecraft:shattered_savanna": 163,
+          "minecraft:shattered_savanna_plateau": 164,
+          "minecraft:snowy_mountains": 13,
+          "minecraft:snowy_taiga_hills": 31,
+          "minecraft:snowy_taiga_mountains": 158,
+          "minecraft:snowy_tundra": 12,
+          "minecraft:stone_shore": 25,
+          "minecraft:swamp_hills": 134,
+          "minecraft:taiga_hills": 19,
+          "minecraft:taiga_mountains": 133,
+          "minecraft:tall_birch_forest": 155,
+          "minecraft:tall_birch_hills": 156,
+          "minecraft:wooded_badlands_plateau": 38,
+          "minecraft:wooded_hills": 18,
+          "minecraft:wooded_mountains": 34
+        }
+      },
+      "fixture": "src/testFixtures/worlds/building-pieces-1.17.1.zip",
+      "sha256": "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67",
+      "source_jar_sha256": "40ACD56C59F50C9C5DC484781B7FEA180E1C45FAB5470735CA27983E14258240",
+      "saved_uses": 18240,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 959,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.biomes.json",
+        "sha256": "1FDD5E6FEC9097501649D47B98982030EC96E11C202241007059FF122DEF53C7",
+        "source": "1.17.1",
+        "checked_cells": 982016,
+        "renamed_cells": 18240
+      }
     }
   },
   "native_control": {
@@ -62,5 +192,17 @@
     "source_sha256": "026DB236B140825EB68B516B84BECDC5E3A41BCF91A89498609AA9214CA77B8C",
     "helper_sha256": "B8E305F3B1DE1BB372DB72C8D0FB4A13DCD0E478F62EB858C95441BE359B2D18",
     "first_log_sha256": "A22ACFC9417D2F8FA3D9CF8CFC7BF933A91733FDF3116DD35DA80B7FE08AE346"
+  },
+  "native_biome_control": {
+    "target": "Forge 40.3.0",
+    "sky_mods_loaded": false,
+    "native_sources_sha256": "610B11E71BC75F23D80607007E865A573ACA0AF5AFB6BB30F12EB06FAE19CD6C",
+    "probe_sha256": "7F72FAD7E1A7CF51A6DC02999EF3FA828A6FBBCFC1A016DFF409D00C4A2D5402",
+    "first_log_sha256": "EA5E9B6655318245BF5FFBD17B126110E3607BED3C9DC196EF667A9E9EDD00D6",
+    "reload_log_sha256": "F44550FA72952C0E3162AA27EDA928AAC1FDCAAC6F2E29815677D07B63D5DAE6",
+    "checked_cells": 541696,
+    "renamed_cells": 14400,
+    "matching_missing_biome_names_and_numbers": true,
+    "scope": "Independent native conversion control; each Sky fixture also requires its own complete cell audit."
   }
 }

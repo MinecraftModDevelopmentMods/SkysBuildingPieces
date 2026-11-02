@@ -24,6 +24,7 @@ class LoaderHooksTest {
         Map<String, String> targets = new LinkedHashMap<>();
 
         targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/level/chunk/storage/ChunkStorage");
+        targets.put("skysbuildingpieces_legacy_level_registry", "net/minecraftforge/common/ForgeHooks");
         targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/nbt/NbtUtils");
         targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/world/item/BlockItem");
         return targets;
@@ -32,7 +33,7 @@ class LoaderHooksTest {
     private ScriptEngine engine() throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        assertNotNull(engine, "Forge 37 transformers and their tests require the production Java 16 runtime");
+        assertNotNull(engine, "Forge 40 transformer tests require the production Java 17 runtime");
         engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
                 StandardCharsets.UTF_8));
         return engine;
@@ -73,7 +74,7 @@ class LoaderHooksTest {
     }
 
     @Test
-    void realForge37MethodsMatchAndEveryReturnIsWrapped() throws Exception {
+    void realForge40MethodsMatchAndEveryReturnIsWrapped() throws Exception {
         for (Map.Entry<String, String> target : targets().entrySet()) {
             ScriptEngine engine = engine();
             ClassNode node = original(target.getValue());
@@ -81,7 +82,7 @@ class LoaderHooksTest {
 
             if (target.getKey().endsWith("legacy_chunk")) {
                 for (MethodNode method : node.methods) {
-                    if (method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;)")) {
+                    if (method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;Ljava/util/Optional;)")) {
                         for (AbstractInsnNode instruction : method.instructions.toArray()) {
                             if (instruction.getOpcode() == Opcodes.ARETURN) {
                                 returns++;
@@ -97,6 +98,8 @@ class LoaderHooksTest {
             assertEquals(target.getKey().endsWith("legacy_chunk") ? 1 : 0, calls(node, "prepareLegacyChunk"));
             assertEquals(returns, calls(node, "finalizeLegacyChunk"));
             assertEquals(target.getKey().endsWith("raw_inventory") ? 1 : 0, calls(node, "prepareNbt"));
+            assertEquals(target.getKey().endsWith("level_registry") ? 1 : 0, calls(node, "captureLegacyLevelData"));
+            assertEquals(target.getKey().endsWith("level_registry") ? 1 : 0, calls(node, "writeLegacyLevelData"));
 
             if (target.getKey().endsWith("raw_inventory")) {
                 int inventoryReturns = 0;
@@ -142,7 +145,7 @@ class LoaderHooksTest {
         for (Map.Entry<String, String> target : targets().entrySet()) {
             ClassNode empty = new ClassNode();
 
-            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), empty));
+            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), empty), target.getKey());
 
             ClassNode node = original(target.getValue());
 
@@ -160,7 +163,7 @@ class LoaderHooksTest {
             }).findFirst().get();
 
             node.methods.add(patched);
-            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), node));
+            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), node), target.getKey());
         }
     }
 }

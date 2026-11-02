@@ -41,13 +41,6 @@ public final class Pieces {
 
     public static void register() {
         initialized = true;
-
-        for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
-            Item item = new Item(new Item.Properties().stacksTo(1));
-
-            item.setRegistryName(SkysBuildingPieces.ID, "template_" + name);
-            RETIRED_TEMPLATES.put(name, item);
-        }
     }
 
     public static void registerBlocks(IForgeRegistry<Block> registry) {
@@ -72,7 +65,14 @@ public final class Pieces {
 
     public static void registerItems(IForgeRegistry<Item> registry) {
         registerNamespaceItems(SkysBuildingPieces.ID, registry);
-        RETIRED_TEMPLATES.values().forEach(registry::register);
+        // Retain old item identities, creating their intrusive holders only
+        // while Forge has opened the item registry.
+        for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
+            Item item = new Item(new Item.Properties().stacksTo(1));
+            item.setRegistryName(SkysBuildingPieces.ID, "template_" + name);
+            RETIRED_TEMPLATES.put(name, item);
+            registry.register(item);
+        }
     }
 
     public static void registerNamespaceItems(String namespace, IForgeRegistry<Item> registry) {

@@ -1,1 +1,8 @@
-{"pack":{"pack_format":4,"description":"Legacy piece policy checks"}}
+{
+  "pack": {
+    "pack_format": 9,
+    "description": "Legacy piece policy checks",
+    "forge:resource_pack_format": 8,
+    "forge:data_pack_format": 9
+  }
+}

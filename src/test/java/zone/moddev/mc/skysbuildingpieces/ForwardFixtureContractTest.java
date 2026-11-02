@@ -17,6 +17,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ForwardFixtureContractTest {
     @Test
+    void native117FixtureKeepsTheAcceptedSourceAndCompleteSavedPieces() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser().parse(Files.readString(root.resolve("building-pieces-1.17.1.json")))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("building-pieces-1.17.1.zip"));
+        assertEquals("b8d7fac567f6dc22240186cd0b0601eb1dfe2090", manifest.get("source_commit").getAsString());
+        assertEquals("40ACD56C59F50C9C5DC484781B7FEA180E1C45FAB5470735CA27983E14258240",
+                manifest.get("source_jar_sha256").getAsString());
+        assertEquals("E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67", sha256(archive));
+        assertEquals(7029, manifest.getAsJsonArray("states").size());
+        assertEquals(3346, manifest.get("wet_states").getAsInt());
+        assertEquals(144, manifest.get("snowy_states").getAsInt());
+        assertEquals(7029, manifest.get("source_saved_states_verified").getAsInt());
+        assertTrue(manifest.get("source_unchanged").getAsBoolean());
+        assertTrue(manifest.get("player_shovel").getAsString().contains("Enchantments"));
+        assertTrue(manifest.get("player_nested").getAsString().contains("Items"));
+        assertTrue(verifyMembers(manifest, archive).contains("data/skysbuildingpieces_world_state.dat"));
+    }
+
+    @Test
     void native116FixtureKeepsAllPiecesAndTheRenamedVanillaPath() throws Exception {
         Path root = Paths.get("src/testFixtures/worlds");
         JsonObject manifest = new JsonParser().parse(Files.readString(root.resolve("building-pieces-1.16.5.json")))

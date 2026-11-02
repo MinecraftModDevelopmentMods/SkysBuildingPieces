@@ -13,7 +13,7 @@ if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.vers
     throw new GradleException('The coordinated Grass Slabs dependency needs exact candidate checksums')
 }
 
-def sibling = "../../SkysGrassSlabs117/SkysGrassSlabs"
+def sibling = "../../SkysGrassSlabs118/SkysGrassSlabs"
 def pinnedJar = providers.provider {
     file(providers.gradleProperty('grassSlabsMainJar').getOrElse(
             "${sibling}/build/libs/SkysGrassSlabs-${lock.version}.jar"))
@@ -37,7 +37,7 @@ def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
             }
             new ZipFile(source).withCloseable { archive ->
                 def descriptor = archive.getEntry('META-INF/mods.toml')
-                if (descriptor == null) throw new GradleException('Grass Slabs has no Forge 37 metadata')
+                if (descriptor == null) throw new GradleException('Grass Slabs has no Forge 40 metadata')
                 String metadata = archive.getInputStream(descriptor).getText('UTF-8')
                 if (!(metadata =~ /(?m)^\s*modId\s*=\s*"skysgrassslabs"\s*$/) ||
                         !(metadata =~ /(?m)^\s*version\s*=\s*"${java.util.regex.Pattern.quote(lock.version)}"\s*$/)) {

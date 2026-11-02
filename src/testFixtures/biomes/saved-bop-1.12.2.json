@@ -1,0 +1,17 @@
+{
+  "purpose": "Biome-schema regression only; this extract does not qualify block or item migration.",
+  "source_archive_sha256": "E7028E104C276C38239A084186529D66792A2C6586C869B21B36FC78BEC121A2",
+  "source_region": "region/r.2.2.mca",
+  "source_region_sha256": "BB941AF3B1F992C122855A09610E01380F63559E5120D13F57E2A501D3039FE2",
+  "chunk_x": 93,
+  "chunk_z": 93,
+  "data_version": 1343,
+  "biomes": {
+    "40": "biomesoplenty:gravel_beach"
+  },
+  "source_columns": {
+    "40": 256
+  },
+  "raw_chunk_sha256": "C7FD8629B2D5120C7FC21DBDA43B2EFFB08F39F148D359B57A0BFFCA44F8D9FB",
+  "compressed_chunk_sha256": "1140725D866D437EDEF10E36C898EE8EAAC67D1F4A928F56EE0B0DA8802F1BC4"
+}

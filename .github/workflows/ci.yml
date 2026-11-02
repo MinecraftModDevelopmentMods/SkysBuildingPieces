@@ -1,19 +1,19 @@
-name: Sky's Building Pieces 1.17 CI
+name: Sky's Building Pieces 1.18 CI
 
 on:
   push:
     branches:
-      - master-1.17.1
+      - master-1.18.2
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.17.1
+      - master-1.18.2
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.17-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-1.18-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,15 +38,15 @@ jobs:
           distribution: temurin
           java-version: '8.0.502+7'
 
-      - name: Install pinned Java 16 compilation toolchain
+      - name: Install pinned Java 17 compilation toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '16.0.2+7'
+          java-version: '17.0.1+12'
 
       - name: Pin production Java
         run: |
-          echo "SBP_JAVA16_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "SBP_JAVA17_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
 
       - name: Install pinned Java 17 Gradle runtime
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -67,7 +67,7 @@ jobs:
           gradle_args=(
             classes test
             --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_16_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_17_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -82,7 +82,7 @@ jobs:
           gradle_args=(
             classes test
             --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_16_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_17_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -172,7 +172,7 @@ jobs:
         run: >-
           ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
           verifyEclipseProductionClasspath --no-daemon --stacktrace
-          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_16_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_17_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
           -Dorg.gradle.java.installations.auto-detect=false
           -Dorg.gradle.java.installations.auto-download=false
 
@@ -182,13 +182,13 @@ jobs:
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.17.1-${{ github.sha }}
+          name: SkysBuildingPieces-1.18.2-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.8.117011.jar
-            build/libs/SkysBuildingPieces-0.3.8.117011-sources.jar
-            build/libs/SkysBuildingPieces-0.3.8.117011-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.8.118021.jar
+            build/libs/SkysBuildingPieces-0.3.8.118021-sources.jar
+            build/libs/SkysBuildingPieces-0.3.8.118021-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -196,7 +196,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.17.1-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-1.18.2-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

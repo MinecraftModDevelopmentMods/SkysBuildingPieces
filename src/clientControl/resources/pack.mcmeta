@@ -1,1 +1,8 @@
-{"pack":{"pack_format":4,"description":"Forge client control resources"}}
+{
+  "pack": {
+    "pack_format": 9,
+    "description": "Forge client control resources",
+    "forge:resource_pack_format": 8,
+    "forge:data_pack_format": 9
+  }
+}

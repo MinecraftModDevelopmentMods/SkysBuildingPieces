@@ -19,15 +19,39 @@ def profile_for(directory):
     fixture = root / profile["fixture"]
     if (hashlib.sha256(fixture.read_bytes()).hexdigest().upper() != profile["sha256"]
             or source.get("source_jar_sha256") != profile["source_jar_sha256"]
-            or profile["saved_uses"] != 0 or profile["inspected_nbt_records"] <= 0):
+            or profile.get("non_biome_saved_uses", profile["saved_uses"]) != 0
+            or profile["inspected_nbt_records"] <= 0):
         raise ValueError("The unused-entry proof does not match the upgrade fixture")
+    proof = profile.get("native_biome_contract")
+    if profile["saved_uses"] and proof is None:
+        raise ValueError("Used biome entries require a complete native conversion contract")
+    if proof is not None:
+        contract = root / proof["path"]
+        data = json.loads(contract.read_text(encoding="utf-8"))
+        if (hashlib.sha256(contract.read_bytes()).hexdigest().upper() != proof["sha256"]
+                or data["source_world_sha256"] != profile["sha256"]
+                or data["source_minecraft"] != proof["source"]
+                or data["checked_cells"] != proof["checked_cells"]
+                or data["native_renamed_cells"] != proof["renamed_cells"]
+                or profile["saved_uses"] != proof["renamed_cells"]):
+            raise ValueError("The native biome contract does not match this source fixture")
     return profile
+
+
+def audit_biome_proof(text, profile):
+    proof = profile.get("native_biome_contract") if profile else None
+    if proof is None:
+        return
+    marker = ("BUILDING_PIECES_NATIVE_BIOME_PASS source=" + proof["source"]
+              + " cells=" + str(proof["checked_cells"]) + " renamed=" + str(proof["renamed_cells"]))
+    if not any(line.endswith(marker) for line in text.splitlines()):
+        raise ValueError("The complete native biome conversion was not verified")
 
 
 def audit_text(text, profile=None):
     text = text.replace("\r\n", "\n")
     observed = {}
-    pattern = r"Unidentified mapping from registry (minecraft:[a-z_]+)\n(.*?)(?:\n\n)"
+    pattern = r"Unidentified mapping from registry (minecraft:[a-z_/]+)\n(.*?)(?:\n\n)"
     for registry, body in re.findall(pattern, text, re.S):
         entries = {}
         for row in body.splitlines():

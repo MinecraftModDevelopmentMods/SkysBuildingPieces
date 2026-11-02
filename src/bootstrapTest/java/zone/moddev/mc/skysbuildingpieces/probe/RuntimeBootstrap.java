@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -38,6 +38,8 @@ public final class RuntimeBootstrap {
     private int startupTicks;
 
     public RuntimeBootstrap() {
+        PathChecks.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus(),
+                "buildingpiecesbootstrap");
         PersistenceRegistrationChecks.register(
                 net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.addListener(this::started);
@@ -48,7 +50,7 @@ public final class RuntimeBootstrap {
                 () -> () -> new ClientProbe().init());
     }
 
-    private void started(FMLServerStartedEvent event) {
+    private void started(ServerStartedEvent event) {
         pendingServer = event.getServer();
         startupTicks = 0;
         if (System.getProperty("skysbuildingpieces.bootstrapPhase", "").startsWith("forward")) {
@@ -157,7 +159,7 @@ public final class RuntimeBootstrap {
             // Report a failed probe there too, so it exits instead of waiting forever.
             net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> net.minecraft.client.Minecraft.getInstance().delayCrash(
-                            net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
+                            () -> net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
             server.halt(false);
         } finally {
             if (phase.startsWith("forward")) {

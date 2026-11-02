@@ -1,1 +1,8 @@
-{"pack":{"pack_format":4,"description":"Optional dependency control"}}
+{
+  "pack": {
+    "pack_format": 9,
+    "description": "Optional dependency control",
+    "forge:resource_pack_format": 8,
+    "forge:data_pack_format": 9
+  }
+}

@@ -25,16 +25,15 @@ public final class LegacyPolicyMod {
     private static BlockEntityType<MaterialTile> materialType;
 
     public LegacyPolicyMod() {
-        for (int index = 0; index < NAMES.length; index++) {
-            BLOCKS[index] = new LegacyBlock().setRegistryName("buildingbricks", NAMES[index]);
-        }
-
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, this::blocks);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::items);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(BlockEntityType.class, this::tiles);
     }
 
     private void blocks(RegistryEvent.Register<Block> event) {
+        for (int index = 0; index < NAMES.length; index++) {
+            BLOCKS[index] = new LegacyBlock().setRegistryName("buildingbricks", NAMES[index]);
+        }
         event.getRegistry().registerAll(BLOCKS);
     }
 
@@ -84,9 +83,9 @@ public final class LegacyPolicyMod {
         }
 
         @Override
-        public CompoundTag save(CompoundTag tag) {
+        protected void saveAdditional(CompoundTag tag) {
             tag.merge(retained);
-            return super.save(tag);
+            super.saveAdditional(tag);
         }
     }
 }

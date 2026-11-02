@@ -1,4 +1,4 @@
-"""Check Forge 37 completion, native settings and unexpected errors."""
+"""Check Forge 40 completion, native settings and unexpected errors."""
 
 import argparse
 import gzip
@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import re
 import tomllib
-from native_registry_notices import audit_text, profile_for
+from native_registry_notices import audit_text, profile_for, audit_biome_proof
 
 
 
@@ -58,7 +58,7 @@ def audit(directory, phase, control=False):
     if not unchanged:
         raise ValueError("Native Forge settings differ from the controlled defaults")
     receipt = classify(log, unchanged)
-    required = (("FORGE37_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
+    required = (("FORGE40_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
                 ("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED", "SKY_RECIPE_PREVIEW_MODELS_PASS",
                  "BUILDING_PIECES_CONTINUOUS_GLASS_PASS", "BUILDING_PIECES_COLOURS_PASS"))
     if any(marker not in log for marker in required):
@@ -84,6 +84,7 @@ def classify_server(log, debug, unchanged_defaults, profile=None):
     if not unchanged_defaults or not startup or 'Done (' not in log:
         raise ValueError('Native server defaults or startup sequence changed')
     notices = audit_text(log, profile)
+    audit_biome_proof(log, profile)
     if not debug.strip():
         raise ValueError('Native server debug evidence is missing')
     return {'native_server_config_notices': 0, 'notices': notices,
@@ -116,4 +117,4 @@ if __name__ == "__main__":
     options = parser.parse_args()
     result = (audit_server(options.directory, options.phase) if options.server else
               audit(options.directory, options.phase, options.control))
-    print("FORGE37_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))
+    print("FORGE40_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))

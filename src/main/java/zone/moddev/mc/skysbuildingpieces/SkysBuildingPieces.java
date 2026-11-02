@@ -1,14 +1,12 @@
 package zone.moddev.mc.skysbuildingpieces;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fmlserverevents.FMLServerAboutToStartEvent;
-import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +22,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.117011";
+    public static final String VERSION = "0.3.8.118021";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;
@@ -33,19 +31,16 @@ public final class SkysBuildingPieces {
         BuildingPiecesConfig.register();
         Pieces.register();
         MineralogyCompat.register();
-        HOLDER = new Block(Block.Properties.of(Material.STONE).strength(-1.0F, 3_600_000.0F));
-        HOLDER.setRegistryName(ID, "legacy_piece_holder");
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(new MigrationEvents());
         MinecraftForge.EVENT_BUS.register(new PathPieces());
-        MinecraftForge.EVENT_BUS.addListener(this::beforeServer);
         MinecraftForge.EVENT_BUS.addListener(this::afterServer);
         DistExecutor.runWhenOn(Dist.CLIENT, () -> zone.moddev.mc.skysbuildingpieces.client.ClientProxy::register);
     }
 
     private void setup(FMLCommonSetupEvent event) {
-        // Forge's shared save-hook list must not be changed by parallel mod constructors.
+        // Install the legacy-world startup listener after parallel mod setup.
         event.enqueueWork(LegacyBridge::registerPersistence);
         forceReplace = BuildingPiecesConfig.forceReplacement();
         Pieces.validateMaterials();
@@ -54,11 +49,7 @@ public final class SkysBuildingPieces {
         LegacyBridge.ready = true;
     }
 
-    private void beforeServer(FMLServerAboutToStartEvent event) {
-        LegacyBridge.start(event.getServer());
-    }
-
-    private void afterServer(FMLServerStoppedEvent event) {
+    private void afterServer(ServerStoppedEvent event) {
         LegacyBridge.stop();
     }
 }

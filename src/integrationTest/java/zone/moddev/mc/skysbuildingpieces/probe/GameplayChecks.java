@@ -38,7 +38,8 @@ public final class GameplayChecks {
     }
 
     public static boolean ready(ServerLevel world) {
-        return world.isPositionTickingWithEntitiesLoaded(FIXTURE_POSITION);
+        long chunk = new net.minecraft.world.level.ChunkPos(FIXTURE_POSITION).toLong();
+        return world.areEntitiesLoaded(chunk) && world.getChunkSource().isPositionTicking(chunk);
     }
 
     public static void release(ServerLevel world) {
@@ -74,6 +75,9 @@ public final class GameplayChecks {
 
         require(world.getChunkSource().isPositionTicking(chunkPosition), "Native gameplay fixture never became a ticking chunk");
 
+        // This seed has gravel above the 1.18 test site. A stable ceiling leaves
+        // room for tall walls and keeps natural falling blocks out of the tests.
+        world.setBlock(position.above(2), Blocks.STONE.defaultBlockState(), 2);
         world.removeBlock(position.above(), false);
         world.removeBlock(position, false);
 
@@ -496,7 +500,7 @@ public final class GameplayChecks {
                             + actualFire + " expected=" + expectedFire);
                     require(actualSpread == expectedSpread, "native fire spread");
                     world.setBlock(position, state, 2);
-                    require(ItemStack.matches(pieceBlock.getPickBlock(state, null, world, position, player),
+                    require(ItemStack.matches(pieceBlock.getCloneItemStack(world, position, state),
                             expectedDrop(materialDefinition.id, pieceBlock, state)),
                             "pick identity follows regular slab");
 

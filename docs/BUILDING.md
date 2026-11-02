@@ -1,8 +1,8 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.17.1 and Forge 37.1.1. Run the included Gradle
-wrapper with Java 17. Compilation and Minecraft use Java 16; the pinned production
-toolchain is Temurin 16.0.2+7. ForgeGradle uses Java 25 for its Mavenizer tool.
+This branch targets Minecraft 1.18.2 and Forge 40.3.0. Run the included Gradle
+wrapper with Java 17. Compilation and Minecraft use Java 17; the pinned production
+toolchain is Temurin 17.0.1+12. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
 the command path, or pass `-PpythonExecutable=<python executable>` to Gradle.
 
@@ -27,7 +27,7 @@ and exclude test classes.
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs117/SkysGrassSlabs` checkout,
+Build that exact commit in the sibling `SkysGrassSlabs118/SkysGrassSlabs` checkout,
 or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
 match their pinned hashes. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.
@@ -54,7 +54,9 @@ so a clean reload cannot hide an earlier failure. The two locked upgrade fixture
 contain nine unused vanilla registry names that Forge reports during upgrades.
 Their audit accepts only the exact entries and numeric IDs, after checking every
 saved NBT record and reproducing the notices without Sky mods. All other errors
-still fail. The checked Forge settings must remain unchanged throughout the test.
+still fail. Named 1.14–1.17 fixtures also check every saved biome cell against
+Minecraft's own biome renames before accepting those exact registry notices.
+The checked Forge settings must remain unchanged throughout the test.
 
 The resource helpers in `tools` regenerate models, translations and native
 recipe/advancement JSON from the fixed catalogues. Unlocks retain their existing

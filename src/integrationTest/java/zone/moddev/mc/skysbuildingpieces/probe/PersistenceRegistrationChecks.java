@@ -1,15 +1,13 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fmllegacy.WorldPersistenceHooks;
 import org.apache.logging.log4j.LogManager;
 
-/** Checks the real loading stages around Forge's shared persistence-hook list. */
+/** Checks queued activation; native read/write wrappers are checked separately. */
 public final class PersistenceRegistrationChecks {
     private static final String CORE = "zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge$";
     private static final String GRASS = "zone.moddev.mc.skysgrassslabs.compat.LegacyWorldDataHook$";
@@ -39,17 +37,26 @@ public final class PersistenceRegistrationChecks {
                     "Grass Slabs must register exactly one persistence hook");
             require(count(MINERALOGY) == (ModList.get().isLoaded("mineralogy") ? 1 : 0),
                     "Mineralogy's independent persistence hook must remain installed");
-            LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_AFTER_PASS core={} grass={} mineralogy={}",
+            LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_AFTER_PASS mechanism=forge_level_hooks core={} grass={} mineralogy={}",
                     count(CORE), count(GRASS), count(MINERALOGY));
         });
     }
 
     private static long count(String prefix) {
+        if (prefix.equals(GRASS) && !ModList.get().isLoaded("skysgrassslabs")) return 0;
+        if (prefix.equals(MINERALOGY) && !ModList.get().isLoaded("mineralogy")) return 0;
         try {
-            Field field = WorldPersistenceHooks.class.getDeclaredField("worldPersistenceHooks");
+            Class<?> owner = Class.forName(prefix.substring(0, prefix.length() - 1));
+            if (prefix.equals(MINERALOGY)) {
+                var capture = owner.getMethod("captureLegacyLevelData", net.minecraft.nbt.CompoundTag.class,
+                        java.nio.file.Path.class);
+                require(java.lang.reflect.Modifier.isStatic(capture.getModifiers()),
+                        "Mineralogy's native capture callback must be static");
+                return 1;
+            }
+            Field field = owner.getDeclaredField(prefix.equals(CORE) ? "persistenceRegistered" : "registered");
             field.setAccessible(true);
-            return ((List<?>) field.get(null)).stream()
-                    .filter(hook -> hook.getClass().getName().startsWith(prefix)).count();
+            return field.getBoolean(null) ? 1 : 0;
         } catch (ReflectiveOperationException failure) {
             throw new AssertionError("Cannot inspect the native persistence callbacks", failure);
         }
