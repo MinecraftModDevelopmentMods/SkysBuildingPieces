@@ -272,6 +272,9 @@ public final class GameplayChecks {
         // Light tickets complete through the server mailbox as well as the chunk
         // mailbox. Pump the native event loop while waiting for this exact pass.
         world.getServer().managedBlock(() -> {
+            // Keep chunk tickets moving after the normal server loop has spent
+            // this tick's budget. Lighting needs the chunk mailbox too.
+            world.getChunkSource().pollTask();
             // Pre- and post-light tasks arrive asynchronously. A single schedule
             // call can run before either task has reached the worker's queue.
             lights.tryScheduleUpdate();
