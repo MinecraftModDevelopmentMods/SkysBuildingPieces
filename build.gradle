@@ -87,6 +87,9 @@ tasks.named('compileTestJava', JavaCompile) {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     workingDir = project.projectDir
+    // These saved-world audits read files outside the compiled test resources.
+    inputs.file('tools/native-log-profiles.json')
+    inputs.dir('src/testFixtures')
     if (pinnedJava17.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava17Spec)
 }
 tasks.withType(JavaExec).configureEach {

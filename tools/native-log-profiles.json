@@ -24,7 +24,7 @@
         }
       },
       "saved_uses": 0,
-      "inspected_nbt_records": 777,
+      "inspected_nbt_records": 785,
       "non_biome_saved_uses": 0,
       "native_biome_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.14.4.biomes.json",
@@ -59,7 +59,7 @@
         }
       },
       "saved_uses": 14400,
-      "inspected_nbt_records": 777,
+      "inspected_nbt_records": 787,
       "non_biome_saved_uses": 0,
       "native_biome_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.15.2.biomes.json",
@@ -117,7 +117,7 @@
       "source_jar_sha256": "B4DC9F16E5CF42902B93667B9E95EC846B66E2A3C488CC7CF48D9FBA3B477C41",
       "saved_uses": 14400,
       "non_biome_saved_uses": 0,
-      "inspected_nbt_records": 778,
+      "inspected_nbt_records": 792,
       "native_biome_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.16.5.biomes.json",
         "sha256": "93CDCB3346343BFEBBDD86C2BA173A00181450145928E37FBDA6D2BAB8B42C37",
@@ -173,7 +173,7 @@
       "source_jar_sha256": "40ACD56C59F50C9C5DC484781B7FEA180E1C45FAB5470735CA27983E14258240",
       "saved_uses": 18240,
       "non_biome_saved_uses": 0,
-      "inspected_nbt_records": 959,
+      "inspected_nbt_records": 996,
       "native_biome_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.17.1.biomes.json",
         "sha256": "1FDD5E6FEC9097501649D47B98982030EC96E11C202241007059FF122DEF53C7",
