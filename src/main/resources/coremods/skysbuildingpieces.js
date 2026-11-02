@@ -47,6 +47,52 @@ function replacementFor(size) {
 
 function initializeCoreMod() {
     return {
+        'skysbuildingpieces_sparse_biome_palette': {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraft.world.level.chunk.PalettedContainer$Strategy$2'
+            },
+            'transformer': function(classNode) {
+                var owner = 'zone/moddev/mc/skysbuildingpieces/legacy/SparseBiomeIds';
+                var methods = 0;
+                var replacements = 0;
+                for (var index = 0; index < classNode.methods.size(); index++) {
+                    var method = classNode.methods.get(index);
+                    if (method.desc !== '(Lnet/minecraft/core/IdMap;I)'
+                            + 'Lnet/minecraft/world/level/chunk/PalettedContainer$Configuration;') {
+                        continue;
+                    }
+                    methods++;
+                    for (var instruction = method.instructions.getFirst(); instruction !== null;
+                            instruction = instruction.getNext()) {
+                        if (!(instruction instanceof MethodInsnNode)) continue;
+                        var original = instruction.getOpcode() === Opcodes.INVOKEINTERFACE
+                                && instruction.owner === 'net/minecraft/core/IdMap' && instruction.desc === '()I';
+                        var patched = instruction.getOpcode() === Opcodes.INVOKESTATIC
+                                && instruction.owner === owner && instruction.name === 'storageSize'
+                                && instruction.desc === '(Lnet/minecraft/core/IdMap;)I';
+                        if (!original && !patched) continue;
+                        var next = instruction.getNext();
+                        while (next !== null && next.getOpcode() < 0) next = next.getNext();
+                        if (!(next instanceof MethodInsnNode) || next.getOpcode() !== Opcodes.INVOKESTATIC
+                                || next.owner !== 'net/minecraft/util/Mth' || next.desc !== '(I)I') {
+                            throw new Error("Sky's Building Pieces found an unexpected biome palette width calculation");
+                        }
+                        replacements++;
+                        if (original) {
+                            var corrected = new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                    owner, 'storageSize', '(Lnet/minecraft/core/IdMap;)I', false);
+                            method.instructions.set(instruction, corrected);
+                            instruction = corrected;
+                        }
+                    }
+                }
+                if (methods !== 1 || replacements !== 1) {
+                    throw new Error("Sky's Building Pieces could not prepare the Forge 40 biome palette width");
+                }
+                return classNode;
+            }
+        },
         'skysbuildingpieces_legacy_level_registry': {
             'target': {
                 'type': 'CLASS',

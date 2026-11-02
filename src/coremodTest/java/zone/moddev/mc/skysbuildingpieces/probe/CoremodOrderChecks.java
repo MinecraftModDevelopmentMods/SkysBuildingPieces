@@ -29,6 +29,23 @@ public final class CoremodOrderChecks {
 
         int[][] orders = {{0, 1, 2}, {0, 2, 1}, {1, 0, 2}, {1, 2, 0}, {2, 0, 1}, {2, 1, 0}};
         for (int[] order : orders) {
+            ClassNode biomePalette = nativeClass("net/minecraft/world/level/chunk/PalettedContainer$Strategy$2");
+            for (int index : order) {
+                apply(scripts.get(index), biomePalette, index == 0 ? 1 : 0);
+            }
+            int paletteInstructions = biomePalette.methods.stream().mapToInt(method -> method.instructions.size()).sum();
+            apply(sky, biomePalette);
+            require(paletteInstructions == biomePalette.methods.stream().mapToInt(method -> method.instructions.size()).sum(),
+                    "Repeated Sky transformation changes the biome palette width");
+            int widths = 0;
+            for (MethodNode method : biomePalette.methods) {
+                widths += calls(method, "skysbuildingpieces", "storageSize");
+                if (calls(method, "skysbuildingpieces", "storageSize") > 0) {
+                    new Analyzer<>(new BasicVerifier()).analyze(biomePalette.name, method);
+                }
+            }
+            require(widths == 1, "Expected one corrected biome storage-width calculation");
+
             ClassNode tables = nativeClass("net/minecraft/util/datafix/fixes/BlockStateData");
             for (int index : order) {
                 apply(scripts.get(index), tables);
@@ -108,7 +125,16 @@ public final class CoremodOrderChecks {
             }
         }
 
-        System.out.println("BUILDING_PIECES_COREMOD_ORDER_PASS orders=6 targets=3 actual_scripts=true stack_verification=true");
+        ClassNode unsupported = nativeClass("net/minecraft/world/level/chunk/PalettedContainer$Strategy$2");
+        unsupported.methods.removeIf(method -> method.desc.startsWith("(Lnet/minecraft/core/IdMap;I)"));
+        boolean refused = false;
+        try {
+            apply(sky, unsupported);
+        } catch (javax.script.ScriptException expected) {
+            refused = expected.getMessage().contains("biome palette width");
+        }
+        require(refused, "An unsupported biome strategy must stop with an explanation");
+        System.out.println("BUILDING_PIECES_COREMOD_ORDER_PASS orders=6 targets=4 actual_scripts=true stack_verification=true");
     }
 
     private static ClassNode nativeClass(String name) throws Exception {
@@ -184,6 +210,10 @@ public final class CoremodOrderChecks {
     }
 
     private static void apply(String script, ClassNode node) throws Exception {
+        apply(script, node, 1);
+    }
+
+    private static void apply(String script, ClassNode node, int expectedMatches) throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
         require(engine != null, "Forge's Nashorn script engine is missing from the test runtime");
@@ -196,7 +226,7 @@ public final class CoremodOrderChecks {
                 + "if (definition.target.type === 'CLASS' && String(definition.target.name) === String(targetName)) {"
                 + "definition.transformer(candidate); matches++; }} matches;");
 
-        require(((Number) count).intValue() == 1, "Expected one matching transformer in the pinned script");
+        require(((Number) count).intValue() == expectedMatches, "Unexpected matching transformers in the pinned script");
     }
 
     private static int calls(MethodNode method, String namespace, String name) {

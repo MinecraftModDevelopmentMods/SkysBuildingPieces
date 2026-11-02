@@ -7,6 +7,7 @@
 - Keep saved palettes, orientations, inventories and custom item data when upgrading.
 - Preserve recovery progress in the new chunk format, including add-on coverage.
 - Keep add-on biome names through Minecraft's conversion to section palettes.
+- Fix loading of older worlds with gaps in their saved biome numbers.
 - Use the matching Grass Slabs version for shared grass behaviour when installed.
 
 ## 0.3.8.117011 - Minecraft 1.17.1 (unreleased)

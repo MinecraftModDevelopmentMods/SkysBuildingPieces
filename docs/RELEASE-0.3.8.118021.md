@@ -16,3 +16,5 @@ before continuing to play.
 The upgrade bridge also retains add-on biome names through the conversion from
 older numeric biome volumes to section palettes. Vanilla biome renames still
 run normally. This changes saved identities without regenerating terrain.
+Older saves with gaps left by removed biomes also keep their remaining biome
+numbers when loading mixed-biome sections.
