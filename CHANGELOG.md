@@ -8,6 +8,7 @@
 - Keep saved palettes, orientations and custom item data when upgrading.
 - Keep add-on material names short and translated, including BOP wood pieces.
 - Keep the full material's mining rules for pieces made from retired rocks.
+- Fix a startup crash when several mods preserve old world data.
 
 ## 0.3.8.116051 - Minecraft 1.16.5 (unreleased)
 

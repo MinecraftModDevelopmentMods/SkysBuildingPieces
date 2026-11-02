@@ -30,7 +30,6 @@ public final class SkysBuildingPieces {
     public static Block HOLDER;
 
     public SkysBuildingPieces() {
-        LegacyBridge.registerPersistence();
         BuildingPiecesConfig.register();
         Pieces.register();
         MineralogyCompat.register();
@@ -46,6 +45,8 @@ public final class SkysBuildingPieces {
     }
 
     private void setup(FMLCommonSetupEvent event) {
+        // Forge's shared save-hook list must not be changed by parallel mod constructors.
+        event.enqueueWork(LegacyBridge::registerPersistence);
         forceReplace = BuildingPiecesConfig.forceReplacement();
         Pieces.validateMaterials();
         GrassLifecycle.initialize();

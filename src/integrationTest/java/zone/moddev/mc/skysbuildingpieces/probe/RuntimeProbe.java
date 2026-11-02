@@ -32,6 +32,8 @@ public final class RuntimeProbe {
     private boolean needsGameplay;
 
     public RuntimeProbe() {
+        PersistenceRegistrationChecks.register(
+                net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.register(this);
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> new ClientProbe().init());
     }

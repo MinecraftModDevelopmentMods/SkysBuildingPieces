@@ -12,6 +12,7 @@ def bootstrapClasses = layout.buildDirectory.dir('native-bootstrap-probe/classes
 def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile) {
     dependsOn tasks.named('classes')
     source fileTree('src/bootstrapTest/java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PersistenceRegistrationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GameplayChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PathChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SharedGrassChecks.java')
