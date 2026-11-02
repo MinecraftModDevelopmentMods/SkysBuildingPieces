@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 
-/** Internal bridge for biome numbers stored in pre-flattening chunks. */
+/** Internal bridge for biome identities stored before section biome palettes. */
 public final class HistoricalBiomes {
     private static final String PENDING = "skysbuildingpieces_biomes";
     private static final String PENDING_NAMES = "skysbuildingpieces_biome_names";
@@ -117,6 +117,34 @@ public final class HistoricalBiomes {
         return true;
     }
 
+    /**
+     * Keep an add-on's resolved names through the 1.18 biome fixer. Numeric IDs
+     * alone are unsafe here: vanilla interprets them using its own old table.
+     * The caller supplies the original cells before translating their numbers.
+     */
+    public static void preserveNamed(CompoundTag root, int[] source, Map<Integer, String> replacements) {
+        CompoundTag level = root.getCompound("Level");
+        int[] translated = level.getIntArray("Biomes");
+        if ((source.length != 256 && source.length != 1024) || translated.length != source.length) {
+            throw blocked("invalid named biome recovery array");
+        }
+        ListTag names = new ListTag();
+        for (int number : source) {
+            String replacement = replacements.get(number);
+            names.add(StringTag.valueOf(replacement == null ? "" : new ResourceLocation(replacement).toString()));
+        }
+        if (level.contains(PENDING) || level.contains(PENDING_NAMES)) {
+            if (!level.contains(PENDING, 11) || !level.contains(PENDING_NAMES, 9)
+                    || !level.get(PENDING).equals(new net.minecraft.nbt.IntArrayTag(translated))
+                    || !names.equals(level.get(PENDING_NAMES))) {
+                throw blocked("conflicting pending named biome recovery");
+            }
+            return;
+        }
+        level.putIntArray(PENDING, translated.clone());
+        level.put(PENDING_NAMES, names);
+    }
+
     private static int[] translate(CompoundTag root) {
         if (active.source.isEmpty() || root.getInt("DataVersion") > 1343 || !root.contains("Level", 10)) {
             return null;
@@ -144,7 +172,9 @@ public final class HistoricalBiomes {
             }
             return;
         }
-        if (!level.contains(PENDING, 11) || level.getIntArray(PENDING).length != 256) {
+        int cells = level.getIntArray(PENDING).length;
+        if (!level.contains(PENDING, 11) || (cells != 256 && cells != 1024)
+                || level.getList(PENDING_NAMES, 8).size() != cells) {
             throw blocked("invalid pending biome recovery");
         }
 
@@ -162,7 +192,7 @@ public final class HistoricalBiomes {
     private static void restoreSectionBiomes(CompoundTag chunk) {
         ListTag names = chunk.getList(PENDING_NAMES, 8);
         ListTag sections = chunk.getList("sections", 10);
-        if (names.size() != 256 || sections.isEmpty()) {
+        if ((names.size() != 256 && names.size() != 1024) || sections.isEmpty()) {
             throw blocked("missing names or sections for pending biome recovery");
         }
 
@@ -189,10 +219,18 @@ public final class HistoricalBiomes {
                 if (oldIndex >= palette.size()) {
                     throw blocked("out-of-range native biome palette entry");
                 }
-                // Match vanilla's old two-dimensional-to-quart sampling exactly.
-                int column = (cell & 3) * 4 + 2;
-                int row = (cell >> 2 & 3) * 4 + 2;
-                String replacement = names.getString(row * 16 + column);
+                String replacement;
+                if (names.size() == 256) {
+                    // Match vanilla's old two-dimensional-to-quart sampling.
+                    int column = (cell & 3) * 4 + 2;
+                    int row = (cell >> 2 & 3) * 4 + 2;
+                    replacement = names.getString(row * 16 + column);
+                } else {
+                    // The 1.15–1.17 format already stores a 4×4×64 volume.
+                    // Vanilla extends its bottom and top planes into new height.
+                    int height = Math.max(0, Math.min(63, section.getByte("Y") * 4 + (cell >> 4)));
+                    replacement = names.getString(height * 16 + (cell & 15));
+                }
                 String name = replacement.isEmpty() ? palette.getString(oldIndex) : replacement;
                 cells[cell] = indices.computeIfAbsent(name, ignored -> indices.size());
             }

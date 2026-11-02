@@ -12,3 +12,7 @@ Existing palettes, orientations and custom item data are kept when upgrading.
 Recovery also keeps its progress in Minecraft's new chunk format. Keep the whole
 world and its registry sidecar together when making a backup, and test a copy
 before continuing to play.
+
+The upgrade bridge also retains add-on biome names through the conversion from
+older numeric biome volumes to section palettes. Vanilla biome renames still
+run normally. This changes saved identities without regenerating terrain.
