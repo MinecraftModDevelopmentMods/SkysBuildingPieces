@@ -8,5 +8,8 @@ Existing palette identities, material slots and supported recovery paths are
 retained. Grass Slabs and Mineralogy remain optional. Building Pieces does not
 generate terrain; use the matching Terrain Smoother for that.
 
+Recovery data from older upgrades keeps its saved path targets when loading
+unopened chunks. Their numeric staging values stay the same.
+
 Use Forge 45.4.0 and Java 17. Back up your world before upgrading, and check a
 copy before continuing with the original. Other mods need their own upgrade path.

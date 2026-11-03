@@ -68,7 +68,16 @@ final class NumericStateBridge {
 
             wrapped.put("BlockState", entry.getCompound("state"));
 
-            BlockState state = NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), HistoricalItems.prepareCopy(wrapped).getCompound("BlockState"));
+            CompoundTag target = HistoricalItems.prepareCopy(wrapped).getCompound("BlockState").copy();
+
+            // Sidecars can retain a target chosen before vanilla renamed grass paths.
+            // The staging number stays fixed for chunks which have not been opened yet.
+            if (target.getString("Name").equals("minecraft:grass_path")) {
+                target.putString("Name", "minecraft:dirt_path");
+            }
+
+            BlockState state = NbtUtils.readBlockState(
+                    net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), target);
 
             if (state.isAir() || state.hasBlockEntity()) {
                 throw new LegacyBridge.RecoveryAbort("A saved migration target is no longer available: " + entry, null);

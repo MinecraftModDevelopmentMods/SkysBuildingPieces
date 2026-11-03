@@ -129,6 +129,44 @@ class NumericStateBridgeTest {
     }
 
     @Test
+    void savedGrassPathTargetUsesDirtPathWithoutChangingItsEncodingOrSourceTag() {
+        CompoundTag state = new CompoundTag();
+        state.putString("Name", "minecraft:grass_path");
+        CompoundTag entry = new CompoundTag();
+        entry.putInt("encoded", 11198);
+        entry.put("state", state);
+        ListTag saved = new ListTag();
+        saved.add(entry);
+        ListTag original = saved.copy();
+
+        NumericStateBridge.begin(new LinkedHashMap<>(), saved);
+
+        assertEquals(original, saved, "Reading a sidecar must not mutate the supplied NBT");
+        assertEquals(Blocks.DIRT_PATH.defaultBlockState(), NumericStateBridge.stagedState(11198));
+        ListTag current = NumericStateBridge.saveStaging();
+        assertEquals(11198, current.getCompound(0).getInt("encoded"));
+        assertEquals("minecraft:dirt_path", current.getCompound(0).getCompound("state").getString("Name"));
+        NumericStateBridge.begin(new LinkedHashMap<>(), current);
+        assertEquals(current, NumericStateBridge.saveStaging(), "A reload must not repeat recovery");
+        assertEquals(11198, NumericStateBridge.encode(Blocks.DIRT_PATH.defaultBlockState()));
+    }
+
+    @Test
+    void currentStoneSlabTargetKeepsItsMeaningWhenRestored() {
+        CompoundTag entry = new CompoundTag();
+        entry.putInt("encoded", 2000 << 4);
+        entry.put("state", net.minecraft.nbt.NbtUtils.writeBlockState(Blocks.STONE_SLAB.defaultBlockState()));
+        ListTag saved = new ListTag();
+        saved.add(entry);
+
+        NumericStateBridge.begin(new LinkedHashMap<>(), saved);
+
+        assertEquals(Blocks.STONE_SLAB.defaultBlockState(), NumericStateBridge.stagedState(2000 << 4));
+        assertNotEquals(Blocks.SMOOTH_STONE_SLAB.defaultBlockState(), NumericStateBridge.stagedState(2000 << 4));
+        assertEquals(saved, NumericStateBridge.saveStaging());
+    }
+
+    @Test
     void corruptSidecarsAndOutOfRangeSourceNumbersFailClearly() {
         Map<Integer, String> snapshot = new LinkedHashMap<>();
 
