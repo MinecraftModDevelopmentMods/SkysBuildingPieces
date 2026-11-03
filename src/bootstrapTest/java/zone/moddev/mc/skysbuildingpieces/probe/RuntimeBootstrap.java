@@ -159,7 +159,7 @@ public final class RuntimeBootstrap {
             // Report a failed probe there too, so it exits instead of waiting forever.
             net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> net.minecraft.client.Minecraft.getInstance().delayCrash(
-                            () -> net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
+                            net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
             server.halt(false);
         } finally {
             if (phase.startsWith("forward")) {
@@ -197,7 +197,7 @@ public final class RuntimeBootstrap {
 
                 if (reload) {
                     require(NbtUtils.writeBlockState(world.getBlockState(position)).equals(saved.getCompound(key)),
-                            "Client world reload lost " + block.getRegistryName() + " / " + metadata);
+                            "Client world reload lost " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
                 } else {
                     world.setBlock(position, block.getStateFromMeta(metadata), 18);
                 }
@@ -226,6 +226,10 @@ public final class RuntimeBootstrap {
     private static CraftingContainer grid() {
         return new CraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
+            public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
+                return ItemStack.EMPTY;
+            }
+            @Override
             public boolean stillValid(Player player) {
                 return true;
             }
@@ -242,7 +246,7 @@ public final class RuntimeBootstrap {
             for (int metadata = 0; metadata < assigned; metadata++) {
                 CompoundTag raw = new CompoundTag();
 
-                raw.putString("id", block.getRegistryName().toString());
+                raw.putString("id", net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString());
                 raw.putShort("Damage", (short) metadata);
                 raw.putByte("Count", (byte) 17);
                 raw.putByte("Slot", (byte) 4);
@@ -254,14 +258,14 @@ public final class RuntimeBootstrap {
                 LegacyBridge.prepareStack(raw);
 
                 ItemStack actual = ItemStack.of(raw);
-                ItemStack expected = Pieces.legacyItem(block.getRegistryName().toString(), metadata, 17);
+                ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 17);
 
                 require(actual.getItem() == expected.getItem() && actual.getCount() == 17,
-                        "Legacy material item: " + block.getRegistryName() + " / " + metadata);
+                        "Legacy material item: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
                 require(actual.hasTag() && actual.getTag().equals(custom) && raw.getByte("Slot") == 4,
                         "Legacy custom data and inventory slot");
 
-                if (expected.getItem().getRegistryName().getNamespace().equals("minecraft")
+                if (net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem()).getNamespace().equals("minecraft")
                         && nativeItems.add(expected.getItem())) {
                     // Native item names can have an older meaning. Check the chosen target after both the direct
                     // fixer and the chunk loader's intermediate-version route, not only our own raw conversion.
@@ -271,16 +275,14 @@ public final class RuntimeBootstrap {
                         inventory.add(raw.copy());
                         fixed.put("Inventory", inventory);
                         if (intermediate) {
-                            fixed = NbtUtils.update(net.minecraft.util.datafix.DataFixers.getDataFixer(),
-                                    net.minecraft.util.datafix.DataFixTypes.PLAYER, fixed, 1343, 1493);
+                            fixed = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), fixed, 1343, 1493);
                         }
-                        fixed = NbtUtils.update(net.minecraft.util.datafix.DataFixers.getDataFixer(),
-                                net.minecraft.util.datafix.DataFixTypes.PLAYER, fixed,
+                        fixed = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), fixed,
                                 intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
                         ItemStack saved = ItemStack.of(fixed);
                         require(saved.getItem() == expected.getItem() && saved.getCount() == 17
                                 && saved.hasTag() && saved.getTag().equals(custom) && fixed.getByte("Slot") == 4,
-                                "Native item fixer changed " + expected.getItem().getRegistryName()
+                                "Native item fixer changed " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem())
                                         + " intermediate=" + intermediate + ": " + fixed);
                     }
                 }
@@ -304,7 +306,7 @@ public final class RuntimeBootstrap {
         ListTag inventory = new ListTag();
         CompoundTag stack = new CompoundTag();
 
-        stack.putString("id", block.getRegistryName().toString());
+        stack.putString("id", net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString());
         stack.putShort("Damage", (short) metadata);
         stack.putByte("Count", (byte) 23);
         stack.putByte("Slot", (byte) 7);
@@ -321,11 +323,10 @@ public final class RuntimeBootstrap {
         inventory.add(stack);
         source.put("Inventory", inventory);
 
-        CompoundTag upgraded = NbtUtils.update(net.minecraft.util.datafix.DataFixers.getDataFixer(),
-                net.minecraft.util.datafix.DataFixTypes.PLAYER, source, 1343, 1976);
+        CompoundTag upgraded = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), source, 1343, 1976);
         CompoundTag saved = upgraded.getList("Inventory", 10).getCompound(0);
         ItemStack actual = ItemStack.of(saved);
-        ItemStack expected = Pieces.legacyItem(block.getRegistryName().toString(), metadata, 23);
+        ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 23);
 
         require(actual.getItem() == expected.getItem() && actual.getCount() == 23,
                 "The real player data fixer must see the recovered flat item, not the metadata carrier");

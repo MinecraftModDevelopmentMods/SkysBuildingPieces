@@ -88,7 +88,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (methods !== 1 || replacements !== 1) {
-                    throw new Error("Sky's Building Pieces could not prepare the Forge 40 biome palette width");
+                    throw new Error("Sky's Building Pieces could not prepare the Forge 45 biome palette width");
                 }
                 return classNode;
             }
@@ -105,7 +105,7 @@ function initializeCoreMod() {
                 for (var index = 0; index < classNode.methods.size(); ++index) {
                     var method = classNode.methods.get(index);
                     var reading = method.name === 'readAdditionalLevelSaveData' &&
-                            method.desc === '(Lnet/minecraft/nbt/CompoundTag;Ljava/nio/file/Path;)V';
+                            method.desc === '(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;)V';
                     var writing = method.name === 'writeAdditionalLevelSaveData' &&
                             method.desc === '(Lnet/minecraft/world/level/storage/WorldData;' +
                                     'Lnet/minecraft/nbt/CompoundTag;)V';
@@ -120,19 +120,19 @@ function initializeCoreMod() {
                                 instruction.name === callback) ++existingCalls;
                     }
                     if (existingCalls > 1) {
-                        throw new Error("Sky's Building Pieces found duplicate Forge 40 level hooks");
+                        throw new Error("Sky's Building Pieces found duplicate Forge 45 level hooks");
                     }
                     if (existingCalls === 1) continue;
                     var prefix = new InsnList();
                     prefix.add(new VarInsnNode(Opcodes.ALOAD, reading ? 0 : 1));
                     if (reading) prefix.add(new VarInsnNode(Opcodes.ALOAD, 1));
                     prefix.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner, callback,
-                            reading ? '(Lnet/minecraft/nbt/CompoundTag;Ljava/nio/file/Path;)V' :
+                            reading ? '(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;)V' :
                                     '(Lnet/minecraft/nbt/CompoundTag;)V', false));
                     method.instructions.insert(prefix);
                 }
                 if (readMethods !== 1 || writeMethods !== 1) {
-                    throw new Error("Sky's Building Pieces could not find the exact Forge 40 level methods");
+                    throw new Error("Sky's Building Pieces could not find the exact Forge 45 level methods");
                 }
                 return classNode;
             }
@@ -166,7 +166,7 @@ function initializeCoreMod() {
                         var sizeInstruction = previousOpcode(instruction);
                         var current = integerValue(sizeInstruction);
                         if (target < 0 || (current !== vanilla && current !== target)) {
-                            throw new Error("Sky's Building Pieces found an unexpected Forge 40 " +
+                            throw new Error("Sky's Building Pieces found an unexpected Forge 45 " +
                                     "BlockStateData array layout");
                         }
                         if (current === vanilla || !(sizeInstruction instanceof LdcInsnNode)) {
@@ -176,7 +176,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (!registerExposed || arraysSeen !== 2) {
-                    throw new Error("Sky's Building Pieces could not prepare Forge 40 BlockStateData");
+                    throw new Error("Sky's Building Pieces could not prepare Forge 45 BlockStateData");
                 }
                 return classNode;
             }
@@ -213,7 +213,7 @@ function initializeCoreMod() {
                     method.maxStack = Math.max(method.maxStack, 4);
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 40 hardness method, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 45 hardness method, found " + matches);
                 }
                 return type;
             }
@@ -250,11 +250,11 @@ function initializeCoreMod() {
                         }
                     }
                     if (returns === 0) {
-                        throw new Error("Sky's Building Pieces found no Forge 40 chunk return");
+                        throw new Error("Sky's Building Pieces found no Forge 45 chunk return");
                     }
                     if (preparations !== 0 || finalizations !== 0) {
                         if (preparations !== 1 || finalizations !== returns) {
-                            throw new Error("Sky's Building Pieces found a partial Forge 40 chunk patch");
+                            throw new Error("Sky's Building Pieces found a partial Forge 45 chunk patch");
                         }
                         patched = true;
                         continue;
@@ -285,20 +285,19 @@ function initializeCoreMod() {
                     patched = true;
                 }
                 if (!patched || matches !== 1) {
-                    throw new Error("Sky's Building Pieces could not patch Forge 40 ChunkStorage");
+                    throw new Error("Sky's Building Pieces could not patch Forge 45 ChunkStorage");
                 }
                 return classNode;
             }
         },
         'skysbuildingpieces_raw_inventory': {
-            'target': {'type': 'CLASS', 'name': 'net.minecraft.nbt.NbtUtils'},
+            'target': {'type': 'CLASS', 'name': 'net.minecraft.util.datafix.DataFixTypes'},
             'transformer': function(type) {
                 var matches = 0;
                 for (var index = 0; index < type.methods.size(); index++) {
                     var method = type.methods.get(index);
-                    if ((method.access & Opcodes.ACC_STATIC) === 0
+                    if ((method.access & Opcodes.ACC_STATIC) !== 0
                             || method.desc !== '(Lcom/mojang/datafixers/DataFixer;'
-                            + 'Lnet/minecraft/util/datafix/DataFixTypes;'
                             + 'Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;') {
                         continue;
                     }
@@ -325,12 +324,12 @@ function initializeCoreMod() {
                             }
                         }
                         if (returns === 0) {
-                            throw new Error("Sky's Building Pieces: Forge 40 NBT updater has no return");
+                            throw new Error("Sky's Building Pieces: Forge 45 NBT updater has no return");
                         }
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 40 NBT updater, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 45 NBT updater, found " + matches);
                 }
                 return type;
             }

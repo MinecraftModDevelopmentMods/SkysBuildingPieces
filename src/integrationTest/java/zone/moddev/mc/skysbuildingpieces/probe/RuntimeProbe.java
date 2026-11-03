@@ -78,9 +78,9 @@ public final class RuntimeProbe {
             }
 
             // Use the same server commands as an operator; the bulk-copy helper is client-only.
-            server.getCommands().performCommand(server.createCommandSourceStack().withSuppressedOutput(),
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
                     "gamerule randomTickSpeed 0");
-            server.getCommands().performCommand(server.createCommandSourceStack().withSuppressedOutput(),
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
                     "gamerule doFireTick false");
             if (world.getGameRules().getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING) != 0
                     || world.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOFIRETICK)) {
@@ -191,7 +191,7 @@ public final class RuntimeProbe {
                     if (!NbtUtils.writeBlockState(world.getBlockState(position))
                             .equals(saved.getCompound("" + number))) {
                         throw new AssertionError(
-                                "Saved client grid lost " + block.getRegistryName() + " / " + metadata);
+                                "Saved client grid lost " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
                     }
                 } else {
                     world.setBlock(position, block.getStateFromMeta(metadata), 18);

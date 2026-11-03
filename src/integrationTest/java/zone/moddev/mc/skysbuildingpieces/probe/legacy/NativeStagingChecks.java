@@ -68,15 +68,24 @@ public final class NativeStagingChecks {
                 for (boolean intermediate : new boolean[] { false, true }) {
                     CompoundTag source = root.copy();
                     if (intermediate) {
-                        source = NbtUtils.update(world.getServer().getFixerUpper(), DataFixTypes.CHUNK, source,
+                        source = DataFixTypes.CHUNK.update(world.getServer().getFixerUpper(), source,
                                 1343, 1493);
                     }
-                    CompoundTag fixed = NbtUtils.update(world.getServer().getFixerUpper(), DataFixTypes.CHUNK,
-                            source, intermediate ? 1493 : 1343, 1976);
+                    CompoundTag fixed = DataFixTypes.CHUNK.update(world.getServer().getFixerUpper(), source, intermediate ? 1493 : 1343, 1976);
                     ListTag palette = fixed.getCompound("Level").getList("Sections", 10).getCompound(0)
                             .getList("Palette", 10);
 
-                    if (!palette.contains(NbtUtils.writeBlockState(expected))) {
+                    boolean retained = false;
+                    for (int entry = 0; entry < palette.size(); entry++) {
+                        // Vanilla can omit properties introduced after the intermediate
+                        // save format. Decode them with the native defaults, then require
+                        // the complete material and state to match the staged block.
+                        BlockState decoded = NbtUtils.readBlockState(world.registryAccess()
+                                .lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK),
+                                palette.getCompound(entry));
+                        retained |= decoded.equals(expected);
+                    }
+                    if (!retained) {
                         throw new AssertionError("Vanilla data fixing changed the staged state " + expected
                                 + " intermediate=" + intermediate + ": " + palette);
                     }
@@ -103,7 +112,7 @@ public final class NativeStagingChecks {
 
             custom.putString("fixture", "Rough stone stays rough");
             item.put("tag", custom);
-            item.putString("id", source.getRegistryName().toString());
+            item.putString("id", net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(source).toString());
             item.putShort("Damage", (short) (source.palette.materials.indexOf("minecraft:stone") * 2 + orientation));
             item.putByte("Count", (byte) 37);
             item.putByte("Slot", (byte) 7);
@@ -116,11 +125,9 @@ public final class NativeStagingChecks {
             for (boolean intermediate : new boolean[] { false, true }) {
                 CompoundTag sourceData = player.copy();
                 if (intermediate) {
-                    sourceData = NbtUtils.update(world.getServer().getFixerUpper(), DataFixTypes.PLAYER,
-                            sourceData, 1343, 1493);
+                    sourceData = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, 1343, 1493);
                 }
-                CompoundTag upgraded = NbtUtils.update(world.getServer().getFixerUpper(), DataFixTypes.PLAYER,
-                        sourceData, intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
+                CompoundTag upgraded = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
                 net.minecraft.world.item.ItemStack result = net.minecraft.world.item.ItemStack.of(upgraded);
 
                 if (result.getItem() != net.minecraft.world.item.Items.STONE_SLAB || result.getCount() != 37

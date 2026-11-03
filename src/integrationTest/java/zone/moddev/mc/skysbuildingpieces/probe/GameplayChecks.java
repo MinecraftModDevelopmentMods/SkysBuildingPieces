@@ -94,8 +94,8 @@ public final class GameplayChecks {
             // Vanilla items consume the action on the server; Sky items retain their explicit success result.
             boolean nativeConsumption = result == InteractionResult.CONSUME && !(item.getItem() instanceof PieceItem);
             require((result == InteractionResult.SUCCESS || nativeConsumption) && item.getCount() == 1,
-                    "own placement and consumption " + pieceBlock.getRegistryName() + " item="
-                            + item.getItem().getRegistryName() + " result=" + result + " count=" + item.getCount()
+                    "own placement and consumption " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(pieceBlock) + " item="
+                            + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item.getItem()) + " result=" + result + " count=" + item.getCount()
                             + " placed=" + world.getBlockState(position));
 
             BlockState state = world.getBlockState(position);
@@ -112,7 +112,7 @@ public final class GameplayChecks {
                 BlockState equivalent = Pieces.state(pieceBlock.palette.materials.get(0), pieceBlock.palette.shape, 0);
 
                 require(state.getBlock() == equivalent.getBlock(), "own placement uses the material's shape: "
-                        + pieceBlock.getRegistryName() + " placed " + state + ", expected " + equivalent);
+                        + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(pieceBlock) + " placed " + state + ", expected " + equivalent);
                 state = pieceBlock.getStateFromMeta(0);
                 world.setBlock(position, state, 2);
             }
@@ -217,7 +217,7 @@ public final class GameplayChecks {
                 BlockState grass = Pieces.state("minecraft:grass", shape, orientation);
 
                 world.setBlock(position, grass, 2);
-                grass.getBlock().tick(grass, world, position, new Random(0));
+                grass.getBlock().tick(grass, world, position, net.minecraft.util.RandomSource.create(0));
                 require(world.getBlockState(position).equals(Pieces.state("minecraft:dirt", shape, orientation)),
                         "covered grass decay preserves geometry: " + shape + " / " + orientation + " became "
                                 + world.getBlockState(position));
@@ -419,7 +419,7 @@ public final class GameplayChecks {
                     && stack.getCount() == 1, "empty selected half permits placement next to an entity");
         } finally {
             stand.discard();
-            world.removeEntity(stand, false);
+            stand.discard();
         }
 
         clearAround(world, position);
@@ -445,6 +445,10 @@ public final class GameplayChecks {
 
     private static net.minecraft.world.inventory.CraftingContainer grid() {
         return new net.minecraft.world.inventory.CraftingContainer(new net.minecraft.world.inventory.AbstractContainerMenu(null, 0) {
+            @Override
+            public net.minecraft.world.item.ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
+                return net.minecraft.world.item.ItemStack.EMPTY;
+            }
             public boolean stillValid(net.minecraft.world.entity.player.Player player) {
                 return true;
             }
@@ -582,7 +586,10 @@ public final class GameplayChecks {
             if (block.palette.shape == Shape.VERTICAL_SLAB) {
                 NonNullList<ItemStack> creative = NonNullList.create();
 
-                Pieces.stack(block.defaultBlockState(), 1).getItem().fillItemCategory(PiecesTab.INSTANCE, creative);
+                net.minecraft.world.item.Item hidden = Pieces.stack(block.defaultBlockState(), 1).getItem();
+                if (PiecesTab.entries().containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(hidden))) {
+                    creative.add(new ItemStack(hidden));
+                }
                 require(creative.isEmpty(), "vertical slabs absent from creative tab");
             }
         }
@@ -718,14 +725,14 @@ public final class GameplayChecks {
             }
         }
 
-        throw new AssertionError("Missing registered slab item: " + block.getRegistryName() + " / " + material);
+        throw new AssertionError("Missing registered slab item: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + material);
     }
 
     public static final class PlacementVeto {
         boolean seen;
 
         @net.minecraftforge.eventbus.api.SubscribeEvent
-        public void place(net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent event) {
+        public void place(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event) {
             seen = true;
             event.setCanceled(true);
         }

@@ -35,7 +35,7 @@ class NativeRegistryNoticeProofTest {
         JsonObject profiles = new JsonParser().parse(new String(
                 Files.readAllBytes(Paths.get("tools/native-log-profiles.json")), StandardCharsets.UTF_8))
                 .getAsJsonObject().getAsJsonObject("profiles");
-        assertEquals(4, profiles.size());
+        assertEquals(5, profiles.size());
         Set<String> versions = new HashSet<>();
 
         for (java.util.Map.Entry<String, com.google.gson.JsonElement> entry : profiles.entrySet()) {
@@ -46,7 +46,14 @@ class NativeRegistryNoticeProofTest {
                 // Biomes are used terrain data. Check their complete source
                 // volumes below, separately from genuinely unused entries.
                 if (registry.getKey().equals("minecraft:worldgen/biome")) {
-                    assertEquals(37, registry.getValue().getAsJsonObject().size());
+                    JsonObject binding = profile.getAsJsonObject("static_biome_contract");
+                    byte[] raw = Files.readAllBytes(Paths.get(binding.get("path").getAsString()));
+                    assertEquals(binding.get("sha256").getAsString(), checksum(raw));
+                    JsonObject proof = new JsonParser().parse(new String(raw, StandardCharsets.UTF_8)).getAsJsonObject();
+                    assertEquals(profile.get("sha256"), proof.get("source_world_sha256"));
+                    assertEquals(registry.getValue(), proof.get("snapshot_entries"));
+                    assertEquals(profile.getAsJsonObject("native_biome_contract").get("sha256"),
+                            proof.get("native_biome_contract_sha256"));
                     continue;
                 }
                 for (java.util.Map.Entry<String, com.google.gson.JsonElement> mapping
@@ -54,7 +61,8 @@ class NativeRegistryNoticeProofTest {
                     names.add(mapping.getKey());
                 }
             }
-            assertEquals(profile.has("legacy_biome_registry") ? 9 : 0, names.size());
+            assertEquals((profile.has("legacy_biome_registry") ? 9 : 0)
+                    + (profile.has("retired_poi_contract") ? 2 : 0), names.size());
             assertEquals(0, profile.get("non_biome_saved_uses").getAsInt());
             BiomeProof biomes = new BiomeProof(profile);
             assertTrue(versions.add(biomes.version));
@@ -84,7 +92,7 @@ class NativeRegistryNoticeProofTest {
             assertEquals(profile.get("inspected_nbt_records").getAsInt(), records);
             biomes.complete(profile);
         }
-        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1"), versions);
+        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2"), versions);
     }
 
     private static int region(byte[] bytes, Set<String> names, String label, BiomeProof biomes) throws Exception {
@@ -136,6 +144,7 @@ class NativeRegistryNoticeProofTest {
         private final Map<String, byte[]> volumes = new HashMap<>();
         private final Set<String> visited = new HashSet<>();
         private final String version;
+        private final boolean nativeHeight;
         private long cells;
         private long renamed;
 
@@ -144,7 +153,13 @@ class NativeRegistryNoticeProofTest {
             byte[] bytes = Files.readAllBytes(Paths.get(proof.get("path").getAsString()));
             assertEquals(proof.get("sha256").getAsString(), checksum(bytes));
             contract = new JsonParser().parse(new String(bytes, StandardCharsets.UTF_8)).getAsJsonObject();
-            assertEquals("zlib-u8-quart-volume-v1", contract.get("format").getAsString());
+            String format = contract.get("format").getAsString();
+            nativeHeight = format.equals("zlib-u8-quart-volume-v2");
+            assertTrue(nativeHeight || format.equals("zlib-u8-quart-volume-v1"));
+            if (nativeHeight) {
+                assertEquals(-16, contract.get("min_quart_y").getAsInt());
+                assertEquals(96, contract.get("quart_height").getAsInt());
+            }
             assertEquals(profile.get("sha256"), contract.get("source_world_sha256"));
             assertEquals(proof.get("source"), contract.get("source_minecraft"));
             version = proof.get("source").getAsString();
@@ -155,17 +170,17 @@ class NativeRegistryNoticeProofTest {
                 try (InputStream packed = new InflaterInputStream(new ByteArrayInputStream(
                         Base64.getDecoder().decode(row.get("cells").getAsString())))) {
                     byte[] volume = readAll(packed);
-                    assertEquals(1024, volume.length, position);
+                    assertEquals(nativeHeight ? 1536 : 1024, volume.length, position);
                     assertNull(volumes.put(position, volume), "Repeated source chunk " + position);
                 }
             }
         }
 
         void inspect(CompoundTag root) {
-            if (!root.contains("Level", 10)) {
+            if (!(nativeHeight ? root.contains("sections", 9) : root.contains("Level", 10))) {
                 return;
             }
-            CompoundTag level = root.getCompound("Level");
+            CompoundTag level = nativeHeight ? root : root.getCompound("Level");
             String status = level.getString("Status");
             if (!status.equals("full") && !status.equals("minecraft:full")) {
                 return;
@@ -174,6 +189,10 @@ class NativeRegistryNoticeProofTest {
             byte[] expected = volumes.get(position);
             assertNotNull(expected, "Missing biome contract for " + position);
             assertTrue(visited.add(position), "Repeated saved chunk " + position);
+            if (nativeHeight) {
+                inspectNativeSections(level, expected, position);
+                return;
+            }
             int[] saved;
             if (level.contains("Biomes", 7)) {
                 byte[] legacy = level.getByteArray("Biomes");
@@ -197,6 +216,35 @@ class NativeRegistryNoticeProofTest {
                     current = "minecraft:warm_ocean";
                 }
                 renamed += oldName.equals(current) ? 0 : 1;
+                cells++;
+            }
+        }
+
+        private void inspectNativeSections(CompoundTag level, byte[] expected, String position) {
+            Map<Integer, CompoundTag> sections = new HashMap<>();
+            for (Tag entry : level.getList("sections", 10)) {
+                CompoundTag section = (CompoundTag) entry;
+                assertNull(sections.put(section.getInt("Y"), section), "Repeated source section");
+            }
+            for (int cell = 0; cell < expected.length; cell++) {
+                CompoundTag section = sections.get(-4 + cell / 64);
+                assertNotNull(section, position + " cell=" + cell);
+                CompoundTag container = section.getCompound("biomes");
+                ListTag palette = container.getList("palette", 8);
+                assertFalse(palette.isEmpty());
+                int paletteIndex = 0;
+                if (palette.size() > 1) {
+                    int bits = Math.max(1, 32 - Integer.numberOfLeadingZeros(palette.size() - 1));
+                    int valuesPerWord = 64 / bits;
+                    int localCell = cell & 63;
+                    long word = container.getLongArray("data")[localCell / valuesPerWord];
+                    paletteIndex = (int) (word >>> ((localCell % valuesPerWord) * bits) & ((1L << bits) - 1));
+                }
+                String source = palette.getString(paletteIndex);
+                String recorded = names.get(Integer.toString(Byte.toUnsignedInt(expected[cell]))).getAsString();
+                assertEquals(recorded, source, position + " cell=" + cell);
+                String current = CavesAndCliffsRenames.RENAMES.getOrDefault(source, source);
+                renamed += source.equals(current) ? 0 : 1;
                 cells++;
             }
         }

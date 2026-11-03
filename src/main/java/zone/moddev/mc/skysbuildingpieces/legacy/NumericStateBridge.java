@@ -68,7 +68,7 @@ final class NumericStateBridge {
 
             wrapped.put("BlockState", entry.getCompound("state"));
 
-            BlockState state = NbtUtils.readBlockState(HistoricalItems.prepareCopy(wrapped).getCompound("BlockState"));
+            BlockState state = NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), HistoricalItems.prepareCopy(wrapped).getCompound("BlockState"));
 
             if (state.isAir() || state.hasBlockEntity()) {
                 throw new LegacyBridge.RecoveryAbort("A saved migration target is no longer available: " + entry, null);

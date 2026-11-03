@@ -14,13 +14,15 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.core.Direction;
-import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelEvent;
+import net.minecraft.util.RandomSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+
+import net.minecraftforge.client.model.data.ModelData;
+
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -38,8 +40,8 @@ public final class ContinuousGlassModel implements BakedModel {
     }
 
     @Override
-    public IModelData getModelData(BlockAndTintGetter world, BlockPos position, BlockState state,
-            IModelData tileData) {
+    public ModelData getModelData(BlockAndTintGetter world, BlockPos position, BlockState state,
+            ModelData tileData) {
         int joins = 0;
         PieceBlock wall = (PieceBlock) state.getBlock();
         int connectionBit = 1;
@@ -60,18 +62,18 @@ public final class ContinuousGlassModel implements BakedModel {
             connectionBit <<= 1;
         }
 
-        return new ModelDataMap.Builder().withInitial(JOINS, joins).build();
+        return tileData.derive().with(JOINS, joins).build();
     }
 
     @Override
-    public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
-        return getQuads(state, side, random, EmptyModelData.INSTANCE);
+    public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
+        return getQuads(state, side, random, ModelData.EMPTY, null);
     }
 
     @Override
-    public List<BakedQuad> getQuads(BlockState state, Direction side, Random random, IModelData modelData) {
-        Integer joins = modelData.getData(JOINS);
-        List<BakedQuad> quads = original.getQuads(state, side, random, modelData);
+    public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random, ModelData modelData, RenderType renderType) {
+        Integer joins = modelData.get(JOINS);
+        List<BakedQuad> quads = original.getQuads(state, side, random, modelData, renderType);
 
         if (joins == null || joins == 0 || quads.isEmpty()) {
             return quads;
@@ -114,7 +116,7 @@ public final class ContinuousGlassModel implements BakedModel {
 
             result.add(data == quad.getVertices() ? quad
                     : new BakedQuad(data, quad.getTintIndex(), quad.getDirection(), quad.getSprite(),
-                            quad.isShade()));
+                            quad.isShade(), quad.hasAmbientOcclusion()));
         }
 
         List<BakedQuad> immutable = Collections.unmodifiableList(result);
@@ -129,6 +131,16 @@ public final class ContinuousGlassModel implements BakedModel {
         }
 
         return immutable;
+    }
+
+    @Override
+    public net.minecraftforge.client.ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource random, ModelData data) {
+        return original.getRenderTypes(state, random, data);
+    }
+
+    @Override
+    public List<RenderType> getRenderTypes(net.minecraft.world.item.ItemStack stack, boolean fabulous) {
+        return original.getRenderTypes(stack, fabulous);
     }
 
     public boolean useAmbientOcclusion() {
@@ -182,16 +194,16 @@ public final class ContinuousGlassModel implements BakedModel {
     }
 
     public static final class BakeHandler {
-        public void bake(ModelBakeEvent event) {
+        public void bake(ModelEvent.ModifyBakingResult event) {
             Set<String> walls = new HashSet<String>();
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {
                 if (block.palette.shape == Shape.WALL && block.palette.group.contains("glass")) {
-                    walls.add(block.getRegistryName().toString());
+                    walls.add(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString());
                 }
             }
 
-            install(event.getModelRegistry(), event.getModelManager().getMissingModel(), walls);
+            install(event.getModels(), event.getModels().get(ModelBakery.MISSING_MODEL_LOCATION), walls);
         }
     }
 

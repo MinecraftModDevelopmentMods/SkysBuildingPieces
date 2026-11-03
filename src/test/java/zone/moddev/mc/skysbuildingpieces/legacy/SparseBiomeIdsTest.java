@@ -67,7 +67,7 @@ class SparseBiomeIdsTest {
     }
 
     private static PalettedContainer<String> read(IdMap<String> registry, CompoundTag disk) {
-        return PalettedContainer.codec(registry, Codec.STRING, PalettedContainer.Strategy.SECTION_BIOMES, "biome-0")
+        return PalettedContainer.codecRW(registry, Codec.STRING, PalettedContainer.Strategy.SECTION_BIOMES, "biome-0")
                 .parse(NbtOps.INSTANCE, disk).result().orElseThrow();
     }
 

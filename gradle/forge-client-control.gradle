@@ -1,3 +1,9 @@
+def clientControlRunName = providers.gradleProperty('forgeClientControlRunName')
+        .getOrElse('forge-client-control-run')
+if (!(clientControlRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable client-control directory name')
+}
+
 // This login control runs without Sky mods and checks the native Forge defaults.
 def controlClasses = layout.buildDirectory.dir('forge-client-control/classes')
 def compileControl = tasks.register('compileForgeClientControl', JavaCompile) {
@@ -16,11 +22,11 @@ def controlJar = tasks.register('forgeClientControlJar', Jar) {
 
 tasks.register('forgeClientControlTest', JavaExec) {
     dependsOn controlJar
-    workingDir layout.buildDirectory.dir('forge-client-control-run')
+    workingDir layout.buildDirectory.dir(clientControlRunName)
     project.ext.configureNativeBootstrapRun(delegate, 'runClient', false)
     doFirst {
         File directory = workingDir
-        if (directory.canonicalFile != new File(buildDir, 'forge-client-control-run').canonicalFile) {
+        if (directory.canonicalFile != new File(buildDir, clientControlRunName).canonicalFile) {
             throw new GradleException('Control checks must remain inside their build directory')
         }
         if (directory.exists()) throw new GradleException('Preserve the existing control evidence before starting another run: ' + directory)
@@ -47,3 +53,10 @@ tasks.register('verifyNativeClientLogPolicy', Exec) {
             'tools/test_native_client_log.py'
 }
 tasks.named('check') { dependsOn tasks.named('verifyNativeClientLogPolicy') }
+
+tasks.register('verifyPackagedClientNatives', Exec) {
+    group = 'verification'
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+            '-m', 'unittest', 'discover', '-s', 'tools', '-p', 'test_packaged_client_natives.py'
+}
+tasks.named('check') { dependsOn tasks.named('verifyPackagedClientNatives') }

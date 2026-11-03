@@ -7,7 +7,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraft.core.RegistryAccess;
 
 /** A one-piece rotation keeps the original name and other custom stack data. */
 public final class CuttingRecipe extends ShapedRecipe {
@@ -15,14 +15,14 @@ public final class CuttingRecipe extends ShapedRecipe {
     private final boolean preserveTag;
 
     private CuttingRecipe(ShapedRecipe recipe, boolean preserveTag) {
-        super(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(), recipe.getRecipeHeight(),
-                recipe.getIngredients(), recipe.getResultItem());
+        super(recipe.getId(), recipe.getGroup(), recipe.category(), recipe.getRecipeWidth(), recipe.getRecipeHeight(),
+                recipe.getIngredients(), recipe.getResultItem(RegistryAccess.EMPTY));
         this.preserveTag = preserveTag;
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inventory) {
-        ItemStack result = super.assemble(inventory);
+    public ItemStack assemble(CraftingContainer inventory, RegistryAccess registries) {
+        ItemStack result = super.assemble(inventory, registries);
 
         if (preserveTag) {
             for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
@@ -46,8 +46,7 @@ public final class CuttingRecipe extends ShapedRecipe {
         return SERIALIZER;
     }
 
-    public static final class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<CuttingRecipe> {
+    public static final class Serializer implements RecipeSerializer<CuttingRecipe> {
         private final ShapedRecipe.Serializer shaped = new ShapedRecipe.Serializer();
 
         @Override

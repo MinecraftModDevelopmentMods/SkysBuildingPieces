@@ -84,7 +84,7 @@ public final class WaterloggingChecks {
 
                     BlockState current = world.getBlockState(position);
 
-                    current.getBlock().tick(current, world, position, new Random(0));
+                    current.getBlock().tick(current, world, position, net.minecraft.util.RandomSource.create(0));
 
                     BlockState expected = Pieces.state("minecraft:dirt", block.palette.shape, block.orientation(dry));
                     BlockState actual = world.getBlockState(position);

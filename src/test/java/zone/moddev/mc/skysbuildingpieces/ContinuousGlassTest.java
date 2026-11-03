@@ -1,5 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces;
 
+import net.minecraft.util.RandomSource;
+
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
@@ -16,8 +18,7 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.core.Direction;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel;
 import zone.moddev.mc.skysbuildingpieces.content.GlassWallTexture;
@@ -104,7 +105,7 @@ class ContinuousGlassTest {
         BakedQuad source = new BakedQuad(data, 3, Direction.WEST, null, false);
         List<BakedQuad> original = Collections.singletonList(source);
         BakedModel base = new BakedModel() {
-            public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
+            public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
                 assertNull(state);
                 return original;
             }
@@ -139,12 +140,12 @@ class ContinuousGlassTest {
         };
         ContinuousGlassModel model = new ContinuousGlassModel(base);
 
-        assertSame(original, model.getQuads(null, null, new Random(0)));
-        assertSame(original, model.getQuads(null, Direction.WEST, new Random(0), data(0)));
+        assertSame(original, model.getQuads(null, null, RandomSource.create(0)));
+        assertSame(original, model.getQuads(null, Direction.WEST, RandomSource.create(0), data(0), null));
 
-        List<BakedQuad> joined = model.getQuads(null, Direction.WEST, new Random(0), data(5));
+        List<BakedQuad> joined = model.getQuads(null, Direction.WEST, RandomSource.create(0), data(5), null);
 
-        assertSame(joined, model.getQuads(null, Direction.WEST, new Random(123), data(5)));
+        assertSame(joined, model.getQuads(null, Direction.WEST, RandomSource.create(123), data(5), null));
         assertThrows(UnsupportedOperationException.class, () -> joined.clear());
 
         BakedQuad trimmed = joined.get(0);
@@ -154,6 +155,7 @@ class ContinuousGlassTest {
         assertEquals(3, trimmed.getTintIndex());
         assertEquals(Direction.WEST, trimmed.getDirection());
         assertFalse(trimmed.isShade());
+        assertEquals(source.hasAmbientOcclusion(), trimmed.hasAmbientOcclusion());
         assertSame(source.getSprite(), trimmed.getSprite());
         assertEquals(stride * 4, trimmed.getVertices().length);
         assertFalse(model.useAmbientOcclusion());
@@ -165,7 +167,7 @@ class ContinuousGlassTest {
         assertSame(base.getTransforms(), model.getTransforms());
     }
 
-    private static IModelData data(int joins) {
+    private static ModelData data(int joins) {
         try {
             java.lang.reflect.Field field = ContinuousGlassModel.class.getDeclaredField("JOINS");
 
@@ -174,7 +176,7 @@ class ContinuousGlassTest {
             @SuppressWarnings("unchecked")
             ModelProperty<Integer> property = (ModelProperty<Integer>) field.get(null);
 
-            return new ModelDataMap.Builder().withInitial(property, joins).build();
+            return ModelData.builder().with(property, joins).build();
         } catch (ReflectiveOperationException failure) {
             throw new AssertionError(failure);
         }

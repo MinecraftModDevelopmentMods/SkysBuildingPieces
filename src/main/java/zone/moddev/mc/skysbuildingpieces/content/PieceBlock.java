@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -91,7 +91,6 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         this.palette = palette;
         metadataProperty = construction.metadata;
         CONSTRUCTING.remove();
-        setRegistryName(palette.namespace, palette.id);
 
         BlockState initial = stateDefinition.any().setValue(SlabBlock.WATERLOGGED, false);
 
@@ -606,6 +605,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
+    public boolean canPlaceLiquid(BlockGetter world, BlockPos position, BlockState state,
+            net.minecraft.world.level.material.Fluid fluid) {
+        // Keep an already filled piece from accepting another bucket action.
+        return fluid == Fluids.WATER && !state.getValue(SlabBlock.WATERLOGGED);
+    }
+
+    @Override
     public FluidState getFluidState(BlockState state) {
         return state.getValue(SlabBlock.WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
@@ -629,7 +635,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel world, BlockPos position, Random random) {
+    public void tick(BlockState state, ServerLevel world, BlockPos position, RandomSource random) {
         if (world.isClientSide) {
             return;
         }
@@ -670,17 +676,17 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public boolean isValidBonemealTarget(BlockGetter world, BlockPos position, BlockState state, boolean client) {
+    public boolean isValidBonemealTarget(net.minecraft.world.level.LevelReader world, BlockPos position, BlockState state, boolean client) {
         return GrassLifecycle.grass(state) && completeTop(state) && !state.getValue(SlabBlock.WATERLOGGED);
     }
 
     @Override
-    public boolean isBonemealSuccess(Level world, Random random, BlockPos position, BlockState state) {
+    public boolean isBonemealSuccess(Level world, RandomSource random, BlockPos position, BlockState state) {
         return isValidBonemealTarget(world, position, state, world.isClientSide);
     }
 
     @Override
-    public void performBonemeal(ServerLevel world, Random random, BlockPos position, BlockState state) {
+    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos position, BlockState state) {
         if (isValidBonemealTarget(world, position, state, world.isClientSide)) {
             ((BonemealableBlock) Blocks.GRASS_BLOCK).performBonemeal(world, random, position, Blocks.GRASS_BLOCK.defaultBlockState());
         }

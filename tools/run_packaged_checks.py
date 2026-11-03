@@ -47,6 +47,24 @@ def manifest_classpath(destination, files):
         archive.writestr("META-INF/MANIFEST.MF", "\r\n".join(lines))
 
 
+def verify_native_libraries(directory, artifacts):
+    """Match the extracted native files to the checksum-verified Windows jars."""
+    checked = 0
+    for artifact in artifacts:
+        with zipfile.ZipFile(artifact) as archive:
+            for member in archive.namelist():
+                if not member.lower().endswith(".dll"):
+                    continue
+                target = (directory / member).resolve()
+                if not target.is_relative_to(directory.resolve()) or not target.is_file():
+                    raise ValueError("Client native library is missing: " + member)
+                if hashlib.sha256(target.read_bytes()).digest() != hashlib.sha256(archive.read(member)).digest():
+                    raise ValueError("Client native library checksum changed: " + member)
+                checked += 1
+    if not checked:
+        raise ValueError("The official client metadata contains no Windows native libraries")
+
+
 def argument_file(java, directory, phase, arguments):
     # Java 17 argument files avoid Windows' command-line length limit. Quoting
     # each argument also preserves paths containing spaces.
@@ -64,21 +82,23 @@ def argument_file(java, directory, phase, arguments):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.18.2/1.18.2.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.19.4/1.19.4.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.18.2-forge-40.3.0", "forge-40.3.0")]
+                for name in ("1.19.4-forge-45.4.0", "forge-45.4.0")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 40.3.0 profile")
+        raise ValueError("The installed client has no Forge 45.4.0 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.18.2" or forge["inheritsFrom"] != "1.18.2":
-        raise ValueError("This launcher requires the verified Forge 40 client metadata")
+    if base["id"] != "1.19.4" or forge["inheritsFrom"] != "1.19.4":
+        raise ValueError("This launcher requires the verified Forge 45 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
             if allowed(library.get("rules")):
-                libraries[":".join(library["name"].split(":")[:2])] = library
+                coordinates = library["name"].split(":")
+                libraries[":".join(coordinates[:2] + coordinates[3:])] = library
     classpath = []
+    native_artifacts = []
     for library in libraries.values():
         artifact = (library.get("downloads") or {}).get("artifact")
         if artifact is None:
@@ -87,7 +107,9 @@ def client_command(options, directory):
         if digest(path, "sha1") != artifact["sha1"].upper():
             raise ValueError("Client library checksum changed: " + library["name"])
         classpath.append(path)
-    client = runtime / "versions/1.18.2/1.18.2.jar"
+        if library["name"].split(":")[-1] == "natives-windows":
+            native_artifacts.append(path)
+    client = runtime / "versions/1.19.4/1.19.4.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -96,8 +118,7 @@ def client_command(options, directory):
     if digest(index, "sha1") != base["assetIndex"]["sha1"].upper():
         raise ValueError("The official client asset index is missing or damaged")
     natives = (options.natives or runtime.parent / (runtime.name + "-natives")).resolve()
-    if not natives.is_dir() or not any(natives.glob("*.dll")):
-        raise ValueError("Client native libraries are incomplete")
+    verify_native_libraries(natives, native_artifacts)
     substitutions = {
         "library_directory": (runtime / "libraries").as_posix(),
         "classpath_separator": os.pathsep,
@@ -124,7 +145,7 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/minecraftforge/forge/1.18.2-40.3.0" / filename
+    source = runtime / "libraries/net/minecraftforge/forge/1.19.4-45.4.0" / filename
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
     for argument in shlex.split(source.read_text(encoding="utf-8")):

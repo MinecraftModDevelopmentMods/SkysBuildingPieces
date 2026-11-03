@@ -58,7 +58,7 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            registry.register(block);
+            registry.register(new ResourceLocation(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
         }
     }
@@ -69,9 +69,8 @@ public final class Pieces {
         // while Forge has opened the item registry.
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
             Item item = new Item(new Item.Properties().stacksTo(1));
-            item.setRegistryName(SkysBuildingPieces.ID, "template_" + name);
             RETIRED_TEMPLATES.put(name, item);
-            registry.register(item);
+            registry.register(new ResourceLocation(SkysBuildingPieces.ID, "template_" + name), item);
         }
     }
 
@@ -85,8 +84,7 @@ public final class Pieces {
             // entries use the flat items below.
             BlockItem carrier = new BlockItem(block, new Item.Properties());
 
-            carrier.setRegistryName(block.getRegistryName());
-            registry.register(carrier);
+            registry.register(new ResourceLocation(block.palette.registryId()), carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -97,8 +95,7 @@ public final class Pieces {
 
                 PieceItem item = new PieceItem(block, material);
 
-                item.setRegistryName(new ResourceLocation(identifier));
-                registry.register(item);
+                registry.register(new ResourceLocation(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -307,7 +304,7 @@ public final class Pieces {
             throw new IllegalArgumentException("Invalid saved piece metadata: " + registryId + ":" + metadata);
         }
         for (PieceBlock block : BLOCKS.values()) {
-            if (block.getRegistryName().toString().equals(registryId)) {
+            if (ForgeRegistries.BLOCKS.getKey(block).toString().equals(registryId)) {
                 String material = block.palette.material(metadata);
                 Shape shape = block.palette.shape;
                 BlockState canonical = state(material, shape, shape == Shape.SLAB ? 1 : 0);

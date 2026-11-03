@@ -1,7 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
@@ -176,7 +176,7 @@ public final class PresentationChecks {
 
         ItemStack named = Pieces.stack(Pieces.state("minecraft:gold_block", Shape.WALL, 0), 1);
 
-        named.setHoverName(new net.minecraft.network.chat.TextComponent("My Wall"));
+        named.setHoverName(net.minecraft.network.chat.Component.literal("My Wall"));
         require(named.getHoverName().getString().equals("My Wall"), "custom item names are preserved");
 
         int checked = 0;
@@ -334,7 +334,7 @@ public final class PresentationChecks {
                         }
 
                         require(torch.canSurvive(torch.defaultBlockState(), world, pos.above()),
-                                "wall supports a top torch " + block.getRegistryName());
+                                "wall supports a top torch " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block));
 
                         ItemStack stack = new ItemStack(Item.byBlock(torch), 2);
 
@@ -407,11 +407,11 @@ public final class PresentationChecks {
                     .get(null);
             zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel model = new zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel(
                     null);
-            net.minecraftforge.client.model.data.IModelData data = model.getModelData(world, position, state,
-                    net.minecraftforge.client.model.data.EmptyModelData.INSTANCE);
+            net.minecraftforge.client.model.data.ModelData data = model.getModelData(world, position, state,
+                    net.minecraftforge.client.model.data.ModelData.EMPTY);
 
-            require(data.hasProperty(property), "glass joins are present in render-only model data");
-            return data.getData(property);
+            require(data.has(property), "glass joins are present in render-only model data");
+            return data.get(property);
         } catch (ReflectiveOperationException failure) {
             throw new AssertionError("Cannot inspect the native glass model data", failure);
         }

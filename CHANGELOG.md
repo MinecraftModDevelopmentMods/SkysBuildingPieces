@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.8.119041
+
+- Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.19.4.
+- Keep the existing palettes, recipes and supported world recovery.
+- Retain optional Grass Slabs and Mineralogy integration without requiring either mod.
+
+
 ## 0.3.8.118021 - Minecraft 1.18.2 (unreleased)
 
 - Bring the existing building shapes and Mineralogy pieces to Minecraft 1.18.2.

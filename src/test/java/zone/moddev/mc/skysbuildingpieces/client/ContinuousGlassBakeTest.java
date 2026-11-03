@@ -1,5 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
+import net.minecraft.util.RandomSource;
+
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
@@ -68,11 +70,11 @@ class ContinuousGlassBakeTest {
     }
 
     private static ModelResourceLocation key(String block, String variant) {
-        return new ModelResourceLocation("skysbuildingpieces:" + block, variant);
+        return new ModelResourceLocation(new net.minecraft.resources.ResourceLocation("skysbuildingpieces:" + block), variant);
     }
 
     private static final class EmptyModel implements BakedModel {
-        public List<BakedQuad> getQuads(BlockState state, Direction side, Random random) {
+        public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
             return Collections.emptyList();
         }
 

@@ -22,7 +22,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.118021";
+    public static final String VERSION = "0.3.8.119041";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;

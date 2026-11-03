@@ -35,7 +35,7 @@ final class RecipePreviewModels {
                 }
             }
 
-            checkModel(minecraft, recipe.getResultItem(), id);
+            checkModel(minecraft, recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY), id);
             previews++;
             recipes++;
         }
@@ -51,18 +51,18 @@ final class RecipePreviewModels {
             throw new AssertionError("Empty recipe preview: " + recipe);
         }
 
-        String label = recipe + " -> " + stack.getItem().getRegistryName();
+        String label = recipe + " -> " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
         BakedModel model = minecraft.getItemRenderer().getModel(stack, null, null, 0);
         BakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                 .getMissingModel();
 
-        if (model == missing || model.getParticleIcon().getName().toString().contains("missingno")) {
+        if (model == missing || model.getParticleIcon().contents().name().toString().contains("missingno")) {
             throw new AssertionError("Missing recipe preview model: " + label);
         }
         for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
                 Direction.WEST, Direction.EAST }) {
-            for (BakedQuad quad : model.getQuads(null, face, new java.util.Random(0))) {
-                if (quad.getSprite().getName().toString().contains("missingno")) {
+            for (BakedQuad quad : model.getQuads(null, face, net.minecraft.util.RandomSource.create(0))) {
+                if (quad.getSprite().contents().name().toString().contains("missingno")) {
                     throw new AssertionError("Missing recipe preview texture: " + label);
                 }
             }

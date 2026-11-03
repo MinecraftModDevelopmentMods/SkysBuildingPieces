@@ -17,6 +17,38 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ForwardFixtureContractTest {
     @Test
+    void native118FixtureKeepsTheExactSealedCandidateAndNativeHeight() throws Exception {
+        Path root = Paths.get("src/testFixtures/worlds");
+        JsonObject manifest = new JsonParser().parse(Files.readString(root.resolve("building-pieces-1.18.2.json")))
+                .getAsJsonObject();
+        byte[] archive = Files.readAllBytes(root.resolve("building-pieces-1.18.2.zip"));
+        assertEquals("2be3ed9bb7f01c853e1da7f2fc1829c171132382", manifest.get("source_commit").getAsString());
+        assertEquals("82709CF16A7282DB5562BE5FCC2F417D0F103620EAE86DBDE9E0CBD760B51B5A",
+                manifest.get("source_jar_sha256").getAsString());
+        assertEquals("FEF0D4A8C999159BCE8F1E14D28827FBB73FDBB27DAC2828F662A87D74529C35",
+                manifest.get("native_source_probe_sha256").getAsString());
+        assertEquals("85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49", sha256(archive));
+        assertEquals(2975, manifest.get("source_data_version").getAsInt());
+        assertEquals(7029, manifest.getAsJsonArray("states").size());
+        assertEquals(3346, manifest.get("wet_states").getAsInt());
+        assertEquals(144, manifest.get("snowy_states").getAsInt());
+        assertEquals(7029, manifest.get("source_saved_states_verified").getAsInt());
+        assertTrue(manifest.get("source_unchanged").getAsBoolean());
+        assertTrue(manifest.get("player_shovel").getAsString().contains("Enchantments"));
+        assertTrue(manifest.get("player_nested").getAsString().contains("Items"));
+        Set<String> members = verifyMembers(manifest, archive);
+        assertTrue(members.contains("data/skysbuildingpieces_world_state.dat"));
+        assertTrue(members.contains("playerdata/" + manifest.get("player").getAsString() + ".dat"));
+        JsonObject biomes = new JsonParser().parse(Files.readString(root.resolve("building-pieces-1.18.2.biomes.json")))
+                .getAsJsonObject();
+        assertEquals("zlib-u8-quart-volume-v2", biomes.get("format").getAsString());
+        assertEquals(manifest.get("archive_sha256"), biomes.get("source_world_sha256"));
+        assertEquals(-16, biomes.get("min_quart_y").getAsInt());
+        assertEquals(96, biomes.get("quart_height").getAsInt());
+        assertEquals(528384, biomes.get("checked_cells").getAsInt());
+    }
+
+    @Test
     void native117FixtureKeepsTheAcceptedSourceAndCompleteSavedPieces() throws Exception {
         Path root = Paths.get("src/testFixtures/worlds");
         JsonObject manifest = new JsonParser().parse(Files.readString(root.resolve("building-pieces-1.17.1.json")))

@@ -58,7 +58,7 @@ public final class RecipeBookChecks {
 
                 JsonObject predicate = new JsonObject();
 
-                predicate.addProperty("item", stack.getItem().getRegistryName().toString());
+                predicate.addProperty("item", net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
 
                 if (seen.add(predicate.toString())) {
                     ingredients.add(predicate);
@@ -101,7 +101,7 @@ public final class RecipeBookChecks {
 
             @Override
             public void send(Packet<?> packet,
-                    io.netty.util.concurrent.GenericFutureListener<? extends io.netty.util.concurrent.Future<? super Void>> listener) {
+                    net.minecraft.network.PacketSendListener listener) {
                 sentPackets.add(packet);
             }
         };
@@ -144,7 +144,7 @@ public final class RecipeBookChecks {
                     .getAdvancement(new ResourceLocation(owner(id), "recipes/" + id.getPath()));
 
             require(advancement != null, "Missing recipe advancement: " + id);
-            require(!recipe.getResultItem().isEmpty(), "Missing book result: " + id);
+            require(!recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY).isEmpty(), "Missing book result: " + id);
             reset(player, recipe, advancement);
             player.getInventory().clearContent();
             player.getInventory().setItem(0, new ItemStack(Items.APPLE));

@@ -12,7 +12,9 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -25,29 +27,24 @@ public final class LegacyPolicyMod {
     private static BlockEntityType<MaterialTile> materialType;
 
     public LegacyPolicyMod() {
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, this::blocks);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::items);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(BlockEntityType.class, this::tiles);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::register);
     }
 
-    private void blocks(RegistryEvent.Register<Block> event) {
-        for (int index = 0; index < NAMES.length; index++) {
-            BLOCKS[index] = new LegacyBlock().setRegistryName("buildingbricks", NAMES[index]);
+    private void register(RegisterEvent event) {
+        if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCKS)) {
+            for (int index = 0; index < NAMES.length; index++) {
+                BLOCKS[index] = new LegacyBlock();
+                ForgeRegistries.BLOCKS.register(new ResourceLocation("buildingbricks", NAMES[index]), BLOCKS[index]);
+            }
+        } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
+            for (Block block : BLOCKS) {
+                ForgeRegistries.ITEMS.register(ForgeRegistries.BLOCKS.getKey(block),
+                        new BlockItem(block, new Item.Properties()));
+            }
+        } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES)) {
+            materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
+            ForgeRegistries.BLOCK_ENTITY_TYPES.register(new ResourceLocation("buildingbricks", "material"), materialType);
         }
-        event.getRegistry().registerAll(BLOCKS);
-    }
-
-    private void items(RegistryEvent.Register<Item> event) {
-        for (Block block : BLOCKS) {
-            event.getRegistry()
-                    .register(new BlockItem(block, new Item.Properties()).setRegistryName(block.getRegistryName()));
-        }
-    }
-
-    private void tiles(RegistryEvent.Register<BlockEntityType<?>> event) {
-        materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
-        materialType.setRegistryName("buildingbricks", "material");
-        event.getRegistry().register(materialType);
     }
 
     public static final class LegacyBlock extends Block implements EntityBlock {

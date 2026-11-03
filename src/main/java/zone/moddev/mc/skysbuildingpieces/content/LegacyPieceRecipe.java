@@ -5,21 +5,24 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraftforge.registries.ForgeRegistries;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
 /** Optional recovery for a legacy piece obtained while its original mod is installed. */
 public final class LegacyPieceRecipe extends CustomRecipe {
-    public static final SimpleRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SimpleRecipeSerializer<>(
+    public static final SimpleCraftingRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(
             LegacyPieceRecipe::new);
 
-    public LegacyPieceRecipe(ResourceLocation id) {
-        super(id);
+    public LegacyPieceRecipe(ResourceLocation id, CraftingBookCategory category) {
+        super(id, category);
     }
 
     private ItemStack result(CraftingContainer inventory) {
@@ -45,7 +48,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
         if (Pieces.RETIRED_TEMPLATES.containsValue(source.getItem())) {
             output = new ItemStack(Items.PAPER);
         } else {
-            String identity = source.getItem().getRegistryName().toString();
+            String identity = ForgeRegistries.ITEMS.getKey(source.getItem()).toString();
 
             if (!LegacyMapping.owned(identity) || !source.hasTag()) {
                 return ItemStack.EMPTY;
@@ -81,7 +84,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inventory) {
+    public ItemStack assemble(CraftingContainer inventory, RegistryAccess registries) {
         return result(inventory);
     }
 

@@ -28,13 +28,27 @@ public final class MinecraftTestBootstrap {
             Class<?> versionInfo = Class.forName("net.minecraftforge.fml.loading.VersionInfo");
             Object forgeVersion = versionInfo
                     .getConstructor(String.class, String.class, String.class, String.class)
-                    .newInstance("40.3.0", "1.18.2", "20220404.173914", "net.minecraftforge");
+                    .newInstance("45.4.0", "1.19.4", "20230314.122934", "net.minecraftforge");
             set(loader, "versionInfo", forgeVersion);
             SharedConstants.tryDetectVersion();
-            Bootstrap.bootStrap();
+            // Plain JUnit has no ModLauncher event transformation. Build the
+            // registries here; real Forge launches cover the networking bootstrap.
+            set(Bootstrap.class, "isBootstrapped", true);
+            net.minecraft.core.registries.BuiltInRegistries.BLOCK.size();
+            net.minecraft.core.registries.BuiltInRegistries.bootStrap();
+            net.minecraftforge.registries.GameData.vanillaSnapshot();
+            // Focused tests create blocks outside Forge's normal registration event.
+            ((net.minecraft.core.MappedRegistry<?>)
+                    net.minecraft.core.registries.BuiltInRegistries.BLOCK).unfreeze();
+            ((net.minecraft.core.MappedRegistry<?>)
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM).unfreeze();
+            ((net.minecraftforge.registries.ForgeRegistry<?>)
+                    net.minecraftforge.registries.ForgeRegistries.BLOCKS).unfreeze();
+            ((net.minecraftforge.registries.ForgeRegistry<?>)
+                    net.minecraftforge.registries.ForgeRegistries.ITEMS).unfreeze();
             initialized = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to initialize the Forge 40 test runtime",
+            throw new IllegalStateException("Unable to initialize the Forge 45 test runtime",
                     exception);
         }
     }

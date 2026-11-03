@@ -85,7 +85,7 @@ public final class HistoricalBiomes {
         active = new Mappings(source, aliases, name -> {
             // Numeric IDs belong to the world's biome instances, which can differ from Forge's registration objects.
             Registry<Biome> current = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer()
-                    .registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+                    .registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME);
             Biome biome = current.get(new ResourceLocation(name));
 
             return biome == null ? -1 : current.getId(biome);

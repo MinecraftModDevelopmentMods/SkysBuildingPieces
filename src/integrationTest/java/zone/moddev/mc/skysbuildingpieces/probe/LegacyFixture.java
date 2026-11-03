@@ -101,7 +101,7 @@ public final class LegacyFixture {
                             "converted identity and geometry " + entryIndex + " " + state + " != " + expected);
                     require(world.getBlockEntity(pos(entryIndex)) == null, "no remaining material tile " + entryIndex);
                 } else {
-                    require(state.getBlock().getRegistryName().toString().equals("buildingbricks:" + legacyId),
+                    require(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString().equals("buildingbricks:" + legacyId),
                             "default coexistence block " + entryIndex);
 
                     BlockEntity tile = world.getBlockEntity(pos(entryIndex));
@@ -117,7 +117,7 @@ public final class LegacyFixture {
             require(stack != null && stack.getCount() == 23
                     && stack.getTag().getString("custom_label").equals("NBT survives"),
                     "container count and custom NBT");
-            require(stack.getItem().getRegistryName().getNamespace()
+            require(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getNamespace()
                     .equals(converted ? "skysbuildingpieces" : "buildingbricks"), "container identity");
 
             CompoundTag saved = new CompoundTag();

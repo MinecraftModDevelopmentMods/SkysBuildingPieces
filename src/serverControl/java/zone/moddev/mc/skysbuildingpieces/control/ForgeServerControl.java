@@ -32,7 +32,7 @@ public final class ForgeServerControl {
     private void tick(TickEvent.ServerTickEvent event) {
         // Keep the native watcher alive after startup so a delayed self-save notification can be observed.
         if (server != null && event.phase == TickEvent.Phase.END && ++ticks == 200) {
-            org.apache.logging.log4j.LogManager.getLogger().info("FORGE40_SERVER_CONTROL_PASS started=true sky_mods=false ticks=200");
+            org.apache.logging.log4j.LogManager.getLogger().info("FORGE45_SERVER_CONTROL_PASS started=true sky_mods=false ticks=200");
             server.halt(false);
         }
     }

@@ -49,7 +49,7 @@ public final class RecipeChecks {
 
                         input.setCount(17);
                         grid.setItem(slot, input);
-                        assertManager(grid, world, recipe.getResultItem(), recipe.getId().toString());
+                        assertManager(grid, world, recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY), recipe.getId().toString());
                         require(input.getCount() == 17, "Restore lookup changed its input");
                         grid.setItem((slot + 1) % (size * size), input.copy());
                         require(!recipe.matches(grid, world), "Restore recipe accepts an extra block");
@@ -57,7 +57,7 @@ public final class RecipeChecks {
                     }
                 }
 
-                obtainable.add(recipe.getResultItem().getItem());
+                obtainable.add(recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY).getItem());
                 network(recipe);
                 recipes++;
                 continue;
@@ -67,7 +67,7 @@ public final class RecipeChecks {
 
             ShapedRecipe recipe = (ShapedRecipe) entry;
 
-            obtainable.add(recipe.getResultItem().getItem());
+            obtainable.add(recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY).getItem());
 
             for (int size : new int[] { 2, 3 }) {
                 if (!recipe.canCraftInDimensions(size, size)) {
@@ -101,7 +101,7 @@ public final class RecipeChecks {
 
                             require(recipe.matches(grid, world), "Offset or mirrored recipe: " + recipe.getId());
 
-                            ItemStack expected = recipe.getResultItem().copy();
+                            ItemStack expected = recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY).copy();
 
                             assertManager(grid, world, expected, recipe.getId().toString());
 
@@ -144,7 +144,7 @@ public final class RecipeChecks {
                                 named.setTag(tag.copy());
                                 assertManager(grid, world, named, "Rotation keeps the complete custom tag");
 
-                                ItemStack result = recipe.assemble(grid);
+                                ItemStack result = recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY);
 
                                 result.getTag().putString("custom_label", "Changed result");
                                 require(input.getTag().equals(tag), "Rotation result must not share the input tag");
@@ -207,7 +207,7 @@ public final class RecipeChecks {
 
             require(decoded.getId().equals(recipe.getId()) && !decoded.isSpecial(),
                     "Network recipe identity and visibility");
-            require(ItemStack.matches(decoded.getResultItem(), recipe.getResultItem()),
+            require(ItemStack.matches(decoded.getResultItem(net.minecraft.core.RegistryAccess.EMPTY), recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY)),
                     "Network result changed: " + recipe.getId());
 
             CraftingContainer grid = grid(3);
@@ -226,7 +226,7 @@ public final class RecipeChecks {
                 }
             }
 
-            require(ItemStack.matches(decoded.assemble(grid), recipe.assemble(grid)),
+            require(ItemStack.matches(decoded.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY), recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)),
                     "Network assembly changed: " + recipe.getId());
         } finally {
             buffer.release();
@@ -254,7 +254,7 @@ public final class RecipeChecks {
     private static void templates(ServerLevel world) {
         for (Item retired : Pieces.RETIRED_TEMPLATES.values()) {
             for (Recipe<?> recipe : world.getRecipeManager().getRecipes()) {
-                require(recipe.getResultItem().getItem() != retired, "Retired templates must not be craftable");
+                require(recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY).getItem() != retired, "Retired templates must not be craftable");
             }
 
             CraftingContainer grid = grid(2);
@@ -286,12 +286,12 @@ public final class RecipeChecks {
 
     private static void assertManager(CraftingContainer grid, ServerLevel world, ItemStack expected, String label) {
         ItemStack actual = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.assemble(grid)).orElse(ItemStack.EMPTY);
+                .map(recipe -> recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)).orElse(ItemStack.EMPTY);
 
         require(ItemStack.matches(expected, actual), "Crafting manager selects " + label);
 
         for (CraftingRecipe recipe : world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, grid, world)) {
-            require(ItemStack.matches(expected, recipe.assemble(grid)),
+            require(ItemStack.matches(expected, recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)),
                     "Conflicting recipe for " + label + ": " + recipe.getId());
         }
     }

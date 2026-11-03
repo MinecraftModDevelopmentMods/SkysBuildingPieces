@@ -1,7 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Method;
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.BlockPos;
@@ -24,7 +24,7 @@ public final class SharedGrassChecks {
 
         Class<?> api = Class.forName("zone.moddev.mc.skysgrassslabs.api.GrassSlabsApi");
         Method coversSupport = api.getMethod("coversSupport", BlockState.class, BlockGetter.class, BlockPos.class);
-        Method tickGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, Random.class);
+        Method tickGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, RandomSource.class);
         BlockPos position = new BlockPos(-500, 220, -500);
 
         world.setDayTime(6000);
@@ -55,7 +55,7 @@ public final class SharedGrassChecks {
                         "shared footprint " + block.palette.shape + "/" + orientation);
 
                 // Every spread attempt targets the ground directly beneath this piece.
-                Random downward = new Random(0) {
+                RandomSource downward = new net.minecraft.world.level.levelgen.LegacyRandomSource(0) {
                     @Override
                     public int nextInt(int bound) {
                         return bound == 5 ? 2 : 1;

@@ -33,14 +33,15 @@ public final class PathChecks {
 
     public static void register(net.minecraftforge.eventbus.api.IEventBus modBus, String namespace) {
         // Test tools follow the same registration lifecycle as a real mod's items.
-        modBus.addGenericListener(Item.class, (net.minecraftforge.event.RegistryEvent.Register<Item> event) -> {
+        modBus.addListener((net.minecraftforge.registries.RegisterEvent event) -> {
+            if (!event.getRegistryKey().equals(net.minecraftforge.registries.ForgeRegistries.Keys.ITEMS)) return;
             compatibleShovel = new Item(new Item.Properties().defaultDurability(50)) {
                 @Override
                 public boolean canPerformAction(ItemStack stack, net.minecraftforge.common.ToolAction action) {
                     return action == net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN;
                 }
             };
-            event.getRegistry().register(compatibleShovel.setRegistryName(namespace, "flattening_tool"));
+            net.minecraftforge.registries.ForgeRegistries.ITEMS.register(new ResourceLocation(namespace, "flattening_tool"), compatibleShovel);
         });
     }
 
@@ -241,7 +242,7 @@ public final class PathChecks {
         require(!coveredSupport.canSurvive(world, position.below())
                 && world.getBlockTicks().hasScheduledTick(position.below(), Blocks.DIRT_PATH),
                 "solid cover schedules the native path conversion");
-        coveredSupport.getBlock().tick(coveredSupport, world, position.below(), new java.util.Random(0));
+        coveredSupport.getBlock().tick(coveredSupport, world, position.below(), net.minecraft.util.RandomSource.create(0));
         require(world.getBlockState(position.below()).getBlock() == Blocks.DIRT,
                 "solid cover still restores a vanilla path support to dirt");
         world.removeBlock(position, false);

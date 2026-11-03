@@ -31,11 +31,11 @@ public final class RecipeBookDiscovery {
 
     @SubscribeEvent
     public static void crafted(PlayerEvent.ItemCraftedEvent event) {
-        if (!(event.getPlayer() instanceof ServerPlayer) || event.getCrafting().isEmpty()) {
+        if (!(event.getEntity() instanceof ServerPlayer) || event.getCrafting().isEmpty()) {
             return;
         }
 
-        ServerPlayer player = (ServerPlayer) event.getPlayer();
+        ServerPlayer player = (ServerPlayer) event.getEntity();
         Inventory ingredient = new Inventory(player);
 
         ingredient.setItem(0, event.getCrafting().copy());

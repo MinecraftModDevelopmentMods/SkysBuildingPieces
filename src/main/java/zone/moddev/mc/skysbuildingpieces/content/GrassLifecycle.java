@@ -2,7 +2,7 @@ package zone.moddev.mc.skysbuildingpieces.content;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 import java.util.Set;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -44,8 +44,8 @@ public final class GrassLifecycle {
                 }
             }
 
-            sharedGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, Random.class);
-            sharedDirt = api.getMethod("tickDirt", Level.class, BlockPos.class, BlockState.class, Random.class);
+            sharedGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, RandomSource.class);
+            sharedDirt = api.getMethod("tickDirt", Level.class, BlockPos.class, BlockState.class, RandomSource.class);
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException(
                     "Install Sky's Grass Slabs 1.2.0.117011 or later for grass-piece integration", failure);
@@ -96,7 +96,7 @@ public final class GrassLifecycle {
         return ((occupied & 15) | (occupied >>> 4 & 15)) == 15;
     }
 
-    public static void tick(Level world, BlockPos position, BlockState state, Random random) {
+    public static void tick(Level world, BlockPos position, BlockState state, RandomSource random) {
         if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }

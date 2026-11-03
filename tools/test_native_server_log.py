@@ -1,4 +1,4 @@
-"""Negative controls for Forge 40 server completion and native settings."""
+"""Negative controls for Forge 45 server completion and native settings."""
 
 from pathlib import Path
 import shutil
@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from native_client_log import audit_server, classify_server
-from native_registry_notices import audit_biome_proof
+from native_registry_notices import audit_biome_proof, validate_registry_proofs
 
 
 NOTICE = ('[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: '
@@ -107,6 +107,32 @@ class NativeRegistryNoticeTest(unittest.TestCase):
 
 
 class NativeBiomeProofTest(unittest.TestCase):
+    def test_native_registry_proofs_reject_changed_sources_uses_and_cells(self):
+        import copy
+        import hashlib
+        import json
+        root = Path(__file__).resolve().parent.parent
+        profile = json.loads((root / "tools/native-log-profiles.json").read_text(encoding="utf-8"))["profiles"][
+            "85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49"]
+        validate_registry_proofs(root, profile)
+        for key, field, value in (("retired_poi_contract", "saved_uses", {"minecraft:nitwit": 1, "minecraft:unemployed": 0}),
+                                  ("static_biome_contract", "checked_cells", 528383),
+                                  ("static_biome_contract", "native_biome_contract_sha256", "wrong"),
+                                  ("retired_poi_contract", "source_world_sha256", "wrong")):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
+                candidate = copy.deepcopy(profile)
+                for receipt_key in ("retired_poi_contract", "static_biome_contract"):
+                    original = root / profile[receipt_key]["path"]
+                    proof = json.loads(original.read_text(encoding="utf-8"))
+                    if receipt_key == key:
+                        proof[field] = value
+                    target = Path(directory) / (receipt_key + ".json")
+                    target.write_text(json.dumps(proof), encoding="utf-8")
+                    candidate[receipt_key] = {"path": target.name,
+                        "sha256": hashlib.sha256(target.read_bytes()).hexdigest().upper()}
+                with self.assertRaises(ValueError):
+                    validate_registry_proofs(directory, candidate)
+
     def test_complete_native_volume_is_required(self):
         profile = {"native_biome_contract": {"source": "1.17.1", "checked_cells": 982016,
                                              "renamed_cells": 18240}}
@@ -158,8 +184,11 @@ class NativeServerFilesTest(unittest.TestCase):
         self.assertEqual(audit_server(self.directory, 'test')['native_server_config_notices'], 0)
 
     def test_changed_defaults_fail(self):
-        self.config.write_text(self.config.read_text().replace('fixAdvancementLoading = true',
-                                                              'fixAdvancementLoading = false'))
+        original = self.config.read_text()
+        changed = original.replace('advertiseDedicatedServerToLan = true',
+                                   'advertiseDedicatedServerToLan = false')
+        self.assertNotEqual(original, changed, "The negative control must alter a native setting")
+        self.config.write_text(changed)
         with self.assertRaises(ValueError):
             audit_server(self.directory, 'test')
 

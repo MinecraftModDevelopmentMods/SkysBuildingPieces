@@ -50,8 +50,15 @@ public final class PersistenceRegistrationChecks {
             if (prefix.equals(MINERALOGY)) {
                 var capture = owner.getMethod("captureLegacyLevelData", net.minecraft.nbt.CompoundTag.class,
                         java.nio.file.Path.class);
+                var fallback = owner.getMethod("onServerAboutToStart",
+                        net.minecraftforge.event.server.ServerAboutToStartEvent.class);
                 require(java.lang.reflect.Modifier.isStatic(capture.getModifiers()),
-                        "Mineralogy's native capture callback must be static");
+                        "Mineralogy's capture API must be static");
+                require(java.lang.reflect.Modifier.isStatic(fallback.getModifiers()),
+                        "Mineralogy's server fallback must be static");
+                // This pinned Mineralogy build retains the older Path callback.
+                // Its server listener and sidecar provide recovery on Forge 45;
+                // do not count it as a native LevelDirectory reader.
                 return 1;
             }
             Field field = owner.getDeclaredField(prefix.equals(CORE) ? "persistenceRegistered" : "registered");

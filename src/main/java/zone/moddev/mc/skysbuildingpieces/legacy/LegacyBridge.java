@@ -64,6 +64,14 @@ public final class LegacyBridge {
     }
 
     /** Capture the untouched registry and biome source before an early level save. */
+    /** Capture the legacy snapshot before Forge processes its modern level data. */
+    public static void captureLegacyLevelData(CompoundTag root,
+            net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory directory) {
+        if (directory != null) {
+            captureLegacyLevelData(root, directory.path());
+        }
+    }
+
     public static synchronized void captureLegacyLevelData(CompoundTag root, Path directory) {
         if (root == null || directory == null) {
             return;
@@ -405,7 +413,7 @@ public final class LegacyBridge {
                         continue;
                     }
 
-                    BlockState original = NbtUtils.readBlockState(saved);
+                    BlockState original = NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), saved);
                     BlockState target = Pieces.canonicalState(original);
                     CompoundTag converted = saved.copy();
                     CompoundTag nativeState = NbtUtils.writeBlockState(target);
@@ -494,7 +502,7 @@ public final class LegacyBridge {
     private static void applyStacks(List<StackChange> changes) {
         // Resolve every nested target before changing any part of the stack.
         for (StackChange change : changes) {
-            change.stack.putString("id", change.output.getItem().getRegistryName().toString());
+            change.stack.putString("id", net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(change.output.getItem()).toString());
             change.stack.remove("Damage");
             HistoricalItems.preserveNativeItem(change.stack);
 
@@ -562,7 +570,7 @@ public final class LegacyBridge {
 
         if (sourcePalette != null) {
             int metadata = stack.getShort("Damage");
-            net.minecraft.world.item.ItemStack output = Pieces.legacyItem(sourcePalette.getRegistryName().toString(),
+            net.minecraft.world.item.ItemStack output = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(sourcePalette).toString(),
                     metadata, 1);
 
             if (output == null || output.isEmpty()) {

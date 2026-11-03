@@ -29,7 +29,7 @@ final class MineralogyChecks {
         int registered = 0;
 
         for (Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValues()) {
-            if (block.getRegistryName().toString().startsWith("skysbuildingpieces:mineralogy_")) {
+            if (net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString().startsWith("skysbuildingpieces:mineralogy_")) {
                 registered++;
             }
         }

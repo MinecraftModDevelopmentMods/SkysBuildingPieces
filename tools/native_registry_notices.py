@@ -6,6 +6,31 @@ from pathlib import Path
 import re
 
 
+def validate_registry_proofs(root, profile):
+    """Keep registry notices tied to this fixture and its complete native audit."""
+    for key in ("static_biome_contract", "retired_poi_contract"):
+        receipt = profile.get(key)
+        if receipt is None:
+            continue
+        path = Path(root) / receipt["path"]
+        proof = json.loads(path.read_text(encoding="utf-8"))
+        if (hashlib.sha256(path.read_bytes()).hexdigest().upper() != receipt["sha256"]
+                or proof["source_world_sha256"] != profile["sha256"]):
+            raise ValueError("The native registry proof does not match this fixture")
+        if key == "static_biome_contract":
+            biomes = profile.get("native_biome_contract")
+            if (biomes is None or proof["native_biome_contract_sha256"] != biomes["sha256"]
+                    or proof["checked_cells"] != biomes["checked_cells"]
+                    or proof["native_renamed_cells"] != biomes["renamed_cells"]
+                    or proof["snapshot_entries"] != profile["mappings"]["minecraft:worldgen/biome"]):
+                raise ValueError("The static biome snapshot lacks its complete conversion proof")
+        elif (proof["inspected_nbt_values"] <= 0
+                or proof["saved_uses"] != {"minecraft:nitwit": 0, "minecraft:unemployed": 0}
+                or proof["snapshot_entries"] != {"minecraft:point_of_interest_type":
+                                                 profile["mappings"]["minecraft:point_of_interest_type"]}):
+            raise ValueError("The retired POI entries are not proven unused")
+
+
 def profile_for(directory):
     manifest = Path(directory) / "forward-fixture.json"
     if not manifest.is_file():
@@ -35,6 +60,7 @@ def profile_for(directory):
                 or data["native_renamed_cells"] != proof["renamed_cells"]
                 or profile["saved_uses"] != proof["renamed_cells"]):
             raise ValueError("The native biome contract does not match this source fixture")
+    validate_registry_proofs(root, profile)
     return profile
 
 

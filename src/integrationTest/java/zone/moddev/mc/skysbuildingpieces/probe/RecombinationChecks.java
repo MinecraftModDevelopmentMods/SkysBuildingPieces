@@ -88,7 +88,7 @@ public final class RecombinationChecks {
                         for (net.minecraft.world.item.crafting.CraftingRecipe recipe : world.getRecipeManager()
                                 .getRecipesFor(RecipeType.CRAFTING, grid, world)) {
                             if (recipe.matches(grid, world)) {
-                                require(ItemStack.matches(expected, recipe.assemble(grid)),
+                                require(ItemStack.matches(expected, recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)),
                                         "no conflicting recipe for " + label);
 
                                 for (ItemStack remainder : recipe.getRemainingItems(grid)) {
@@ -148,6 +148,10 @@ public final class RecombinationChecks {
     static CraftingContainer grid(int size) {
         return new CraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
+            public net.minecraft.world.item.ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
+                return net.minecraft.world.item.ItemStack.EMPTY;
+            }
+            @Override
             public boolean stillValid(net.minecraft.world.entity.player.Player player) {
                 return true;
             }
@@ -156,7 +160,7 @@ public final class RecombinationChecks {
 
     private static ItemStack result(CraftingContainer grid, ServerLevel world) {
         return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.assemble(grid)).orElse(ItemStack.EMPTY);
+                .map(recipe -> recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)).orElse(ItemStack.EMPTY);
     }
 
     private static void require(boolean condition, String message) {

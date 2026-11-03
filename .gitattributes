@@ -12,3 +12,8 @@ gradlew text eol=lf
 *.jar binary
 *.zip binary
 *.nbt binary
+
+# Keep build scripts and the sealed Mavenizer fixture stable on Windows.
+.gitattributes text eol=lf
+*.js text eol=lf
+ci-fixtures/tools/** -text

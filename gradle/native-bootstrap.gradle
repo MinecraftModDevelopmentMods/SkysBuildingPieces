@@ -49,7 +49,12 @@ def packagedBootstrap = renamer.classes(bootstrapJar) {
     output = layout.buildDirectory.file('native-bootstrap-probe/building-pieces-native-checks-reobf.jar')
 }
 tasks.register('preparePackagedNativeProbe') { dependsOn packagedBootstrap }
-def directory = layout.buildDirectory.dir('native-bootstrap-test-run')
+def bootstrapRunName = providers.gradleProperty('nativeBootstrapRunName')
+        .getOrElse('native-bootstrap-test-run')
+if (!(bootstrapRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable bootstrap directory name')
+}
+def directory = layout.buildDirectory.dir(bootstrapRunName)
 def prepare = tasks.register('prepareNativeBootstrapTest') {
     dependsOn bootstrapJar
     if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
@@ -60,7 +65,7 @@ def prepare = tasks.register('prepareNativeBootstrapTest') {
     }
     doLast {
         File target = directory.get().asFile
-        if (target.canonicalFile != new File(buildDir, 'native-bootstrap-test-run').canonicalFile) {
+        if (target.canonicalFile != new File(buildDir, bootstrapRunName).canonicalFile) {
             throw new GradleException('Bootstrap checks must stay inside the build directory')
         }
         if (target.exists()) throw new GradleException('Preserve the existing bootstrap evidence before starting another run: ' + target)
@@ -210,7 +215,11 @@ def forwardPhases = [:]
 }
 tasks.register('nativeForwardTest') { dependsOn forwardPhases['forward-reload'] }
 
-def clientDirectory = layout.buildDirectory.dir('native-client-test-run')
+def clientRunName = providers.gradleProperty('nativeClientRunName').getOrElse('native-client-test-run')
+if (!(clientRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable client directory name')
+}
+def clientDirectory = layout.buildDirectory.dir(clientRunName)
 def prepareClient = tasks.register('prepareNativeClientTest') {
     dependsOn bootstrapJar
     if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
@@ -221,7 +230,7 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
     }
     doLast {
         File target = clientDirectory.get().asFile
-        if (target.canonicalFile != new File(buildDir, 'native-client-test-run').canonicalFile) {
+        if (target.canonicalFile != new File(buildDir, clientRunName).canonicalFile) {
             throw new GradleException('Client checks must stay inside their build directory')
         }
         if (target.exists()) throw new GradleException('Preserve the existing client evidence before starting another run: ' + target)
@@ -232,7 +241,7 @@ def prepareClient = tasks.register('prepareNativeClientTest') {
         if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
             copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
         }
-        // Native defaults avoid Forge 40's first-write file-watcher race. The
+        // Set native defaults before Forge's configuration watcher starts. The
         // failed first-start receipt remains part of the qualification evidence.
         copy { from 'src/bootstrapTest/defaultconfigs'; into target }
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {

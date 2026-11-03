@@ -20,13 +20,13 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 public final class PathPieces {
     @SubscribeEvent
     public void allowShovelUse(PlayerInteractEvent.RightClickBlock event) {
-        if (target(event.getWorld(), event.getPos(), event.getPlayer(), event.getItemStack(),
+        if (target(event.getLevel(), event.getPos(), event.getEntity(), event.getItemStack(),
                 event.getFace()) == null) {
             return;
         }
         // Sneaking bypasses block activation. Finish this valid use here so the
         // shovel acts once, including when a step sits above grass.
-        if (event.getPlayer().isShiftKeyDown() && activate(event.getWorld(), event.getPos(), event.getPlayer(),
+        if (event.getEntity().isShiftKeyDown() && activate(event.getLevel(), event.getPos(), event.getEntity(),
                 event.getItemStack(), event.getFace(), event.getHand())) {
             event.setCanceled(true);
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);

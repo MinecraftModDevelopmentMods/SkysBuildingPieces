@@ -56,8 +56,7 @@ public final class NativeLegacyChecks {
                 LegacyBridge.prepareLegacyChunk(raw);
                 require(once.equals(raw), "Raw chunk recovery is idempotent");
 
-                CompoundTag fixed = NbtUtils.update(world.getServer().getFixerUpper(), DataFixTypes.CHUNK,
-                        raw.copy(), 1343, 1976);
+                CompoundTag fixed = DataFixTypes.CHUNK.update(world.getServer().getFixerUpper(), raw.copy(), 1343, 1976);
 
                 require(contains(fixed.getCompound("Level"), actual), "Native flattening lost step code " + code);
                 require(!fixed.getCompound("Level").getList("Sections", 10).getCompound(0).contains("Blocks"),
@@ -235,7 +234,7 @@ public final class NativeLegacyChecks {
         ender.add(stack("minecraft:stone", 11));
         player.put("EnderItems", ender);
 
-        CompoundTag fixed = NbtUtils.update(world.getServer().getFixerUpper(), DataFixTypes.PLAYER, player, 1343,
+        CompoundTag fixed = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), player, 1343,
                 1976);
 
         require(fixed.getList("Inventory", 10).getCompound(0).getString("id").startsWith("skysbuildingpieces:")

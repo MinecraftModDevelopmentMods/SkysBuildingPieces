@@ -25,7 +25,7 @@ class LoaderHooksTest {
 
         targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/level/chunk/storage/ChunkStorage");
         targets.put("skysbuildingpieces_legacy_level_registry", "net/minecraftforge/common/ForgeHooks");
-        targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/nbt/NbtUtils");
+        targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/util/datafix/DataFixTypes");
         targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/world/item/BlockItem");
         return targets;
     }
@@ -33,7 +33,7 @@ class LoaderHooksTest {
     private ScriptEngine engine() throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        assertNotNull(engine, "Forge 40 transformer tests require the production Java 17 runtime");
+        assertNotNull(engine, "Forge 45 transformer tests require the production Java 17 runtime");
         engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
                 StandardCharsets.UTF_8));
         return engine;
@@ -74,7 +74,7 @@ class LoaderHooksTest {
     }
 
     @Test
-    void realForge40MethodsMatchAndEveryReturnIsWrapped() throws Exception {
+    void realForge45MethodsMatchAndEveryReturnIsWrapped() throws Exception {
         for (Map.Entry<String, String> target : targets().entrySet()) {
             ScriptEngine engine = engine();
             ClassNode node = original(target.getValue());
@@ -106,7 +106,7 @@ class LoaderHooksTest {
 
                 for (MethodNode method : node.methods) {
                     if (method.desc.equals(
-                            "(Lcom/mojang/datafixers/DataFixer;" + "Lnet/minecraft/util/datafix/DataFixTypes;"
+                            "(Lcom/mojang/datafixers/DataFixer;"
                                     + "Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;")) {
                         for (AbstractInsnNode instruction : method.instructions.toArray()) {
                             if (instruction.getOpcode() == Opcodes.ARETURN) {

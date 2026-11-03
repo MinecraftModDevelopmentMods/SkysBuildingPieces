@@ -34,13 +34,13 @@ public final class PieceItem extends Item {
     }
 
     private static Item.Properties properties(PieceBlock block, String material) {
-        boolean nativeEquivalent = Pieces.nativeState(Catalogue.INSTANCE.materials.get(material),
-                block.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
-        boolean hiddenVertical = block.palette.shape == Shape.VERTICAL_SLAB;
-        boolean retired = Catalogue.INSTANCE.materials.get(material).replacement() != null;
-        Item.Properties properties = new Item.Properties();
+        return new Item.Properties();
+    }
 
-        return nativeEquivalent || hiddenVertical || retired ? properties : properties.tab(PiecesTab.INSTANCE);
+    boolean visibleInCreativeTab() {
+        Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
+        return piece.palette.shape != Shape.VERTICAL_SLAB && definition.replacement() == null
+                && Pieces.nativeState(definition, piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) == null;
     }
 
     @Override

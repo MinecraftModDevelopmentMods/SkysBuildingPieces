@@ -25,9 +25,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -78,7 +78,7 @@ public final class CompatibilityChecks {
 
         NativeLegacyChecks.require(
                 !stack.isEmpty() && stack.getCount() == count
-                        && stack.getItem().getRegistryName().getNamespace().equals(namespace),
+                        && net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getNamespace().equals(namespace),
                 "Live stack replacement policy");
         NativeLegacyChecks.require(stack.hasTag() && stack.getTag().equals(legacy(count).getTag()),
                 "Complete unrelated custom data is retained");
@@ -89,7 +89,7 @@ public final class CompatibilityChecks {
 
         player.getInventory().setItem(0, legacy(13));
         player.getEnderChestInventory().setItem(0, legacy(11));
-        MinecraftForge.EVENT_BUS.post(new EntityJoinWorldEvent(player, world));
+        MinecraftForge.EVENT_BUS.post(new EntityJoinLevelEvent(player, world));
         identity(player.getInventory().getItem(0), 13, convert);
         identity(player.getEnderChestInventory().getItem(0), 11, convert);
         player.getInventory().setItem(1, legacy(9));
@@ -151,6 +151,10 @@ public final class CompatibilityChecks {
 
         CraftingContainer grid = new CraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
+            public net.minecraft.world.item.ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
+                return net.minecraft.world.item.ItemStack.EMPTY;
+            }
+            @Override
             public boolean stillValid(Player ignored) {
                 return true;
             }
@@ -158,11 +162,11 @@ public final class CompatibilityChecks {
 
         grid.setItem(0, legacy(1));
 
-        LegacyPieceRecipe recipe = new LegacyPieceRecipe(new ResourceLocation("skysbuildingpieces:bridge_test"));
+        LegacyPieceRecipe recipe = new LegacyPieceRecipe(new ResourceLocation("skysbuildingpieces:bridge_test"), net.minecraft.world.item.crafting.CraftingBookCategory.BUILDING);
 
         NativeLegacyChecks.require(recipe.matches(grid, world),
                 "Explicit bridge recipe works independently of replacement");
-        identity(recipe.assemble(grid), 1, true);
+        identity(recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY), 1, true);
         drop.discard();
         frame.discard();
         world.removeBlock(position.north(), false);
@@ -186,7 +190,7 @@ public final class CompatibilityChecks {
         tile.load(tag);
         MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
                 Blocks.STONE.defaultBlockState(), FakePlayerFactory.getMinecraft(world)));
-        NativeLegacyChecks.require(world.getBlockState(position).getBlock().getRegistryName().getNamespace()
+        NativeLegacyChecks.require(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(world.getBlockState(position).getBlock()).getNamespace()
                 .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "New placement replacement policy");
         NativeLegacyChecks.require((world.getBlockEntity(position) == null) == convert,
                 "Remove the material tile only after successful conversion");
