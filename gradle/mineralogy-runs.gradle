@@ -4,6 +4,7 @@ import java.nio.file.Files
 // These are optional development mods, never compile or production dependencies.
 def runtimeLock = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { runtimeLock.load(it) }
+def runtimeAvailable = runtimeLock.getProperty('runtime.available', 'true').toBoolean()
 def runtimeSources = ['mineralogy', 'orespawn'].collectEntries { mod ->
     File siblingJar = file(runtimeLock.getProperty(mod + '.development.path'))
     File retainedJar = file('.gradle/qualification-dependencies/' + siblingJar.name)
@@ -25,6 +26,9 @@ ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') 
     group = 'verification'
     dependsOn project.ext.prepareOfficialMineralogyDevelopment
     doLast {
+        if (!runtimeAvailable) {
+            throw new GradleException('No compatible Mineralogy and OreSpawn jars are pinned for this loader')
+        }
         ['mineralogy', 'orespawn'].each { mod ->
             [[file(runtimeLock.getProperty(mod + '.path')), runtimeLock.getProperty(mod + '.sha256')],
              [runtimeSources[mod], runtimeLock.getProperty(mod + '.development.sha256')]].each { pair ->
@@ -83,14 +87,14 @@ def prepareMineralogyDevelopmentRun = tasks.register('prepareMineralogyDevelopme
 def prepareAvailableMineralogyDevelopmentRun = tasks.register('prepareAvailableMineralogyDevelopmentRun') {
     group = 'ide'
     dependsOn {
-        file(runtimeLock.getProperty('mineralogy.path')).isFile()
+        runtimeAvailable && file(runtimeLock.getProperty('mineralogy.path')).isFile()
                 ? [project.ext.prepareOfficialMineralogyDevelopment] : []
     }
     description = 'Prepares the Eclipse profile when the optional development jars are available.'
     onlyIf {
-        boolean available = runtimeSources.values().every { it.isFile() }
+        boolean available = runtimeAvailable && runtimeSources.values().every { it.isFile() }
         if (!available) {
-            logger.lifecycle('Mineralogy profiles generated; supply the optional jars before using them. See docs/BUILDING.md.')
+            logger.lifecycle('Mineralogy launches require compatible optional jars. See docs/BUILDING.md.')
         }
         available
     }
@@ -119,6 +123,7 @@ tasks.register('runMineralogyServer', JavaExec) {
 def generateMineralogyEclipseRuns = tasks.register('generateMineralogyEclipseRuns') {
     group = 'ide'
     dependsOn tasks.named('isolateEclipseProductionRuns')
+    onlyIf { runtimeAvailable }
     doLast {
         ['Client', 'Server'].each { side ->
             File source = file("run${side}.launch")
@@ -141,6 +146,7 @@ tasks.named('genEclipseRuns') {
 
 tasks.named('verifyEclipseProductionClasspath') {
     doLast {
+        if (!runtimeAvailable) return
         ['runMineralogyClient.launch', 'runMineralogyServer.launch'].each { name ->
             File launch = file(name)
             def xml = new groovy.xml.XmlSlurper().parse(launch)

@@ -28,7 +28,7 @@ side="BOTH"
 [[dependencies.skysbuildingpieces]]
 modId="skysgrassslabs"
 mandatory=false
-versionRange="[1.2.0.120011,)"
+versionRange="[1.2.0.120012,)"
 ordering="AFTER"
 side="BOTH"
 

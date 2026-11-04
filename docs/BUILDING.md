@@ -1,6 +1,6 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.20.1 and Forge 47.4.10. Run the included Gradle
+This branch targets Minecraft 1.20.1 and NeoForge 47.1.106. Run the included Gradle
 wrapper with Java 17. Compilation and Minecraft use Java 17; the pinned production
 toolchain is Temurin 17.0.1+12. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
@@ -23,18 +23,15 @@ and exclude test classes.
 - `runClient` and `runServer` load Building Pieces on its own.
 - `runGrassSlabsClient` and `runGrassSlabsServer` add the coordinated Grass Slabs
   candidate recorded in `gradle/grass-slabs-release.properties`.
-- `runMineralogyClient` and `runMineralogyServer` add the optional Mineralogy and
-  OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
+Mineralogy launches need a compatible Mineralogy and OreSpawn pair. The Forge
+47.4.10 builds are unsuitable for early NeoForge and are kept out of its launches.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs1201/SkysGrassSlabs` checkout,
+Build that exact commit in the sibling `SkysGrassSlabs1201NEO/SkysGrassSlabs` checkout,
 or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
 match their pinned hashes. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.
-
-Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each
-ordinary profile has its own game folder and leaves existing saves alone.
 
 ## Runtime checks
 
@@ -61,13 +58,3 @@ The checked Forge settings must remain unchanged throughout the test.
 The resource helpers in `tools` regenerate models, translations and native
 recipe/advancement JSON from the fixed catalogues. Unlocks retain their existing
 identities; the server checks discovery from both inventory and crafting inputs.
-
-For the optional Mineralogy profiles, first run:
-
-```text
-gradlew prepareOfficialMineralogyDevelopment -PgenerateOptionalDevelopment=true
-```
-
-This makes separate mapped development jars from the two checksum-locked
-production jars. Their native access rules are preserved. Ordinary builds
-and launches remain independent of those optional mods.

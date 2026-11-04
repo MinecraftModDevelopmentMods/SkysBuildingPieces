@@ -36,15 +36,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                '416DCA4797BC55826F0DDCF03FDC405F1990FC15C2133FA27A1F143BF7976177',
+                'F4DB44F64C98F6401ED3A856ECEBCC5E1C2126E7C02BD1237FAB38793B4AF275',
         (mavenizerRuleManifest.asFile):
-                '8945511DFF53B8F1A91EE44B14AF9EC7DB34C373617EA37A608C6958BFEEB22E',
+                '351746200B44A4B9656C9AD5888DA3371E69AA601880FECA048C0131223DCCAC',
         (mavenizerSourcePatch.asFile):
-                'D856190DEF5574716C5E4F4379912C451B1F5952B0B111576651A98EECF58544',
+                '0AC522C64FEBA87C14792364D86FE1487E064681C54629F747E7DC80E8A83650',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                '177C1DDEDEF9704B9FDC8EA24B8DCDF4DDCC826DD0E253E7872A00DB2EA34518'
+                'C9091DBA5967D497A3D219832FA0EF0B2AF0F4D65157BF1193D0DFBF2D742EAD'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -280,6 +280,11 @@ def configureFromForgeRun = { JavaExec process, String runTaskName, boolean incl
 
 repositories {
     minecraft.mavenizer(it)
+    maven {
+        name = 'NeoForge'
+        url = 'https://maven.neoforged.net/releases'
+        content { includeGroupAndSubgroups('net.neoforged') }
+    }
     maven fg.forgeMaven
     maven fg.minecraftLibsMaven
     exclusiveContent {
@@ -311,7 +316,7 @@ repositories {
 
 dependencies {
     implementation minecraft.dependency(
-            "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
+            "net.neoforged:forge:${project.minecraft_version}-${project.forge_version}")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
@@ -355,7 +360,7 @@ def integrationTestModJar = tasks.register('integrationTestModJar', Jar) {
     archiveFileName = 'skysbuildingpieces-integration-test.jar'
     destinationDirectory = layout.buildDirectory.dir('integration-test-mod')
     from integrationTestClasses
-    from 'src/integrationTest/resources'
+    from('src/integrationTest/resources') { exclude 'log4j2.xml' }
 }
 
 def packagedIntegrationTestModJar = renamer.classes(integrationTestModJar) {
@@ -540,9 +545,9 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.20.1' || project.forge_version != '47.4.10' ||
+        if (project.minecraft_version != '1.20.1' || project.forge_version != '47.1.106' ||
                 project.mapping_channel != 'official' || project.mapping_version != '1.20.1' ||
-                project.loader_name != 'forge' || project.loader_code != '1' ||
+                project.loader_name != 'neoforge' || project.loader_code != '2' ||
                 project.java_version != '17' || project.java_toolchain_version != '17.0.1+12' ||
                 project.mod_id != 'skysbuildingpieces') {
             throw new GradleException('Unexpected 1.20.1 release metadata')

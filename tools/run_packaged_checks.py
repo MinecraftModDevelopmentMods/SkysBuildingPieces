@@ -68,12 +68,6 @@ def verify_native_libraries(directory, artifacts):
 def argument_file(java, directory, phase, arguments):
     # Java 17 argument files avoid Windows' command-line length limit. Quoting
     # each argument also preserves paths containing spaces.
-    source = Path(__file__).resolve().parent.parent / "src/bootstrapTest/native-log4j2.xml"
-    logging = directory / "native-log4j2.xml"
-    if logging.exists() and digest(logging) != digest(source):
-        raise ValueError("The packaged logging configuration changed between loads")
-    shutil.copyfile(source, logging)
-    arguments = ["-Dlog4j.configurationFile=" + logging.as_uri(), *arguments]
     target = directory / (phase + "-launch-arguments.txt")
     target.write_text("\n".join(json.dumps(str(value), ensure_ascii=False)
                                 for value in arguments) + "\n", encoding="utf-8")
@@ -84,10 +78,10 @@ def client_command(options, directory):
     runtime = options.runtime.resolve()
     base = json.loads((runtime / "versions/1.20.1/1.20.1.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.20.1-forge-47.4.10", "forge-47.4.10")]
+                for name in ("1.20.1-forge-47.1.106", "forge-47.1.106")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 47.4.10 profile")
+        raise ValueError("The installed client has no NeoForge 47.1.106 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
     if base["id"] != "1.20.1" or forge["inheritsFrom"] != "1.20.1":
         raise ValueError("This launcher requires the verified Forge 47 client metadata")
@@ -145,7 +139,7 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/minecraftforge/forge/1.20.1-47.4.10" / filename
+    source = runtime / "libraries/net/neoforged/forge/1.20.1-47.1.106" / filename
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
     for argument in shlex.split(source.read_text(encoding="utf-8")):

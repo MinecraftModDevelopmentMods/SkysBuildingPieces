@@ -13,7 +13,7 @@ if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.vers
     throw new GradleException('The coordinated Grass Slabs dependency needs exact candidate checksums')
 }
 
-def sibling = "../../SkysGrassSlabs1201/SkysGrassSlabs"
+def sibling = "../../SkysGrassSlabs1201NEO/SkysGrassSlabs"
 def pinnedJar = providers.provider {
     file(providers.gradleProperty('grassSlabsMainJar').getOrElse(
             "${sibling}/build/libs/SkysGrassSlabs-${lock.version}.jar"))
@@ -74,7 +74,6 @@ def prepareManual = tasks.register('prepareGrassSlabsDevelopmentRun') {
         description = "Runs a separate ${side.toLowerCase(Locale.ROOT)} with pinned Grass Slabs."
         dependsOn prepareManual
         workingDir manualDirectory
-        systemProperty 'log4j.configurationFile', file('gradle/development-log4j2.xml').toURI().toString()
         if (side == 'Server') args '--nogui'
         configureVerification(delegate, 'run' + side)
     }

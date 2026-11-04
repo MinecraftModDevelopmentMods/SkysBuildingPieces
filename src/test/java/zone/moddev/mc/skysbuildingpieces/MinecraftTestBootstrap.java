@@ -28,7 +28,7 @@ public final class MinecraftTestBootstrap {
             Class<?> versionInfo = Class.forName("net.minecraftforge.fml.loading.VersionInfo");
             Object forgeVersion = versionInfo
                     .getConstructor(String.class, String.class, String.class, String.class)
-                    .newInstance("47.4.10", "1.20.1", "20230612.114412", "net.minecraftforge");
+                    .newInstance("47.1.106", "1.20.1", "20230612.114412", "net.neoforged");
             set(loader, "versionInfo", forgeVersion);
             SharedConstants.tryDetectVersion();
             // Plain JUnit has no ModLauncher event transformation. Build the
