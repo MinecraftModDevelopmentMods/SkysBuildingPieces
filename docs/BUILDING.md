@@ -1,6 +1,6 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.19.4 and Forge 45.4.0. Run the included Gradle
+This branch targets Minecraft 1.20.1 and Forge 47.4.10. Run the included Gradle
 wrapper with Java 17. Compilation and Minecraft use Java 17; the pinned production
 toolchain is Temurin 17.0.1+12. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
@@ -27,7 +27,7 @@ and exclude test classes.
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs119/SkysGrassSlabs` checkout,
+Build that exact commit in the sibling `SkysGrassSlabs1201/SkysGrassSlabs` checkout,
 or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
 match their pinned hashes. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.
@@ -53,7 +53,7 @@ reports. They include rolled logs from earlier loads, as well as the latest log,
 so a clean reload cannot hide an earlier failure. Upgrade fixtures are locked
 to their source checksums. The audit permits only their exact recorded vanilla
 registry notices, with matching numeric IDs and proof that retired entries have
-no saved uses. Named 1.14–1.18 fixtures also check every retained biome cell
+no saved uses. Named 1.14–1.19 fixtures also check every retained biome cell
 against Minecraft's own conversion before accepting old biome-registry notices.
 The 1.18 fixture includes the full native world height. All other errors fail.
 The checked Forge settings must remain unchanged throughout the test.

@@ -119,10 +119,7 @@ public final class CoremodOrderChecks {
                         new Analyzer<>(new BasicVerifier()).analyze(level.name, method);
                     }
                 }
-                // The pinned Mineralogy build retains a Path reader, which does
-                // not match Forge 45's LevelDirectory entry point. Its normal
-                // server listener and sidecar are checked in packaged upgrades.
-                require(readers == (namespace.equals("mineralogy") ? 0 : 1),
+                require(readers == 1,
                         "Unexpected native level capture count: " + namespace);
                 require(writers == (namespace.equals("mineralogy") ? 0 : 1),
                         "Missing or repeated level writer: " + namespace);

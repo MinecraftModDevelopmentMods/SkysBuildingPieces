@@ -38,7 +38,6 @@ def bookTasks = [:]
         dependsOn phase == 'fresh' ? prepareBook : bookTasks.fresh
         workingDir bookDirectory
         systemProperty 'skysbuildingpieces.integrationPhase', 'recipe-book-' + phase
-        systemProperty 'log4j.configurationFile', project.ext.recipeBookLogConfiguration
         project.ext.configureRecipeBookRun(delegate, 'runServer')
         doLast {
             if (!new File(bookDirectory.get().asFile, 'world/recipe-book-' + phase + '.pass').isFile()) {

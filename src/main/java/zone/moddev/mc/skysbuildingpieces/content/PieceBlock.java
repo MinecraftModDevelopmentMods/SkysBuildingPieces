@@ -18,8 +18,7 @@ import net.minecraft.world.level.block.SnowyDirtBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.Entity;
@@ -49,7 +48,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraftforge.common.IPlantable;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
@@ -62,7 +61,6 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     public static final BooleanProperty LOWERED_SUPPORT = BooleanProperty.create("lowered_support");
     public static final EnumProperty<StairsShape> STAIR_SHAPE = StairBlock.SHAPE;
     private static final ThreadLocal<Construction> CONSTRUCTING = new ThreadLocal<>();
-    private static final Material PATH_MATERIAL = new Material.Builder(MaterialColor.DIRT).nonSolid().build();
     public final Catalogue.Palette palette;
     private final IntegerProperty metadataProperty;
     private final Map<Integer, VoxelShape> outlines = new ConcurrentHashMap<>();
@@ -119,46 +117,27 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     private static Block.Properties properties(Catalogue.Palette palette) {
         CONSTRUCTING.set(new Construction(palette));
 
-        Material material;
+        MapColor color = switch (palette.group) {
+            case "metal" -> MapColor.METAL;
+            case "wood" -> MapColor.WOOD;
+            case "path", "dirt" -> MapColor.DIRT;
+            case "grass" -> MapColor.GRASS;
+            case "cloth" -> MapColor.WOOL;
+            case "clear_glass", "stained_glass" -> MapColor.NONE;
+            case "ice", "packed_ice" -> MapColor.ICE;
+            case "snow" -> MapColor.SNOW;
+            default -> MapColor.STONE;
+        };
 
-        switch (palette.group) {
-            case "metal":
-                material = Material.METAL;
-                break;
-            case "wood":
-                material = Material.WOOD;
-                break;
-            case "path":
-                material = PATH_MATERIAL;
-                break;
-            case "dirt":
-                material = Material.DIRT;
-                break;
-            case "grass":
-                material = Material.GRASS;
-                break;
-            case "cloth":
-                material = Material.WOOL;
-                break;
-            case "clear_glass":
-            case "stained_glass":
-                material = Material.GLASS;
-                break;
-            case "ice":
-                material = Material.ICE;
-                break;
-            case "packed_ice":
-                material = Material.ICE_SOLID;
-                break;
-            case "snow":
-                material = Material.SNOW;
-                break;
-            default:
-                material = Material.STONE;
-        }
-
-        Block.Properties properties = Block.Properties.of(material).strength(1).sound(SoundType.STONE)
+        Block.Properties properties = Block.Properties.of().mapColor(color).strength(1).sound(SoundType.STONE)
                 .dynamicShape().noOcclusion();
+
+        // Keep the old solidity rules for covered paths and other pieces.
+        if (palette.group.equals("path")) {
+            properties.forceSolidOff();
+        } else {
+            properties.forceSolidOn();
+        }
 
         if (palette.group.equals("ice") || palette.group.equals("packed_ice")) {
             properties.friction(.98F);
@@ -568,8 +547,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder context) {
-        ItemStack tool = context.getParameter(LootContextParams.TOOL);
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder context) {
+        ItemStack tool = context.getOptionalParameter(LootContextParams.TOOL);
 
         if (!palette.group.equals("path") && tool != null
                 && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {

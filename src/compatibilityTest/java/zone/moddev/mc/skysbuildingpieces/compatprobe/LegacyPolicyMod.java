@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.nbt.CompoundTag;
@@ -51,7 +51,7 @@ public final class LegacyPolicyMod {
         private static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
         LegacyBlock() {
-            super(Block.Properties.of(Material.STONE));
+            super(Block.Properties.of().mapColor(MapColor.STONE));
             registerDefaultState(stateDefinition.any().setValue(META, 0));
         }
 

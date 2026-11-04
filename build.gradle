@@ -36,15 +36,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                '341B3FB10ABA6EA7DC612FBE519DC290A1C81867AED5DD320ACD783688AC49DE',
+                '416DCA4797BC55826F0DDCF03FDC405F1990FC15C2133FA27A1F143BF7976177',
         (mavenizerRuleManifest.asFile):
-                '33A3217261EBB8F37D45F50BD2F8CE70B221C014A5C15F4C5F8F9091AD6D1EC8',
+                '8945511DFF53B8F1A91EE44B14AF9EC7DB34C373617EA37A608C6958BFEEB22E',
         (mavenizerSourcePatch.asFile):
                 'D856190DEF5574716C5E4F4379912C451B1F5952B0B111576651A98EECF58544',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                '88806D79B0FD4479FA07CCFF30A44A6D90F1BF822665EFBFCCCBD5C99F65FBB3'
+                '177C1DDEDEF9704B9FDC8EA24B8DCDF4DDCC826DD0E253E7872A00DB2EA34518'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -181,7 +181,7 @@ minecraft {
                             "${mod_id}%%${buildDir}/forge-run-mod-classes/main"
             if (name.toLowerCase(Locale.ROOT).contains('client') &&
                     providers.gradleProperty('forgeClientAssets').isPresent()) {
-                environment 'assetIndex', '3'
+                environment 'assetIndex', '5'
                 environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
                 if (providers.gradleProperty('forgeClientNatives').isPresent()) {
                     environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
@@ -258,7 +258,9 @@ def configureFromForgeRun = { JavaExec process, String runTaskName, boolean incl
             run.exec()
         } finally {
             runOptions.workingDir.set(originalConfiguredWorkingDir)
-            runOptions.environment.set(originalConfiguredEnvironment)
+            if (!includeMain) {
+                runOptions.environment.set(originalConfiguredEnvironment)
+            }
             run.workingDir(originalWorkingDir)
             run.setArgs(originalArgs)
             run.setJvmArgs(originalJvmArgs)
@@ -391,7 +393,7 @@ def prepareIntegrationTest = tasks.register('prepareIntegrationTest') {
         new File(runDirectory, 'server.properties').setText('''\
 level-name=world
 level-seed=skys-building-pieces-integration
-level-type=default
+level-type=minecraft:normal
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
@@ -410,7 +412,6 @@ def createIntegrationProcess = { String phase, Object dependency ->
         dependsOn dependency
         workingDir integrationRunDirectory
         systemProperty 'skysbuildingpieces.integrationPhase', phase.toLowerCase(Locale.ROOT)
-        systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
         configureFromForgeRun(delegate, 'runServer')
         doLast {
             File marker = new File(integrationRunDirectory.get().asFile,
@@ -458,7 +459,6 @@ tasks.register('integrationClientProcess', JavaExec) {
     dependsOn prepareIntegrationTest
     workingDir integrationRunDirectory
     systemProperty 'skysbuildingpieces.integrationPhase', 'client'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureFromForgeRun(delegate, 'runClient')
     doLast {
         if (!new File(integrationRunDirectory.get().asFile, 'building-pieces-client-pass.txt').isFile())
@@ -540,12 +540,12 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.19.4' || project.forge_version != '45.4.0' ||
-                project.mapping_channel != 'official' || project.mapping_version != '1.19.4' ||
+        if (project.minecraft_version != '1.20.1' || project.forge_version != '47.4.10' ||
+                project.mapping_channel != 'official' || project.mapping_version != '1.20.1' ||
                 project.loader_name != 'forge' || project.loader_code != '1' ||
                 project.java_version != '17' || project.java_toolchain_version != '17.0.1+12' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 1.19.4 release metadata')
+            throw new GradleException('Unexpected 1.20.1 release metadata')
         }
     }
 }
@@ -746,7 +746,7 @@ tasks.register('isolateEclipseProductionRuns') {
             boolean production = name in ['runClient.launch', 'runServer.launch']
             if (production) {
                 // Eclipse compiles into bin/main; use that same merged output
-                // for both of Forge 45's discovery passes, including fresh edits.
+                // for both of Forge 47's discovery passes, including fresh edits.
                 String roots = "${mod_id}%%${projectDir}/bin/main${File.pathSeparator}" +
                         "${mod_id}%%${projectDir}/bin/main"
                 contents = contents.replaceAll(/key="MOD_CLASSES" value="[^"]*"/) {
@@ -841,7 +841,6 @@ apply from: 'gradle/grass-slabs-release.gradle'
 // Recipe and advancement JSON is checked in under the native data/ tree.
 
 ext.configureRecipeBookRun = configureFromForgeRun
-ext.recipeBookLogConfiguration = file('src/integrationTest/resources/log4j2.xml').toURI().toString()
 apply from: 'gradle/recipe-book-verification.gradle'
 
 ext.configureNativeBootstrapRun = configureFromForgeRun

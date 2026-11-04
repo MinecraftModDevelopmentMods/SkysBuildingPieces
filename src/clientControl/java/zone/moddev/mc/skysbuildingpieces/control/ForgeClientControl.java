@@ -51,7 +51,7 @@ public final class ForgeClientControl {
                 throw new AssertionError("The Forge-only control contains a Sky mod");
             }
 
-            org.apache.logging.log4j.LogManager.getLogger().info("FORGE45_CLIENT_CONTROL_PASS joined=true sky_mods=false");
+            org.apache.logging.log4j.LogManager.getLogger().info("FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false");
             client.stop();
         }
     }
@@ -82,7 +82,7 @@ public final class ForgeClientControl {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
                     button.onPress();
-                    System.out.println("FORGE45_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
+                    System.out.println("FORGE47_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;
             }

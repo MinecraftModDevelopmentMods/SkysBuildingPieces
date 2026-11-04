@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -444,7 +445,7 @@ public final class GameplayChecks {
     }
 
     private static net.minecraft.world.inventory.CraftingContainer grid() {
-        return new net.minecraft.world.inventory.CraftingContainer(new net.minecraft.world.inventory.AbstractContainerMenu(null, 0) {
+        return new TransientCraftingContainer(new net.minecraft.world.inventory.AbstractContainerMenu(null, 0) {
             @Override
             public net.minecraft.world.item.ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
                 return net.minecraft.world.item.ItemStack.EMPTY;

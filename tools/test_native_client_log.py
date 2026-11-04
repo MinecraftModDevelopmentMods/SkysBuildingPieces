@@ -1,4 +1,4 @@
-"""Negative controls for the exact Forge 45 native log classification."""
+"""Negative controls for the exact Forge 47 native log classification."""
 
 import unittest
 import json
@@ -74,7 +74,7 @@ class NativeClientFilesTest(unittest.TestCase):
         (self.directory / "logs").mkdir()
         (self.directory / "logs/latest.log").write_text("\n".join((
             START, LOGIN,
-            "FORGE45_CLIENT_CONTROL_PASS joined=true sky_mods=false")), encoding="utf-8")
+            "FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false")), encoding="utf-8")
 
     def test_native_defaults_with_different_order_and_comments(self):
         client = self.directory / "config/forge-client.toml"
@@ -98,6 +98,14 @@ class NativeClientFilesTest(unittest.TestCase):
     def test_missing_server_config_stops_the_check(self):
         (self.server / "forge-server.toml").unlink()
         with self.assertRaises(ValueError):
+            audit(self.directory, "control", True)
+
+    def test_login_exception_in_info_log_stops_the_check(self):
+        log = self.directory / "logs/latest.log"
+        with log.open("a", encoding="utf-8") as output:
+            output.write("\n[Server thread/INFO]: lost connection: Internal Exception: "
+                         "java.util.ConcurrentModificationException")
+        with self.assertRaisesRegex(ValueError, "ConcurrentModificationException"):
             audit(self.directory, "control", True)
 
     def test_crash_report_stops_the_check(self):

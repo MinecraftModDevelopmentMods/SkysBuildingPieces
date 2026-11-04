@@ -35,7 +35,7 @@ class NativeRegistryNoticeProofTest {
         JsonObject profiles = new JsonParser().parse(new String(
                 Files.readAllBytes(Paths.get("tools/native-log-profiles.json")), StandardCharsets.UTF_8))
                 .getAsJsonObject().getAsJsonObject("profiles");
-        assertEquals(5, profiles.size());
+        assertEquals(6, profiles.size());
         Set<String> versions = new HashSet<>();
 
         for (java.util.Map.Entry<String, com.google.gson.JsonElement> entry : profiles.entrySet()) {
@@ -61,8 +61,9 @@ class NativeRegistryNoticeProofTest {
                     names.add(mapping.getKey());
                 }
             }
+            int forge47Names = verifyForge47UnusedRegistryProof(profile, names);
             assertEquals((profile.has("legacy_biome_registry") ? 9 : 0)
-                    + (profile.has("retired_poi_contract") ? 2 : 0), names.size());
+                    + (profile.has("retired_poi_contract") ? 2 : 0) + forge47Names, names.size());
             assertEquals(0, profile.get("non_biome_saved_uses").getAsInt());
             BiomeProof biomes = new BiomeProof(profile);
             assertTrue(versions.add(biomes.version));
@@ -92,7 +93,25 @@ class NativeRegistryNoticeProofTest {
             assertEquals(profile.get("inspected_nbt_records").getAsInt(), records);
             biomes.complete(profile);
         }
-        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2"), versions);
+        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4"), versions);
+    }
+
+    private static int verifyForge47UnusedRegistryProof(JsonObject profile, Set<String> names) throws Exception {
+        JsonObject binding = profile.getAsJsonObject("forge47_unused_registry_contract");
+        if (binding == null) {
+            return 0;
+        }
+
+        byte[] raw = Files.readAllBytes(Paths.get(binding.get("path").getAsString()));
+        assertEquals(binding.get("sha256").getAsString(), checksum(raw));
+        JsonObject proof = JsonParser.parseString(new String(raw, StandardCharsets.UTF_8)).getAsJsonObject();
+        assertEquals(profile.get("sha256"), proof.get("source_world_sha256"));
+        assertEquals(profile.get("mappings"), proof.get("snapshot_entries"));
+        JsonObject savedUses = proof.getAsJsonObject("saved_uses");
+        assertEquals(names, savedUses.keySet());
+        savedUses.entrySet().forEach(entry -> assertEquals(0, entry.getValue().getAsInt(), entry.getKey()));
+        assertEquals(7, savedUses.size());
+        return savedUses.size();
     }
 
     private static int region(byte[] bytes, Set<String> names, String label, BiomeProof biomes) throws Exception {

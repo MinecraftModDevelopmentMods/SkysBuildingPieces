@@ -8,7 +8,7 @@ import re
 
 def validate_registry_proofs(root, profile):
     """Keep registry notices tied to this fixture and its complete native audit."""
-    for key in ("static_biome_contract", "retired_poi_contract"):
+    for key in ("static_biome_contract", "retired_poi_contract", "forge47_unused_registry_contract"):
         receipt = profile.get(key)
         if receipt is None:
             continue
@@ -24,6 +24,15 @@ def validate_registry_proofs(root, profile):
                     or proof["native_renamed_cells"] != biomes["renamed_cells"]
                     or proof["snapshot_entries"] != profile["mappings"]["minecraft:worldgen/biome"]):
                 raise ValueError("The static biome snapshot lacks its complete conversion proof")
+        elif key == "forge47_unused_registry_contract":
+            entries = proof["snapshot_entries"]
+            names = {name for registry in entries.values() for name in registry}
+            if (not names or proof["inspected_nbt_values"] <= 0
+                    or "minecraft:worldgen/biome" in entries
+                    or proof["saved_uses"] != dict.fromkeys(names, 0)
+                    or any(profile["mappings"].get(registry, {}).get(name) != numeric_id
+                           for registry, values in entries.items() for name, numeric_id in values.items())):
+                raise ValueError("The additional Forge 47 entries are not proven unused")
         elif (proof["inspected_nbt_values"] <= 0
                 or proof["saved_uses"] != {"minecraft:nitwit": 0, "minecraft:unemployed": 0}
                 or proof["snapshot_entries"] != {"minecraft:point_of_interest_type":
@@ -111,7 +120,8 @@ def audit_text(text, profile=None):
                     "MissingModsException", "NoSuchMethodError", "NoClassDefFoundError",
                     "ExceptionInInitializerError", "cascading worldgen lag", "Unable to load model",
                     "Unable to load blockstate", "outside of the generating region",
-                    "java.lang.AssertionError", "java.lang.IllegalStateException:"):
+                    "java.lang.AssertionError", "java.lang.IllegalStateException:",
+                    "java.util.ConcurrentModificationException"):
         if problem in text:
             raise ValueError("Unexpected native failure: " + problem)
     return sorted(headers)

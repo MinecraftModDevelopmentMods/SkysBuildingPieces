@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.120011
+
+- Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.20.1.
+- Preserve existing pieces, their recipes and supported world upgrades.
+- Keep Grass Slabs and Mineralogy integration optional.
+
 ## 0.3.8.119041
 
 - Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.19.4.

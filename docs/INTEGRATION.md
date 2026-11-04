@@ -17,7 +17,7 @@ west; corners use those directions for NW, NE, SE and SW respectively.
 
 Sky's Terrain Smoother uses this lookup without depending on palette internals.
 Building Pieces never generates terrain itself. It optionally joins Grass
-Slabs' grass-form integration, using 1.2.0.119041 or later on Minecraft 1.19.4.
+Slabs' grass-form integration, using 1.2.0.120011 or later on Minecraft 1.20.1.
 It works without either Grass Slabs or Terrain Smoother installed.
 
 Mineralogy is supported directly. Its presence adds 35 fixed rock-piece
@@ -25,7 +25,7 @@ palettes during construction; no add-on or compile-time Mineralogy
 dependency is required. The original rocks, textures and slabs remain owned
 by Mineralogy. Disabled native slabs are not used in recipes or smoothing.
 
-On Forge 45, call `registerBlocks(namespace, registry)` and
+On Forge 47, call `registerBlocks(namespace, registry)` and
 `registerItems(namespace, registry)` from the contributor's own mod-bus `RegisterEvent`
 listener, using `ForgeRegistries.BLOCKS` and `ForgeRegistries.ITEMS` for the matching registry key. Catalogue registration must finish before any block registry event;
 the first block registration freezes the catalogue. The helpers register only

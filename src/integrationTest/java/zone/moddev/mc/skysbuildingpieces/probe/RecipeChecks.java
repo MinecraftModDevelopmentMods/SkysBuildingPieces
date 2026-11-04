@@ -254,7 +254,8 @@ public final class RecipeChecks {
     private static void templates(ServerLevel world) {
         for (Item retired : Pieces.RETIRED_TEMPLATES.values()) {
             for (Recipe<?> recipe : world.getRecipeManager().getRecipes()) {
-                require(recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY).getItem() != retired, "Retired templates must not be craftable");
+                require(recipe.getResultItem(world.registryAccess()).getItem() != retired,
+                        "Retired templates must not be craftable");
             }
 
             CraftingContainer grid = grid(2);

@@ -2,6 +2,7 @@ package zone.moddev.mc.skysbuildingpieces.content;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -41,7 +42,7 @@ public final class RegistryEvents {
     }
 
     private static void blocks() {
-        SkysBuildingPieces.HOLDER = new Block(Block.Properties.of(net.minecraft.world.level.material.Material.STONE)
+        SkysBuildingPieces.HOLDER = new Block(Block.Properties.of().mapColor(MapColor.STONE)
                 .strength(-1.0F, 3_600_000.0F));
         Pieces.registerBlocks(ForgeRegistries.BLOCKS);
         ForgeRegistries.BLOCKS.register(new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece_holder"),

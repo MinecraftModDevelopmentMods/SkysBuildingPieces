@@ -16,6 +16,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayerFactory;
@@ -109,7 +111,11 @@ public final class PathChecks {
 
                             require(Math.abs(pathBounds.minY - base) < 1e-9,
                                     "the path base meets its support without moving the top");
-                            require(expected.getMaterial().blocksMotion() && !expected.getMaterial().isReplaceable(),
+                            // Legacy solidity controls the dirt path below. The collision shape controls movement.
+                            boolean collisionMatches = !Shapes.joinIsNotEmpty(
+                                    expected.getCollisionShape(world, position),
+                                    expected.getShape(world, position), BooleanOp.NOT_SAME);
+                            require(collisionMatches && !expected.canBeReplaced(),
                                     "path pieces retain collision and cannot be overwritten");
                             conversions++;
                         }

@@ -88,7 +88,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (methods !== 1 || replacements !== 1) {
-                    throw new Error("Sky's Building Pieces could not prepare the Forge 45 biome palette width");
+                    throw new Error("Sky's Building Pieces could not prepare the Forge 47 biome palette width");
                 }
                 return classNode;
             }
@@ -120,7 +120,7 @@ function initializeCoreMod() {
                                 instruction.name === callback) ++existingCalls;
                     }
                     if (existingCalls > 1) {
-                        throw new Error("Sky's Building Pieces found duplicate Forge 45 level hooks");
+                        throw new Error("Sky's Building Pieces found duplicate Forge 47 level hooks");
                     }
                     if (existingCalls === 1) continue;
                     var prefix = new InsnList();
@@ -132,7 +132,7 @@ function initializeCoreMod() {
                     method.instructions.insert(prefix);
                 }
                 if (readMethods !== 1 || writeMethods !== 1) {
-                    throw new Error("Sky's Building Pieces could not find the exact Forge 45 level methods");
+                    throw new Error("Sky's Building Pieces could not find the exact Forge 47 level methods");
                 }
                 return classNode;
             }
@@ -166,7 +166,7 @@ function initializeCoreMod() {
                         var sizeInstruction = previousOpcode(instruction);
                         var current = integerValue(sizeInstruction);
                         if (target < 0 || (current !== vanilla && current !== target)) {
-                            throw new Error("Sky's Building Pieces found an unexpected Forge 45 " +
+                            throw new Error("Sky's Building Pieces found an unexpected Forge 47 " +
                                     "BlockStateData array layout");
                         }
                         if (current === vanilla || !(sizeInstruction instanceof LdcInsnNode)) {
@@ -176,7 +176,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (!registerExposed || arraysSeen !== 2) {
-                    throw new Error("Sky's Building Pieces could not prepare Forge 45 BlockStateData");
+                    throw new Error("Sky's Building Pieces could not prepare Forge 47 BlockStateData");
                 }
                 return classNode;
             }
@@ -213,7 +213,7 @@ function initializeCoreMod() {
                     method.maxStack = Math.max(method.maxStack, 4);
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 45 hardness method, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 47 hardness method, found " + matches);
                 }
                 return type;
             }
@@ -250,11 +250,11 @@ function initializeCoreMod() {
                         }
                     }
                     if (returns === 0) {
-                        throw new Error("Sky's Building Pieces found no Forge 45 chunk return");
+                        throw new Error("Sky's Building Pieces found no Forge 47 chunk return");
                     }
                     if (preparations !== 0 || finalizations !== 0) {
                         if (preparations !== 1 || finalizations !== returns) {
-                            throw new Error("Sky's Building Pieces found a partial Forge 45 chunk patch");
+                            throw new Error("Sky's Building Pieces found a partial Forge 47 chunk patch");
                         }
                         patched = true;
                         continue;
@@ -285,7 +285,7 @@ function initializeCoreMod() {
                     patched = true;
                 }
                 if (!patched || matches !== 1) {
-                    throw new Error("Sky's Building Pieces could not patch Forge 45 ChunkStorage");
+                    throw new Error("Sky's Building Pieces could not patch Forge 47 ChunkStorage");
                 }
                 return classNode;
             }
@@ -324,12 +324,12 @@ function initializeCoreMod() {
                             }
                         }
                         if (returns === 0) {
-                            throw new Error("Sky's Building Pieces: Forge 45 NBT updater has no return");
+                            throw new Error("Sky's Building Pieces: Forge 47 NBT updater has no return");
                         }
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one Forge 45 NBT updater, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one Forge 47 NBT updater, found " + matches);
                 }
                 return type;
             }

@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 /** Exercises real capture/write callbacks; native transformer orders are checked separately. */
@@ -32,7 +33,7 @@ final class PersistenceOrderChecks {
                     "zone.moddev.mc.skysgrassslabs.compat.LegacyWorldDataHook",
                     "zone.moddev.mc.mineralogy.patching.LegacyWorldDataHook"}) {
                 Class<?> owner = Class.forName(name);
-                owner.getMethod("captureLegacyLevelData", CompoundTag.class, java.nio.file.Path.class);
+                owner.getMethod("captureLegacyLevelData", CompoundTag.class, LevelDirectory.class);
                 selected.add(owner);
             }
             require(selected.size() == 3, "All three actual persistence hooks must be installed");
@@ -62,8 +63,8 @@ final class PersistenceOrderChecks {
         CompoundTag combined = new CompoundTag();
         int writers = 0;
         for (Class<?> owner : callbacks) {
-            owner.getMethod("captureLegacyLevelData", CompoundTag.class, java.nio.file.Path.class)
-                    .invoke(null, originalRoot.copy(), directory.toPath());
+            owner.getMethod("captureLegacyLevelData", CompoundTag.class, LevelDirectory.class)
+                    .invoke(null, originalRoot.copy(), new LevelDirectory(directory.toPath()));
             Method writer;
             try {
                 writer = owner.getMethod("writeLegacyLevelData", CompoundTag.class);

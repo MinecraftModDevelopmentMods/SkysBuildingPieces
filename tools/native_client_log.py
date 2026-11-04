@@ -1,4 +1,4 @@
-"""Check Forge 45 completion, native settings and unexpected errors."""
+"""Check Forge 47 completion, native settings and unexpected errors."""
 
 import argparse
 import gzip
@@ -58,7 +58,7 @@ def audit(directory, phase, control=False):
     if not unchanged:
         raise ValueError("Native Forge settings differ from the controlled defaults")
     receipt = classify(log, unchanged)
-    required = (("FORGE45_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
+    required = (("FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
                 ("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED", "SKY_RECIPE_PREVIEW_MODELS_PASS",
                  "BUILDING_PIECES_CONTINUOUS_GLASS_PASS", "BUILDING_PIECES_COLOURS_PASS"))
     if any(marker not in log for marker in required):
@@ -117,4 +117,4 @@ if __name__ == "__main__":
     options = parser.parse_args()
     result = (audit_server(options.directory, options.phase) if options.server else
               audit(options.directory, options.phase, options.control))
-    print("FORGE45_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))
+    print("FORGE47_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))

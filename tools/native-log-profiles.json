@@ -399,6 +399,38 @@
         "path": "src/testFixtures/worlds/building-pieces-1.18.2.retired-poi.json",
         "sha256": "8BA0EDD066627A2B5D014354000A7720FB4FF364F2544594AE0523D23AD50B45"
       }
+    },
+    "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.19.4.zip",
+      "sha256": "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095",
+      "source_jar_sha256": "A1055C3DD776D24619635D1F30700D6E2A51CBA19ECF2AEE6894E2DBBC6C6DB7",
+      "saved_uses": 0,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 353,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.biomes.json",
+        "sha256": "84D921F247B7F49D01D08C0E9673368363A721E8FDDA1FE4AE0F2163F9163BB0",
+        "source": "1.19.4",
+        "checked_cells": 528384,
+        "renamed_cells": 0
+      },
+      "mappings": {
+        "minecraft:item": {
+          "minecraft:pottery_shard_archer": 2115,
+          "minecraft:pottery_shard_arms_up": 2117,
+          "minecraft:pottery_shard_prize": 2116,
+          "minecraft:pottery_shard_skull": 2118
+        },
+        "minecraft:sound_event": {
+          "minecraft:item.brush.brush_sand_completed": 1226,
+          "minecraft:item.brush.brushing": 1225,
+          "minecraft:music.overworld.jungle_and_forest": 1363
+        }
+      },
+      "forge47_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge47-unused-registry.json",
+        "sha256": "C94BF0F5B7836FE498B3A114825099BBD2BD268412FEA8CBF21F161576587885"
+      }
     }
   },
   "native_control": {

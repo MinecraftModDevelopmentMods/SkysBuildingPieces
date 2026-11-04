@@ -114,7 +114,7 @@ public final class PathPieces {
         PieceBlock piece = (PieceBlock) state.getBlock();
 
         if (piece.palette.group.equals("path")
-                && (state.getValue(SlabBlock.WATERLOGGED) || world.getBlockState(position.above()).getMaterial().isSolid())) {
+                && (state.getValue(SlabBlock.WATERLOGGED) || world.getBlockState(position.above()).isSolid())) {
             world.setBlock(position, dirt(state), 3);
         }
     }

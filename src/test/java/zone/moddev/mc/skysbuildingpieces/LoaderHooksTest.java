@@ -33,7 +33,7 @@ class LoaderHooksTest {
     private ScriptEngine engine() throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        assertNotNull(engine, "Forge 45 transformer tests require the production Java 17 runtime");
+        assertNotNull(engine, "Forge 47 transformer tests require the production Java 17 runtime");
         engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
                 StandardCharsets.UTF_8));
         return engine;
@@ -74,7 +74,7 @@ class LoaderHooksTest {
     }
 
     @Test
-    void realForge45MethodsMatchAndEveryReturnIsWrapped() throws Exception {
+    void realForge47MethodsMatchAndEveryReturnIsWrapped() throws Exception {
         for (Map.Entry<String, String> target : targets().entrySet()) {
             ScriptEngine engine = engine();
             ClassNode node = original(target.getValue());

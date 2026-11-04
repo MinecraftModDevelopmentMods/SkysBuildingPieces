@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -116,7 +117,6 @@ public final class RuntimeBootstrap {
                 SharedGrassChecks.run(world);
                 MineralogyChecks.run();
                 RecombinationChecks.run(world);
-                RecipeBookChecks.run(world);
                 PresentationChecks.run(world);
 
                 if (phase.startsWith("client")) {
@@ -125,6 +125,10 @@ public final class RuntimeBootstrap {
                     ClientStatus.complete = true;
                     return;
                 }
+
+                // This check reloads server resources. Run it on the dedicated
+                // server, away from the integrated client's login handshake.
+                RecipeBookChecks.run(world);
             }
 
             File marker = new File(root, "native-bootstrap.properties");
@@ -224,7 +228,7 @@ public final class RuntimeBootstrap {
     }
 
     private static CraftingContainer grid() {
-        return new CraftingContainer(new AbstractContainerMenu(null, 0) {
+        return new TransientCraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
             public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
                 return ItemStack.EMPTY;

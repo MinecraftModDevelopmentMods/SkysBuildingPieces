@@ -201,7 +201,7 @@ def prepareMineralogyIntegrationTest = tasks.register('prepareMineralogyIntegrat
         new File(directory, 'server.properties').setText('''\
 level-name=world
 level-seed=4815162342
-level-type=default
+level-type=minecraft:normal
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
@@ -210,8 +210,8 @@ spawn-animals=false
 spawn-monsters=false
 spawn-protection=0
 max-tick-time=120000
-'''.replace('level-type=default',
-                probeId == 'skysterrainsmootherbop' ? 'level-type=BIOMESOP' : 'level-type=default'), 'UTF-8')
+'''.replace('level-type=minecraft:normal',
+                probeId == 'skysterrainsmootherbop' ? 'level-type=BIOMESOP' : 'level-type=minecraft:normal'), 'UTF-8')
     }
 }
 

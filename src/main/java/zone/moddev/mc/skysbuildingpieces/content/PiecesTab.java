@@ -3,16 +3,17 @@ package zone.moddev.mc.skysbuildingpieces.content;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -23,11 +24,15 @@ public final class PiecesTab {
     public static CreativeModeTab INSTANCE;
 
     @SubscribeEvent
-    public static void register(CreativeModeTabEvent.Register event) {
-        INSTANCE = event.registerCreativeModeTab(new ResourceLocation(SkysBuildingPieces.ID, "pieces"),
-                builder -> builder.title(Component.translatable("itemGroup.skysbuildingpieces"))
-                        .icon(() -> new ItemStack(Blocks.BRICK_STAIRS))
-                        .displayItems((parameters, output) -> entries().values().forEach(output::accept)));
+    public static void register(RegisterEvent event) {
+        event.register(Registries.CREATIVE_MODE_TAB, registry -> {
+            INSTANCE = CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.skysbuildingpieces"))
+                    .icon(() -> new ItemStack(Blocks.BRICK_STAIRS))
+                    .displayItems((parameters, output) -> entries().values().forEach(output::accept))
+                    .build();
+            registry.register(new ResourceLocation(SkysBuildingPieces.ID, "pieces"), INSTANCE);
+        });
     }
 
     public static Map<ResourceLocation, ItemStack> entries() {

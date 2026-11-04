@@ -13,7 +13,7 @@ if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.vers
     throw new GradleException('The coordinated Grass Slabs dependency needs exact candidate checksums')
 }
 
-def sibling = "../../SkysGrassSlabs119/SkysGrassSlabs"
+def sibling = "../../SkysGrassSlabs1201/SkysGrassSlabs"
 def pinnedJar = providers.provider {
     file(providers.gradleProperty('grassSlabsMainJar').getOrElse(
             "${sibling}/build/libs/SkysGrassSlabs-${lock.version}.jar"))
@@ -37,7 +37,7 @@ def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
             }
             new ZipFile(source).withCloseable { archive ->
                 def descriptor = archive.getEntry('META-INF/mods.toml')
-                if (descriptor == null) throw new GradleException('Grass Slabs has no Forge 45 metadata')
+                if (descriptor == null) throw new GradleException('Grass Slabs has no Forge 47 metadata')
                 String metadata = archive.getInputStream(descriptor).getText('UTF-8')
                 if (!(metadata =~ /(?m)^\s*modId\s*=\s*"skysgrassslabs"\s*$/) ||
                         !(metadata =~ /(?m)^\s*version\s*=\s*"${java.util.regex.Pattern.quote(lock.version)}"\s*$/)) {
@@ -110,14 +110,19 @@ tasks.named('verifyEclipseProductionClasspath') {
     }
 }
 
-def runtime = layout.buildDirectory.dir('grass-slabs-integration-run')
+def grassSlabsIntegrationRunName = providers.gradleProperty('grassSlabsIntegrationRunName')
+        .getOrElse('grass-slabs-integration-run')
+if (!(grassSlabsIntegrationRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable Grass Slabs integration directory name')
+}
+def runtime = layout.buildDirectory.dir(grassSlabsIntegrationRunName)
 def prepareTest = tasks.register('prepareGrassSlabsIntegrationTest') {
     group = 'verification'
     dependsOn mapRelease, tasks.named('integrationTestModJar')
     doLast {
         File directory = runtime.get().asFile
         if (directory.canonicalFile != new File(layout.buildDirectory.get().asFile,
-                'grass-slabs-integration-run').canonicalFile) {
+                grassSlabsIntegrationRunName).canonicalFile) {
             throw new GradleException('Refusing to clear a verification directory outside the build output')
         }
         if (directory.exists()) throw new GradleException('Preserve the existing Grass Slabs verification evidence: ' + directory)
@@ -151,7 +156,6 @@ def fresh = tasks.register('integrationGrassSlabsFreshProcess', JavaExec) {
     dependsOn prepareTest
     workingDir runtime
     systemProperty 'skysbuildingpieces.integrationPhase', 'fresh'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runServer')
     doLast {
         File directory = runtime.get().asFile
@@ -171,7 +175,6 @@ def reload = tasks.register('integrationGrassSlabsReloadProcess', JavaExec) {
     dependsOn fresh
     workingDir runtime
     systemProperty 'skysbuildingpieces.integrationPhase', 'reload'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runServer')
 }
 tasks.register('integrationGrassSlabsTest') {
@@ -192,7 +195,6 @@ tasks.register('integrationGrassSlabsClientProcess', JavaExec) {
     dependsOn prepareTest
     workingDir runtime
     systemProperty 'skysbuildingpieces.integrationPhase', 'client'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runClient')
     doLast {
         if (!new File(runtime.get().asFile, 'building-pieces-client-pass.txt').isFile()) {

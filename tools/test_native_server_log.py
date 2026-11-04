@@ -1,4 +1,4 @@
-"""Negative controls for Forge 45 server completion and native settings."""
+"""Negative controls for Forge 47 server completion and native settings."""
 
 from pathlib import Path
 import shutil

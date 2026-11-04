@@ -82,15 +82,15 @@ def argument_file(java, directory, phase, arguments):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.19.4/1.19.4.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.20.1/1.20.1.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.19.4-forge-45.4.0", "forge-45.4.0")]
+                for name in ("1.20.1-forge-47.4.10", "forge-47.4.10")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 45.4.0 profile")
+        raise ValueError("The installed client has no Forge 47.4.10 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.19.4" or forge["inheritsFrom"] != "1.19.4":
-        raise ValueError("This launcher requires the verified Forge 45 client metadata")
+    if base["id"] != "1.20.1" or forge["inheritsFrom"] != "1.20.1":
+        raise ValueError("This launcher requires the verified Forge 47 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -109,7 +109,7 @@ def client_command(options, directory):
         classpath.append(path)
         if library["name"].split(":")[-1] == "natives-windows":
             native_artifacts.append(path)
-    client = runtime / "versions/1.19.4/1.19.4.jar"
+    client = runtime / "versions/1.20.1/1.20.1.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -145,7 +145,7 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/minecraftforge/forge/1.19.4-45.4.0" / filename
+    source = runtime / "libraries/net/minecraftforge/forge/1.20.1-47.4.10" / filename
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
     for argument in shlex.split(source.read_text(encoding="utf-8")):

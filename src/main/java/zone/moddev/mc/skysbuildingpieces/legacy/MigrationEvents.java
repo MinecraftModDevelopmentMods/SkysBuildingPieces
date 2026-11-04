@@ -24,7 +24,9 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.*;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 
 public final class MigrationEvents {
@@ -312,7 +314,7 @@ public final class MigrationEvents {
 
         for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
                 Direction.EAST, Direction.WEST }) {
-            IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, face).orElse(null);
+            IItemHandler handler = tile.getCapability(ForgeCapabilities.ITEM_HANDLER, face).orElse(null);
 
             if (handler != null) {
 

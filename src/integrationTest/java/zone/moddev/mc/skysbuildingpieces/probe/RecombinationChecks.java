@@ -3,6 +3,7 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -146,7 +147,7 @@ public final class RecombinationChecks {
     }
 
     static CraftingContainer grid(int size) {
-        return new CraftingContainer(new AbstractContainerMenu(null, 0) {
+        return new TransientCraftingContainer(new AbstractContainerMenu(null, 0) {
             @Override
             public net.minecraft.world.item.ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
                 return net.minecraft.world.item.ItemStack.EMPTY;
