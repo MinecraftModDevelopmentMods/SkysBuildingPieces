@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stonebrick_carved_stairs",
+    "id": "skysbuildingpieces:stonebrick_carved_stairs",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stonebrick_carved_stairs"
+  }
 }

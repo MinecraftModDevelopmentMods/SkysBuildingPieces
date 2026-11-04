@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:end_stone_wall",
+    "id": "skysbuildingpieces:end_stone_wall",
     "count": 6
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:end_stone_wall"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:end_stone_wall"
+  }
 }

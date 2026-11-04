@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:smooth_sandstone_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:smooth_sandstone_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/smooth_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_11_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/smooth_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_11_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:smooth_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+      }
+    ]
+  }
 }

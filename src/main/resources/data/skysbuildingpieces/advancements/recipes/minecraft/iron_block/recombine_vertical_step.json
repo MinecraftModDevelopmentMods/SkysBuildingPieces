@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:iron_block_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:iron_block_vertical_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/iron_block/recombine_vertical_step"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/iron_block/recombine_vertical_step"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:iron_block_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:iron_block_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_vertical_step"
+      }
+    ]
+  }
 }

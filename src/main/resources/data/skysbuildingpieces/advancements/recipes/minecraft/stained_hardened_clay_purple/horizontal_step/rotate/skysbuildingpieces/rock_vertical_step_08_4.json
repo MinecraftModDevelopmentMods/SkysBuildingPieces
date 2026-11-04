@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_hardened_clay_purple_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:stained_hardened_clay_purple_vertical_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_purple/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_08_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_purple/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_08_4"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_purple_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_purple_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_purple_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_purple_vertical_step"
+      }
+    ]
+  }
 }

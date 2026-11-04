@@ -8,14 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:diorite_slab",
+    "id": "minecraft:diorite_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:diorite_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:diorite_vertical_slab"
+  }
 }

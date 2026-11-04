@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:granite_smooth_horizontal_step",
+    "id": "skysbuildingpieces:granite_smooth_horizontal_step",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:granite_smooth_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:granite_smooth_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:granite_smooth_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:granite_smooth_vertical_slab"
+      }
+    ]
+  }
 }

@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:prismarine_bricks_stairs",
+    "id": "skysbuildingpieces:prismarine_bricks_stairs",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_bricks_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_bricks_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_stairs"
+      }
+    ]
+  }
 }

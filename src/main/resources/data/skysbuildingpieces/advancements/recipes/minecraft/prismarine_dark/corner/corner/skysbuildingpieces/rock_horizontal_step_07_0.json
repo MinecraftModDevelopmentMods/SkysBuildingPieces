@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:prismarine_dark_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:prismarine_dark_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/prismarine_dark/corner/corner/skysbuildingpieces/rock_horizontal_step_07_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/prismarine_dark/corner/corner/skysbuildingpieces/rock_horizontal_step_07_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_dark_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
+      }
+    ]
+  }
 }

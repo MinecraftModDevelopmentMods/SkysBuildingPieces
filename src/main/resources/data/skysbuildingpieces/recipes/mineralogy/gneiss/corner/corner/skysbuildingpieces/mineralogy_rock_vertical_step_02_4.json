@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:mineralogy_gneiss_corner",
+    "id": "skysbuildingpieces:mineralogy_gneiss_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_gneiss_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_gneiss_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_gneiss_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_gneiss_vertical_step"
+      }
+    ]
+  }
 }

@@ -121,15 +121,18 @@ class NativeBiomeProofTest(unittest.TestCase):
                                   ("retired_poi_contract", "source_world_sha256", "wrong")):
             with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
                 candidate = copy.deepcopy(profile)
-                for receipt_key in ("retired_poi_contract", "static_biome_contract"):
+                for receipt_key in ("retired_poi_contract", "static_biome_contract",
+                                    "native_block_rename_contract", "forge50_unused_registry_contract"):
+                    if receipt_key not in profile:
+                        continue
                     original = root / profile[receipt_key]["path"]
                     proof = json.loads(original.read_text(encoding="utf-8"))
                     if receipt_key == key:
                         proof[field] = value
                     target = Path(directory) / (receipt_key + ".json")
                     target.write_text(json.dumps(proof), encoding="utf-8")
-                    candidate[receipt_key] = {"path": target.name,
-                        "sha256": hashlib.sha256(target.read_bytes()).hexdigest().upper()}
+                    candidate[receipt_key].update(path=target.name,
+                        sha256=hashlib.sha256(target.read_bytes()).hexdigest().upper())
                 with self.assertRaises(ValueError):
                     validate_registry_proofs(directory, candidate)
 

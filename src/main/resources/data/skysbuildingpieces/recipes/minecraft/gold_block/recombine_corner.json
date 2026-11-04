@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:gold_block_horizontal_step",
+    "id": "skysbuildingpieces:gold_block_horizontal_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:gold_block_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:gold_block_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:gold_block_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:gold_block_horizontal_step"
+      }
+    ]
+  }
 }

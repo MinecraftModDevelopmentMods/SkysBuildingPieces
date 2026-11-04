@@ -1,7 +1,6 @@
 // Build-only checks for the former add-on's save format and real generated slopes.
 // Neither these classes nor Terrain Smoother enter ordinary content-mod runs.
-// Renamer attaches its outputs to assemble. Register this optional fixture only
-// when requested, so a normal build does not need a sibling project's jar.
+// Only build this fixture on request, so an ordinary build does not need a sibling project.
 if (!providers.gradleProperty('enableMineralogyFixtures').getOrElse('false').toBoolean()) {
     ['prepareMineralogyFixture', 'prepareLegacyMineralogyWorld'].each { name ->
         tasks.register(name) {
@@ -14,9 +13,9 @@ if (!providers.gradleProperty('enableMineralogyFixtures').getOrElse('false').toB
     return
 }
 
-def smoother = file('../../SkysTerrainSmoother1201/SkysTerrainSmoother')
+def smoother = file('../../SkysTerrainSmoother1206/SkysTerrainSmoother')
 def smootherJar = new File(smoother,
-        'build/libs-dev/SkysTerrainSmoother-0.1.0.120011-deobf.jar')
+        'build/libs/SkysTerrainSmoother-0.1.0.120061.jar')
 def fixtureClasses = layout.buildDirectory.dir('mineralogy-fixture/classes')
 def compileFixture = tasks.register('compileMineralogyFixture', JavaCompile) {
     group = 'verification'
@@ -37,13 +36,7 @@ def fixtureJar = tasks.register('mineralogyFixtureJar', Jar) {
     destinationDirectory = layout.buildDirectory.dir('mineralogy-fixture')
     from fixtureClasses
 }
-def packagedFixture = renamer.classes(fixtureJar) {
-    map.from minecraft.dependency.toSrgFile
-    libraries.from tasks.named('jar', Jar).flatMap { it.archiveFile }
-    libraries.from sourceSets.main.compileClasspath
-    libraries.from smootherJar
-    output = layout.buildDirectory.file('mineralogy-fixture/skysbuildingpieces-mineralogy-runtime-test-reobf.jar')
-}
+def packagedFixture = fixtureJar
 tasks.register('prepareMineralogyFixture') {
     group = 'verification'
     dependsOn packagedFixture

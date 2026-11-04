@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:oak_slab"
-            ]
+            "items": ["minecraft:oak_slab"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/planks_oak/horizontal_step/step/minecraft/wooden_slab_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/planks_oak/horizontal_step/step/minecraft/wooden_slab_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_oak_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:planks_oak_horizontal_step"
+  }
 }

@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stonebrick_carved_horizontal_step",
+    "id": "skysbuildingpieces:stonebrick_carved_horizontal_step",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_carved_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_carved_slab"
+      }
+    ]
+  }
 }

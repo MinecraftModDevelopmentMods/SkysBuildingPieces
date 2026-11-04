@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:mineralogy_limestone_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:mineralogy_limestone_vertical_step"]
           }
         ]
       }
@@ -20,28 +18,26 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/limestone/recombine_vertical_step"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/limestone/recombine_vertical_step"]
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:limestone_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_limestone_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:limestone_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_limestone_vertical_step"
+      }
+    ]
+  }
 }

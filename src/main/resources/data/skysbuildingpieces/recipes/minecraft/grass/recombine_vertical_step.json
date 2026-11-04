@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysgrassslabs:grass_slab",
+    "id": "skysgrassslabs:grass_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:grass_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysgrassslabs:grass_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:grass_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:grass_slab"
+      }
+    ]
+  }
 }

@@ -12,12 +12,16 @@ def policyJar = tasks.register('legacyPolicyFixtureJar', Jar) {
     from policyClasses
     from 'src/compatibilityTest/resources'
 }
-def policyDirectory = layout.buildDirectory.dir('legacy-policy-test-run')
+def policyRunName = providers.gradleProperty('nativePolicyRunName').getOrElse('legacy-policy-test-run')
+if (!(policyRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable policy directory name')
+}
+def policyDirectory = layout.buildDirectory.dir(policyRunName)
 def preparePolicy = tasks.register('prepareLegacyPolicyTest') {
     dependsOn policyJar, tasks.named('integrationTestModJar')
     doLast {
         File directory = policyDirectory.get().asFile
-        if (directory.canonicalFile != new File(buildDir, 'legacy-policy-test-run').canonicalFile) {
+        if (directory.canonicalFile != new File(buildDir, policyRunName).canonicalFile) {
             throw new GradleException('Policy checks must remain inside their build directory')
         }
         if (directory.exists()) throw new GradleException('Preserve the existing policy evidence before another run: ' + directory)

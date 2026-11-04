@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:grass_step"
-            ]
+            "items": ["skysbuildingpieces:grass_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/grass/recombine_vertical_step"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/grass/recombine_vertical_step"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:grass_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysgrassslabs:grass_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:grass_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:grass_slab"
+      }
+    ]
+  }
 }

@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:end_stone",
+    "id": "minecraft:end_stone",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:end_stone_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:end_stone_slab"
+  }
 }

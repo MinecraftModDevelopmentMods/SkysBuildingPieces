@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysgrassslabs:dirt_slab",
+    "id": "skysgrassslabs:dirt_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysgrassslabs:dirt_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_vertical_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:dirt_slab"
+      }
+    ]
+  }
 }

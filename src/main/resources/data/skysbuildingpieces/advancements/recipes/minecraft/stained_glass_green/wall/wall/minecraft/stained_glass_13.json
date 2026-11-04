@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:green_stained_glass"
-            ]
+            "items": ["minecraft:green_stained_glass"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_glass_green/wall/wall/minecraft/stained_glass_13"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_green/wall/wall/minecraft/stained_glass_13"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_green_wall"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_glass_green_wall"
+  }
 }

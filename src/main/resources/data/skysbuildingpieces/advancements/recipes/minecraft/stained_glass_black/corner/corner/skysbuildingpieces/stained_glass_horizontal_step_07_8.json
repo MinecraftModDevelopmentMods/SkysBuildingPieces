@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_glass_black_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:stained_glass_black_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_glass_black/corner/corner/skysbuildingpieces/stained_glass_horizontal_step_07_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_black/corner/corner/skysbuildingpieces/stained_glass_horizontal_step_07_8"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_black_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_black_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_black_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_black_horizontal_step"
+      }
+    ]
+  }
 }

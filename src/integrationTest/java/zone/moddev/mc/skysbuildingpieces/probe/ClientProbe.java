@@ -240,7 +240,7 @@ public final class ClientProbe extends ProbeProxy {
                 startedWorld = true;
                 worldStarted = System.nanoTime();
                 if (new File(minecraft.gameDirectory, "saves/building-pieces-world/level.dat").isFile()) {
-                    minecraft.createWorldOpenFlows().loadLevel(new net.minecraft.client.gui.screens.TitleScreen(), "building-pieces-world");
+                    minecraft.createWorldOpenFlows().openWorld("building-pieces-world", () -> minecraft.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
                 } else {
                     net.minecraft.world.level.LevelSettings settings = new net.minecraft.world.level.LevelSettings(
                             "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE, false,
@@ -248,7 +248,7 @@ public final class ClientProbe extends ProbeProxy {
                             net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
                     minecraft.createWorldOpenFlows().createFreshLevel("building-pieces-world", settings,
                             new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions);
+                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, minecraft.screen);
                 }
             }
         } catch (Throwable failure) {

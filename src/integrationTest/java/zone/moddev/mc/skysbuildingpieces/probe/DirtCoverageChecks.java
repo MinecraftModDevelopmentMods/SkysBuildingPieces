@@ -53,7 +53,7 @@ public final class DirtCoverageChecks {
 
             LegacyBridge.finalizeLegacyChunk(raw);
             events.load(
-                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
             NativeLegacyChecks.require(totals.blocks == blocks + orientation + 1 && totals.chunks == chunks,
                     "New dirt coverage must not count the chunk twice");
 

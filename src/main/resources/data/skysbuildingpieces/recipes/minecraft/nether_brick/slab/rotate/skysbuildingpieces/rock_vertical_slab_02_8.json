@@ -8,14 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:nether_brick_slab",
+    "id": "minecraft:nether_brick_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:nether_brick_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:nether_brick_vertical_slab"
+  }
 }

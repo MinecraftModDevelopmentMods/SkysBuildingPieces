@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:dirt_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:dirt_vertical_step"]
           }
         ]
       }
@@ -20,31 +18,29 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt/recombine_vertical_step_without_grass_slabs"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt/recombine_vertical_step_without_grass_slabs"]
   },
-  "conditions": [
-    {
-      "type": "forge:not",
-      "value": {
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:item_exists",
+          "item": "skysgrassslabs:dirt_slab"
+        }
+      },
+      {
         "type": "forge:item_exists",
-        "item": "skysgrassslabs:dirt_slab"
+        "item": "skysbuildingpieces:dirt_vertical_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_vertical_step"
       }
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_step"
-    }
-  ]
+    ]
+  }
 }

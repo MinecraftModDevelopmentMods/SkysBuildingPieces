@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_hardened_clay_blue_corner",
+    "id": "skysbuildingpieces:stained_hardened_clay_blue_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_blue_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_blue_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_blue_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_blue_horizontal_step"
+      }
+    ]
+  }
 }

@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:hardened_clay_wall",
+    "id": "skysbuildingpieces:hardened_clay_wall",
     "count": 6
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_wall"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:hardened_clay_wall"
+  }
 }

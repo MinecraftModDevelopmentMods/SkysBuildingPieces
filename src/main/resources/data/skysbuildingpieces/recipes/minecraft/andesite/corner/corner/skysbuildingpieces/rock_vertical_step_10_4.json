@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:andesite_corner",
+    "id": "skysbuildingpieces:andesite_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:andesite_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:andesite_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:andesite_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:andesite_vertical_step"
+      }
+    ]
+  }
 }

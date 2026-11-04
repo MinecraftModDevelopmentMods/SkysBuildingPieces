@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:red_sandstone_corner",
+    "id": "skysbuildingpieces:red_sandstone_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:red_sandstone_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:red_sandstone_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:red_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:red_sandstone_vertical_step"
+      }
+    ]
+  }
 }

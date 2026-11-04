@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_hardened_clay_silver_slab",
+    "id": "skysbuildingpieces:stained_hardened_clay_silver_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_silver_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_silver_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_silver_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_silver_vertical_slab"
+      }
+    ]
+  }
 }

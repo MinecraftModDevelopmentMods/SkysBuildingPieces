@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:oak_slab",
+    "id": "minecraft:oak_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_oak_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:planks_oak_vertical_step"
+  }
 }

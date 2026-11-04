@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_hardened_clay_brown_horizontal_step",
+    "id": "skysbuildingpieces:stained_hardened_clay_brown_horizontal_step",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_brown_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_brown_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_brown_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_brown_vertical_step"
+      }
+    ]
+  }
 }

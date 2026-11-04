@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:snow_block",
+    "id": "minecraft:snow_block",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:snow_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:snow_slab"
+  }
 }

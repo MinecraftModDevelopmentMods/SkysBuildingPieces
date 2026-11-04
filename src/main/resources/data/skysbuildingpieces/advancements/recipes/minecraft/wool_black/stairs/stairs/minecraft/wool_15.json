@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:black_wool"
-            ]
+            "items": ["minecraft:black_wool"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/wool_black/stairs/stairs/minecraft/wool_15"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/wool_black/stairs/stairs/minecraft/wool_15"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_black_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_black_stairs"
+  }
 }

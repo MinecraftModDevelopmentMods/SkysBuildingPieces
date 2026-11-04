@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_glass_silver_slab",
+    "id": "skysbuildingpieces:stained_glass_silver_slab",
     "count": 6
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_silver_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_glass_silver_slab"
+  }
 }

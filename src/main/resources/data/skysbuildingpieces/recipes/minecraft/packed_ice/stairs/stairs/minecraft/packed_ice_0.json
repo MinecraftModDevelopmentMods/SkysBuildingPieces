@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:packed_ice_stairs",
+    "id": "skysbuildingpieces:packed_ice_stairs",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:packed_ice_stairs"
+  }
 }

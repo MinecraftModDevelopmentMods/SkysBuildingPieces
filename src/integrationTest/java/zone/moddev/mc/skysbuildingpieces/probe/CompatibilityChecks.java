@@ -25,7 +25,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -48,7 +47,7 @@ public final class CompatibilityChecks {
         ItemStack stack = new ItemStack(
                 ForgeRegistries.ITEMS.getValue(new ResourceLocation("buildingbricks:rock_step")), count);
 
-        stack.setTag(NativeLegacyChecks.stack("minecraft:stone", count).getCompound("tag").copy());
+        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, NativeLegacyChecks.stack("minecraft:stone", count).getCompound("tag").copy());
         return stack;
     }
 
@@ -80,13 +79,13 @@ public final class CompatibilityChecks {
         NativeLegacyChecks.require(
                 !stack.isEmpty() && stack.getCount() == count
                         && net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getNamespace().equals(namespace),
-                "Live stack replacement policy");
-        NativeLegacyChecks.require(stack.hasTag() && stack.getTag().equals(legacy(count).getTag()),
+                "Live stack replacement policy: expected " + namespace + " x" + count + ", found " + stack);
+        NativeLegacyChecks.require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(stack) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack).equals(NativeProbeItems.custom(legacy(count))),
                 "Complete unrelated custom data is retained");
     }
 
     private static void liveInventories(ServerLevel world, boolean convert) throws Exception {
-        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = NativeProbeItems.player(world);
 
         player.getInventory().setItem(0, legacy(13));
         player.getEnderChestInventory().setItem(0, legacy(11));
@@ -125,10 +124,21 @@ public final class CompatibilityChecks {
         scan.invoke(null, tile);
         identity(tile.handler.getStackInSlot(0), 17, convert);
 
-        CompoundTag once = tile.handler.serializeNBT();
+        CompoundTag once = tile.handler.serializeNBT(world.registryAccess());
 
         scan.invoke(null, tile);
-        NativeLegacyChecks.require(once.equals(tile.handler.serializeNBT()), "Shared handler faces convert only once");
+        NativeLegacyChecks.require(once.equals(tile.handler.serializeNBT(world.registryAccess())),
+                "Shared handler faces convert only once");
+
+        BlockPos chestPosition = position.east();
+        world.setBlock(chestPosition, Blocks.CHEST.defaultBlockState(), 2);
+        var chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) world.getBlockEntity(chestPosition);
+        NativeLegacyChecks.require(chest != null, "Policy fixture chest is installed");
+        chest.setItem(0, legacy(19));
+        scan.invoke(null, chest);
+        identity(chest.getItem(0), 19, convert);
+        chest.clearContent();
+        world.removeBlock(chestPosition, false);
 
         ItemStack crate = new ItemStack(Blocks.CHEST);
         CompoundTag tag = new CompoundTag();
@@ -137,15 +147,15 @@ public final class CompatibilityChecks {
 
         ListTag contents = new ListTag();
 
-        contents.add(legacy(7).save(new CompoundTag()));
+        contents.add(NativeProbeItems.save(legacy(7)));
         tag.put("Items", contents);
-        crate.setTag(tag);
+        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(crate, tag);
 
         ItemStack migrated = MigrationEvents.convert(crate, world);
-        CompoundTag recovered = migrated.getTag().getList("Items", 10).getCompound(0);
+        CompoundTag recovered = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getList("Items", 10).getCompound(0);
 
-        identity(ItemStack.of(recovered), 7, convert);
-        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && migrated.getTag().getBoolean("Sealed"),
+        identity(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(recovered), 7, convert);
+        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getBoolean("Sealed"),
                 "Sealed container identity and custom data");
         NativeLegacyChecks.require(MigrationEvents.convert(migrated, world) == migrated,
                 "Live nested inventory is idempotent");
@@ -163,7 +173,7 @@ public final class CompatibilityChecks {
 
         grid.setItem(0, legacy(1));
 
-        LegacyPieceRecipe recipe = new LegacyPieceRecipe(new ResourceLocation("skysbuildingpieces:bridge_test"), net.minecraft.world.item.crafting.CraftingBookCategory.BUILDING);
+        LegacyPieceRecipe recipe = new LegacyPieceRecipe(net.minecraft.world.item.crafting.CraftingBookCategory.BUILDING);
 
         NativeLegacyChecks.require(recipe.matches(grid, world),
                 "Explicit bridge recipe works independently of replacement");
@@ -184,13 +194,13 @@ public final class CompatibilityChecks {
         world.setBlock(position, old, 2);
 
         BlockEntity tile = world.getBlockEntity(position);
-        CompoundTag tag = tile.saveWithFullMetadata();
+        CompoundTag tag = tile.saveWithFullMetadata(world.registryAccess());
 
         tag.putString("material", "minecraft:stone");
         tag.putString("custom", "Keep the old tile in coverage");
-        tile.load(tag);
+        tile.loadWithComponents(tag, world.registryAccess());
         MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
-                Blocks.STONE.defaultBlockState(), FakePlayerFactory.getMinecraft(world)));
+                Blocks.STONE.defaultBlockState(), NativeProbeItems.player(world)));
         NativeLegacyChecks.require(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(world.getBlockState(position).getBlock()).getNamespace()
                 .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "New placement replacement policy");
         NativeLegacyChecks.require((world.getBlockEntity(position) == null) == convert,
@@ -201,12 +211,14 @@ public final class CompatibilityChecks {
     private static void unknownMaterial(ServerLevel world) {
         ItemStack unknown = legacy(3);
 
-        unknown.getTag().putString("material", "missing:unknown");
+        CompoundTag unknownData = NativeProbeItems.custom(unknown);
+        unknownData.putString("material", "missing:unknown");
+        NativeProbeItems.setCustom(unknown, unknownData);
 
-        CompoundTag before = unknown.save(new CompoundTag());
+        CompoundTag before = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.save(unknown);
         ItemStack result = MigrationEvents.convert(unknown, world);
 
-        NativeLegacyChecks.require(result.save(new CompoundTag()).equals(before),
+        NativeLegacyChecks.require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.save(result).equals(before),
                 "Installed legacy mod retains unsupported materials");
 
         // Horizontal soil recovery belongs to Grass Slabs and must stay outside this bridge.

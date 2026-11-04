@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:cyan_wool",
+    "id": "minecraft:cyan_wool",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_cyan_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_cyan_slab"
+  }
 }

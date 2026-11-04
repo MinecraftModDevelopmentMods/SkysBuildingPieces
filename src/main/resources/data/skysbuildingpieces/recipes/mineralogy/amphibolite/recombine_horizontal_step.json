@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:amphibolite_slab",
+    "id": "mineralogy:amphibolite_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:amphibolite_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:amphibolite_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
+      }
+    ]
+  }
 }

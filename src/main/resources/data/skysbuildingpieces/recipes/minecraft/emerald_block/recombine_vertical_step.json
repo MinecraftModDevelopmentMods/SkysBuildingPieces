@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:emerald_block_slab",
+    "id": "skysbuildingpieces:emerald_block_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:emerald_block_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:emerald_block_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:emerald_block_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:emerald_block_vertical_step"
+      }
+    ]
+  }
 }

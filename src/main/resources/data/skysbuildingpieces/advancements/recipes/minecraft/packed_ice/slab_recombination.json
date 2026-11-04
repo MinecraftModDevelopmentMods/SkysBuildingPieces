@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:packed_ice_slab"
-            ]
+            "items": ["skysbuildingpieces:packed_ice_slab"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/packed_ice/slab_recombination"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/packed_ice/slab_recombination"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:packed_ice_slab"
+  }
 }

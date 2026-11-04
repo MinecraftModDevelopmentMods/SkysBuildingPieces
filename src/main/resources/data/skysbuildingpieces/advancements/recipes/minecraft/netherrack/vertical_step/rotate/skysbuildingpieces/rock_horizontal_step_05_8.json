@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:netherrack_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:netherrack_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/netherrack/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_05_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/netherrack/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_05_8"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:netherrack_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:netherrack_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_vertical_step"
+      }
+    ]
+  }
 }

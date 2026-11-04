@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:magenta_terracotta",
+    "id": "minecraft:magenta_terracotta",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_magenta_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_magenta_slab"
+  }
 }

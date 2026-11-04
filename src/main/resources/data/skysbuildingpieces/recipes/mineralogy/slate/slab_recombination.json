@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:slate",
+    "id": "mineralogy:slate",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:slate"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:slate_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:slate"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:slate_slab"
+      }
+    ]
+  }
 }

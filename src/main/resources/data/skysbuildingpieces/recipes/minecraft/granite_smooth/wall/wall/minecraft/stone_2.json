@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:granite_smooth_wall",
+    "id": "skysbuildingpieces:granite_smooth_wall",
     "count": 6
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:granite_smooth_wall"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:granite_smooth_wall"
+  }
 }

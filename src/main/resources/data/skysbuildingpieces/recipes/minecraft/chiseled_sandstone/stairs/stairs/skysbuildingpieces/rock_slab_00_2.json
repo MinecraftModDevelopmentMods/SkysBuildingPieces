@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:chiseled_sandstone_stairs",
+    "id": "skysbuildingpieces:chiseled_sandstone_stairs",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_stairs"
+      }
+    ]
+  }
 }

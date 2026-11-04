@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:prismarine_rough_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:prismarine_rough_vertical_step"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/prismarine_rough/recombine_vertical_step"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/prismarine_rough/recombine_vertical_step"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:prismarine_rough_vertical_step"
+  }
 }

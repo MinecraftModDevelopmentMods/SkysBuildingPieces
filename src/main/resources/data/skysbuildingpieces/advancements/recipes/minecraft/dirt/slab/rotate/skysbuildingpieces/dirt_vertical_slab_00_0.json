@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:dirt_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:dirt_vertical_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt/slab/rotate/skysbuildingpieces/dirt_vertical_slab_00_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt/slab/rotate/skysbuildingpieces/dirt_vertical_slab_00_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysgrassslabs:dirt_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_vertical_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:dirt_slab"
+      }
+    ]
+  }
 }

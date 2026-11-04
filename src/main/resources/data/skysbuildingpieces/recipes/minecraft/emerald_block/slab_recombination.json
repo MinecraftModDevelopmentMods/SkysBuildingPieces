@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:emerald_block",
+    "id": "minecraft:emerald_block",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:emerald_block_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:emerald_block_slab"
+  }
 }

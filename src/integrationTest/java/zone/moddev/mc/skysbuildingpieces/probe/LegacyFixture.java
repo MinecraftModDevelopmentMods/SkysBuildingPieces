@@ -64,11 +64,11 @@ public final class LegacyFixture {
 
                 require(tile != null, "real material tile " + legacyId);
 
-                CompoundTag compoundTag = tile.saveWithFullMetadata();
+                CompoundTag compoundTag = tile.saveWithFullMetadata(world.registryAccess());
 
                 compoundTag.putString("material", material);
                 compoundTag.putString("fixture_note", "material identity, not item damage");
-                tile.load(compoundTag);
+                tile.loadWithComponents(compoundTag, world.registryAccess());
                 tile.setChanged();
             }
 
@@ -106,7 +106,7 @@ public final class LegacyFixture {
 
                     BlockEntity tile = world.getBlockEntity(pos(entryIndex));
 
-                    require(tile != null && tile.saveWithFullMetadata().getString("material").equals(material),
+                    require(tile != null && tile.saveWithFullMetadata(world.registryAccess()).getString("material").equals(material),
                             "default material identity");
                 }
             }
@@ -115,7 +115,7 @@ public final class LegacyFixture {
             ItemStack stack = chest.getItem(0);
 
             require(stack != null && stack.getCount() == 23
-                    && stack.getTag().getString("custom_label").equals("NBT survives"),
+                    && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack).getString("custom_label").equals("NBT survives"),
                     "container count and custom NBT");
             require(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getNamespace()
                     .equals(converted ? "skysbuildingpieces" : "buildingbricks"), "container identity");
@@ -158,7 +158,7 @@ public final class LegacyFixture {
         tag.putString("material", material);
         tag.putString("custom_label", "NBT survives");
         compoundTag.put("tag", tag);
-        return ItemStack.of(compoundTag);
+        return zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(compoundTag);
     }
 
     private static void require(boolean value, String message) {

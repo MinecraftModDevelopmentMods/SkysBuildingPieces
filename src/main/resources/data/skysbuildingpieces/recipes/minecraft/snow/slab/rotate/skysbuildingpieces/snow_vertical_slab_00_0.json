@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:snow_slab",
+    "id": "skysbuildingpieces:snow_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:snow_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:snow_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:snow_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:snow_vertical_slab"
+      }
+    ]
+  }
 }

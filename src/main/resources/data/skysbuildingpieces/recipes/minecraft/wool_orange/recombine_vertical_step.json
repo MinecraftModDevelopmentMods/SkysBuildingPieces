@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_orange_slab",
+    "id": "skysbuildingpieces:wool_orange_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_orange_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_orange_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_orange_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_orange_vertical_step"
+      }
+    ]
+  }
 }

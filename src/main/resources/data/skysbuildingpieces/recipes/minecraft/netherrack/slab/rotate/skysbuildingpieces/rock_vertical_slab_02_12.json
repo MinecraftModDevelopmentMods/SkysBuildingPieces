@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:netherrack_slab",
+    "id": "skysbuildingpieces:netherrack_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:netherrack_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:netherrack_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_vertical_slab"
+      }
+    ]
+  }
 }

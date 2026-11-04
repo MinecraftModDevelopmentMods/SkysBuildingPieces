@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:orange_terracotta"
-            ]
+            "items": ["minecraft:orange_terracotta"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_orange/stairs/stairs/minecraft/stained_hardened_clay_1"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_orange/stairs/stairs/minecraft/stained_hardened_clay_1"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_orange_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_orange_stairs"
+  }
 }

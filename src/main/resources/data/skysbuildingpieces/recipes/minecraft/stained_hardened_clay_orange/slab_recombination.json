@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:orange_terracotta",
+    "id": "minecraft:orange_terracotta",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_orange_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_orange_slab"
+  }
 }

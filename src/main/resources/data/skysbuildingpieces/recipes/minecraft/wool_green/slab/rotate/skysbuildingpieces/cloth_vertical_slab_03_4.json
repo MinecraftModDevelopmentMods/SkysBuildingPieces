@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_green_slab",
+    "id": "skysbuildingpieces:wool_green_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_green_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_green_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_green_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_green_vertical_slab"
+      }
+    ]
+  }
 }

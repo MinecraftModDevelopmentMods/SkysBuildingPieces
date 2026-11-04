@@ -1,8 +1,8 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.20.1 and Forge 47.4.10. Run the included Gradle
-wrapper with Java 17. Compilation and Minecraft use Java 17; the pinned production
-toolchain is Temurin 17.0.1+12. ForgeGradle uses Java 25 for its Mavenizer tool.
+This branch targets Minecraft 1.20.6 and Forge 50.2.0. Run the included Gradle
+wrapper with Java 21. Compilation and Minecraft use Java 21; the pinned production
+toolchain is Temurin 21.0.7+6. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
 the command path, or pass `-PpythonExecutable=<python executable>` to Gradle.
 
@@ -27,9 +27,8 @@ and exclude test classes.
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs1201/SkysGrassSlabs` checkout,
-or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
-match their pinned hashes. CI builds the pinned commit before testing the optional
+Build that exact commit in the sibling `SkysGrassSlabs1206/SkysGrassSlabs` checkout,
+or pass `-PgrassSlabsMainJar=<jar>`. The jar must match its pinned hash. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
@@ -65,9 +64,8 @@ identities; the server checks discovery from both inventory and crafting inputs.
 For the optional Mineralogy profiles, first run:
 
 ```text
-gradlew prepareOfficialMineralogyDevelopment -PgenerateOptionalDevelopment=true
+gradlew prepareMineralogyDevelopmentRun
 ```
 
-This makes separate mapped development jars from the two checksum-locked
-production jars. Their native access rules are preserved. Ordinary builds
-and launches remain independent of those optional mods.
+This checks the two pinned jars and copies them into the separate Mineralogy
+run folder. The same jars work in development and in the game.

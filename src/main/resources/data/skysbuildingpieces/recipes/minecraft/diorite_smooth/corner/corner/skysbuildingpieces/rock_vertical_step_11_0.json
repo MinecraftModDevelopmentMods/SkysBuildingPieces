@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:diorite_smooth_corner",
+    "id": "skysbuildingpieces:diorite_smooth_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:diorite_smooth_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:diorite_smooth_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_smooth_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_smooth_vertical_step"
+      }
+    ]
+  }
 }

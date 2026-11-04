@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:amphibolite",
+    "id": "mineralogy:amphibolite",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:amphibolite"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:amphibolite_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:amphibolite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:amphibolite_slab"
+      }
+    ]
+  }
 }

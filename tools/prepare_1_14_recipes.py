@@ -1,4 +1,4 @@
-"""Generate Forge 31 recipes from permanent material and shape catalogues.
+"""Generate Forge 50 recipes from permanent material and shape catalogues.
 
 The catalogue keeps source-world identities; recipes use the flattened item IDs.
 Optional inputs and matching advancements share the same Forge conditions.
@@ -26,6 +26,10 @@ def item_id(spec):
 
 def exists(item):
     return {'type': 'forge:item_exists', 'item': item}
+
+
+def all_conditions(conditions):
+    return conditions[0] if len(conditions) == 1 else {'type': 'forge:and', 'values': conditions}
 
 
 def canonical_pattern(rows):
@@ -59,7 +63,7 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
             inputs = recipe['ingredients']
             if len(inputs) == len(pattern) and all(accepts(value) for value in inputs):
                 result = recipe['result']
-                if (result['item'], result.get('count', 1)) != output:
+                if (result.get('id', result.get('item')), result.get('count', 1)) != output:
                     return True
             continue
         if recipe.get('type') != 'minecraft:crafting_shaped':
@@ -70,7 +74,7 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
         inputs = list(recipe['key'].values())
         if all(accepts(value) for value in inputs):
             result = recipe['result']
-            if (result['item'], result.get('count', 1)) != output:
+            if (result.get('id', result.get('item')), result.get('count', 1)) != output:
                 return True
     return False
 
@@ -136,11 +140,11 @@ def prepare(resources, native_recipes=(), tags=None):
                     'category': 'building',
                     'group': 'skysbuildingpieces/' + path.split('/')[-2],
                     'pattern': rows, 'key': {'X': {'item': ingredient}},
-                    'result': {'item': output, 'count': count}}
+                    'result': {'id': output, 'count': count}}
             if preserve:
                 body['preserve_tag'] = True
             if conditions:
-                body['conditions'] = conditions
+                body['forge:condition'] = all_conditions(conditions)
             if path in recipes:
                 if recipes[path] != body:
                     raise ValueError('Conflicting generated recipe ID: ' + path)
@@ -155,7 +159,7 @@ def prepare(resources, native_recipes=(), tags=None):
                 'requirements': [['has_ingredient', 'has_the_recipe']],
                 'rewards': {'recipes': ['skysbuildingpieces:' + path]}}
             if conditions:
-                advancement['conditions'] = copy.deepcopy(conditions)
+                advancement['forge:condition'] = copy.deepcopy(all_conditions(conditions))
             advancements['recipes/' + path] = advancement
 
         for material in materials:

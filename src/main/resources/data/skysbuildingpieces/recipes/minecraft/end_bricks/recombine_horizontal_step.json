@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:end_stone_brick_slab",
+    "id": "minecraft:end_stone_brick_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:end_bricks_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:end_bricks_horizontal_step"
+  }
 }

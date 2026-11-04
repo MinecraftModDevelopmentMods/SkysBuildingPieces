@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:red_terracotta",
+    "id": "minecraft:red_terracotta",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_red_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_red_slab"
+  }
 }

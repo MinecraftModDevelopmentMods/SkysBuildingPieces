@@ -110,6 +110,9 @@ public final class RuntimeProbe {
                 org.apache.logging.log4j.LogManager.getLogger().info("RECIPE_BOOK_PHASE_PASS " + phase);
             } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
+            } else if (phase.equals("compat")) {
+                NativeLegacyChecks.run(world);
+                CompatibilityChecks.run(world);
             } else {
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
@@ -122,9 +125,6 @@ public final class RuntimeProbe {
                 RecipeBookChecks.run(world);
                 PresentationChecks.run(world);
 
-                if (phase.equals("compat")) {
-                    CompatibilityChecks.run(world);
-                }
                 if (ModList.get().isLoaded("skysbuildingpiecesbop") && !phase.startsWith("client")) {
                     Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks")
                             .getMethod("run", ServerLevel.class).invoke(null, world);
@@ -175,7 +175,7 @@ public final class RuntimeProbe {
 
         if (reload) {
             try (FileInputStream input = new FileInputStream(file)) {
-                saved = NbtIo.readCompressed(input);
+                saved = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
             }
         }
 

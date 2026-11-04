@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:ice",
+    "id": "minecraft:ice",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:ice_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:ice_slab"
+  }
 }

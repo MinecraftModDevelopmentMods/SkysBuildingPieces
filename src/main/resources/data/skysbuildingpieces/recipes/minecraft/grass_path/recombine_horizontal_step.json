@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysgrassslabs:path_slab",
+    "id": "skysgrassslabs:path_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:grass_path_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysgrassslabs:path_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:grass_path_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:path_slab"
+      }
+    ]
+  }
 }

@@ -31,7 +31,7 @@ class RecipeAdvancementContractTest {
 
                 assertFalse(advancement.has("parent"), "Large recipe catalogues have independent hidden unlocks");
                 assertEquals(id, advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString());
-                assertEquals(recipe.get("conditions"), advancement.get("conditions"));
+                assertEquals(recipe.get("forge:condition"), advancement.get("forge:condition"));
 
                 JsonObject criteria = advancement.getAsJsonObject("criteria");
 

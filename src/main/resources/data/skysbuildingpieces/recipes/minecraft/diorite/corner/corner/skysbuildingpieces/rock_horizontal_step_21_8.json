@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:diorite_corner",
+    "id": "skysbuildingpieces:diorite_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:diorite_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:diorite_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_horizontal_step"
+      }
+    ]
+  }
 }

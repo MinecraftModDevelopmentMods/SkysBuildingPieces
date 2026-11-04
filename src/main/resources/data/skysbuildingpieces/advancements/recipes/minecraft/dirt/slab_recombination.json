@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysgrassslabs:dirt_slab"
-            ]
+            "items": ["skysgrassslabs:dirt_slab"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt/slab_recombination"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt/slab_recombination"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysgrassslabs:dirt_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysgrassslabs:dirt_slab"
+  }
 }

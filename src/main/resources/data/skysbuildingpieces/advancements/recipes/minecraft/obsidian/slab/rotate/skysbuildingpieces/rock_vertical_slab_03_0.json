@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:obsidian_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:obsidian_vertical_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/obsidian/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/obsidian/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:obsidian_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:obsidian_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:obsidian_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:obsidian_vertical_slab"
+      }
+    ]
+  }
 }

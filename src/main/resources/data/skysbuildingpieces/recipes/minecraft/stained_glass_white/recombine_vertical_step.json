@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_glass_white_slab",
+    "id": "skysbuildingpieces:stained_glass_white_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_white_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_white_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_white_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_white_vertical_step"
+      }
+    ]
+  }
 }

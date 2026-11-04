@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:packed_ice_corner",
+    "id": "skysbuildingpieces:packed_ice_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:packed_ice_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:packed_ice_step"
+      }
+    ]
+  }
 }

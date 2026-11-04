@@ -8,14 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:polished_andesite_slab",
+    "id": "minecraft:polished_andesite_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:andesite_smooth_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:andesite_smooth_vertical_slab"
+  }
 }

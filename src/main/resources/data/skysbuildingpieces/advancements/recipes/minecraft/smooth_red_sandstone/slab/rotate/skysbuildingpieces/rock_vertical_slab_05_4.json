@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:smooth_red_sandstone_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:smooth_red_sandstone_vertical_slab"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/smooth_red_sandstone/slab/rotate/skysbuildingpieces/rock_vertical_slab_05_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/smooth_red_sandstone/slab/rotate/skysbuildingpieces/rock_vertical_slab_05_4"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:smooth_red_sandstone_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:smooth_red_sandstone_vertical_slab"
+  }
 }

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:red_sandstone_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:red_sandstone_vertical_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/red_sandstone/corner/corner/skysbuildingpieces/rock_vertical_step_04_12"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/red_sandstone/corner/corner/skysbuildingpieces/rock_vertical_step_04_12"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:red_sandstone_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:red_sandstone_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:red_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:red_sandstone_vertical_step"
+      }
+    ]
+  }
 }

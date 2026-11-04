@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:mossy_cobblestone_corner"
-            ]
+            "items": ["skysbuildingpieces:mossy_cobblestone_corner"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/mossy_cobblestone/recombine_corner"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/mossy_cobblestone/recombine_corner"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mossy_cobblestone_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mossy_cobblestone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+      }
+    ]
+  }
 }

@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:chiseled_red_sandstone_corner",
+    "id": "skysbuildingpieces:chiseled_red_sandstone_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_red_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_red_sandstone_horizontal_step"
+      }
+    ]
+  }
 }

@@ -128,10 +128,10 @@ public final class NativeStagingChecks {
                     sourceData = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, 1343, 1493);
                 }
                 CompoundTag upgraded = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
-                net.minecraft.world.item.ItemStack result = net.minecraft.world.item.ItemStack.of(upgraded);
+                net.minecraft.world.item.ItemStack result = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(upgraded);
 
                 if (result.getItem() != net.minecraft.world.item.Items.STONE_SLAB || result.getCount() != 37
-                        || !result.hasTag() || !custom.equals(result.getTag()) || upgraded.getByte("Slot") != 7
+                        || !zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(result) || !custom.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(result)) || upgraded.getByte("Slot") != 7
                         || upgraded.contains(HistoricalItems.NATIVE_ITEM_ID)) {
                     throw new AssertionError("Vanilla data fixing changed the recovered rough-stone slab item"
                             + " intermediate=" + intermediate + ": " + upgraded);

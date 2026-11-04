@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:prismarine_rough_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:prismarine_rough_vertical_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/prismarine_rough/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_03_12"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/prismarine_rough/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_03_12"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_rough_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
+      }
+    ]
+  }
 }

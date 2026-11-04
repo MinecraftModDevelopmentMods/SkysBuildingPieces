@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:ice_step",
+    "id": "skysbuildingpieces:ice_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:ice_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:ice_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:ice_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:ice_step"
+      }
+    ]
+  }
 }

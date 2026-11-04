@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "mineralogy:rock_salt"
-            ]
+            "items": ["mineralogy:rock_salt"]
           }
         ]
       }
@@ -20,28 +18,26 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/rock_salt/horizontal_step/rock_step/mineralogy/rock_salt_0"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/rock_salt/horizontal_step/rock_step/mineralogy/rock_salt_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:rock_salt"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_rock_salt_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:rock_salt"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_rock_salt_horizontal_step"
+      }
+    ]
+  }
 }

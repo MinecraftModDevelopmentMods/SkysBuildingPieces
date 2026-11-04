@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:wool_blue_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:wool_blue_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/wool_blue/corner/corner/skysbuildingpieces/cloth_horizontal_step_05_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/wool_blue/corner/corner/skysbuildingpieces/cloth_horizontal_step_05_8"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_blue_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_blue_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_blue_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_blue_horizontal_step"
+      }
+    ]
+  }
 }

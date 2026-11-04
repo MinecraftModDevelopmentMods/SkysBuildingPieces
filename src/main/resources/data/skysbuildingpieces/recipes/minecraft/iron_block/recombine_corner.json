@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:iron_block_horizontal_step",
+    "id": "skysbuildingpieces:iron_block_horizontal_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:iron_block_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:iron_block_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_horizontal_step"
+      }
+    ]
+  }
 }

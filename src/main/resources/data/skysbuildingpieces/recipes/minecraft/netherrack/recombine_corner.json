@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:netherrack_horizontal_step",
+    "id": "skysbuildingpieces:netherrack_horizontal_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:netherrack_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:netherrack_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_horizontal_step"
+      }
+    ]
+  }
 }

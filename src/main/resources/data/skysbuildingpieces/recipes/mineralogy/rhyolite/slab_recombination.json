@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:rhyolite",
+    "id": "mineralogy:rhyolite",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:rhyolite"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:rhyolite_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:rhyolite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:rhyolite_slab"
+      }
+    ]
+  }
 }

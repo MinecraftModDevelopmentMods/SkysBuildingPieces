@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "mineralogy:hornfels"
-            ]
+            "items": ["mineralogy:hornfels"]
           }
         ]
       }
@@ -20,28 +18,26 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/hornfels/horizontal_step/rock_step/mineralogy/hornfels_0"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/hornfels/horizontal_step/rock_step/mineralogy/hornfels_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:hornfels"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_hornfels_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:hornfels"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_hornfels_horizontal_step"
+      }
+    ]
+  }
 }

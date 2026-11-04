@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:light_gray_terracotta"
-            ]
+            "items": ["minecraft:light_gray_terracotta"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_silver/wall/wall/minecraft/stained_hardened_clay_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_silver/wall/wall/minecraft/stained_hardened_clay_8"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_silver_wall"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_silver_wall"
+  }
 }

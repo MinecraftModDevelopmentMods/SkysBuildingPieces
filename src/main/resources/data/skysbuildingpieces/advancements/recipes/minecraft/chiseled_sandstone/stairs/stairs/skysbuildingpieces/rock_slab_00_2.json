@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:chiseled_sandstone_slab"
-            ]
+            "items": ["skysbuildingpieces:chiseled_sandstone_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/chiseled_sandstone/stairs/stairs/skysbuildingpieces/rock_slab_00_2"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/chiseled_sandstone/stairs/stairs/skysbuildingpieces/rock_slab_00_2"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_stairs"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_stairs"
+      }
+    ]
+  }
 }

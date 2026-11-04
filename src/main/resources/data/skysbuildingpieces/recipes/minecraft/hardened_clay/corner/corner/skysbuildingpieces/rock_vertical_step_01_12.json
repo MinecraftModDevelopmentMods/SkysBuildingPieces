@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:hardened_clay_corner",
+    "id": "skysbuildingpieces:hardened_clay_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_vertical_step"
+      }
+    ]
+  }
 }

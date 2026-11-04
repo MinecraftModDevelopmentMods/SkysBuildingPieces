@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.AABB;
@@ -272,7 +272,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
             return full.getDestroyProgress(player, world, position) * fullHardness / hardness;
         }
         int divisor = full.canHarvestBlock(world, position, player) ? 30 : 100;
-        return player.getDigSpeed(full, position) / hardness / divisor;
+        return player.getDestroySpeed(full, position) / hardness / divisor;
     }
 
     @Override
@@ -578,13 +578,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter world, BlockPos position, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos position, BlockState state) {
         return palette.shape == Shape.VERTICAL_SLAB ? Pieces.slabDrop(definition(state).id, state)
                 : Pieces.stack(Pieces.state(definition(state).id, palette.shape, orientation(state)), 1);
     }
 
     @Override
-    public boolean canPlaceLiquid(BlockGetter world, BlockPos position, BlockState state,
+    public boolean canPlaceLiquid(Player player, BlockGetter world, BlockPos position, BlockState state,
             net.minecraft.world.level.material.Fluid fluid) {
         // Keep an already filled piece from accepting another bucket action.
         return fluid == Fluids.WATER && !state.getValue(SlabBlock.WATERLOGGED);
@@ -636,10 +636,11 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos position, Player player, InteractionHand hand,
-            BlockHitResult hit) {
-        return PathPieces.activate(world, position, player, player.getItemInHand(hand), hit.getDirection(), hand)
-                ? InteractionResult.SUCCESS : InteractionResult.PASS;
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos position,
+            Player player, InteractionHand hand, BlockHitResult hit) {
+        return PathPieces.activate(world, position, player, stack, hit.getDirection(), hand)
+                ? ItemInteractionResult.sidedSuccess(world.isClientSide)
+                : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
@@ -655,18 +656,18 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public boolean isValidBonemealTarget(net.minecraft.world.level.LevelReader world, BlockPos position, BlockState state, boolean client) {
+    public boolean isValidBonemealTarget(net.minecraft.world.level.LevelReader world, BlockPos position, BlockState state) {
         return GrassLifecycle.grass(state) && completeTop(state) && !state.getValue(SlabBlock.WATERLOGGED);
     }
 
     @Override
     public boolean isBonemealSuccess(Level world, RandomSource random, BlockPos position, BlockState state) {
-        return isValidBonemealTarget(world, position, state, world.isClientSide);
+        return isValidBonemealTarget(world, position, state);
     }
 
     @Override
     public void performBonemeal(ServerLevel world, RandomSource random, BlockPos position, BlockState state) {
-        if (isValidBonemealTarget(world, position, state, world.isClientSide)) {
+        if (isValidBonemealTarget(world, position, state)) {
             ((BonemealableBlock) Blocks.GRASS_BLOCK).performBonemeal(world, random, position, Blocks.GRASS_BLOCK.defaultBlockState());
         }
     }

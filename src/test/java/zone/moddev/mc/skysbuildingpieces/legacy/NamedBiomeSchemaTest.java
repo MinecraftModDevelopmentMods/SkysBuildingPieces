@@ -53,7 +53,7 @@ class NamedBiomeSchemaTest {
         byte[] bytes = Files.readAllBytes(fixture);
         assertEquals("FBDF087B300AE3F9DAA6D55D46049E49051EBD931C52FCDF3734BEA234FDB4F5",
                 java.util.HexFormat.of().withUpperCase().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)));
-        CompoundTag source = NbtIo.readCompressed(fixture.toFile());
+        CompoundTag source = NbtIo.readCompressed(fixture, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
         int[] cells = source.getCompound("Level").getIntArray("Biomes");
         assertEquals(1024, cells.length);
         for (int cell = 0; cell < cells.length; cell++) {
@@ -64,7 +64,8 @@ class NamedBiomeSchemaTest {
         }
         source.getCompound("Level").putIntArray("Biomes", cells);
         CompoundTag original = source.copy();
-        try (ChunkStorage storage = new ChunkStorage(temporary, DataFixers.getDataFixer(), false)) {
+        try (ChunkStorage storage = new ChunkStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
+                temporary, DataFixers.getDataFixer(), false)) {
             CompoundTag control = storage.upgradeChunkTag(Level.OVERWORLD, () -> null,
                     source.copy(), Optional.empty());
             CompoundTag prepared = source.copy();

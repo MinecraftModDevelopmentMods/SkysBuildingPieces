@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_glass_yellow_corner",
+    "id": "skysbuildingpieces:stained_glass_yellow_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_yellow_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_yellow_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_yellow_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_yellow_horizontal_step"
+      }
+    ]
+  }
 }

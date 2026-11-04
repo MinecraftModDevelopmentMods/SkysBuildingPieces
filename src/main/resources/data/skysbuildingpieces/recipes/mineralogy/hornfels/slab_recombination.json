@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:hornfels",
+    "id": "mineralogy:hornfels",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:hornfels"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:hornfels_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:hornfels"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:hornfels_slab"
+      }
+    ]
+  }
 }

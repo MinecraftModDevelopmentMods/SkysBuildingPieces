@@ -3,6 +3,7 @@ package zone.moddev.mc.skysbuildingpieces;
 import java.lang.reflect.Field;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 public final class MinecraftTestBootstrap {
     private static boolean initialized;
@@ -24,12 +25,11 @@ public final class MinecraftTestBootstrap {
     public static synchronized void registerVanilla() {
         if (initialized) return;
         try {
-            Class<?> loader = Class.forName("net.minecraftforge.fml.loading.FMLLoader");
-            Class<?> versionInfo = Class.forName("net.minecraftforge.fml.loading.VersionInfo");
-            Object forgeVersion = versionInfo
-                    .getConstructor(String.class, String.class, String.class, String.class)
-                    .newInstance("47.4.10", "1.20.1", "20230612.114412", "net.minecraftforge");
-            set(loader, "versionInfo", forgeVersion);
+            var versions = FMLLoader.versionInfo();
+            if (!versions.forgeVersion().equals("50.2.0") || !versions.mcVersion().equals("1.20.6")
+                    || !versions.mcpVersion().equals("20240429.135109")) {
+                throw new IllegalStateException("Wrong Forge or Minecraft version for the focused tests");
+            }
             SharedConstants.tryDetectVersion();
             // Plain JUnit has no ModLauncher event transformation. Build the
             // registries here; real Forge launches cover the networking bootstrap.
@@ -48,7 +48,7 @@ public final class MinecraftTestBootstrap {
                     net.minecraftforge.registries.ForgeRegistries.ITEMS).unfreeze();
             initialized = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to initialize the Forge 45 test runtime",
+            throw new IllegalStateException("Unable to initialize the Forge 50 test runtime",
                     exception);
         }
     }

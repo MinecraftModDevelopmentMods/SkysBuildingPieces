@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:andesite_smooth_horizontal_step",
+    "id": "skysbuildingpieces:andesite_smooth_horizontal_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:andesite_smooth_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:andesite_smooth_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:andesite_smooth_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:andesite_smooth_horizontal_step"
+      }
+    ]
+  }
 }

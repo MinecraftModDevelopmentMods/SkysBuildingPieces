@@ -64,7 +64,7 @@ public final class PathPieces {
         world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1, 1);
 
         if (!player.getAbilities().instabuild) {
-            shovel.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
+            shovel.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
         }
 
         return true;

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:gold_block_corner"
-            ]
+            "items": ["skysbuildingpieces:gold_block_corner"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/gold_block/recombine_corner"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/gold_block/recombine_corner"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:gold_block_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:gold_block_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:gold_block_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:gold_block_horizontal_step"
+      }
+    ]
+  }
 }

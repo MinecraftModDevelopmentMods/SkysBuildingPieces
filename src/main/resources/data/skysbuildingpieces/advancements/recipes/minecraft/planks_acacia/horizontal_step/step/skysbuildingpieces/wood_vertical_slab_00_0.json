@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:planks_acacia_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:planks_acacia_vertical_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/planks_acacia/horizontal_step/step/skysbuildingpieces/wood_vertical_slab_00_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/planks_acacia/horizontal_step/step/skysbuildingpieces/wood_vertical_slab_00_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_acacia_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_acacia_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_acacia_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_acacia_vertical_slab"
+      }
+    ]
+  }
 }

@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:prismarine_dark_corner",
+    "id": "skysbuildingpieces:prismarine_dark_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_dark_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
+      }
+    ]
+  }
 }

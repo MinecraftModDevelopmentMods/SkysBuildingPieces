@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:mossy_stone_brick_slab",
+    "id": "minecraft:mossy_stone_brick_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_mossy_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stonebrick_mossy_horizontal_step"
+  }
 }

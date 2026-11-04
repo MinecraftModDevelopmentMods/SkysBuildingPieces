@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:wool_pink_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:wool_pink_vertical_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/wool_pink/slab/rotate/skysbuildingpieces/cloth_vertical_slab_01_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/wool_pink/slab/rotate/skysbuildingpieces/cloth_vertical_slab_01_8"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_pink_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_pink_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_pink_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_pink_vertical_slab"
+      }
+    ]
+  }
 }

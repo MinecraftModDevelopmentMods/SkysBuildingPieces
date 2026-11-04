@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:planks_jungle_horizontal_step",
+    "id": "skysbuildingpieces:planks_jungle_horizontal_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_jungle_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_jungle_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_jungle_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_jungle_horizontal_step"
+      }
+    ]
+  }
 }

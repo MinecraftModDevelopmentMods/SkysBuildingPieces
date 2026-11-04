@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "mineralogy:hornfels_slab"
-            ]
+            "items": ["mineralogy:hornfels_slab"]
           }
         ]
       }
@@ -20,28 +18,26 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/hornfels/slab_recombination"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/hornfels/slab_recombination"]
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:hornfels"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:hornfels_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:hornfels"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:hornfels_slab"
+      }
+    ]
+  }
 }

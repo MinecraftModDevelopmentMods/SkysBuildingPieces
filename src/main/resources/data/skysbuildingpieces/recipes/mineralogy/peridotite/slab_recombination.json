@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:peridotite",
+    "id": "mineralogy:peridotite",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:peridotite"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:peridotite_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:peridotite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:peridotite_slab"
+      }
+    ]
+  }
 }

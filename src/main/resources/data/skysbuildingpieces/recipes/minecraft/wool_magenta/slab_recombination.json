@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:magenta_wool",
+    "id": "minecraft:magenta_wool",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_magenta_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_magenta_slab"
+  }
 }

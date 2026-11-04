@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:hardened_clay_slab",
+    "id": "skysbuildingpieces:hardened_clay_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_vertical_slab"
+      }
+    ]
+  }
 }

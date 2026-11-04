@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.120061
+
+- Bring the building pieces and recipes to Minecraft 1.20.6.
+- Keep custom names and other item data when rotating or recovering pieces.
+- Keep Grass Slabs and Mineralogy optional.
+
 ## 0.3.8.120011
 
 - Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.20.1.

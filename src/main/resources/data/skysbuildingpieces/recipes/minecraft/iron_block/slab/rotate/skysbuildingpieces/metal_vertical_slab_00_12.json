@@ -8,18 +8,21 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:iron_block_slab",
+    "id": "skysbuildingpieces:iron_block_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:iron_block_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:iron_block_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_vertical_slab"
+      }
+    ]
+  }
 }

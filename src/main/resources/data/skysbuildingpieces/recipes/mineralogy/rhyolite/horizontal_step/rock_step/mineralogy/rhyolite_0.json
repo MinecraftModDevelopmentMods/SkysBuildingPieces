@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:mineralogy_rhyolite_horizontal_step",
+    "id": "skysbuildingpieces:mineralogy_rhyolite_horizontal_step",
     "count": 12
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:rhyolite"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_rhyolite_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:rhyolite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_rhyolite_horizontal_step"
+      }
+    ]
+  }
 }

@@ -13,6 +13,7 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     dependsOn tasks.named('classes')
     source fileTree('src/bootstrapTest/java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PersistenceRegistrationChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeProbeItems.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GameplayChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PathChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SharedGrassChecks.java')
@@ -42,12 +43,7 @@ def bootstrapJar = tasks.register('nativeBootstrapProbeJar', Jar) {
     from 'src/bootstrapTest/resources'
 }
 
-def packagedBootstrap = renamer.classes(bootstrapJar) {
-    map.from minecraft.dependency.toSrgFile
-    libraries.from tasks.named('jar', Jar).flatMap { it.archiveFile }
-    libraries.from sourceSets.main.compileClasspath
-    output = layout.buildDirectory.file('native-bootstrap-probe/building-pieces-native-checks-reobf.jar')
-}
+def packagedBootstrap = bootstrapJar
 tasks.register('preparePackagedNativeProbe') { dependsOn packagedBootstrap }
 def bootstrapRunName = providers.gradleProperty('nativeBootstrapRunName')
         .getOrElse('native-bootstrap-test-run')

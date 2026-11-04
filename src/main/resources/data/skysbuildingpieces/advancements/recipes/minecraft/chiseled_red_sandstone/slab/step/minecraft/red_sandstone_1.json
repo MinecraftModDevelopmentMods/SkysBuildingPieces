@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:chiseled_red_sandstone"
-            ]
+            "items": ["minecraft:chiseled_red_sandstone"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/step/minecraft/red_sandstone_1"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/step/minecraft/red_sandstone_1"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
+  }
 }

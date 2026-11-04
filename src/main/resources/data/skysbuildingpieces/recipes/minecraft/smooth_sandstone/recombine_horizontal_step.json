@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:cut_sandstone_slab",
+    "id": "minecraft:cut_sandstone_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+  }
 }

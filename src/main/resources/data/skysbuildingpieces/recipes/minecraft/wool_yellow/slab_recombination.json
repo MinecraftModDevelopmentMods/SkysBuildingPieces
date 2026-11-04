@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:yellow_wool",
+    "id": "minecraft:yellow_wool",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_yellow_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_yellow_slab"
+  }
 }

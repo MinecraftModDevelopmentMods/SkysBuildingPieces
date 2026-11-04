@@ -1,19 +1,19 @@
-name: Sky's Building Pieces 1.20.1 CI
+name: Sky's Building Pieces 1.20.6 CI
 
 on:
   push:
     branches:
-      - master-1.20.1
+      - master-1.20.6
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.20.1
+      - master-1.20.6
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.20.1-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-1.20.6-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,21 +38,21 @@ jobs:
           distribution: temurin
           java-version: '8.0.502+7'
 
-      - name: Install pinned Java 17 compilation toolchain
+      - name: Install pinned Java 21 compilation toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '17.0.1+12'
+          java-version: '21.0.7+6.0.LTS'
 
       - name: Pin production Java
         run: |
-          echo "SBP_JAVA17_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "SBP_JAVA21_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
 
-      - name: Install pinned Java 17 Gradle runtime
+      - name: Install pinned Java 21 Gradle runtime
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '17.0.1+12'
+          java-version: '21.0.7+6.0.LTS'
 
       - name: Bootstrap Forge from an empty cache
         shell: bash
@@ -67,7 +67,7 @@ jobs:
           gradle_args=(
             classes test
             --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_17_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -76,13 +76,14 @@ jobs:
       - name: Verify same-cache bootstrap offline
         shell: bash
         env:
+          ORESPAWN_MAVENIZER_OFFLINE: 'true'
           GRADLE_USER_HOME: ${{ runner.temp }}/skysbuildingpieces-cold-gradle
         run: |
           set -euo pipefail
           gradle_args=(
             classes test
             --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_17_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -113,6 +114,12 @@ jobs:
           distribution: temurin
           java-version: '25.0.3+9.0.LTS'
 
+      - name: Install pinned Java 8 Forge launcher toolchain
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '8.0.502+7'
+
       - name: Install target production toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
@@ -129,7 +136,7 @@ jobs:
             echo "${prefix}_JAVA${java_version}_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
           done
 
-      - name: Install Java 17 for Gradle
+      - name: Install Java 21 for Gradle
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -163,32 +170,36 @@ jobs:
           set -euo pipefail
           dependency="$GITHUB_WORKSPACE/.gradle/qualification-sources/grass-slabs"
           chmod +x "$dependency/gradlew"
-          "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace
+          "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
           version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
           echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
-          echo "ORG_GRADLE_PROJECT_grassSlabsDeobfJar=$dependency/build/libs-dev/SkysGrassSlabs-$version-deobf.jar" >> "$GITHUB_ENV"
 
       - name: Build, test, and audit release artifacts
         run: >-
           ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
           verifyEclipseProductionClasspath --no-daemon --stacktrace
-          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_17_X64,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
           -Dorg.gradle.java.installations.auto-detect=false
           -Dorg.gradle.java.installations.auto-download=false
 
       - name: Replay artifact checks offline
-        run: ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
+        env:
+          ORESPAWN_MAVENIZER_OFFLINE: 'true'
+        run: >-
+          ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.20.1-${{ github.sha }}
+          name: SkysBuildingPieces-1.20.6-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.8.120011.jar
-            build/libs/SkysBuildingPieces-0.3.8.120011-sources.jar
-            build/libs/SkysBuildingPieces-0.3.8.120011-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.8.120061.jar
+            build/libs/SkysBuildingPieces-0.3.8.120061-sources.jar
+            build/libs/SkysBuildingPieces-0.3.8.120061-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -196,7 +207,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.20.1-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-1.20.6-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

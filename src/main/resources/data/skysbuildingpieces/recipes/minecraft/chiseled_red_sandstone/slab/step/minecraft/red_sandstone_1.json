@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:chiseled_red_sandstone_slab",
+    "id": "skysbuildingpieces:chiseled_red_sandstone_slab",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
+  }
 }

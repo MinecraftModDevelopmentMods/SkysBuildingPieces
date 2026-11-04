@@ -5,7 +5,7 @@ import java.nio.file.Files
 def runtimeLock = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { runtimeLock.load(it) }
 def runtimeSources = ['mineralogy', 'orespawn'].collectEntries { mod ->
-    File siblingJar = file(runtimeLock.getProperty(mod + '.development.path'))
+    File siblingJar = file(runtimeLock.getProperty(mod + '.path'))
     File retainedJar = file('.gradle/qualification-dependencies/' + siblingJar.name)
     // Sibling builds can change during other work. A retained copy still has to
     // pass the same checksum check before it can enter a development profile.
@@ -18,21 +18,17 @@ def gameDirectory = layout.projectDirectory.dir(
 
 def configureVerification = project.ext.configureMineralogyVerificationRun
 
-// Exact mapped reference jars already carry the target's native access rules.
-// Leave their matching production artifacts unchanged for packaged checks.
+// Forge 50 uses the same official names in development and in the game.
 ext.nativeOptionalDevelopmentJars = runtimeSources
 ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
     group = 'verification'
-    dependsOn project.ext.prepareOfficialMineralogyDevelopment
     doLast {
-        ['mineralogy', 'orespawn'].each { mod ->
-            [[file(runtimeLock.getProperty(mod + '.path')), runtimeLock.getProperty(mod + '.sha256')],
-             [runtimeSources[mod], runtimeLock.getProperty(mod + '.development.sha256')]].each { pair ->
-                File source = pair[0]
-                if (!source.isFile()) throw new GradleException('Missing optional reference jar: ' + source)
-                String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
-                        .encodeHex().toString().toUpperCase(Locale.ROOT)
-                if (actual != pair[1]) throw new GradleException('Optional reference hash changed: ' + source.name)
+        runtimeSources.each { mod, source ->
+            if (!source.isFile()) throw new GradleException('Missing optional reference jar: ' + source)
+            String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
+                    .encodeHex().toString().toUpperCase(Locale.ROOT)
+            if (actual != runtimeLock.getProperty(mod + '.sha256')) {
+                throw new GradleException('Optional reference hash changed: ' + source.name)
             }
         }
     }
@@ -46,7 +42,7 @@ def installRuntimeMods = {
         if (!source.isFile()) {
             throw new GradleException("Missing optional ${mod} jar: ${source}. Set -P${mod}RuntimeJar=<jar>.")
         }
-        String expected = runtimeLock.getProperty(mod + '.development.sha256')
+        String expected = runtimeLock.getProperty(mod + '.sha256')
         String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
                 .encodeHex().toString()
         if (!(expected ==~ /(?i)[a-f0-9]{64}/) || !actual.equalsIgnoreCase(expected)) {
@@ -82,10 +78,6 @@ def prepareMineralogyDevelopmentRun = tasks.register('prepareMineralogyDevelopme
 
 def prepareAvailableMineralogyDevelopmentRun = tasks.register('prepareAvailableMineralogyDevelopmentRun') {
     group = 'ide'
-    dependsOn {
-        file(runtimeLock.getProperty('mineralogy.path')).isFile()
-                ? [project.ext.prepareOfficialMineralogyDevelopment] : []
-    }
     description = 'Prepares the Eclipse profile when the optional development jars are available.'
     onlyIf {
         boolean available = runtimeSources.values().every { it.isFile() }

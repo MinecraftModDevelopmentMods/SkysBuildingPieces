@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:prismarine_bricks_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:prismarine_bricks_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/prismarine_bricks/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_06_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/prismarine_bricks/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_06_8"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_bricks_horizontal_step"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_bricks_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_vertical_step"
+      }
+    ]
+  }
 }

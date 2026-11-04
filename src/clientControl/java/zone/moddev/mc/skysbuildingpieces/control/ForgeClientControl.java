@@ -44,7 +44,7 @@ public final class ForgeClientControl {
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions);
+                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.screen);
         } else if (client.player != null && client.level != null && ++joinedTicks >= 40) {
             if (net.minecraftforge.fml.ModList.get().isLoaded("skysbuildingpieces")
                     || net.minecraftforge.fml.ModList.get().isLoaded("skysgrassslabs")) {

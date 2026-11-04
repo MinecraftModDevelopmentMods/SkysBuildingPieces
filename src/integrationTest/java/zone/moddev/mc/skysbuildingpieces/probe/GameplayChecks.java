@@ -25,7 +25,6 @@ import net.minecraft.core.*;
 import net.minecraft.resources.*;
 import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
@@ -55,7 +54,7 @@ public final class GameplayChecks {
     }
 
     public static void run(ServerLevel world) {
-        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = NativeProbeItems.player(world);
 
         player.getAbilities().instabuild = false;
 
@@ -218,7 +217,7 @@ public final class GameplayChecks {
                 BlockState grass = Pieces.state("minecraft:grass", shape, orientation);
 
                 world.setBlock(position, grass, 2);
-                grass.getBlock().tick(grass, world, position, net.minecraft.util.RandomSource.create(0));
+                grass.tick(world, position, net.minecraft.util.RandomSource.create(0));
                 require(world.getBlockState(position).equals(Pieces.state("minecraft:dirt", shape, orientation)),
                         "covered grass decay preserves geometry: " + shape + " / " + orientation + " became "
                                 + world.getBlockState(position));
@@ -534,7 +533,7 @@ public final class GameplayChecks {
                                 "material drop and metadata");
                     }
                     if (materialDefinition.soil()) {
-                        for (Block plant : new Block[] { Blocks.GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
+                        for (Block plant : new Block[] { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
                             BlockState full = Pieces.nativeState(materialDefinition, "full");
                             boolean nativeSupport = full.getBlock().canSustainPlant(full, world, position, Direction.UP,
                                     (net.minecraftforge.common.IPlantable) plant);
@@ -629,12 +628,16 @@ public final class GameplayChecks {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(veto);
 
         try {
-            require(use(oak, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .1f, 1,
-                    .5f) != InteractionResult.SUCCESS && veto.seen && world.isEmptyBlock(position) && oak.getCount() == 2,
+            InteractionResult result = use(oak, player, world, position.below(), InteractionHand.MAIN_HAND,
+                    Direction.UP, .1f, 1, .5f);
+            // Forge 50 restores the hand with a copy of the original stack.
+            require(result == InteractionResult.FAIL && veto.seen && world.isEmptyBlock(position)
+                            && ItemStack.matches(player.getMainHandItem(), new ItemStack(Blocks.OAK_SLAB, 2)),
                     "Forge placement protection rolls back the exact native slab placement");
         } finally {
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);
         }
+        oak = player.getMainHandItem();
 
         clearAround(world, position);
         world.setBlock(position, Blocks.OAK_TRAPDOOR.defaultBlockState(), 2);
@@ -689,7 +692,7 @@ public final class GameplayChecks {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 
                     tag.putString("custom_label", "Preserved slab");
-                    stack.setTag(tag);
+                    zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, tag);
                     player.setItemInHand(hand, stack);
                     InteractionResult placement = use(stack, player, world, anchor, hand, face, hitX,
                             face == Direction.UP ? 1 : 0, hitZ);
@@ -698,7 +701,7 @@ public final class GameplayChecks {
                     require(world.getBlockState(position)
                             .equals(Pieces.state(material.id, slabShape(occupied), slabOrientation(occupied))),
                             "native slab selects six orientations " + material.id);
-                    require(stack.getCount() == 2 && tag.equals(stack.getTag()),
+                    require(stack.getCount() == 2 && tag.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack)),
                             "native hook consumes once and preserves NBT");
                     require(use(stack, player, world, position, hand, occupied.getOpposite(), .5f, .5f,
                             .5f).consumesAction(),

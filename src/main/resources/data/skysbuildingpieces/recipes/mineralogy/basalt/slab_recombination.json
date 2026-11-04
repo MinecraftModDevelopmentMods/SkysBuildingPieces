@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:basalt",
+    "id": "mineralogy:basalt",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:basalt"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:basalt_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:basalt"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:basalt_slab"
+      }
+    ]
+  }
 }

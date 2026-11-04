@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:blue_terracotta"
-            ]
+            "items": ["minecraft:blue_terracotta"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_blue/wall/wall/minecraft/stained_hardened_clay_11"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_blue/wall/wall/minecraft/stained_hardened_clay_11"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_blue_wall"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_blue_wall"
+  }
 }

@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_blue_slab",
+    "id": "skysbuildingpieces:wool_blue_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_blue_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_blue_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_blue_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_blue_vertical_step"
+      }
+    ]
+  }
 }

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:lapis_block_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:lapis_block_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/lapis_block/corner/corner/skysbuildingpieces/rock_horizontal_step_04_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/lapis_block/corner/corner/skysbuildingpieces/rock_horizontal_step_04_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:lapis_block_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:lapis_block_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:lapis_block_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:lapis_block_horizontal_step"
+      }
+    ]
+  }
 }

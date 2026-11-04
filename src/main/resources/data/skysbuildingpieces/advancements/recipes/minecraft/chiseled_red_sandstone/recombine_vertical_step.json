@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:chiseled_red_sandstone_vertical_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/chiseled_red_sandstone/recombine_vertical_step"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/chiseled_red_sandstone/recombine_vertical_step"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
+      }
+    ]
+  }
 }

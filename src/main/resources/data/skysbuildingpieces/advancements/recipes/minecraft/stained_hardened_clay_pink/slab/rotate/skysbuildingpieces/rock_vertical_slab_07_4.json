@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_hardened_clay_pink_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:stained_hardened_clay_pink_vertical_slab"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_pink/slab/rotate/skysbuildingpieces/rock_vertical_slab_07_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_pink/slab/rotate/skysbuildingpieces/rock_vertical_slab_07_4"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_slab"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_pink_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_pink_vertical_slab"
+      }
+    ]
+  }
 }

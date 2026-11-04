@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:packed_ice"
-            ]
+            "items": ["minecraft:packed_ice"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/packed_ice/pane/pane/minecraft/packed_ice_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/packed_ice/pane/pane/minecraft/packed_ice_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_pane"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:packed_ice_pane"
+  }
 }

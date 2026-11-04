@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:phyllite",
+    "id": "mineralogy:phyllite",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:phyllite"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:phyllite_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:phyllite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:phyllite_slab"
+      }
+    ]
+  }
 }

@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:granite_slab",
+    "id": "minecraft:granite_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:granite_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:granite_vertical_step"
+  }
 }

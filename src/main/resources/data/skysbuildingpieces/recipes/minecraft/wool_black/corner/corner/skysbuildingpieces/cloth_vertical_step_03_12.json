@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_black_corner",
+    "id": "skysbuildingpieces:wool_black_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_black_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_black_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_black_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_black_vertical_step"
+      }
+    ]
+  }
 }

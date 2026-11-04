@@ -37,6 +37,11 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
 public final class RuntimeBootstrap {
     private MinecraftServer pendingServer;
     private int startupTicks;
+    private DeferredAudit deferredAudit;
+
+    private record DeferredAudit(MinecraftServer server, RecipeChecks.Audit recipeAudit,
+            RecombinationChecks.Audit recombinationAudit, int recipes, int stacks, long resumeAt) {
+    }
 
     public RuntimeBootstrap() {
         PathChecks.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus(),
@@ -62,7 +67,19 @@ public final class RuntimeBootstrap {
     }
 
     private void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event) {
-        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || pendingServer == null) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) {
+            return;
+        }
+        if (deferredAudit != null) {
+            if (System.nanoTime() < deferredAudit.resumeAt()) {
+                return;
+            }
+            DeferredAudit next = deferredAudit;
+            deferredAudit = null;
+            audit(next.server(), next);
+            return;
+        }
+        if (pendingServer == null) {
             return;
         }
         if (++startupTicks < 20) {
@@ -82,10 +99,10 @@ public final class RuntimeBootstrap {
         pendingServer = null;
         // Entity storage is asynchronous in 1.17. Run after normal server ticks
         // make the fixture visible, keeping every collision assertion intact.
-        audit(server);
+        audit(server, null);
     }
 
-    private void audit(MinecraftServer server) {
+    private void audit(MinecraftServer server, DeferredAudit pending) {
         ServerLevel world = server.getLevel(Level.OVERWORLD);
         String phase = System.getProperty("skysbuildingpieces.bootstrapPhase", "");
         File root = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile();
@@ -106,25 +123,42 @@ public final class RuntimeBootstrap {
                 zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
+            } else if (phase.startsWith("client")) {
+                // The dedicated server exercises crafting and migration exhaustively.
+                // Here a real client must load, render and reopen the native piece states.
+                PresentationChecks.connectedGlass(world);
+                clientGrid(world, phase.endsWith("reload"));
+                ClientStatus.complete = true;
+                return;
             } else {
-                recipes = RecipeChecks.run(world);
-                stacks = legacyStacks();
-                rawPlayer();
-                NativeLegacyChecks.run(world);
-                GameplayChecks.run(world);
-                WaterloggingChecks.run(world);
-                PathChecks.run(world);
-                SharedGrassChecks.run(world);
-                MineralogyChecks.run();
-                RecombinationChecks.run(world);
-                PresentationChecks.run(world);
-
-                if (phase.startsWith("client")) {
-                    PresentationChecks.connectedGlass(world);
-                    clientGrid(world, phase.endsWith("reload"));
-                    ClientStatus.complete = true;
+                if (pending == null || pending.recombinationAudit() == null) {
+                    RecipeChecks.Audit current = pending == null
+                            ? new RecipeChecks.Audit(world) : pending.recipeAudit();
+                    if (!current.advance(24)) {
+                        defer(server, current, null, 0, 0);
+                        return;
+                    }
+                    recipes = current.finish();
+                    stacks = legacyStacks();
+                    rawPlayer();
+                    NativeLegacyChecks.run(world);
+                    GameplayChecks.run(world);
+                    WaterloggingChecks.run(world);
+                    PathChecks.run(world);
+                    SharedGrassChecks.run(world);
+                    MineralogyChecks.run();
+                    defer(server, null, new RecombinationChecks.Audit(world), recipes, stacks);
                     return;
                 }
+                recipes = pending.recipes();
+                stacks = pending.stacks();
+                RecombinationChecks.Audit combinations = pending.recombinationAudit();
+                if (!combinations.advance(4)) {
+                    defer(server, null, combinations, recipes, stacks);
+                    return;
+                }
+                combinations.finish();
+                PresentationChecks.run(world);
 
                 // This check reloads server resources. Run it on the dedicated
                 // server, away from the integrated client's login handshake.
@@ -168,10 +202,17 @@ public final class RuntimeBootstrap {
         } finally {
             if (phase.startsWith("forward")) {
                 NativeForwardChecks.release(world);
-            } else {
+            } else if (deferredAudit == null) {
                 GameplayChecks.release(world);
             }
         }
+    }
+
+    private void defer(MinecraftServer server, RecipeChecks.Audit recipes, RecombinationChecks.Audit combinations,
+            int recipesChecked, int stacks) {
+        // Let the server catch up between batches while keeping the watchdog active.
+        long resumeAt = System.nanoTime() + java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(75);
+        deferredAudit = new DeferredAudit(server, recipes, combinations, recipesChecked, stacks, resumeAt);
     }
 
     private static void clientGrid(ServerLevel world, boolean reload) throws Exception {
@@ -180,7 +221,7 @@ public final class RuntimeBootstrap {
 
         if (reload) {
             try (FileInputStream input = new FileInputStream(file)) {
-                saved = NbtIo.readCompressed(input);
+                saved = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
             }
         }
 
@@ -261,12 +302,12 @@ public final class RuntimeBootstrap {
                 raw.put("tag", custom);
                 LegacyBridge.prepareStack(raw);
 
-                ItemStack actual = ItemStack.of(raw);
+                ItemStack actual = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(raw);
                 ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 17);
 
                 require(actual.getItem() == expected.getItem() && actual.getCount() == 17,
                         "Legacy material item: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
-                require(actual.hasTag() && actual.getTag().equals(custom) && raw.getByte("Slot") == 4,
+                require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(custom) && raw.getByte("Slot") == 4,
                         "Legacy custom data and inventory slot");
 
                 if (net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem()).getNamespace().equals("minecraft")
@@ -283,9 +324,9 @@ public final class RuntimeBootstrap {
                         }
                         fixed = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), fixed,
                                 intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
-                        ItemStack saved = ItemStack.of(fixed);
+                        ItemStack saved = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(fixed);
                         require(saved.getItem() == expected.getItem() && saved.getCount() == 17
-                                && saved.hasTag() && saved.getTag().equals(custom) && fixed.getByte("Slot") == 4,
+                                && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(saved) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(saved).equals(custom) && fixed.getByte("Slot") == 4,
                                 "Native item fixer changed " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem())
                                         + " intermediate=" + intermediate + ": " + fixed);
                     }
@@ -329,12 +370,12 @@ public final class RuntimeBootstrap {
 
         CompoundTag upgraded = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), source, 1343, 1976);
         CompoundTag saved = upgraded.getList("Inventory", 10).getCompound(0);
-        ItemStack actual = ItemStack.of(saved);
+        ItemStack actual = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(saved);
         ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 23);
 
         require(actual.getItem() == expected.getItem() && actual.getCount() == 23,
                 "The real player data fixer must see the recovered flat item, not the metadata carrier");
-        require(actual.hasTag() && actual.getTag().getString("Keep").equals("Unrelated custom data")
+        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).getString("Keep").equals("Unrelated custom data")
                 && actual.getHoverName().getString().equals("Named legacy piece") && saved.getByte("Slot") == 7,
                 "Player data fixing must preserve the custom name, slot and unrelated data");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RAW_PLAYER_FIXER_PASS");

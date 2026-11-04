@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:mossy_cobblestone_slab"
-            ]
+            "items": ["minecraft:mossy_cobblestone_slab"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/mossy_cobblestone/horizontal_step/step/skysbuildingpieces/rock_slab_00_14"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/mossy_cobblestone/horizontal_step/step/skysbuildingpieces/rock_slab_00_14"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+  }
 }

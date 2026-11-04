@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:acacia_slab",
+    "id": "minecraft:acacia_slab",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:planks_acacia_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:planks_acacia_vertical_step"
+  }
 }

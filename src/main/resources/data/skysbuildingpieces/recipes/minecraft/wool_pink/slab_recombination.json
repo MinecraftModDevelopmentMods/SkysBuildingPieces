@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:pink_wool",
+    "id": "minecraft:pink_wool",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:wool_pink_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_pink_slab"
+  }
 }

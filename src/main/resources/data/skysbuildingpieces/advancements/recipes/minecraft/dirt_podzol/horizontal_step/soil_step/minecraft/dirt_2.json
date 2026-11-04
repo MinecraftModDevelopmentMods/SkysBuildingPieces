@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:podzol"
-            ]
+            "items": ["minecraft:podzol"]
           }
         ]
       }
@@ -20,20 +18,13 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt_podzol/horizontal_step/soil_step/minecraft/dirt_2"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt_podzol/horizontal_step/soil_step/minecraft/dirt_2"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_podzol_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:dirt_podzol_horizontal_step"
+  }
 }

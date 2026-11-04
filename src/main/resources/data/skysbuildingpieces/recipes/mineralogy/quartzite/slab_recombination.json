@@ -8,21 +8,24 @@
     }
   },
   "result": {
-    "item": "mineralogy:quartzite",
+    "id": "mineralogy:quartzite",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:quartzite"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:quartzite_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:quartzite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:quartzite_slab"
+      }
+    ]
+  }
 }

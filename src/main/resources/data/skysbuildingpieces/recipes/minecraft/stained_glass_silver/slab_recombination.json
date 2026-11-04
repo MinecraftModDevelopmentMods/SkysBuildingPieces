@@ -8,13 +8,11 @@
     }
   },
   "result": {
-    "item": "minecraft:light_gray_stained_glass",
+    "id": "minecraft:light_gray_stained_glass",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_silver_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_glass_silver_slab"
+  }
 }

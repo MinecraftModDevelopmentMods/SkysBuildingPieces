@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:glass_step",
+    "id": "skysbuildingpieces:glass_step",
     "count": 1
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:glass_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:glass_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:glass_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:glass_step"
+      }
+    ]
+  }
 }

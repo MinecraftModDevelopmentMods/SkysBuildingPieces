@@ -8,17 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:dirt_podzol_corner",
+    "id": "skysbuildingpieces:dirt_podzol_corner",
     "count": 4
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_podzol_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:dirt_podzol_vertical_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_vertical_step"
+      }
+    ]
+  }
 }

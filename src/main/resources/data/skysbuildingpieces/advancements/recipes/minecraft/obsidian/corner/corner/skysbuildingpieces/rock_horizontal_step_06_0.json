@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:obsidian_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:obsidian_horizontal_step"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/obsidian/corner/corner/skysbuildingpieces/rock_horizontal_step_06_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/obsidian/corner/corner/skysbuildingpieces/rock_horizontal_step_06_0"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:obsidian_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:obsidian_horizontal_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:obsidian_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:obsidian_horizontal_step"
+      }
+    ]
+  }
 }

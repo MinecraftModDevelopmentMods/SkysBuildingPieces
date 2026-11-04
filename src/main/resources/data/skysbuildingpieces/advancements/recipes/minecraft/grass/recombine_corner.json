@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:grass_corner"
-            ]
+            "items": ["skysbuildingpieces:grass_corner"]
           }
         ]
       }
@@ -20,24 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/grass/recombine_corner"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/grass/recombine_corner"]
   },
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:grass_corner"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:grass_step"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:grass_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:grass_step"
+      }
+    ]
+  }
 }

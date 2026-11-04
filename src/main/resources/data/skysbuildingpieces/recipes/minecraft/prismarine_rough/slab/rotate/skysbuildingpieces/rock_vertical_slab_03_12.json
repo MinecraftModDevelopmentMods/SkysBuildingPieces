@@ -8,14 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:prismarine_slab",
+    "id": "minecraft:prismarine_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
-    {
-      "type": "forge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
+  }
 }

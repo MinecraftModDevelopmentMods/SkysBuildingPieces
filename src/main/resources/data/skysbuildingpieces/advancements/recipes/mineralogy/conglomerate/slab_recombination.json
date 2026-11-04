@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "mineralogy:conglomerate_slab"
-            ]
+            "items": ["mineralogy:conglomerate_slab"]
           }
         ]
       }
@@ -20,28 +18,26 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/conglomerate/slab_recombination"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/conglomerate/slab_recombination"]
   },
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:conglomerate"
-    },
-    {
-      "type": "forge:item_exists",
-      "item": "mineralogy:conglomerate_slab"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:conglomerate"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:conglomerate_slab"
+      }
+    ]
+  }
 }
