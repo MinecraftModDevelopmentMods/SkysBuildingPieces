@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/marble",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:marble_slab"
-    }
+    "X": "mineralogy:marble_slab"
   },
   "result": {
     "id": "mineralogy:marble",

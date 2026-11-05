@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/tuff",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:tuff_slab"
-    }
+    "X": "mineralogy:tuff_slab"
   },
   "result": {
     "id": "mineralogy:tuff",

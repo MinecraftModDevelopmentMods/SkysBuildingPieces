@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/conglomerate",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:conglomerate_slab"
-    }
+    "X": "mineralogy:conglomerate_slab"
   },
   "result": {
     "id": "mineralogy:conglomerate",

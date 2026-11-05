@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:prismarine_rough_horizontal_step"
-    }
+    "X": "skysbuildingpieces:prismarine_rough_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_rough_vertical_step",

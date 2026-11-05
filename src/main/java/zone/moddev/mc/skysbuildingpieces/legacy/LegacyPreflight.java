@@ -82,33 +82,33 @@ final class LegacyPreflight {
                                 root = NbtIo.read(input);
                             }
 
-                            CompoundTag level = root.getCompound("Level");
+                            CompoundTag level = root.getCompoundOrEmpty("Level");
 
                             HistoricalBiomes.validate(root);
 
                             {
                                 Map<Integer, CompoundTag> tiles = new HashMap<Integer, CompoundTag>();
-                                ListTag tileList = level.getList("TileEntities", 10);
+                                ListTag tileList = level.getListOrEmpty("TileEntities");
 
                                 for (int tileIndex = 0; tileIndex < tileList.size(); tileIndex++) {
-                                    CompoundTag compoundTag = tileList.getCompound(tileIndex);
+                                    CompoundTag compoundTag = tileList.getCompoundOrEmpty(tileIndex);
 
-                                    tiles.put((compoundTag.getInt("x") & 15) | ((compoundTag.getInt("z") & 15) << 4)
-                                            | (compoundTag.getInt("y") << 8), compoundTag);
+                                    tiles.put((compoundTag.getIntOr("x", 0) & 15) | ((compoundTag.getIntOr("z", 0) & 15) << 4)
+                                            | (compoundTag.getIntOr("y", 0) << 8), compoundTag);
                                 }
 
-                                ListTag sections = level.getList("Sections", 10);
+                                ListTag sections = level.getListOrEmpty("Sections");
 
                                 for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-                                    CompoundTag section = sections.getCompound(sectionIndex);
+                                    CompoundTag section = sections.getCompoundOrEmpty(sectionIndex);
 
-                                    if (!section.contains("Blocks", 7)) {
+                                    if (!section.getByteArray("Blocks").isPresent()) {
                                         continue; // Named 1.13+ states do not use the numeric bridge.
                                     }
 
-                                    byte[] blockIdLowBytes = section.getByteArray("Blocks");
-                                    byte[] blockIdHighNibbles = section.getByteArray("Add");
-                                    byte[] meta = section.getByteArray("Data");
+                                    byte[] blockIdLowBytes = section.getByteArray("Blocks").orElseGet(() -> new byte[0]);
+                                    byte[] blockIdHighNibbles = section.getByteArray("Add").orElseGet(() -> new byte[0]);
+                                    byte[] meta = section.getByteArray("Data").orElseGet(() -> new byte[0]);
 
                                     if (blockIdLowBytes.length != 4096 || meta.length != 2048
                                             || blockIdHighNibbles.length != 0 && blockIdHighNibbles.length != 2048) {
@@ -124,7 +124,7 @@ final class LegacyPreflight {
 
                                         String name = registryIds.get(blockId);
                                         CompoundTag tile = tiles.get((blockIndex & 255)
-                                                | (((section.getByte("Y") & 255) * 16 + (blockIndex >> 8)) << 8));
+                                                | (((section.getByteOr("Y", (byte) 0) & 255) * 16 + (blockIndex >> 8)) << 8));
 
                                         zone.moddev.mc.skysbuildingpieces.content.PieceBlock palette = LegacyBridge
                                                 .palette(name);
@@ -151,15 +151,15 @@ final class LegacyPreflight {
                                         }
 
                                         String material = LegacyMapping
-                                                .material(tile == null ? "" : tile.getString("material"));
+                                                .material(tile == null ? "" : tile.getStringOr("material", ""));
                                         Shape shape = LegacyMapping.shape(name, LegacyBridge.nibble(meta, blockIndex));
 
                                         if (!LegacyMapping.allowedMaterial(material, shape)
                                                 || Pieces.state(material, shape, LegacyMapping.orientation(shape,
                                                         LegacyBridge.nibble(meta, blockIndex))) == null) {
                                             throw blocked(name + " / " + material + " / " + shape + " in "
-                                                    + file.getName() + " chunk " + level.getInt("xPos") + ", "
-                                                    + level.getInt("zPos"));
+                                                    + file.getName() + " chunk " + level.getIntOr("xPos", 0) + ", "
+                                                    + level.getIntOr("zPos", 0));
                                         }
                                     }
                                 }
@@ -198,19 +198,19 @@ final class LegacyPreflight {
     private static void inspectStacks(Tag value) {
         if (value instanceof CompoundTag) {
             CompoundTag compoundTag = (CompoundTag) value;
-            String registryId = compoundTag.getString("id");
+            String registryId = compoundTag.getStringOr("id", "");
 
             if (HistoricalItems.isStack(compoundTag)) {
-                HistoricalFullBlocks.resolve(registryId, compoundTag.getShort("Damage"));
+                HistoricalFullBlocks.resolve(registryId, compoundTag.getShortOr("Damage", (short) 0));
 
                 zone.moddev.mc.skysbuildingpieces.content.PieceBlock palette = LegacyBridge.palette(registryId);
 
                 if (palette != null) {
-                    palette.palette.material(compoundTag.getShort("Damage"));
+                    palette.palette.material(compoundTag.getShortOr("Damage", (short) 0));
                 }
                 if (skyOwned(registryId) && palette == null && !HistoricalFullBlocks.historical(registryId)
                         && !net.minecraftforge.registries.ForgeRegistries.ITEMS
-                                .containsKey(net.minecraft.resources.ResourceLocation.parse(registryId))) {
+                                .containsKey(net.minecraft.resources.Identifier.parse(registryId))) {
                     throw blocked(registryId + " item; restore its Sky add-on and dependencies");
                 }
                 if (!net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")
@@ -220,7 +220,7 @@ final class LegacyPreflight {
                 }
             }
             if (HistoricalItems.isStack(compoundTag) && LegacyBridge.active() && LegacyMapping.owned(registryId)) {
-                String material = LegacyMapping.material(HistoricalItems.customData(compoundTag).getString("material"));
+                String material = LegacyMapping.material(HistoricalItems.customData(compoundTag).getStringOr("material", ""));
                 Shape shape = LegacyMapping.shape(registryId, 0);
 
                 if (!LegacyMapping.allowedMaterial(material, shape)
@@ -228,7 +228,7 @@ final class LegacyPreflight {
                     throw blocked(registryId + " / " + material + " / " + shape + " item");
                 }
             }
-            for (String key : compoundTag.getAllKeys()) {
+            for (String key : compoundTag.keySet()) {
                 if (!key.equals("retained_tiles")) {
                     inspectStacks(compoundTag.get(key));
                 }

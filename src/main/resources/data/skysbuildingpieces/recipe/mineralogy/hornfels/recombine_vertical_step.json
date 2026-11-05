@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/hornfels",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_hornfels_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_hornfels_vertical_step"
   },
   "result": {
     "id": "mineralogy:hornfels_slab",

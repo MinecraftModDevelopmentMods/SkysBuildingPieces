@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/stonebrick_mossy",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stonebrick_mossy_vertical_step"
-    }
+    "X": "skysbuildingpieces:stonebrick_mossy_vertical_step"
   },
   "result": {
     "id": "minecraft:mossy_stone_brick_slab",

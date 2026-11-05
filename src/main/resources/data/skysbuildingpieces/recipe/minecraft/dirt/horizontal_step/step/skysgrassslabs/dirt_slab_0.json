@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysgrassslabs",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "skysgrassslabs:dirt_slab"
-    }
+    "X": "skysgrassslabs:dirt_slab"
   },
   "result": {
     "id": "skysbuildingpieces:dirt_horizontal_step",

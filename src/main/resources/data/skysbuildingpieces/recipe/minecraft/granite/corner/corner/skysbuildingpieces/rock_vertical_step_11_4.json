@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:granite_vertical_step"
-    }
+    "X": "skysbuildingpieces:granite_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:granite_corner",

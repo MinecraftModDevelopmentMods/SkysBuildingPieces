@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/red_sandstone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:red_sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:red_sandstone_vertical_step"
   },
   "result": {
     "id": "minecraft:red_sandstone_slab",

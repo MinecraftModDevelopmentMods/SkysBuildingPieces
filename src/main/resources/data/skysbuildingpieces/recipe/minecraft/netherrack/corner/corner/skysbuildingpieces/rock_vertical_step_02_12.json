@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:netherrack_vertical_step"
-    }
+    "X": "skysbuildingpieces:netherrack_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:netherrack_corner",

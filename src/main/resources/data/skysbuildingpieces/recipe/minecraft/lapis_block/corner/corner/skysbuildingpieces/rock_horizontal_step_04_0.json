@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:lapis_block_horizontal_step"
-    }
+    "X": "skysbuildingpieces:lapis_block_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:lapis_block_corner",

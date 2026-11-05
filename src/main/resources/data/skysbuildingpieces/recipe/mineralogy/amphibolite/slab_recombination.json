@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/amphibolite",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:amphibolite_slab"
-    }
+    "X": "mineralogy:amphibolite_slab"
   },
   "result": {
     "id": "mineralogy:amphibolite",

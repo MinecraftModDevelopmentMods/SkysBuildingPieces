@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/rhyolite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_rhyolite_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_rhyolite_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_rhyolite_horizontal_step",

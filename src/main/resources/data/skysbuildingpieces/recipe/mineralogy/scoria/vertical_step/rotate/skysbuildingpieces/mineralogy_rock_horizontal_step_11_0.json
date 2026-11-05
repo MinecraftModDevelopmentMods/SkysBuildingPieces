@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_scoria_horizontal_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_scoria_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_scoria_vertical_step",

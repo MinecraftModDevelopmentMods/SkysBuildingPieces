@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:gold_block_horizontal_step"
-    }
+    "X": "skysbuildingpieces:gold_block_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:gold_block_corner",

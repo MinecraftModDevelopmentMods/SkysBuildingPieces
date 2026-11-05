@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:acacia_slab"
-    }
+    "X": "minecraft:acacia_slab"
   },
   "result": {
     "id": "skysbuildingpieces:planks_acacia_horizontal_step",

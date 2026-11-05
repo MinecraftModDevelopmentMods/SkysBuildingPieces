@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:cracked_stone_bricks"
-    }
+    "X": "minecraft:cracked_stone_bricks"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_cracked_stairs",

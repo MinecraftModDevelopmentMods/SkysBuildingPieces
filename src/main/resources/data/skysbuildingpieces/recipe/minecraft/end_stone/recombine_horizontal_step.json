@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/end_stone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:end_stone_horizontal_step"
-    }
+    "X": "skysbuildingpieces:end_stone_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:end_stone_slab",

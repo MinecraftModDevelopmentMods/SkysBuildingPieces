@@ -2,9 +2,6 @@ package zone.moddev.mc.skysbuildingpieces;
 
 import net.minecraft.util.RandomSource;
 
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.resources.model.BakedModel;
 
 import com.google.gson.*;
 
@@ -12,12 +9,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import org.junit.jupiter.api.Test;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.core.Direction;
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import org.joml.Vector3f;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel;
@@ -92,79 +89,78 @@ class ContinuousGlassTest {
     }
 
     @Test
-    void bakedWrapperPreservesInventoryBordersAndQuadAttributesWithoutGraphics() {
+    void bakedWrapperKeepsTheFaceAndChangesOnlyTheJoinedTexture() {
         JsonObject part = new JsonParser().parse("{\"from\":[5,0,0],\"to\":[5,13,16]}").getAsJsonObject();
-        int[] compact = quad(part, "west", 0);
-        int stride = DefaultVertexFormat.BLOCK.getVertexSize() / Integer.BYTES;
-        int[] data = new int[stride * 4];
-
-        for (int vertex = 0; vertex < 4; vertex++) {
-            System.arraycopy(compact, vertex * 7, data, vertex * stride, 7);
+        int[] vertices = quad(part, "west", 0);
+        Vector3f[] positions = new Vector3f[4];
+        long[] uv = new long[4];
+        for (int vertex = 0; vertex < positions.length; vertex++) {
+            int offset = vertex * 7;
+            positions[vertex] = new Vector3f(value(vertices, offset),
+                    value(vertices, offset + 1), value(vertices, offset + 2));
+            uv[vertex] = UVPair.pack(value(vertices, offset + 4), value(vertices, offset + 5));
         }
-
-        BakedQuad source = new BakedQuad(data, 3, Direction.WEST, null, false);
-        List<BakedQuad> original = Collections.singletonList(source);
-        BakedModel base = new BakedModel() {
-            public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
-                assertNull(state);
-                return original;
+        BakedQuad source = new BakedQuad(positions[0], positions[1], positions[2], positions[3],
+                uv[0], uv[1], uv[2], uv[3], 3, Direction.WEST, null, false, 4, false);
+        List<BakedQuad> original = List.of(source);
+        BlockModelPart basePart = new BlockModelPart() {
+            @Override
+            public List<BakedQuad> getQuads(Direction face) {
+                return face == Direction.WEST ? original : List.of();
             }
 
+            @Override
             public boolean useAmbientOcclusion() {
                 return false;
             }
 
-            public boolean isGui3d() {
-                return true;
-            }
-
-            public boolean usesBlockLight() {
-                return true;
-            }
-
-            public boolean isCustomRenderer() {
-                return false;
-            }
-
-            public TextureAtlasSprite getParticleIcon() {
+            @Override
+            public TextureAtlasSprite particleIcon() {
                 return null;
             }
 
-            public ItemTransforms getTransforms() {
-                return null;
+            @Override
+            public ChunkSectionLayer layer() {
+                return ChunkSectionLayer.TRANSLUCENT;
+            }
+        };
+        BlockStateModel base = new BlockStateModel() {
+            @Override
+            public void collectParts(RandomSource random, List<BlockModelPart> parts) {
+                parts.add(basePart);
             }
 
-            public ItemOverrides getOverrides() {
-                return ItemOverrides.EMPTY;
+            @Override
+            public TextureAtlasSprite particleIcon() {
+                return null;
             }
         };
         ContinuousGlassModel model = new ContinuousGlassModel(base);
+        assertSame(basePart, model.collectParts(RandomSource.create(0)).getFirst());
+        assertSame(basePart, model.collectParts(RandomSource.create(0), data(0), null).getFirst());
+        BlockModelPart joined = model.collectParts(RandomSource.create(0), data(5), null).getFirst();
+        assertSame(joined, model.collectParts(RandomSource.create(123), data(5), null).getFirst());
+        assertEquals(ChunkSectionLayer.TRANSLUCENT, joined.layer());
+        assertFalse(joined.useAmbientOcclusion());
+        assertSame(basePart.particleIcon(), joined.particleIcon());
 
-        assertSame(original, model.getQuads(null, null, RandomSource.create(0)));
-        assertSame(original, model.getQuads(null, Direction.WEST, RandomSource.create(0), data(0), null));
-
-        List<BakedQuad> joined = model.getQuads(null, Direction.WEST, RandomSource.create(0), data(5), null);
-
-        assertSame(joined, model.getQuads(null, Direction.WEST, RandomSource.create(123), data(5), null));
-        assertThrows(UnsupportedOperationException.class, () -> joined.clear());
-
-        BakedQuad trimmed = joined.get(0);
-
+        List<BakedQuad> quads = joined.getQuads(Direction.WEST);
+        assertThrows(UnsupportedOperationException.class, quads::clear);
+        BakedQuad trimmed = quads.getFirst();
         assertNotSame(source, trimmed);
-        assertArrayEquals(GlassWallTexture.trim(data, stride, 0, 4, 5), trimmed.getVertices());
-        assertEquals(3, trimmed.getTintIndex());
-        assertEquals(Direction.WEST, trimmed.getDirection());
-        assertFalse(trimmed.isShade());
-        assertEquals(source.hasAmbientOcclusion(), trimmed.hasAmbientOcclusion());
-        assertSame(source.getSprite(), trimmed.getSprite());
-        assertEquals(stride * 4, trimmed.getVertices().length);
-        assertFalse(model.useAmbientOcclusion());
-        assertTrue(model.isGui3d());
-        assertTrue(model.usesBlockLight());
-        assertFalse(model.isCustomRenderer());
-        assertSame(base.getOverrides(), model.getOverrides());
-        assertSame(base.getParticleIcon(), model.getParticleIcon());
-        assertSame(base.getTransforms(), model.getTransforms());
+        int[] expected = GlassWallTexture.trim(vertices, 7, 0, 4, 5);
+        for (int vertex = 0; vertex < positions.length; vertex++) {
+            assertSame(source.position(vertex), trimmed.position(vertex));
+            int offset = vertex * 7;
+            assertEquals(UVPair.pack(value(expected, offset + 4), value(expected, offset + 5)),
+                    trimmed.packedUV(vertex));
+        }
+        assertEquals(source.tintIndex(), trimmed.tintIndex());
+        assertEquals(source.direction(), trimmed.direction());
+        assertEquals(source.shade(), trimmed.shade());
+        assertEquals(source.ambientOcclusion(), trimmed.ambientOcclusion());
+        assertEquals(source.lightEmission(), trimmed.lightEmission());
+        assertSame(source.sprite(), trimmed.sprite());
     }
 
     private static ModelData data(int joins) {

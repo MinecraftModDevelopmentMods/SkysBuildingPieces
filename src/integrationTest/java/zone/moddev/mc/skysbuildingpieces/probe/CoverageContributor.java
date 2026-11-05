@@ -1,104 +1,54 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.ChunkDataEvent;
-import net.minecraftforge.eventbus.api.*;
+import net.minecraft.world.level.chunk.storage.SerializableChunkData;
+import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 
-/** Build-only stand-in for a later material add-on's independent coverage. */
+/** Exercises independent add-on coverage through the native chunk snapshot. */
 public final class CoverageContributor {
-    private final Map<net.minecraft.world.level.chunk.ChunkAccess, Integer> versions = new WeakHashMap<net.minecraft.world.level.chunk.ChunkAccess, Integer>();
-    private int visits;
-
-    @SubscribeEvent(
-            priority = EventPriority.LOW)
-    public void load(ChunkDataEvent.Load event) {
-        CompoundTag coverage = contents(event.getData()).getCompound("skysbuildingpieces_coverage");
-        int version = coverage.getInt("later_addon");
-
-        if (version < 1) {
-            visits++;
-            version = 1;
-        }
-
-        versions.put(event.getChunk(), version);
-    }
-
-    @SubscribeEvent(
-            priority = EventPriority.LOW)
-    public void save(ChunkDataEvent.Save event) {
-        Integer version = versions.get(event.getChunk());
-
-        if (version == null) {
-            return;
-        }
-
-        CompoundTag level = contents(event.getData());
-        CompoundTag coverage = level.getCompound("skysbuildingpieces_coverage");
-
-        coverage.putInt("later_addon", version);
-        level.put("skysbuildingpieces_coverage", coverage);
+    private CoverageContributor() {
     }
 
     public static void verify(ServerLevel world) {
-        // Finish any real disk load before counting the synthetic load/save cycle.
         LevelChunk chunk = world.getChunk(72, 72);
-        CoverageContributor contributor = new CoverageContributor();
 
-        MinecraftForge.EVENT_BUS.register(contributor);
-
-        try {
-            for (boolean wrapped : new boolean[] {true, false}) {
-                int previousVisits = contributor.visits;
-                CompoundTag root = new CompoundTag();
-                CompoundTag level = new CompoundTag();
-                CompoundTag coverage = new CompoundTag();
-
-                if (wrapped) {
-                    root.put("Level", level);
-                } else {
-                    root = level;
-                }
-                coverage.putInt("vanilla", 1);
-                level.put("skysbuildingpieces_coverage", coverage);
-                MinecraftForge.EVENT_BUS
-                        .post(new ChunkDataEvent.Load(chunk, root, net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
-
-                if (contributor.visits != previousVisits + 1) {
-                    throw new AssertionError("Core coverage must not skip a later add-on");
-                }
-
-                CompoundTag saved = new CompoundTag();
-
-                if (wrapped) {
-                    saved.put("Level", new CompoundTag());
-                }
-                MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, chunk.getLevel(), saved));
-
-                CompoundTag markers = contents(saved).getCompound("skysbuildingpieces_coverage");
-
-                if (markers.getInt("vanilla") != 1 || markers.getInt("later_addon") != 1) {
-                    throw new AssertionError("Independent markers must survive both save handlers");
-                }
-
-                MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved,
-                        net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
-
-                if (contributor.visits != previousVisits + 1) {
-                    throw new AssertionError("Later add-on coverage must be reload idempotent");
-                }
-
+        for (boolean wrapped : new boolean[] {true, false}) {
+            CompoundTag root = new CompoundTag();
+            CompoundTag level = root;
+            if (wrapped) {
+                level = new CompoundTag();
+                root.put("Level", level);
             }
-            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload schemas=2");
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(contributor);
+            CompoundTag coverage = new CompoundTag();
+            coverage.putInt("vanilla", 1);
+            level.put("skysbuildingpieces_coverage", coverage);
+
+            if (!visit(coverage)) {
+                throw new AssertionError("Core coverage must not skip a later add-on");
+            }
+            MigrationEvents.loadSerializedChunk(world, chunk, MigrationEvents.copyMigrationData(root));
+            CompoundTag saved = SerializableChunkData.copyOf(world, chunk).write();
+            CompoundTag markers = saved.getCompoundOrEmpty("skysbuildingpieces_coverage");
+            if (markers.getIntOr("vanilla", 0) != 1 || markers.getIntOr("later_addon", 0) != 1) {
+                throw new AssertionError("Both coverage markers must survive the native chunk save");
+            }
+            MigrationEvents.loadSerializedChunk(world, chunk, MigrationEvents.copyMigrationData(saved));
+            if (visit(SerializableChunkData.copyOf(world, chunk).write()
+                    .getCompoundOrEmpty("skysbuildingpieces_coverage"))) {
+                throw new AssertionError("Reload repeated an add-on's completed coverage");
+            }
         }
+        org.apache.logging.log4j.LogManager.getLogger().info(
+                "BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload schemas=2");
     }
 
-    private static CompoundTag contents(CompoundTag root) {
-        return root.contains("Level", 10) ? root.getCompound("Level") : root;
+    private static boolean visit(CompoundTag coverage) {
+        if (coverage.getIntOr("later_addon", 0) >= 1) {
+            return false;
+        }
+        coverage.putInt("later_addon", 1);
+        return true;
     }
 }

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/quartz_block",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:quartz_block_horizontal_step"
-    }
+    "X": "skysbuildingpieces:quartz_block_horizontal_step"
   },
   "result": {
     "id": "minecraft:quartz_slab",

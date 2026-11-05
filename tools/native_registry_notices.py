@@ -4,6 +4,34 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from zipfile import ZipFile
+
+
+EMPTY_CAPABILITIES = "Failed to parse saved data for 'SavedDataType[capabilities]': No key data in MapLike[{}]"
+CAPABILITIES_PATHS = {"data/capabilities.dat", "DIM-1/data/capabilities.dat", "DIM1/data/capabilities.dat"}
+
+
+def validate_forge61_proof(root, directory, profile, fixture):
+    receipt = profile['forge61_registry_contract']
+    raw = (root / receipt['path']).read_bytes()
+    proof = json.loads(raw)
+    if (hashlib.sha256(raw).hexdigest().upper() != receipt['sha256']
+            or proof['source_world_sha256'] != profile['sha256']
+            or proof['inspected_nbt_records'] <= 0):
+        raise ValueError('The Forge 61 registry proof does not match this fixture')
+    empty = proof['empty_capabilities']
+    if empty:
+        original, rewritten = empty['original'], empty['rewritten']
+        if not original or original.keys() != rewritten.keys() or not original.keys() <= CAPABILITIES_PATHS:
+            raise ValueError('The Forge 61 empty capability proof names unexpected files')
+        with ZipFile(fixture) as archive:
+            for name, expected in original.items():
+                actual = hashlib.sha256(archive.read(name)).hexdigest().upper()
+                current = hashlib.sha256((directory / 'world' / name).read_bytes()).hexdigest().upper()
+                if actual != expected or current != rewritten[name]:
+                    raise ValueError('The Forge 61 capability file does not match its control: ' + name)
+    return {**profile, 'mappings': proof['snapshot_entries'],
+            'empty_capabilities_count': len(empty['original']) if empty else 0}
 
 
 def validate_registry_proofs(root, profile):
@@ -84,6 +112,8 @@ def profile_for(directory):
                 or profile["saved_uses"] != proof["renamed_cells"]):
             raise ValueError("The native biome contract does not match this source fixture")
     validate_registry_proofs(root, profile)
+    if 'forge61_registry_contract' in profile:
+        return validate_forge61_proof(root, Path(directory), profile, fixture)
     receipt = profile.get("forge52_registry_contract")
     if receipt is not None:
         path = root / receipt["path"]
@@ -139,6 +169,7 @@ def audit_text(text, profile=None):
     if observed:
         headers.add("There are unidentified mappings in this world - we are going to attempt to process anyway")
     seen = set()
+    capabilities = 0
     for line in text.splitlines():
         if not re.search(r"/(?:ERROR|FATAL)\]|\[STDERR[/\]]", line):
             continue
@@ -146,16 +177,23 @@ def audit_text(text, profile=None):
                                r"(?: \[net\.minecraftforge\.registries\.GameData/REGISTRIES\])?: (.+)", line)
         if message and message[1] in headers and message[1] not in seen:
             seen.add(message[1])
+        elif (profile and profile.get('empty_capabilities_count', 0)
+                and re.fullmatch(r'\[[^\r\n]+\] \[Server thread/ERROR\]'
+                                 r'(?: \[net\.minecraft\.world\.level\.storage\.DimensionDataStorage/\])?: '
+                                 + re.escape(EMPTY_CAPABILITIES), line)):
+            capabilities += 1
         else:
             raise ValueError("Unexpected native failure: " + line)
+    if capabilities and capabilities != profile['empty_capabilities_count']:
+        raise ValueError('Unexpected number of Forge empty capability records')
     if seen != headers:
         raise ValueError("The native registry notice is incomplete")
     for problem in ("Encountered an unexpected exception", "Exception stopping the server",
                     "MissingModsException", "NoSuchMethodError", "NoClassDefFoundError",
                     "ExceptionInInitializerError", "cascading worldgen lag", "Unable to load model",
-                    "Unable to load blockstate", "outside of the generating region",
+                    "Unable to load blockstate", "Unable to bake item model", "outside of the generating region",
                     "java.lang.AssertionError", "java.lang.IllegalStateException:",
                     "java.util.ConcurrentModificationException"):
         if problem in text:
             raise ValueError("Unexpected native failure: " + problem)
-    return sorted(headers)
+    return sorted(headers) + [EMPTY_CAPABILITIES] * capabilities

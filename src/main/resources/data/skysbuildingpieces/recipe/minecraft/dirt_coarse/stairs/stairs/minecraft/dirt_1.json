@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:coarse_dirt"
-    }
+    "X": "minecraft:coarse_dirt"
   },
   "result": {
     "id": "skysbuildingpieces:dirt_coarse_stairs",

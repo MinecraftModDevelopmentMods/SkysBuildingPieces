@@ -63,9 +63,9 @@ final class LegacyInventoryChecks {
                     RuntimeProbe.require(stack.getCount() == 1 + index % 64, "Legacy stack count changed");
                     RuntimeProbe.require(stack.getTagCompound() != null
                             && stack.getTagCompound().getInteger("fixture_index") == index
-                            && stack.getTagCompound().getCompoundTag("display").getString("Name")
+                            && stack.getTagCompound().getCompoundTag("display").getStringOr("Name", "")
                                     .equals("Fixture rock piece " + index)
-                            && stack.getTagCompound().getTagList("ench", 10).getCompoundTagAt(0).getShort("lvl") == 2,
+                            && stack.getTagCompound().getTagList("ench", 10).getCompoundTagAt(0).getShortOr("lvl", (short) 0) == 2,
                             "Legacy custom item data changed");
                     units += stack.getCount();
                     index++;

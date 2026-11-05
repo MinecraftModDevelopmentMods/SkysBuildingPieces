@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/wool_black",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_black_vertical_step"
-    }
+    "X": "skysbuildingpieces:wool_black_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:wool_black_slab",

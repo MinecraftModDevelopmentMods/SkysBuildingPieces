@@ -1,74 +1,143 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.RecipeDisplayEntry;
+import net.minecraft.world.item.crafting.display.RecipeDisplayId;
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-
-/** Checks every ingredient picture the recipe book can cycle through. */
+/** Inspects the actual ingredient previews sent to the disposable client. */
 final class RecipePreviewModels {
-    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
-            "skysgrassslabs", "skysterrainsmoother", "skysterrainsmootherbop"));
+    private static final Set<String> OWNERS = Set.of("skysbuildingpieces", "skysbuildingpiecesbop",
+            "skysgrassslabs", "skysterrainsmoother", "skysterrainsmootherbop");
 
-    static void check(Minecraft minecraft) {
+    static Set<RecipeDisplayId> unlock(MinecraftServer server) {
+        var recipes = server.getRecipeManager().getRecipes().stream().filter(holder ->
+                OWNERS.contains(holder.id().identifier().getNamespace()) && !holder.value().isSpecial()).toList();
+        Set<RecipeDisplayId> expected = new HashSet<>();
+        for (var recipe : recipes) {
+            server.getRecipeManager().listDisplaysForRecipe(recipe.id(), entry -> expected.add(entry.id()));
+        }
+        if (expected.size() < 1000 || server.getPlayerList().getPlayers().size() != 1) {
+            throw new AssertionError("The disposable client is missing its recipe displays or player");
+        }
+        server.getPlayerList().getPlayers().getFirst().awardRecipes(recipes);
+        return Set.copyOf(expected);
+    }
+
+    static boolean ready(Minecraft minecraft, Set<RecipeDisplayId> expected) {
+        return entries(minecraft).stream().map(RecipeDisplayEntry::id).collect(java.util.stream.Collectors.toSet())
+                .containsAll(expected);
+    }
+
+    static void check(Minecraft minecraft, Set<RecipeDisplayId> expected) {
+        var context = SlotDisplayContext.fromLevel(minecraft.level);
         int recipes = 0;
         int previews = 0;
-
-        for (RecipeHolder<?> holder : minecraft.getConnection().getRecipeManager().getRecipes()) {
-            ResourceLocation id = holder.id();
-            Recipe<?> recipe = holder.value();
-
-            if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isSpecial()) {
+        for (RecipeDisplayEntry entry : entries(minecraft)) {
+            if (!expected.contains(entry.id())) {
                 continue;
             }
-            for (Ingredient ingredient : recipe.getIngredients()) {
-                for (ItemStack preview : ingredient.getItems()) {
-                    checkModel(minecraft, preview, id);
+            var display = entry.display();
+            var slots = switch (display) {
+                case ShapedCraftingRecipeDisplay shaped -> shaped.ingredients();
+                case ShapelessCraftingRecipeDisplay shapeless -> shapeless.ingredients();
+                default -> throw new AssertionError("Unexpected piece recipe display: " + display);
+            };
+            for (var slot : slots) {
+                for (ItemStack preview : slot.resolveForStacks(context)) {
+                    checkModel(minecraft, preview);
                     previews++;
                 }
             }
-
-            checkModel(minecraft, recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY), id);
+            ItemStack result = display.result().resolveForFirstStack(context);
+            checkModel(minecraft, result);
             previews++;
             recipes++;
         }
-        if (recipes < 1000) {
-            throw new AssertionError("Client did not receive the complete native recipe catalogue: " + recipes);
+        if (recipes != expected.size()) {
+            throw new AssertionError("Client received " + recipes + " recipe displays; expected " + expected.size());
         }
-
-        org.apache.logging.log4j.LogManager.getLogger().info("SKY_RECIPE_PREVIEW_MODELS_PASS recipes=" + recipes + " previews=" + previews);
+        org.apache.logging.log4j.LogManager.getLogger().info(
+                "SKY_RECIPE_PREVIEW_MODELS_PASS recipes={} previews={}", recipes, previews);
     }
 
-    private static void checkModel(Minecraft minecraft, ItemStack stack, ResourceLocation recipe) {
+    private static List<RecipeDisplayEntry> entries(Minecraft minecraft) {
+        return minecraft.player.getRecipeBook().getCollections().stream()
+                .flatMap(collection -> collection.getRecipes().stream()).distinct().toList();
+    }
+
+    private static ItemStackRenderState model(Minecraft minecraft, ItemStack stack) {
         if (stack.isEmpty()) {
-            throw new AssertionError("Empty recipe preview: " + recipe);
+            throw new AssertionError("An ingredient or result preview is empty");
         }
-
-        String label = recipe + " -> " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
-        BakedModel model = minecraft.getItemRenderer().getModel(stack, null, null, 0);
-        BakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
-                .getMissingModel();
-
-        if (model == missing || model.getParticleIcon().contents().name().toString().contains("missingno")) {
-            throw new AssertionError("Missing recipe preview model: " + label);
+        ItemStackRenderState state = new ItemStackRenderState();
+        minecraft.getItemModelResolver().updateForTopItem(state, stack, ItemDisplayContext.GUI,
+                minecraft.level, minecraft.player, 0);
+        if (state.isEmpty()) {
+            throw new AssertionError("Missing recipe preview model: " + stack);
         }
-        for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
-                Direction.WEST, Direction.EAST }) {
-            for (BakedQuad quad : model.getQuads(null, face, net.minecraft.util.RandomSource.create(0))) {
-                if (quad.getSprite().contents().name().toString().contains("missingno")) {
-                    throw new AssertionError("Missing recipe preview texture: " + label);
+        return state;
+    }
+
+    private static void checkModel(Minecraft minecraft, ItemStack stack) {
+        var state = model(minecraft, stack);
+        var particle = state.pickParticleIcon(RandomSource.create(0));
+        if (particle == null || particle.contents().name().toString().contains("missingno")) {
+            throw new AssertionError("Missing recipe preview texture: " + stack);
+        }
+        try {
+            for (var layer : layers(state)) {
+                @SuppressWarnings("unchecked")
+                List<BakedQuad> quads = (List<BakedQuad>) field(layer.getClass(), "quads").get(layer);
+                for (BakedQuad quad : quads) {
+                    if (quad.sprite().contents().name().toString().contains("missingno")) {
+                        throw new AssertionError("Missing recipe face texture: " + stack);
+                    }
                 }
             }
+        } catch (ReflectiveOperationException failure) {
+            throw new AssertionError("Cannot inspect rendered item quads", failure);
         }
+    }
+
+    static void checkGrassTint(Minecraft minecraft, ItemStack stack, int expected) {
+        var state = model(minecraft, stack);
+        try {
+            var layer = layers(state).getFirst();
+            int[] tints = (int[]) field(layer.getClass(), "tintLayers").get(layer);
+            if (tints.length == 0 || (tints[0] & 0xFFFFFF) != (expected & 0xFFFFFF)
+                    || tints.length > 1 && tints[1] != -1) {
+                throw new AssertionError("Grass-piece inventory tint: " + stack);
+            }
+        } catch (ReflectiveOperationException failure) {
+            throw new AssertionError("Cannot inspect the baked grass tint", failure);
+        }
+    }
+
+    private static List<ItemStackRenderState.LayerRenderState> layers(ItemStackRenderState state)
+            throws ReflectiveOperationException {
+        var type = ItemStackRenderState.class;
+        var all = (ItemStackRenderState.LayerRenderState[]) field(type, "layers").get(state);
+        int count = field(type, "activeLayerCount").getInt(state);
+        return java.util.Arrays.asList(all).subList(0, count);
+    }
+
+    private static Field field(Class<?> owner, String name) throws NoSuchFieldException {
+        Field field = owner.getDeclaredField(name);
+        field.setAccessible(true);
+        return field;
     }
 
     private RecipePreviewModels() {

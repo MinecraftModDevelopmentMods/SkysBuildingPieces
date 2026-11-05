@@ -1,7 +1,10 @@
 {
-  "pack": {
-    "pack_format": 34,
-    "description": "Optional dependency control",
-    "supported_formats": { "min_inclusive": 34, "max_inclusive": 48 }
-  }
+    "pack": {
+        "description": "Optional dependency control",
+        "max_format": 94,
+        "min_format": [
+            94,
+            1
+        ]
+    }
 }

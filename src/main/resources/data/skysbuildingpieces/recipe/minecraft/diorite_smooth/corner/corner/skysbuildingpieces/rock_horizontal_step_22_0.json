@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:diorite_smooth_horizontal_step"
-    }
+    "X": "skysbuildingpieces:diorite_smooth_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:diorite_smooth_corner",

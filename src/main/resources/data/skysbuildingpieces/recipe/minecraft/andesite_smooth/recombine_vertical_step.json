@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/andesite_smooth",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:andesite_smooth_vertical_step"
-    }
+    "X": "skysbuildingpieces:andesite_smooth_vertical_step"
   },
   "result": {
     "id": "minecraft:polished_andesite_slab",

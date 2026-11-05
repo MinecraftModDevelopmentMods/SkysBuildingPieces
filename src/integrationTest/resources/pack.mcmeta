@@ -1,7 +1,10 @@
 {
-  "pack": {
-    "pack_format": 34,
-    "description": "Building Pieces runtime checks",
-    "supported_formats": { "min_inclusive": 34, "max_inclusive": 48 }
-  }
+    "pack": {
+        "description": "Building Pieces runtime checks",
+        "max_format": 94,
+        "min_format": [
+            94,
+            1
+        ]
+    }
 }

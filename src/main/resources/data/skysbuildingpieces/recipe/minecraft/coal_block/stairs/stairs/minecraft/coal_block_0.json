@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:coal_block"
-    }
+    "X": "minecraft:coal_block"
   },
   "result": {
     "id": "skysbuildingpieces:coal_block_stairs",

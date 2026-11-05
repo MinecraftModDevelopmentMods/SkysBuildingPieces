@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/emerald_block",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:emerald_block_vertical_step"
-    }
+    "X": "skysbuildingpieces:emerald_block_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:emerald_block_slab",

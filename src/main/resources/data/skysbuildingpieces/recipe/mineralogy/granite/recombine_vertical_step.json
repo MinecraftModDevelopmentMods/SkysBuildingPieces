@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/granite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_granite_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_granite_vertical_step"
   },
   "result": {
     "id": "mineralogy:granite_slab",

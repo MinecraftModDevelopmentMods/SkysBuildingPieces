@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/limestone",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:limestone_slab"
-    }
+    "X": "mineralogy:limestone_slab"
   },
   "result": {
     "id": "mineralogy:limestone",

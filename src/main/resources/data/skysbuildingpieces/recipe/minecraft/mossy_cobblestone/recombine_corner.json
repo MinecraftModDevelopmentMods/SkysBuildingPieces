@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/mossy_cobblestone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mossy_cobblestone_corner"
-    }
+    "X": "skysbuildingpieces:mossy_cobblestone_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mossy_cobblestone_horizontal_step",

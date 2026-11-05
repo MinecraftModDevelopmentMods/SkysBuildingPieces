@@ -1,19 +1,21 @@
 package zone.moddev.mc.skysbuildingpieces.compatprobe;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -27,32 +29,34 @@ public final class LegacyPolicyMod {
     private static final Block[] BLOCKS = new Block[NAMES.length];
     private static BlockEntityType<MaterialTile> materialType;
 
-    public LegacyPolicyMod() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::register);
+    public LegacyPolicyMod(FMLJavaModLoadingContext context) {
+        RegisterEvent.getBus(context.getModBusGroup()).addListener(this::register);
     }
 
     private void register(RegisterEvent event) {
         if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCKS)) {
             for (int index = 0; index < NAMES.length; index++) {
-                BLOCKS[index] = new LegacyBlock();
-                ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath("buildingbricks", NAMES[index]), BLOCKS[index]);
+                Identifier id = Identifier.fromNamespaceAndPath("buildingbricks", NAMES[index]);
+                BLOCKS[index] = new LegacyBlock(id);
+                ForgeRegistries.BLOCKS.register(id, BLOCKS[index]);
             }
         } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
             for (Block block : BLOCKS) {
-                ForgeRegistries.ITEMS.register(ForgeRegistries.BLOCKS.getKey(block),
-                        new BlockItem(block, new Item.Properties()));
+                Identifier id = ForgeRegistries.BLOCKS.getKey(block);
+                ForgeRegistries.ITEMS.register(id,
+                        new BlockItem(block, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
             }
         } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES)) {
-            materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
-            ForgeRegistries.BLOCK_ENTITY_TYPES.register(ResourceLocation.fromNamespaceAndPath("buildingbricks", "material"), materialType);
+            materialType = new BlockEntityType<>(MaterialTile::new, java.util.Set.of(BLOCKS));
+            ForgeRegistries.BLOCK_ENTITY_TYPES.register(Identifier.fromNamespaceAndPath("buildingbricks", "material"), materialType);
         }
     }
 
     public static final class LegacyBlock extends Block implements EntityBlock {
         private static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
-        LegacyBlock() {
-            super(Block.Properties.of().mapColor(MapColor.STONE));
+        LegacyBlock(Identifier id) {
+            super(Block.Properties.of().mapColor(MapColor.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
             registerDefaultState(stateDefinition.any().setValue(META, 0));
         }
 
@@ -68,22 +72,26 @@ public final class LegacyPolicyMod {
     }
 
     public static final class MaterialTile extends BlockEntity {
-        private CompoundTag retained = new CompoundTag();
+        private static final String[] FIELDS = {"material", "custom", "fixture_note"};
+        private final java.util.Map<String, String> retained = new java.util.HashMap<>();
 
         public MaterialTile(BlockPos position, BlockState state) {
             super(materialType, position, state);
         }
 
         @Override
-        protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-            super.loadAdditional(tag, registries);
-            retained = tag.copy();
+        protected void loadAdditional(ValueInput input) {
+            super.loadAdditional(input);
+            retained.clear();
+            for (String key : FIELDS) {
+                input.getString(key).ifPresent(value -> retained.put(key, value));
+            }
         }
 
         @Override
-        protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-            tag.merge(retained);
-            super.saveAdditional(tag, registries);
+        protected void saveAdditional(ValueOutput output) {
+            super.saveAdditional(output);
+            retained.forEach(output::putString);
         }
     }
 }

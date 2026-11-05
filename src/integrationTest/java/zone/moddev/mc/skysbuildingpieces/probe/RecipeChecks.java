@@ -1,6 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -15,7 +16,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import static zone.moddev.mc.skysbuildingpieces.probe.NativeRecipeProbe.*;
 import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -43,13 +45,13 @@ public final class RecipeChecks {
 
         Audit(ServerLevel world) {
             this.world = world;
-            remaining = world.getRecipeManager().getRecipes().iterator();
+            remaining = world.getServer().getRecipeManager().getRecipes().iterator();
         }
 
         boolean advance(int limit) {
             for (int checked = 0; checked < limit && remaining.hasNext(); checked++) {
                 RecipeHolder<?> holder = remaining.next();
-                ResourceLocation id = holder.id();
+                Identifier id = holder.id().identifier();
                 Recipe<?> entry = holder.value();
                 if (!id.getNamespace().startsWith("skysbuildingpieces") || entry.isSpecial()) {
                     continue;
@@ -59,17 +61,17 @@ public final class RecipeChecks {
                     net.minecraft.world.item.crafting.ShapelessRecipe recipe = (net.minecraft.world.item.crafting.ShapelessRecipe) entry;
 
                     require(id.getNamespace().equals("skysbuildingpiecesbop")
-                            && id.getPath().startsWith("restore_") && recipe.getIngredients().size() == 1,
+                            && id.getPath().startsWith("restore_") && ingredients(recipe).size() == 1,
                             "Unexpected shapeless building recipe: " + id);
 
                     for (int size : new int[] { 2, 3 }) {
                         for (int slot = 0; slot < size * size; slot++) {
                             CraftingContainer grid = grid(size);
-                            ItemStack input = recipe.getIngredients().get(0).getItems()[0].copy();
+                            ItemStack input = example(ingredients(recipe).getFirst());
 
                             input.setCount(17);
                             grid.setItem(slot, input);
-                            assertManager(grid, world, recipe.getResultItem(world.registryAccess()), id.toString());
+                            assertManager(grid, world, result(recipe, world), id.toString());
                             require(input.getCount() == 17, "Restore lookup changed its input");
                             grid.setItem((slot + 1) % (size * size), input.copy());
                             require(!recipe.matches(grid.asCraftInput(), world), "Restore recipe accepts an extra block");
@@ -77,7 +79,7 @@ public final class RecipeChecks {
                         }
                     }
 
-                    obtainable.add(recipe.getResultItem(world.registryAccess()).getItem());
+                    obtainable.add(result(recipe, world).getItem());
                     network(recipe, id, world);
                     recipes++;
                     continue;
@@ -87,10 +89,10 @@ public final class RecipeChecks {
 
                 ShapedRecipe recipe = (ShapedRecipe) entry;
 
-                obtainable.add(recipe.getResultItem(world.registryAccess()).getItem());
+                obtainable.add(result(recipe, world).getItem());
 
                 for (int size : new int[] { 2, 3 }) {
-                    if (!recipe.canCraftInDimensions(size, size)) {
+                    if (!(recipe.getRecipeWidth() <= size && recipe.getRecipeHeight() <= size)) {
                         continue;
                     }
                     for (int rowOffset = 0; rowOffset <= size - recipe.getRecipeHeight(); rowOffset++) {
@@ -101,17 +103,17 @@ public final class RecipeChecks {
                                 for (int row = 0; row < recipe.getRecipeHeight(); row++) {
                                     for (int column = 0; column < recipe.getRecipeWidth(); column++) {
                                         int ingredientColumn = mirror ? recipe.getRecipeWidth() - 1 - column : column;
-                                        Ingredient ingredient = recipe.getIngredients()
+                                        Ingredient ingredient = ingredients(recipe)
                                                 .get(ingredientColumn + row * recipe.getRecipeWidth());
 
-                                        if (ingredient == Ingredient.EMPTY) {
+                                        if (ingredient == null) {
                                             continue;
                                         }
 
-                                        require(ingredient.getItems().length > 0,
+                                        require(!ingredient.isEmpty(),
                                                 "Empty book ingredient: " + id);
 
-                                        ItemStack input = ingredient.getItems()[0].copy();
+                                        ItemStack input = example(ingredient);
 
                                         input.setCount(17);
                                         grid.setItem(column + columnOffset + (row + rowOffset) * size,
@@ -121,7 +123,7 @@ public final class RecipeChecks {
 
                                 require(recipe.matches(grid.asCraftInput(), world), "Offset or mirrored recipe: " + id);
 
-                                ItemStack expected = recipe.getResultItem(world.registryAccess()).copy();
+                                ItemStack expected = result(recipe, world).copy();
 
                                 assertManager(grid, world, expected, id.toString());
 
@@ -222,33 +224,38 @@ public final class RecipeChecks {
         }
     }
 
-    private static void network(CraftingRecipe recipe, ResourceLocation id, ServerLevel world) {
+    private static void network(CraftingRecipe recipe, Identifier id, ServerLevel world) {
+        displayNetwork(recipe, id, world);
+        if (!(recipe instanceof zone.moddev.mc.skysbuildingpieces.content.CuttingRecipe)) {
+            // The book sends display entries, not vanilla recipe objects.
+            return;
+        }
         RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(),
                 world.registryAccess());
 
         try {
-            RecipeHolder.STREAM_CODEC.encode(buffer, new RecipeHolder<>(id, recipe));
+            RecipeHolder.STREAM_CODEC.encode(buffer, new RecipeHolder<>(key(id), recipe));
             RecipeHolder<?> restored = RecipeHolder.STREAM_CODEC.decode(buffer);
             require(restored.value() instanceof CraftingRecipe, "Network recipe type changed");
             CraftingRecipe decoded = (CraftingRecipe) restored.value();
 
-            require(restored.id().equals(id) && !decoded.isSpecial(),
+            require(restored.id().equals(key(id)) && !decoded.isSpecial(),
                     "Network recipe identity and visibility");
-            require(ItemStack.matches(decoded.getResultItem(world.registryAccess()), recipe.getResultItem(world.registryAccess())),
+            require(ItemStack.matches(result(decoded, world), result(recipe, world)),
                     "Network result changed: " + id);
 
             CraftingContainer grid = grid(3);
 
             int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeWidth()
-                    : recipe.getIngredients().size();
+                    : ingredients(recipe).size();
             int height = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeHeight() : 1;
 
             for (int row = 0; row < height; row++) {
                 for (int column = 0; column < width; column++) {
-                    Ingredient ingredient = recipe.getIngredients().get(column + row * width);
+                    Ingredient ingredient = ingredients(recipe).get(column + row * width);
 
-                    if (ingredient != Ingredient.EMPTY) {
-                        grid.setItem(column + row * 3, ingredient.getItems()[0].copy());
+                    if (ingredient != null) {
+                        grid.setItem(column + row * 3, example(ingredient));
                     }
                 }
             }
@@ -260,18 +267,49 @@ public final class RecipeChecks {
         }
     }
 
+    private static void displayNetwork(CraftingRecipe recipe, Identifier id, ServerLevel world) {
+        var codec = net.minecraft.world.item.crafting.display.RecipeDisplay.STREAM_CODEC;
+        var context = net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(world);
+        for (var display : recipe.display()) {
+            var buffer = new RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), world.registryAccess());
+            try {
+                codec.encode(buffer, display);
+                var received = codec.decode(buffer);
+                require(received.getClass() == display.getClass()
+                        && ItemStack.matches(received.result().resolveForFirstStack(context),
+                                display.result().resolveForFirstStack(context)), "Network display changed: " + id);
+                require(displayIngredients(received, context).equals(displayIngredients(display, context)),
+                        "Network ingredient displays changed: " + id);
+            } finally {
+                buffer.release();
+            }
+        }
+    }
+
+    private static List<List<String>> displayIngredients(
+            net.minecraft.world.item.crafting.display.RecipeDisplay display,
+            net.minecraft.util.context.ContextMap context) {
+        var ingredients = switch (display) {
+            case net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay shaped -> shaped.ingredients();
+            case net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay shapeless -> shapeless.ingredients();
+            default -> throw new AssertionError("Unexpected crafting display: " + display);
+        };
+        return ingredients.stream().map(slot -> slot.resolveForStacks(context).stream().map(stack ->
+                NativeProbeItems.save(stack).toString()).toList()).toList();
+    }
+
     private static void nativeRecipe(ServerLevel world, String path, Item output, int count) {
-        Recipe<?> recipe = world.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("minecraft", path))
+        Recipe<?> recipe = world.getServer().getRecipeManager().byKey(key(Identifier.fromNamespaceAndPath("minecraft", path)))
                 .orElseThrow(() -> new AssertionError("Missing native recipe: " + path)).value();
         CraftingContainer grid = grid(3);
         int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getRecipeWidth() : 3;
 
-        for (int index = 0; index < recipe.getIngredients().size(); index++) {
-            Ingredient ingredient = recipe.getIngredients().get(index);
+        for (int index = 0; index < ingredients(recipe).size(); index++) {
+            Ingredient ingredient = ingredients(recipe).get(index);
 
-            if (ingredient != Ingredient.EMPTY) {
+            if (ingredient != null) {
                 grid.setItem(index % width + index / width * 3,
-                        ingredient.getItems()[0].copy());
+                        example(ingredient));
             }
         }
 
@@ -280,9 +318,9 @@ public final class RecipeChecks {
 
     private static void templates(ServerLevel world) {
         for (Item retired : Pieces.RETIRED_TEMPLATES.values()) {
-            for (RecipeHolder<?> holder : world.getRecipeManager().getRecipes()) {
+            for (RecipeHolder<?> holder : world.getServer().getRecipeManager().getRecipes()) {
                 Recipe<?> recipe = holder.value();
-                require(recipe.getResultItem(world.registryAccess()).getItem() != retired,
+                require(result(recipe, world).getItem() != retired,
                         "Retired templates must not be craftable");
             }
 
@@ -302,7 +340,7 @@ public final class RecipeChecks {
             zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(paper, custom.copy());
             assertManager(grid, world, paper, "retired template recycling");
 
-            CraftingRecipe recycling = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world).orElseThrow().value();
+            CraftingRecipe recycling = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world).orElseThrow().value();
 
             for (ItemStack remainder : recycling.getRemainingItems(grid.asCraftInput())) {
                 require(remainder.isEmpty(), "Recycling consumes the retired template");
@@ -314,12 +352,12 @@ public final class RecipeChecks {
     }
 
     private static void assertManager(CraftingContainer grid, ServerLevel world, ItemStack expected, String label) {
-        ItemStack actual = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
+        ItemStack actual = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
                 .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
 
         require(ItemStack.matches(expected, actual), "Crafting manager selects " + label);
 
-        for (RecipeHolder<CraftingRecipe> recipe : world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, grid.asCraftInput(), world)) {
+        for (RecipeHolder<CraftingRecipe> recipe : NativeRecipeProbe.matching(grid.asCraftInput(), world)) {
             require(ItemStack.matches(expected, recipe.value().assemble(grid.asCraftInput(), world.registryAccess())),
                     "Conflicting recipe for " + label + ": " + recipe.id());
         }

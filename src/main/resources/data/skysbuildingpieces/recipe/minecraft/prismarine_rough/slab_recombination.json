@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/prismarine_rough",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "minecraft:prismarine_slab"
-    }
+    "X": "minecraft:prismarine_slab"
   },
   "result": {
     "id": "minecraft:prismarine",

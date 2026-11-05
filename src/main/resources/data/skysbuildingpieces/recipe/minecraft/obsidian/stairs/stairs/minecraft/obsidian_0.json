@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:obsidian"
-    }
+    "X": "minecraft:obsidian"
   },
   "result": {
     "id": "skysbuildingpieces:obsidian_stairs",

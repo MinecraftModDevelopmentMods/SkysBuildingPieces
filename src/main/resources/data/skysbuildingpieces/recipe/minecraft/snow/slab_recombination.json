@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/snow",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:snow_slab"
-    }
+    "X": "skysbuildingpieces:snow_slab"
   },
   "result": {
     "id": "minecraft:snow_block",

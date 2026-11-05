@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:podzol"
-    }
+    "X": "minecraft:podzol"
   },
   "result": {
     "id": "skysbuildingpieces:dirt_podzol_stairs",

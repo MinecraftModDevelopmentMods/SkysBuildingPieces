@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stonebrick_carved_horizontal_step"
-    }
+    "X": "skysbuildingpieces:stonebrick_carved_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_carved_corner",

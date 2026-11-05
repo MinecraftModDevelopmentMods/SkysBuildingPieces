@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/chiseled_red_sandstone",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    }
+    "X": "skysbuildingpieces:chiseled_red_sandstone_slab"
   },
   "result": {
     "id": "minecraft:chiseled_red_sandstone",

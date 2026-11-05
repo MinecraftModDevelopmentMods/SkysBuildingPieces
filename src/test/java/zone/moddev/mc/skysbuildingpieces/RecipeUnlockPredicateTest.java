@@ -11,7 +11,7 @@ import com.mojang.serialization.JsonOps;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.lang.reflect.Field;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.RegistryOps;

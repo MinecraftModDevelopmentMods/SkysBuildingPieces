@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/ice",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:ice_corner"
-    }
+    "X": "skysbuildingpieces:ice_corner"
   },
   "result": {
     "id": "skysbuildingpieces:ice_step",

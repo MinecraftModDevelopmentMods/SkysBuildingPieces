@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["XX", "XX", "XX"],
   "key": {
-    "X": {
-      "item": "minecraft:packed_ice"
-    }
+    "X": "minecraft:packed_ice"
   },
   "result": {
     "id": "skysbuildingpieces:packed_ice_wall",

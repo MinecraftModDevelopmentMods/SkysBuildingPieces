@@ -40,23 +40,25 @@ public final class NativeProbeItems {
     }
 
     public static CompoundTag save(ItemStack stack) {
-        return (CompoundTag) stack.save(ServerLifecycleHooks.getCurrentServer().registryAccess());
+        return (CompoundTag) ItemStack.CODEC.encodeStart(ServerLifecycleHooks.getCurrentServer().registryAccess()
+                .createSerializationContext(NbtOps.INSTANCE), stack).getOrThrow();
     }
 
     public static ItemStack read(CompoundTag tag) {
-        if ("minecraft:grass_path".equals(tag.getString("id"))) {
+        if ("minecraft:grass_path".equals(tag.getStringOr("id", ""))) {
             // Older fixture descriptions retained this alias after the saved item had been renamed.
             tag = tag.copy();
             tag.putString("id", "minecraft:dirt_path");
         }
-        if (tag.contains("Count", 99)) {
+        if (tag.getInt("Count").isPresent()) {
             // These fixture stacks use the post-flattening layout, before item components.
             tag = (CompoundTag) DataFixers.getDataFixer()
                     .update(References.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, tag), 3700,
-                            net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion())
+                            net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version())
                     .getValue();
         }
-        return ItemStack.parse(ServerLifecycleHooks.getCurrentServer().registryAccess(), tag)
-                .orElseThrow(() -> new AssertionError("Fixture item could not be read"));
+        return ItemStack.CODEC.parse(ServerLifecycleHooks.getCurrentServer().registryAccess()
+                .createSerializationContext(NbtOps.INSTANCE), tag)
+                .getOrThrow(message -> new IllegalStateException("Fixture item could not be read: " + message));
     }
 }

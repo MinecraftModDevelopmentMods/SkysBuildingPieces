@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stone_slab_vertical_slab"
-    }
+    "X": "skysbuildingpieces:stone_slab_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:stone_slab_horizontal_step",

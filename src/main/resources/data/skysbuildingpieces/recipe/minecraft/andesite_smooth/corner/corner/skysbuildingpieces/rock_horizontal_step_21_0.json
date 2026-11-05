@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:andesite_smooth_horizontal_step"
-    }
+    "X": "skysbuildingpieces:andesite_smooth_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:andesite_smooth_corner",

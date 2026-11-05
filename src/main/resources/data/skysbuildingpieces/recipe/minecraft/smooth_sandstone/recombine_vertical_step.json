@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/smooth_sandstone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:smooth_sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:smooth_sandstone_vertical_step"
   },
   "result": {
     "id": "minecraft:cut_sandstone_slab",

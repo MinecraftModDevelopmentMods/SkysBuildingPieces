@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/rock_salt",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:rock_salt_slab"
-    }
+    "X": "mineralogy:rock_salt_slab"
   },
   "result": {
     "id": "mineralogy:rock_salt",

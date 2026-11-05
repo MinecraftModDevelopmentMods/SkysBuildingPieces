@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/gneiss",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:gneiss_slab"
-    }
+    "X": "mineralogy:gneiss_slab"
   },
   "result": {
     "id": "mineralogy:gneiss",

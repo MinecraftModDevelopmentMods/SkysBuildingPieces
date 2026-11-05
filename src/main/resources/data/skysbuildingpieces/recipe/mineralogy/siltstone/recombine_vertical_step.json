@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/siltstone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_siltstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_siltstone_vertical_step"
   },
   "result": {
     "id": "mineralogy:siltstone_slab",

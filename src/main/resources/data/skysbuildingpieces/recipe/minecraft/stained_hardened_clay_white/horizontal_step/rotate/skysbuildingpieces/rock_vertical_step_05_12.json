@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_white_vertical_step"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_white_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_white_horizontal_step",

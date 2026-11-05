@@ -1,7 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.mineralogytest;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.server.ServerWorld;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
@@ -90,7 +90,7 @@ final class SmoothingChecks {
         int mappings = 0;
 
         for (String identity : Catalogue.INSTANCE.modules.get("mineralogy").materials.keySet()) {
-            TerrainMaterial material = MaterialCatalogue.instance().material(new ResourceLocation(identity));
+            TerrainMaterial material = MaterialCatalogue.instance().material(new Identifier(identity));
 
             if (material == null) {
                 continue;

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/mineralogy",
   "pattern": ["X  ", " X ", "  X"],
   "key": {
-    "X": {
-      "item": "mineralogy:hornfels"
-    }
+    "X": "mineralogy:hornfels"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_hornfels_horizontal_step",

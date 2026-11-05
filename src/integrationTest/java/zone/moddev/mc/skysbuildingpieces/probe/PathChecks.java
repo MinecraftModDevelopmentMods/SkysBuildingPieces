@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -32,17 +32,19 @@ public final class PathChecks {
     private PathChecks() {
     }
 
-    public static void register(net.minecraftforge.eventbus.api.IEventBus modBus, String namespace) {
+    public static void register(net.minecraftforge.eventbus.api.bus.BusGroup modBus, String namespace) {
         // Test tools follow the same registration lifecycle as a real mod's items.
-        modBus.addListener((net.minecraftforge.registries.RegisterEvent event) -> {
+        net.minecraftforge.registries.RegisterEvent.getBus(modBus).addListener(event -> {
             if (!event.getRegistryKey().equals(net.minecraftforge.registries.ForgeRegistries.Keys.ITEMS)) return;
-            compatibleShovel = new Item(new Item.Properties().durability(50)) {
+            Identifier toolId = Identifier.fromNamespaceAndPath(namespace, "flattening_tool");
+            compatibleShovel = new Item(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(
+                    net.minecraft.core.registries.Registries.ITEM, toolId)).durability(50)) {
                 @Override
                 public boolean canPerformAction(ItemStack stack, net.minecraftforge.common.ToolAction action) {
                     return action == net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN;
                 }
             };
-            net.minecraftforge.registries.ForgeRegistries.ITEMS.register(ResourceLocation.fromNamespaceAndPath(namespace, "flattening_tool"), compatibleShovel);
+            net.minecraftforge.registries.ForgeRegistries.ITEMS.register(toolId, compatibleShovel);
         });
     }
 
@@ -90,7 +92,7 @@ public final class PathChecks {
                                     "only flattening a grass piece also flattens its grass support");
                             // Notify the support as ordinary building would; a one-tick conversion is not enough.
                             support.handleNeighborChanged(world, position.below(), expected.getBlock(),
-                                    position, false);
+                                    null, false);
 
                             if (support.getBlock() == Blocks.DIRT_PATH) {
                                 require(support.canSurvive(world, position.below()),
@@ -132,8 +134,8 @@ public final class PathChecks {
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
                     silkTool.enchant(world.registryAccess()
-                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
+                            .lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
                     require(ItemStack.matches(
                             Block.getDrops(expected, world, position, null, player, silkTool).get(0),
                             Pieces.stack(Pieces.state("minecraft:dirt", shape, orientation), 1)),
@@ -335,17 +337,17 @@ public final class PathChecks {
 
     private static int slabs(ServerLevel world, ServerPlayer player, BlockPos position) {
         if (!net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                .containsKey(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", "grass_slab"))) {
+                .containsKey(Identifier.fromNamespaceAndPath("skysgrassslabs", "grass_slab"))) {
             return 0;
         }
 
         Block path = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                .getValue(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", "path_slab"));
+                .getValue(Identifier.fromNamespaceAndPath("skysgrassslabs", "path_slab"));
         int checks = 0;
 
         for (String name : new String[] { "dirt_slab", "grass_slab" }) {
             Block slab = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                    .getValue(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", name));
+                    .getValue(Identifier.fromNamespaceAndPath("skysgrassslabs", name));
 
             for (net.minecraft.world.level.block.state.properties.SlabType half : new net.minecraft.world.level.block.state.properties.SlabType[] {
                     net.minecraft.world.level.block.state.properties.SlabType.BOTTOM, net.minecraft.world.level.block.state.properties.SlabType.TOP }) {

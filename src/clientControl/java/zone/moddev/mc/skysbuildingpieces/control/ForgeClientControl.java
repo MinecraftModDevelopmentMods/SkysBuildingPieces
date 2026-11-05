@@ -15,17 +15,14 @@ public final class ForgeClientControl {
     private long worldStarted;
 
     public ForgeClientControl() {
-        MinecraftForge.EVENT_BUS.addListener(this::tick);
+        TickEvent.ClientTickEvent.Post.BUS.addListener(this::tick);
     }
 
-    private void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    private void tick(TickEvent.ClientTickEvent.Post event) {
 
         Minecraft client = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getWindow().getWindow());
+        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getWindow().handle());
 
         if (started && client.level == null) {
             confirmDisposableWorld(client);
@@ -40,7 +37,7 @@ public final class ForgeClientControl {
             started = true;
             worldStarted = System.nanoTime();
             LevelSettings settings = new LevelSettings("Forge Login Control", GameType.CREATIVE, false,
-                    net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.GameRules(),
+                    net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS),
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
@@ -51,7 +48,7 @@ public final class ForgeClientControl {
                 throw new AssertionError("The Forge-only control contains a Sky mod");
             }
 
-            org.apache.logging.log4j.LogManager.getLogger().info("FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false");
+            org.apache.logging.log4j.LogManager.getLogger().info("FORGE61_CLIENT_CONTROL_PASS joined=true sky_mods=false");
             client.stop();
         }
     }
@@ -81,7 +78,7 @@ public final class ForgeClientControl {
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
-                    button.onPress();
+                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
                     System.out.println("FORGE47_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;

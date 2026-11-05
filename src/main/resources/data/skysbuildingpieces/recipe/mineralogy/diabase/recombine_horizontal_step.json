@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/diabase",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_diabase_horizontal_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_diabase_horizontal_step"
   },
   "result": {
     "id": "mineralogy:diabase_slab",

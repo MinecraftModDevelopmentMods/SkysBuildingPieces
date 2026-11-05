@@ -72,6 +72,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.14.4.forge52-registry.json",
         "sha256": "8172D12FDCBFAA8111CF4CF114D68721466DD9DA132A0B51689083CDAA7C5450"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.forge61-registry.json",
+        "sha256": "8F09FCD37FBEEA5A84BF69807F1B1C36191170841B4E4BED73C8D0C90F38D082"
       }
     },
     "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525": {
@@ -141,6 +145,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.15.2.forge52-registry.json",
         "sha256": "F274D93A523435993B59501FCD5612DC0FFE0C04D8BFF2EC5564A6DEEDB2D540"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.forge61-registry.json",
+        "sha256": "1D7F380F721253A9CD6F4CCC4FF37E79583E0E736DAE3677576794EABEA57EA5"
       }
     },
     "B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F": {
@@ -279,6 +287,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.16.5.forge52-registry.json",
         "sha256": "C81FD193801AA58A3B06ECB6EFEC50CEB8FB2A940F2853D4AFC8CDE148C1AAAD"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.forge61-registry.json",
+        "sha256": "DFA2E31AE879F3A38808DD511E78B07D7B17015C3D293C9BD42DE2D803D91F47"
       }
     },
     "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67": {
@@ -419,6 +431,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.17.1.forge52-registry.json",
         "sha256": "6C012C18285992AE81A60A7A5826A2748E573FCE55CA31296E868F10F4156D3D"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.forge61-registry.json",
+        "sha256": "66485530C4018D955ED5608A68836CF3A1746E83BE6FDAD97B181A052E6CDFC8"
       }
     },
     "85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49": {
@@ -539,6 +555,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.18.2.forge52-registry.json",
         "sha256": "0CE83878F699D7FCC72E907CB8FED4AAC0629B87E0AB18DF7C59CB17DBCE018B"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.forge61-registry.json",
+        "sha256": "1CCE638619908C4F23F311F331287ACAB5C6EEA4D2FD2CD0AB65F1AB41CAA4BB"
       }
     },
     "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095": {
@@ -593,6 +613,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge52-registry.json",
         "sha256": "FB8840803A4296F3B69245DEB55CC8638EE1E215E1CEBFFF40383FF7BFF19786"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge61-registry.json",
+        "sha256": "A202835C219521ED2C529C9EDA814EABC8EA1F82BADA6F0F649001EFF46D8989"
       }
     },
     "910789BEF774D2D2B20CDCBEEB08D6E0296D7C2B714267B8EA4CCB49F1DF6324": {
@@ -634,6 +658,10 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.20.1.forge52-registry.json",
         "sha256": "E73A84918015ED146947BD5C9A23BE6A51D5CB960B52BD55BF8D23BA30CD16AD"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.20.1.forge61-registry.json",
+        "sha256": "FF0063E3FA901E30B45BA8CC1ED4545F352DFD9EB8D41700639119C8F1470634"
       }
     },
     "7327CB1F332F5A87E884C3B9AA4940A82A52CBD1D2A53ED1F0179DDCCC9CDF05": {
@@ -690,6 +718,49 @@
       "forge52_registry_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.20.6.forge52-registry.json",
         "sha256": "9E539757B899B63802CBE295EEB71E5F6776DDA94859BC2FA5D3C3184DC00E8E"
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.20.6.forge61-registry.json",
+        "sha256": "876DE80D8C2DE889C4996A9B3F847B16CDC1686618E432C45A39A1476C0041E4"
+      }
+    },
+    "0EEC9D61D7B89323D7878B5DB45F02E7CB49EF0B1AAB75A40AD7D8CB5FDC94F8": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.21.1.zip",
+      "sha256": "0EEC9D61D7B89323D7878B5DB45F02E7CB49EF0B1AAB75A40AD7D8CB5FDC94F8",
+      "source_jar_sha256": "350B2F935ED0817EBDFCEBC235DAB3709FE9152A1B51A0ED3936572AA0FEB66A",
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:chain": 242
+        },
+        "minecraft:entity_type": {
+          "minecraft:boat": 6,
+          "minecraft:chest_boat": 116,
+          "minecraft:potion": 87
+        },
+        "minecraft:item": {
+          "minecraft:chain": 248
+        },
+        "minecraft:sound_event": {
+          "minecraft:entity.goat.screaming.horn_break": 1311,
+          "minecraft:entity.leash_knot.break": 415,
+          "minecraft:entity.leash_knot.place": 416,
+          "minecraft:entity.puffer_fish.ambient": 666,
+          "minecraft:entity.wolf.howl": 939,
+          "minecraft:item.goat_horn.play": 1310
+        }
+      },
+      "saved_uses": 0,
+      "inspected_nbt_records": 8273,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.21.1.biomes.json",
+        "sha256": "4A2D233097797EF0B99997789A087628B8A2E49F39963D85FBCD893BC33DE4D0",
+        "source": "1.21.1",
+        "checked_cells": 1394688,
+        "renamed_cells": 0
+      },
+      "forge61_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.21.1.forge61-registry.json",
+        "sha256": "69B2F008B9D8316E2479254F31A4E34F1B389C0E75395A2D6211783224668C75"
       }
     }
   },

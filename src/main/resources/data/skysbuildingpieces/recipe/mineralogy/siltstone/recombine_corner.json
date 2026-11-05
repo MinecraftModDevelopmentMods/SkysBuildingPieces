@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/siltstone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_siltstone_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_siltstone_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_siltstone_horizontal_step",

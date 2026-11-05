@@ -338,13 +338,13 @@ public final class PresentationChecks {
                         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
                         require(stack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
                                 new BlockHitResult(new Vec3(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
-                                        Direction.UP, pos, false))) == InteractionResult.CONSUME,
+                                        Direction.UP, pos, false))).consumesAction(),
                                 "torch places on wall");
 
                         BlockState placed = world.getBlockState(pos.above());
 
                         require(placed.getBlock() == torch && stack.getCount() == 1, "upright torch consumes one item");
-                        placed.handleNeighborChanged(world, pos.above(), block, pos, false);
+                        placed.handleNeighborChanged(world, pos.above(), block, null, false);
                         require(world.getBlockState(pos.above()).getBlock() == torch, "torch survives a neighbour update");
 
                         if (wall.hasProperty(WallBlock.UP)) {
@@ -402,8 +402,8 @@ public final class PresentationChecks {
 
             net.minecraftforge.client.model.data.ModelProperty<Integer> property = (net.minecraftforge.client.model.data.ModelProperty<Integer>) field
                     .get(null);
-            zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel model = new zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel(
-                    null);
+            var model = net.minecraft.client.Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+            require(type.isInstance(model), "The baked glass wall uses the continuous model");
             net.minecraftforge.client.model.data.ModelData data = model.getModelData(world, position, state,
                     net.minecraftforge.client.model.data.ModelData.EMPTY);
 
@@ -422,7 +422,7 @@ public final class PresentationChecks {
 
     public static void gallery(ServerLevel world) {
         world.setDayTime(6000);
-        world.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DAYLIGHT).set(false, world.getServer());
+        world.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.ADVANCE_TIME, false, world.getServer());
 
         for (int blockX = 0; blockX <= 12; blockX++) {
             for (int blockZ = 0; blockZ <= 11; blockZ++) {

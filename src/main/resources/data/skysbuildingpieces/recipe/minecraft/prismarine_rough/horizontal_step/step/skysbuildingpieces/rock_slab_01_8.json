@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:prismarine_slab"
-    }
+    "X": "minecraft:prismarine_slab"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_rough_horizontal_step",

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:purpur_pillar_vertical_step"
-    }
+    "X": "skysbuildingpieces:purpur_pillar_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:purpur_pillar_corner",

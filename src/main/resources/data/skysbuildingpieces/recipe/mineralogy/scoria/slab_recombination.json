@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/scoria",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:scoria_slab"
-    }
+    "X": "mineralogy:scoria_slab"
   },
   "result": {
     "id": "mineralogy:scoria",

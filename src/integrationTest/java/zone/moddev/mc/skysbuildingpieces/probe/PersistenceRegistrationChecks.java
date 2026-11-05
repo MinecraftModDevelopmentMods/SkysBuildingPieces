@@ -1,7 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Field;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -16,15 +16,15 @@ public final class PersistenceRegistrationChecks {
     private PersistenceRegistrationChecks() {
     }
 
-    public static void register(IEventBus bus) {
-        bus.addListener(PersistenceRegistrationChecks::beforeQueuedWork);
-        bus.addListener(PersistenceRegistrationChecks::afterQueuedWork);
+    public static void register(BusGroup bus) {
+        FMLCommonSetupEvent.getBus(bus).addListener(PersistenceRegistrationChecks::beforeQueuedWork);
+        FMLLoadCompleteEvent.getBus(bus).addListener(PersistenceRegistrationChecks::afterQueuedWork);
     }
 
     private static void beforeQueuedWork(FMLCommonSetupEvent event) {
         require(count(CORE) == 0, "Building Pieces must wait until parallel setup has finished");
         require(count(GRASS) == (ModList.get().isLoaded("skysgrassslabs") ? 1 : 0),
-                "Grass Slabs installs its server listener during construction on Forge 50");
+                "Grass Slabs installs its server listener during construction on Forge 61");
         LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_BEFORE_PASS core=0 grass={}", count(GRASS));
     }
 

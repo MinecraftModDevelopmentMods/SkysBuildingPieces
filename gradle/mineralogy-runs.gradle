@@ -18,7 +18,7 @@ def gameDirectory = layout.projectDirectory.dir(
 
 def configureVerification = project.ext.configureMineralogyVerificationRun
 
-// Forge 52 uses the same official names in development and in the game.
+// Forge 61 uses the same official names in development and in the game.
 ext.nativeOptionalDevelopmentJars = runtimeSources
 ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
     group = 'verification'
@@ -33,9 +33,6 @@ ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') 
         }
     }
 }
-
-def developmentLogging = file('gradle/development-log4j2.xml').toURI().toString()
-
 
 def installRuntimeMods = {
     runtimeSources.each { mod, source ->
@@ -95,7 +92,6 @@ tasks.register('runMineralogyClient', JavaExec) {
     description = 'Runs a separate client with Mineralogy and OreSpawn installed.'
     dependsOn prepareMineralogyDevelopmentRun
     workingDir gameDirectory
-    systemProperty 'log4j.configurationFile', developmentLogging
     configureVerification(delegate, 'runClient')
 }
 tasks.register('runMineralogyServer', JavaExec) {
@@ -103,7 +99,6 @@ tasks.register('runMineralogyServer', JavaExec) {
     description = 'Runs a separate server with Mineralogy and OreSpawn installed.'
     dependsOn prepareMineralogyDevelopmentRun
     workingDir gameDirectory
-    systemProperty 'log4j.configurationFile', developmentLogging
     args '--nogui'
     configureVerification(delegate, 'runServer')
 }
@@ -119,10 +114,6 @@ def generateMineralogyEclipseRuns = tasks.register('generateMineralogyEclipseRun
             xml.stringAttribute.find {
                 it.@key == 'org.eclipse.jdt.launching.WORKING_DIRECTORY'
             }.@value = gameDirectory.asFile.absolutePath
-            def vmArguments = xml.stringAttribute.find {
-                it.@key == 'org.eclipse.jdt.launching.VM_ARGUMENTS'
-            }
-            vmArguments.@value = vmArguments.@value.toString() + ' -Dlog4j.configurationFile=' + developmentLogging
             file("runMineralogy${side}.launch").setText(groovy.xml.XmlUtil.serialize(xml).replace('\r\n', '\n'), 'UTF-8')
         }
     }
@@ -217,7 +208,6 @@ def fresh = tasks.register('integrationMineralogyFreshProcess', JavaExec) {
     dependsOn prepareMineralogyIntegrationTest
     workingDir verificationDirectory
     systemProperty probeId + '.integrationPhase', 'fresh'
-    systemProperty 'log4j.configurationFile', developmentLogging
     systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
     systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
     configureVerification(delegate, 'runServer')
@@ -227,7 +217,6 @@ def reload = tasks.register('integrationMineralogyReloadProcess', JavaExec) {
     dependsOn fresh
     workingDir verificationDirectory
     systemProperty probeId + '.integrationPhase', 'reload'
-    systemProperty 'log4j.configurationFile', developmentLogging
     systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
     systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
     configureVerification(delegate, 'runServer')
@@ -256,7 +245,6 @@ tasks.register('integrationMineralogyClientProcess', JavaExec) {
     dependsOn prepareMineralogyIntegrationTest
     workingDir verificationDirectory
     systemProperty probeId + '.integrationPhase', 'client'
-    systemProperty 'log4j.configurationFile', developmentLogging
     systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
     systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
     configureVerification(delegate, 'runClient')

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/pegmatite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_pegmatite_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_pegmatite_vertical_step"
   },
   "result": {
     "id": "mineralogy:pegmatite_slab",

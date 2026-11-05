@@ -504,15 +504,15 @@ public final class GameplayChecks {
                             + actualFire + " expected=" + expectedFire);
                     require(actualSpread == expectedSpread, "native fire spread");
                     world.setBlock(position, state, 2);
-                    require(ItemStack.matches(pieceBlock.getCloneItemStack(world, position, state),
+                    require(ItemStack.matches(pieceBlock.getCloneItemStack(world, position, state, false),
                             expectedDrop(materialDefinition.id, pieceBlock, state)),
                             "pick identity follows regular slab");
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
                     silkTool.enchant(world.registryAccess()
-                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
+                            .lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
 
                     BlockState silkState = materialDefinition.type.equals("path")
                             ? Pieces.state("minecraft:dirt", pieceBlock.palette.shape, orientation)
@@ -564,7 +564,7 @@ public final class GameplayChecks {
             }
 
             Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                    .getValue(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
+                    .getValue(Identifier.parse("skysgrassslabs:dirt_slab"));
 
             if (material.equals("minecraft:dirt") && dirt != null && dirt != Items.AIR) {
                 return new ItemStack(dirt, 1);
@@ -597,7 +597,7 @@ public final class GameplayChecks {
         }
 
         Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                .getValue(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
+                .getValue(Identifier.parse("skysgrassslabs:dirt_slab"));
 
         if (dirt != null && dirt != Items.AIR) {
             for (Direction occupied : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
@@ -627,17 +627,18 @@ public final class GameplayChecks {
 
         PlacementVeto veto = new PlacementVeto();
 
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(veto);
+        var vetoListener = net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent.BUS.addListener(
+                (java.util.function.Predicate<net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent>) veto::place);
 
         try {
             InteractionResult result = use(oak, player, world, position.below(), InteractionHand.MAIN_HAND,
                     Direction.UP, .1f, 1, .5f);
-            // Forge 50 restores the hand with a copy of the original stack.
+            // Forge restores the hand with a copy of the original stack.
             require(result == InteractionResult.FAIL && veto.seen && world.isEmptyBlock(position)
                             && ItemStack.matches(player.getMainHandItem(), new ItemStack(Blocks.OAK_SLAB, 2)),
                     "Forge placement protection rolls back the exact native slab placement");
         } finally {
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);
+            net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent.BUS.removeListener(vetoListener);
         }
         oak = player.getMainHandItem();
 
@@ -647,7 +648,7 @@ public final class GameplayChecks {
         player.setShiftKeyDown(false);
         require(player.gameMode.useItemOn(player, world, oak, InteractionHand.MAIN_HAND,
                 new BlockHitResult(new Vec3(position.getX() + .1, position.getY() + 1, position.getZ() + .5),
-                        Direction.UP, position, false)) == InteractionResult.CONSUME
+                        Direction.UP, position, false)).consumesAction()
                 && world.isEmptyBlock(position.above()) && oak.getCount() == 2
                 && world.getBlockState(position).getValue(TrapDoorBlock.OPEN),
                 "block activation takes priority and happens exactly once");
@@ -737,10 +738,9 @@ public final class GameplayChecks {
     public static final class PlacementVeto {
         boolean seen;
 
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public void place(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        public boolean place(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event) {
             seen = true;
-            event.setCanceled(true);
+            return true;
         }
     }
 

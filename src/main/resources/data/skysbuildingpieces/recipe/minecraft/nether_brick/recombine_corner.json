@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/nether_brick",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:nether_brick_corner"
-    }
+    "X": "skysbuildingpieces:nether_brick_corner"
   },
   "result": {
     "id": "skysbuildingpieces:nether_brick_horizontal_step",

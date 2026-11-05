@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_glass_green_horizontal_step"
-    }
+    "X": "skysbuildingpieces:stained_glass_green_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:stained_glass_green_vertical_step",

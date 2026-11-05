@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:cyan_wool"
-    }
+    "X": "minecraft:cyan_wool"
   },
   "result": {
     "id": "skysbuildingpieces:wool_cyan_stairs",

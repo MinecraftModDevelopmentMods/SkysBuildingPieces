@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.ServerStartedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -38,7 +37,7 @@ public final class RuntimeProbe {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
+        net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(this::tick);
         proxy.init();
     }
 
@@ -47,9 +46,8 @@ public final class RuntimeProbe {
         server = net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
     }
 
-    @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        if (ran || server == null || event.phase != TickEvent.Phase.END) {
+    public void tick(TickEvent.ServerTickEvent.Post event) {
+        if (ran || server == null) {
             return;
         }
 

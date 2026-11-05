@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:diorite_slab"
-    }
+    "X": "minecraft:diorite_slab"
   },
   "result": {
     "id": "skysbuildingpieces:diorite_horizontal_step",

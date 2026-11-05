@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/grass_path",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:grass_path_step"
-    }
+    "X": "skysbuildingpieces:grass_path_step"
   },
   "result": {
     "id": "skysgrassslabs:path_slab",

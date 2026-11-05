@@ -7,7 +7,7 @@ import java.util.function.ToIntFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 
@@ -34,7 +34,7 @@ public final class HistoricalBiomes {
                 throw new IllegalArgumentException("Invalid historical biome alias: " + source);
             }
 
-            checked.put(ResourceLocation.parse(source).toString(), ResourceLocation.parse(target).toString());
+            checked.put(Identifier.parse(source).toString(), Identifier.parse(target).toString());
         });
         MODULES.put(namespace, Collections.unmodifiableMap(checked));
     }
@@ -47,25 +47,25 @@ public final class HistoricalBiomes {
 
         java.util.Set<Integer> numbers = new java.util.HashSet<>();
         java.util.Set<String> names = new java.util.HashSet<>();
-        ListTag entries = snapshot.getCompound("Registries").getCompound("minecraft:biomes").getList("ids", 10);
+        ListTag entries = snapshot.getCompoundOrEmpty("Registries").getCompoundOrEmpty("minecraft:biomes").getListOrEmpty("ids");
 
         for (int index = 0; index < entries.size(); index++) {
-            CompoundTag entry = entries.getCompound(index);
+            CompoundTag entry = entries.getCompoundOrEmpty(index);
 
-            if (!entry.contains("K", 8) || !entry.contains("V", 99)) {
+            if (!entry.getString("K").isPresent() || !entry.getInt("V").isPresent()) {
                 throw blocked("invalid source biome registration: " + entry);
             }
 
-            String name = entry.getString("K");
-            ResourceLocation identity;
+            String name = entry.getStringOr("K", "");
+            Identifier identity;
 
             try {
-                identity = ResourceLocation.parse(name);
+                identity = Identifier.parse(name);
             } catch (RuntimeException malformed) {
                 throw blocked("invalid source biome name: " + name);
             }
 
-            long savedNumber = entry.getLong("V");
+            long savedNumber = entry.getLongOr("V", 0L);
 
             if (savedNumber < 0 || savedNumber > Integer.MAX_VALUE || !numbers.add((int) savedNumber)
                     || !names.add(name)) {
@@ -85,8 +85,8 @@ public final class HistoricalBiomes {
         active = new Mappings(source, aliases, name -> {
             // Numeric IDs belong to the world's biome instances, which can differ from Forge's registration objects.
             Registry<Biome> current = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer()
-                    .registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME);
-            Biome biome = current.get(ResourceLocation.parse(name));
+                    .registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME);
+            Biome biome = current.getValue(Identifier.parse(name));
 
             return biome == null ? -1 : current.getId(biome);
         });
@@ -103,8 +103,8 @@ public final class HistoricalBiomes {
             return false;
         }
 
-        CompoundTag level = root.getCompound("Level");
-        byte[] saved = level.getByteArray("Biomes");
+        CompoundTag level = root.getCompoundOrEmpty("Level");
+        byte[] saved = level.getByteArray("Biomes").orElseGet(() -> new byte[0]);
         ListTag names = new ListTag();
         for (byte value : saved) {
             String source = active.source.get(value & 255);
@@ -123,18 +123,18 @@ public final class HistoricalBiomes {
      * The caller supplies the original cells before translating their numbers.
      */
     public static void preserveNamed(CompoundTag root, int[] source, Map<Integer, String> replacements) {
-        CompoundTag level = root.getCompound("Level");
-        int[] translated = level.getIntArray("Biomes");
+        CompoundTag level = root.getCompoundOrEmpty("Level");
+        int[] translated = level.getIntArray("Biomes").orElseGet(() -> new int[0]);
         if ((source.length != 256 && source.length != 1024) || translated.length != source.length) {
             throw blocked("invalid named biome recovery array");
         }
         ListTag names = new ListTag();
         for (int number : source) {
             String replacement = replacements.get(number);
-            names.add(StringTag.valueOf(replacement == null ? "" : ResourceLocation.parse(replacement).toString()));
+            names.add(StringTag.valueOf(replacement == null ? "" : Identifier.parse(replacement).toString()));
         }
         if (level.contains(PENDING) || level.contains(PENDING_NAMES)) {
-            if (!level.contains(PENDING, 11) || !level.contains(PENDING_NAMES, 9)
+            if (!level.getIntArray(PENDING).isPresent() || !level.getList(PENDING_NAMES).isPresent()
                     || !level.get(PENDING).equals(new net.minecraft.nbt.IntArrayTag(translated))
                     || !names.equals(level.get(PENDING_NAMES))) {
                 throw blocked("conflicting pending named biome recovery");
@@ -146,21 +146,21 @@ public final class HistoricalBiomes {
     }
 
     private static int[] translate(CompoundTag root) {
-        if (active.source.isEmpty() || root.getInt("DataVersion") > 1343 || !root.contains("Level", 10)) {
+        if (active.source.isEmpty() || root.getIntOr("DataVersion", 0) > 1343 || !root.getCompound("Level").isPresent()) {
             return null;
         }
 
-        CompoundTag level = root.getCompound("Level");
+        CompoundTag level = root.getCompoundOrEmpty("Level");
 
         if (!level.contains("Biomes")) {
             return null;
         }
-        if (!level.contains("Biomes", 7) || level.getByteArray("Biomes").length != 256) {
-            throw blocked("unsupported pre-flattening biome array in chunk " + level.getInt("xPos") + ", "
-                    + level.getInt("zPos"));
+        if (!level.getByteArray("Biomes").isPresent() || level.getByteArray("Biomes").orElseGet(() -> new byte[0]).length != 256) {
+            throw blocked("unsupported pre-flattening biome array in chunk " + level.getIntOr("xPos", 0) + ", "
+                    + level.getIntOr("zPos", 0));
         }
 
-        return active.translate(level.getByteArray("Biomes"));
+        return active.translate(level.getByteArray("Biomes").orElseGet(() -> new byte[0]));
     }
 
     static void finish(CompoundTag root) {
@@ -172,16 +172,16 @@ public final class HistoricalBiomes {
             }
             return;
         }
-        int cells = level.getIntArray(PENDING).length;
-        if (!level.contains(PENDING, 11) || (cells != 256 && cells != 1024)
-                || level.getList(PENDING_NAMES, 8).size() != cells) {
+        int cells = level.getIntArray(PENDING).orElseGet(() -> new int[0]).length;
+        if (!level.getIntArray(PENDING).isPresent() || (cells != 256 && cells != 1024)
+                || level.getListOrEmpty(PENDING_NAMES).size() != cells) {
             throw blocked("invalid pending biome recovery");
         }
 
-        if (root.contains("Level", 10)) {
+        if (root.getCompound("Level").isPresent()) {
             // Retain the intermediate format for callers completing an older
             // fixing stage. Ordinary 1.18 chunk loads use the section path below.
-            level.putIntArray("Biomes", level.getIntArray(PENDING));
+            level.putIntArray("Biomes", level.getIntArray(PENDING).orElseGet(() -> new int[0]));
         } else {
             restoreSectionBiomes(level);
         }
@@ -190,25 +190,25 @@ public final class HistoricalBiomes {
     }
 
     private static void restoreSectionBiomes(CompoundTag chunk) {
-        ListTag names = chunk.getList(PENDING_NAMES, 8);
-        ListTag sections = chunk.getList("sections", 10);
+        ListTag names = chunk.getListOrEmpty(PENDING_NAMES);
+        ListTag sections = chunk.getListOrEmpty("sections");
         if ((names.size() != 256 && names.size() != 1024) || sections.isEmpty()) {
             throw blocked("missing names or sections for pending biome recovery");
         }
 
         java.util.List<Runnable> changes = new java.util.ArrayList<>();
         for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-            CompoundTag section = sections.getCompound(sectionIndex);
-            CompoundTag nativeBiomes = section.getCompound("biomes");
-            ListTag palette = nativeBiomes.getList("palette", 8);
+            CompoundTag section = sections.getCompoundOrEmpty(sectionIndex);
+            CompoundTag nativeBiomes = section.getCompoundOrEmpty("biomes");
+            ListTag palette = nativeBiomes.getListOrEmpty("palette");
             int bits = 32 - Integer.numberOfLeadingZeros(palette.size() - 1);
             if (palette.isEmpty() || palette.size() > 64) {
-                throw blocked("invalid native biome palette in section " + section.getByte("Y"));
+                throw blocked("invalid native biome palette in section " + section.getByteOr("Y", (byte) 0));
             }
             int perLong = bits == 0 ? 64 : 64 / bits;
-            long[] packed = nativeBiomes.getLongArray("data");
+            long[] packed = nativeBiomes.getLongArray("data").orElseGet(() -> new long[0]);
             if (bits > 0 && packed.length != (64 + perLong - 1) / perLong) {
-                throw blocked("invalid native biome storage in section " + section.getByte("Y"));
+                throw blocked("invalid native biome storage in section " + section.getByteOr("Y", (byte) 0));
             }
 
             Map<String, Integer> indices = new LinkedHashMap<>();
@@ -224,14 +224,14 @@ public final class HistoricalBiomes {
                     // Match vanilla's old two-dimensional-to-quart sampling.
                     int column = (cell & 3) * 4 + 2;
                     int row = (cell >> 2 & 3) * 4 + 2;
-                    replacement = names.getString(row * 16 + column);
+                    replacement = names.getStringOr(row * 16 + column, "");
                 } else {
                     // The 1.15–1.17 format already stores a 4×4×64 volume.
                     // Vanilla extends its bottom and top planes into new height.
-                    int height = Math.max(0, Math.min(63, section.getByte("Y") * 4 + (cell >> 4)));
-                    replacement = names.getString(height * 16 + (cell & 15));
+                    int height = Math.max(0, Math.min(63, section.getByteOr("Y", (byte) 0) * 4 + (cell >> 4)));
+                    replacement = names.getStringOr(height * 16 + (cell & 15), "");
                 }
-                String name = replacement.isEmpty() ? palette.getString(oldIndex) : replacement;
+                String name = replacement.isEmpty() ? palette.getStringOr(oldIndex, "") : replacement;
                 cells[cell] = indices.computeIfAbsent(name, ignored -> indices.size());
             }
 

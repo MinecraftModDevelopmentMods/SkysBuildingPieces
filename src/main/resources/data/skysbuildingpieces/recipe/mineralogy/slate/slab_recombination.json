@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/slate",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:slate_slab"
-    }
+    "X": "mineralogy:slate_slab"
   },
   "result": {
     "id": "mineralogy:slate",

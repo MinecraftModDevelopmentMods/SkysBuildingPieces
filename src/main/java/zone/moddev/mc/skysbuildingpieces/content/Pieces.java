@@ -17,7 +17,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -58,7 +60,7 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            registry.register(ResourceLocation.parse(palette.registryId()), block);
+            registry.register(Identifier.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
         }
     }
@@ -68,9 +70,10 @@ public final class Pieces {
         // Retain old item identities, creating their intrusive holders only
         // while Forge has opened the item registry.
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
-            Item item = new Item(new Item.Properties().stacksTo(1));
+            Identifier id = Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name);
+            Item item = new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).stacksTo(1));
             RETIRED_TEMPLATES.put(name, item);
-            registry.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name), item);
+            registry.register(id, item);
         }
     }
 
@@ -82,9 +85,11 @@ public final class Pieces {
 
             // Keep the old item identity available for mixed and unopened saves. Normal drops, recipes and creative
             // entries use the flat items below.
-            BlockItem carrier = new BlockItem(block, new Item.Properties());
+            Identifier blockId = Identifier.parse(block.palette.registryId());
+            BlockItem carrier = new BlockItem(block, new Item.Properties().useBlockDescriptionPrefix()
+                    .setId(ResourceKey.create(Registries.ITEM, blockId)));
 
-            registry.register(ResourceLocation.parse(block.palette.registryId()), carrier);
+            registry.register(blockId, carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -95,7 +100,7 @@ public final class Pieces {
 
                 PieceItem item = new PieceItem(block, material);
 
-                registry.register(ResourceLocation.parse(identifier), item);
+                registry.register(Identifier.parse(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -131,7 +136,7 @@ public final class Pieces {
     private static BlockState nativeState(JsonElement value) {
         JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
         String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
-        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.parse(identifier));
+        Block block = ForgeRegistries.BLOCKS.getValue(Identifier.parse(identifier));
 
         if (block == null || block == Blocks.AIR) {
             if (definition != null && definition.has("fallback")) {

@@ -6,12 +6,13 @@ import java.util.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.listener.EventListener;
 import net.minecraftforge.event.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.legacy.*;
 
 /** Loads only indexed existing chunks in a disposable full-world copy. */
 public final class WorldAuditProbe {
+    private final EventListener tickListener;
     private final net.minecraft.server.MinecraftServer server;
     private final List<int[]> chunks = new ArrayList<int[]>();
     private int next;
@@ -89,15 +90,11 @@ public final class WorldAuditProbe {
             }
         }
 
-        MinecraftForge.EVENT_BUS.register(this);
+        tickListener = TickEvent.ServerTickEvent.Post.BUS.addListener(this::tick);
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WORLD_AUDIT_INDEX " + chunks.size());
     }
 
-    @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public void tick(TickEvent.ServerTickEvent.Post event) {
         try {
             for (int entryIndex = 0; entryIndex < batch && next < chunks.size(); entryIndex++) {
                 int[] point = chunks.get(next++);
@@ -202,7 +199,7 @@ public final class WorldAuditProbe {
 
                 org.apache.logging.log4j.LogManager.getLogger().info(
                         "BUILDING_PIECES_WORLD_AUDIT_PASS blocks=" + blocks + " items=" + items + " reload=" + reload);
-                MinecraftForge.EVENT_BUS.unregister(this);
+                TickEvent.ServerTickEvent.Post.BUS.removeListener(tickListener);
                 server.halt(false);
             }
         } catch (Throwable failure) {

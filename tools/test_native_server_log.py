@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from native_client_log import audit_server, classify_server
-from native_registry_notices import audit_biome_proof, validate_registry_proofs
+from native_registry_notices import EMPTY_CAPABILITIES, audit_biome_proof, audit_text, validate_registry_proofs
 
 
 NOTICE = ('[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: '
@@ -52,6 +52,18 @@ class NativeServerLogTest(unittest.TestCase):
                       'java.lang.IllegalStateException: native fixture failed'):
             with self.subTest(extra=extra), self.assertRaises(ValueError):
                 classify_server(LOG + '\n' + extra, DETAILS, True)
+
+    def test_empty_capabilities_need_the_exact_fixture_count_and_logger(self):
+        profile = {'mappings': {}, 'empty_capabilities_count': 2}
+        notice = '[time] [Server thread/ERROR] [net.minecraft.world.level.storage.DimensionDataStorage/]: '
+        notice += EMPTY_CAPABILITIES + '\n'
+        self.assertEqual(audit_text(notice * 2, profile), [EMPTY_CAPABILITIES] * 2)
+        self.assertEqual(audit_text('A clean reload', profile), [])
+        for log, allowance in ((notice, profile), (notice * 3, profile), (notice, None),
+                               (notice.replace('MapLike[{}]', 'MapLike[{items:[]}]') * 2, profile),
+                               (notice.replace('DimensionDataStorage', 'AnotherMod') * 2, profile)):
+            with self.subTest(log=log), self.assertRaises(ValueError):
+                audit_text(log, allowance)
 
     def test_wrong_logger_is_rejected(self):
         with self.assertRaises(ValueError):

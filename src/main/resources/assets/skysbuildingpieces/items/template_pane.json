@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "skysbuildingpieces:item/template_pane",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 10053176
+      }
+    ]
+  }
+}

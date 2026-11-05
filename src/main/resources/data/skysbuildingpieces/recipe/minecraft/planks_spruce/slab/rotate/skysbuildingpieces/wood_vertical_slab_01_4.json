@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:planks_spruce_vertical_slab"
-    }
+    "X": "skysbuildingpieces:planks_spruce_vertical_slab"
   },
   "result": {
     "id": "minecraft:spruce_slab",

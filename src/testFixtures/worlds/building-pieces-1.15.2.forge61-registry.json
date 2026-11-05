@@ -1,0 +1,60 @@
+{
+  "source_world_sha256": "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525",
+  "snapshot_entries": {
+    "minecraft:block": {
+      "minecraft:grass": 94
+    },
+    "minecraft:entity_type": {
+      "minecraft:boat": 6,
+      "minecraft:potion": 82,
+      "minecraft:zombie_pigman": 57
+    },
+    "minecraft:item": {
+      "minecraft:grass": 76,
+      "minecraft:scute": 519,
+      "minecraft:zombie_pigman_spawn_egg": 754
+    },
+    "minecraft:memory_module_type": {
+      "minecraft:golem_last_seen_time": 24,
+      "minecraft:opened_doors": 16
+    },
+    "minecraft:point_of_interest_type": {
+      "minecraft:nitwit": 11,
+      "minecraft:unemployed": 0
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:entity.leash_knot.break": 377,
+      "minecraft:entity.leash_knot.place": 378,
+      "minecraft:entity.puffer_fish.ambient": 535,
+      "minecraft:entity.wolf.howl": 768,
+      "minecraft:entity.zombie_pigman.ambient": 799,
+      "minecraft:entity.zombie_pigman.angry": 800,
+      "minecraft:entity.zombie_pigman.death": 801,
+      "minecraft:entity.zombie_pigman.hurt": 802,
+      "minecraft:music.nether": 420
+    }
+  },
+  "inspected_nbt_records": 5190,
+  "typed_uses": {
+    "minecraft:grass": {
+      "kind": "vanilla_block_rename",
+      "positions": 20363
+    }
+  },
+  "empty_capabilities": {
+    "original": {
+      "data/capabilities.dat": "84075271CAEA0CDC025520A716A7AC38CCEB275040A6B0E99BC0704E81B1DBB9",
+      "DIM-1/data/capabilities.dat": "84075271CAEA0CDC025520A716A7AC38CCEB275040A6B0E99BC0704E81B1DBB9",
+      "DIM1/data/capabilities.dat": "84075271CAEA0CDC025520A716A7AC38CCEB275040A6B0E99BC0704E81B1DBB9"
+    },
+    "rewritten": {
+      "data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9",
+      "DIM-1/data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9",
+      "DIM1/data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9"
+    },
+    "control_log_sha256": "9CC0807B05308657C6430E3B15C1AB0921617ED5DDBFC4C1ED3BD3B144A77A16"
+  }
+}

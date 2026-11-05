@@ -29,11 +29,11 @@ final class SourceLevelData {
         if (Files.isRegularFile(level)) {
             try (InputStream input = Files.newInputStream(level)) {
                 CompoundTag root = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
-                captured.putInt("DataVersion", root.getCompound("Data").getInt("DataVersion"));
-                CompoundTag registries = root.getCompound("fml").getCompound("Registries");
-                CompoundTag biomes = registries.getCompound("minecraft:worldgen/biome");
+                captured.putInt("DataVersion", root.getCompoundOrEmpty("Data").getIntOr("DataVersion", 0));
+                CompoundTag registries = root.getCompoundOrEmpty("fml").getCompoundOrEmpty("Registries");
+                CompoundTag biomes = registries.getCompoundOrEmpty("minecraft:worldgen/biome");
                 if (biomes.isEmpty()) {
-                    biomes = registries.getCompound("minecraft:biome");
+                    biomes = registries.getCompoundOrEmpty("minecraft:biome");
                 }
                 captured.put("Registry", biomes.copy());
             } catch (IOException failure) {

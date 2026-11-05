@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/rhyolite",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:rhyolite_slab"
-    }
+    "X": "mineralogy:rhyolite_slab"
   },
   "result": {
     "id": "mineralogy:rhyolite",

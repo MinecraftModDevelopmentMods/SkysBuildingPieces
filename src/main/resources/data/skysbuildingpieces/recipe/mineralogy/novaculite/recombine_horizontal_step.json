@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/novaculite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
   },
   "result": {
     "id": "mineralogy:novaculite_slab",

@@ -1,169 +1,58 @@
 package zone.moddev.mc.skysbuildingpieces;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import com.google.gson.JsonParser;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderHooksTest {
-    private static Map<String, String> targets() {
-        Map<String, String> targets = new LinkedHashMap<>();
-
-        targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/level/chunk/storage/ChunkStorage");
-        targets.put("skysbuildingpieces_legacy_level_registry", "net/minecraftforge/common/ForgeHooks");
-        targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/util/datafix/DataFixTypes");
-        targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/world/item/BlockItem");
-        return targets;
-    }
-
-    private ScriptEngine engine() throws Exception {
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-
-        assertNotNull(engine, "Forge 47 transformer tests require the production Java 17 runtime");
-        engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
-                StandardCharsets.UTF_8));
-        return engine;
-    }
-
-    private ClassNode original(String target) throws Exception {
-        try (InputStream stream = getClass().getClassLoader().getResourceAsStream(target + ".class")) {
-            assertNotNull(stream, target);
-
-            ClassNode node = new ClassNode();
-
-            new ClassReader(stream).accept(node, 0);
-            return node;
-        }
-    }
-
-    private void transform(ScriptEngine engine, String key, ClassNode node) throws Exception {
-        engine.put("candidate", node);
-        engine.eval("initializeCoreMod()['" + key + "'].transformer(candidate)");
-    }
-
-    private int calls(ClassNode node, String name) {
-        int count = 0;
-
-        for (MethodNode method : node.methods) {
-            for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                if (instruction instanceof MethodInsnNode) {
-                    MethodInsnNode call = (MethodInsnNode) instruction;
-
-                    if (call.owner.startsWith("zone/moddev/mc/skysbuildingpieces/") && call.name.equals(name)) {
-                        count++;
-                    }
-                }
-            }
-        }
-
-        return count;
+    @Test
+    void theNativeChunkAndInventoryTargetsMatchThisForgeBuild() throws Exception {
+        assertNativeReturn("net.minecraft.world.level.chunk.storage.SimpleRegionStorage", "upgradeChunkTag",
+                "(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraft.util.datafix.DataFixTypes", "update",
+                "(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraft.world.level.chunk.storage.SerializableChunkData", "copyOf",
+                "(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;)"
+                        + "Lnet/minecraft/world/level/chunk/storage/SerializableChunkData;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraftforge.common.ForgeHooks", "readAdditionalLevelSaveData",
+                "(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"
+                        + "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;)V",
+                Opcodes.RETURN);
     }
 
     @Test
-    void realForge47MethodsMatchAndEveryReturnIsWrapped() throws Exception {
-        for (Map.Entry<String, String> target : targets().entrySet()) {
-            ScriptEngine engine = engine();
-            ClassNode node = original(target.getValue());
-            int returns = 0;
-
-            if (target.getKey().endsWith("legacy_chunk")) {
-                for (MethodNode method : node.methods) {
-                    if (method.desc.contains("Ljava/util/function/Supplier;Lnet/minecraft/nbt/CompoundTag;Ljava/util/Optional;)")) {
-                        for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                            if (instruction.getOpcode() == Opcodes.ARETURN) {
-                                returns++;
-                            }
-                        }
-                    }
-                }
-
-                assertTrue(returns > 0);
-            }
-
-            transform(engine, target.getKey(), node);
-            assertEquals(target.getKey().endsWith("legacy_chunk") ? 1 : 0, calls(node, "prepareLegacyChunk"));
-            assertEquals(returns, calls(node, "finalizeLegacyChunk"));
-            assertEquals(target.getKey().endsWith("raw_inventory") ? 1 : 0, calls(node, "prepareNbt"));
-            assertEquals(target.getKey().endsWith("level_registry") ? 1 : 0, calls(node, "captureLegacyLevelData"));
-            assertEquals(target.getKey().endsWith("level_registry") ? 1 : 0, calls(node, "writeLegacyLevelData"));
-
-            if (target.getKey().endsWith("raw_inventory")) {
-                int inventoryReturns = 0;
-
-                for (MethodNode method : node.methods) {
-                    if (method.desc.equals(
-                            "(Lcom/mojang/datafixers/DataFixer;"
-                                    + "Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;")) {
-                        for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                            if (instruction.getOpcode() == Opcodes.ARETURN) {
-                                inventoryReturns++;
-                            }
-                            if (instruction instanceof MethodInsnNode
-                                    && ((MethodInsnNode) instruction).name.equals("finalizeNbt")) {
-                                MethodInsnNode finish = (MethodInsnNode) instruction;
-                                assertEquals("(Lnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/nbt/CompoundTag;",
-                                        finish.desc);
-                                assertTrue(finish.getPrevious() instanceof VarInsnNode);
-                                VarInsnNode version = (VarInsnNode) finish.getPrevious();
-                                assertEquals(Opcodes.ILOAD, version.getOpcode());
-                                assertEquals(4, version.var, "Forward the requested target version, not the old version");
-                            }
-                        }
-                    }
-                }
-
-                assertTrue(inventoryReturns > 0);
-                assertEquals(inventoryReturns, calls(node, "finalizeNbt"));
-            }
-
-            assertEquals(target.getKey().endsWith("native_slab_placement") ? 1 : 0, calls(node, "place"));
-
-            int instructions = node.methods.stream().mapToInt(method -> method.instructions.size()).sum();
-
-            transform(engine, target.getKey(), node);
-            assertEquals(instructions, node.methods.stream().mapToInt(method -> method.instructions.size()).sum(),
-                    "A repeated transformation must leave the class unchanged: " + target.getValue());
-        }
+    void missingMixinsAreAnErrorInsteadOfSilentlySkippingRecovery() throws Exception {
+        Path resources = Path.of("src/main/resources");
+        var config = JsonParser.parseString(Files.readString(resources.resolve("skysbuildingpieces.mixins.json")))
+                .getAsJsonObject();
+        assertTrue(config.get("required").getAsBoolean());
+        assertEquals(1, config.getAsJsonObject("injectors").get("defaultRequire").getAsInt());
+        assertFalse(Files.exists(resources.resolve("META-INF/coremods.json")));
     }
 
-    @Test
-    void missingAndAmbiguousStructuresFailBeforeLoading() throws Exception {
-        for (Map.Entry<String, String> target : targets().entrySet()) {
-            ClassNode empty = new ClassNode();
-
-            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), empty), target.getKey());
-
-            ClassNode node = original(target.getValue());
-
-            transform(engine(), target.getKey(), node);
-
-            MethodNode patched = node.methods.stream().filter(method -> {
-                for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                    if (instruction instanceof MethodInsnNode
-                            && ((MethodInsnNode) instruction).owner.startsWith("zone/moddev/mc/skysbuildingpieces/")) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }).findFirst().get();
-
-            node.methods.add(patched);
-            assertThrows(ScriptException.class, () -> transform(engine(), target.getKey(), node), target.getKey());
+    static void assertNativeReturn(String type, String method, String descriptor, int opcode) throws Exception {
+        String resource = "/" + type.replace('.', '/') + ".class";
+        try (var stream = LoaderHooksTest.class.getResourceAsStream(resource)) {
+            assertNotNull(stream, type);
+            ClassNode nativeClass = new ClassNode();
+            new ClassReader(stream).accept(nativeClass, 0);
+            var methods = nativeClass.methods.stream()
+                    .filter(candidate -> candidate.name.equals(method) && candidate.desc.equals(descriptor))
+                    .toList();
+            assertEquals(1, methods.size(), type + "." + method);
+            boolean returns = false;
+            for (var instruction : methods.getFirst().instructions) {
+                returns |= instruction.getOpcode() == opcode;
+            }
+            assertTrue(returns, type + "." + method);
         }
     }
 }

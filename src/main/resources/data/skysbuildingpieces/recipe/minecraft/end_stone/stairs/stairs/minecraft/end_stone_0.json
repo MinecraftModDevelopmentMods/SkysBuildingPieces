@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:end_stone"
-    }
+    "X": "minecraft:end_stone"
   },
   "result": {
     "id": "skysbuildingpieces:end_stone_stairs",

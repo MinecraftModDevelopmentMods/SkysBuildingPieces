@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_light_blue_vertical_slab"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_light_blue_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_light_blue_slab",

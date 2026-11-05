@@ -38,7 +38,7 @@ class RecipeAdvancementContractTest {
                 assertEquals(id, criteria.getAsJsonObject("has_the_recipe").getAsJsonObject("conditions").get("recipe")
                         .getAsString());
 
-                String input = recipe.getAsJsonObject("key").getAsJsonObject("X").get("item").getAsString();
+                String input = recipe.getAsJsonObject("key").get("X").getAsString();
 
                 assertEquals(input, criteria.getAsJsonObject("has_ingredient").getAsJsonObject("conditions")
                         .getAsJsonArray("items").get(0).getAsJsonObject().getAsJsonArray("items").get(0).getAsString());
@@ -48,8 +48,9 @@ class RecipeAdvancementContractTest {
                 assertTrue(recipe.getAsJsonObject("result").get("count").getAsInt() > 0);
 
                 for (Map.Entry<String, JsonElement> key : recipe.getAsJsonObject("key").entrySet()) {
-                    assertFalse(key.getValue().getAsJsonObject().has("data"), "Flat item identity replaces metadata");
-                    assertFalse(key.getValue().getAsJsonObject().has("nbt"));
+                    assertTrue(key.getValue().isJsonPrimitive()
+                            && key.getValue().getAsJsonPrimitive().isString(),
+                            "Ingredients name flat items instead of inventory metadata");
                 }
 
                 checked++;

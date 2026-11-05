@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/stained_glass_white",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_glass_white_horizontal_step"
-    }
+    "X": "skysbuildingpieces:stained_glass_white_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:stained_glass_white_slab",

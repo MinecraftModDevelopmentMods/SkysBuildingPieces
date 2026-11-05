@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:birch_slab"
-    }
+    "X": "minecraft:birch_slab"
   },
   "result": {
     "id": "skysbuildingpieces:planks_birch_horizontal_step",

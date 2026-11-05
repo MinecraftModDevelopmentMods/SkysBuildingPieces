@@ -22,13 +22,13 @@ class LegacyAccountingTest {
 
         LegacyBridge.finalizeLegacyChunk(chunk);
 
-        assertEquals("full", chunk.getString("Status"));
+        assertEquals("full", chunk.getStringOr("Status", ""));
         assertFalse(chunk.contains("SkysBuildingPiecesPreserveChunk"));
-        assertEquals(26, chunk.getLong("skysbuildingpieces_delta"));
-        assertEquals(4, chunk.getLong("skysbuildingpieces_additional_vanilla_delta"));
-        assertEquals(modules, chunk.getCompound("skysbuildingpieces_module_delta"));
-        assertEquals(coverage, chunk.getCompound("skysbuildingpieces_coverage"));
-        assertEquals("Keep unknown data", chunk.getString("future_addon_note"));
+        assertEquals(26, chunk.getLongOr("skysbuildingpieces_delta", 0L));
+        assertEquals(4, chunk.getLongOr("skysbuildingpieces_additional_vanilla_delta", 0L));
+        assertEquals(modules, chunk.getCompoundOrEmpty("skysbuildingpieces_module_delta"));
+        assertEquals(coverage, chunk.getCompoundOrEmpty("skysbuildingpieces_coverage"));
+        assertEquals("Keep unknown data", chunk.getStringOr("future_addon_note", ""));
         CompoundTag once = chunk.copy();
         LegacyBridge.finalizeLegacyChunk(chunk);
         assertEquals(once, chunk, "Returning through a second wrapper must be harmless");
@@ -36,7 +36,7 @@ class LegacyAccountingTest {
         CompoundTag unrelated = new CompoundTag();
         unrelated.putString("Status", "minecraft:heightmaps");
         LegacyBridge.finalizeLegacyChunk(unrelated);
-        assertEquals("minecraft:heightmaps", unrelated.getString("Status"));
+        assertEquals("minecraft:heightmaps", unrelated.getStringOr("Status", ""));
     }
 
     @Test
@@ -52,8 +52,8 @@ class LegacyAccountingTest {
 
         assertSame(level, MigrationEvents.chunkLevel(root));
         assertSame(level, MigrationEvents.chunkLevel(level));
-        assertEquals(26, MigrationEvents.chunkLevel(root).getLong("skysbuildingpieces_delta"));
-        assertEquals(markers, MigrationEvents.chunkLevel(root).getCompound("skysbuildingpieces_coverage"));
+        assertEquals(26, MigrationEvents.chunkLevel(root).getLongOr("skysbuildingpieces_delta", 0L));
+        assertEquals(markers, MigrationEvents.chunkLevel(root).getCompoundOrEmpty("skysbuildingpieces_coverage"));
         MigrationEvents.chunkLevel(root).remove("skysbuildingpieces_delta");
         assertFalse(level.contains("skysbuildingpieces_delta"));
     }
@@ -76,14 +76,14 @@ class LegacyAccountingTest {
         root.put("skysbuildingpieces_additional_module_delta", modules.copy());
         root.put("skysbuildingpieces_historical_delta", modules.copy());
         LegacyBridge.finalizeLegacyChunk(root);
-        assertEquals(26, level.getLong("skysbuildingpieces_delta"));
-        assertEquals(4, level.getLong("skysbuildingpieces_additional_vanilla_delta"));
-        assertEquals(7, level.getLong("skysbuildingpieces_retired_delta"));
-        assertEquals(modules, level.getCompound("skysbuildingpieces_module_delta"));
-        assertEquals(modules, level.getCompound("skysbuildingpieces_additional_module_delta"));
-        assertEquals(modules, level.getCompound("skysbuildingpieces_historical_delta"));
+        assertEquals(26, level.getLongOr("skysbuildingpieces_delta", 0L));
+        assertEquals(4, level.getLongOr("skysbuildingpieces_additional_vanilla_delta", 0L));
+        assertEquals(7, level.getLongOr("skysbuildingpieces_retired_delta", 0L));
+        assertEquals(modules, level.getCompoundOrEmpty("skysbuildingpieces_module_delta"));
+        assertEquals(modules, level.getCompoundOrEmpty("skysbuildingpieces_additional_module_delta"));
+        assertEquals(modules, level.getCompoundOrEmpty("skysbuildingpieces_historical_delta"));
         assertFalse(root.contains("skysbuildingpieces_delta"));
-        assertEquals("Keep unknown data", level.getString("future_addon_note"));
+        assertEquals("Keep unknown data", level.getStringOr("future_addon_note", ""));
 
         CompoundTag once = root.copy();
 

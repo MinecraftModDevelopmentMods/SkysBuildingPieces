@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/dirt",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysgrassslabs:dirt_slab"
-    }
+    "X": "skysgrassslabs:dirt_slab"
   },
   "result": {
     "id": "minecraft:dirt",

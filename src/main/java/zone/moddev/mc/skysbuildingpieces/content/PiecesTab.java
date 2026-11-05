@@ -9,9 +9,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -19,11 +17,9 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Keep new pieces and the native shapes they reuse together in one tab. */
-@Mod.EventBusSubscriber(modid = SkysBuildingPieces.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class PiecesTab {
     public static CreativeModeTab INSTANCE;
 
-    @SubscribeEvent
     public static void register(RegisterEvent event) {
         event.register(Registries.CREATIVE_MODE_TAB, registry -> {
             INSTANCE = CreativeModeTab.builder()
@@ -31,12 +27,12 @@ public final class PiecesTab {
                     .icon(() -> new ItemStack(Blocks.BRICK_STAIRS))
                     .displayItems((parameters, output) -> entries().values().forEach(output::accept))
                     .build();
-            registry.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
+            registry.register(Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
         });
     }
 
-    public static Map<ResourceLocation, ItemStack> entries() {
-        Map<ResourceLocation, ItemStack> entries = new LinkedHashMap<>();
+    public static Map<Identifier, ItemStack> entries() {
+        Map<Identifier, ItemStack> entries = new LinkedHashMap<>();
 
         for (Item item : ForgeRegistries.ITEMS.getValues()) {
             if (item instanceof PieceItem && ((PieceItem) item).visibleInCreativeTab()) {

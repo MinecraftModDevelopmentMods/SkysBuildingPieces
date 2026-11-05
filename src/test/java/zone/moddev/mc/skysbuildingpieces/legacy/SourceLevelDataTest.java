@@ -31,12 +31,12 @@ class SourceLevelDataTest {
         CompoundTag expected = SourceLevelData.forWorld(directory);
         writeLevel(directory, 2586, 400, "biomesoplenty:tropic_beach");
         SourceLevelData.capture(directory);
-        assertEquals(1976, expected.getInt("DataVersion"));
-        assertEquals(600, expected.getCompound("Registry").getList("ids", 10).getCompound(0).getInt("V"));
+        assertEquals(1976, expected.getIntOr("DataVersion", 0));
+        assertEquals(600, expected.getCompoundOrEmpty("Registry").getListOrEmpty("ids").getCompoundOrEmpty(0).getIntOr("V", 0));
         assertEquals(expected, SourceLevelData.forWorld(directory));
 
-        expected.getCompound("Registry").remove("ids");
-        assertTrue(SourceLevelData.forWorld(directory).getCompound("Registry").contains("ids", 9));
+        expected.getCompoundOrEmpty("Registry").remove("ids");
+        assertTrue(SourceLevelData.forWorld(directory).getCompoundOrEmpty("Registry").getList("ids").isPresent());
     }
 
     @Test

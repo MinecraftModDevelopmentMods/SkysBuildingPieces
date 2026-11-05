@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/amphibolite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_amphibolite_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_amphibolite_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step",

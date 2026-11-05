@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:pink_wool"
-    }
+    "X": "minecraft:pink_wool"
   },
   "result": {
     "id": "skysbuildingpieces:wool_pink_slab",

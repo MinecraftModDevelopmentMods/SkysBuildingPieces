@@ -1,0 +1,60 @@
+{
+  "source_world_sha256": "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209",
+  "snapshot_entries": {
+    "minecraft:block": {
+      "minecraft:grass": 94
+    },
+    "minecraft:entity_type": {
+      "minecraft:boat": 5,
+      "minecraft:potion": 81,
+      "minecraft:zombie_pigman": 56
+    },
+    "minecraft:item": {
+      "minecraft:grass": 76,
+      "minecraft:scute": 519,
+      "minecraft:zombie_pigman_spawn_egg": 753
+    },
+    "minecraft:memory_module_type": {
+      "minecraft:golem_last_seen_time": 24,
+      "minecraft:opened_doors": 16
+    },
+    "minecraft:point_of_interest_type": {
+      "minecraft:nitwit": 11,
+      "minecraft:unemployed": 0
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:entity.leash_knot.break": 357,
+      "minecraft:entity.leash_knot.place": 358,
+      "minecraft:entity.parrot.imitate.enderman": 446,
+      "minecraft:entity.parrot.imitate.panda": 454,
+      "minecraft:entity.parrot.imitate.polar_bear": 457,
+      "minecraft:entity.parrot.imitate.wolf": 470,
+      "minecraft:entity.parrot.imitate.zombie_pigman": 472,
+      "minecraft:entity.puffer_fish.ambient": 520,
+      "minecraft:entity.wolf.howl": 753,
+      "minecraft:entity.zombie_pigman.ambient": 784,
+      "minecraft:entity.zombie_pigman.angry": 785,
+      "minecraft:entity.zombie_pigman.death": 786,
+      "minecraft:entity.zombie_pigman.hurt": 787,
+      "minecraft:music.nether": 400
+    }
+  },
+  "inspected_nbt_records": 5029,
+  "typed_uses": {},
+  "empty_capabilities": {
+    "original": {
+      "data/capabilities.dat": "5ADEBCC102EA8D2CAB0F4E13BC8DD2CBF50DB53211BF21D676B34D4FEDB49D0C",
+      "DIM-1/data/capabilities.dat": "5ADEBCC102EA8D2CAB0F4E13BC8DD2CBF50DB53211BF21D676B34D4FEDB49D0C",
+      "DIM1/data/capabilities.dat": "5ADEBCC102EA8D2CAB0F4E13BC8DD2CBF50DB53211BF21D676B34D4FEDB49D0C"
+    },
+    "rewritten": {
+      "data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9",
+      "DIM-1/data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9",
+      "DIM1/data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9"
+    },
+    "control_log_sha256": "B79BE9031C218CA6F9CCCE2575FE1DD9AABD8455A970F316D7AA96D0ACCCCF86"
+  }
+}

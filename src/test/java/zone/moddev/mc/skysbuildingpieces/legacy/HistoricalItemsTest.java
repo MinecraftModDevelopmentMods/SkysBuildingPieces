@@ -13,7 +13,7 @@ final class HistoricalItemsTest {
         CompoundTag original = stack("minecraft:stone");
 
         assertSame(original, registry.prepareCopy(original));
-        registry.register("test_material", root -> root.getString("id").equals("old:basket"), root -> fail());
+        registry.register("test_material", root -> root.getStringOr("id", "").equals("old:basket"), root -> fail());
         assertSame(original, registry.prepareCopy(original));
     }
 
@@ -22,7 +22,7 @@ final class HistoricalItemsTest {
         HistoricalItems.Registry registry = new HistoricalItems.Registry();
 
         registry.register("test_material", root -> root.contains("Inventory"),
-                root -> root.getList("Inventory", 10).getCompound(0).putString("id", "new:basket"));
+                root -> root.getListOrEmpty("Inventory").getCompoundOrEmpty(0).putString("id", "new:basket"));
 
         CompoundTag original = new CompoundTag();
         ListTag inventory = new ListTag();
@@ -36,11 +36,11 @@ final class HistoricalItemsTest {
         CompoundTag recovered = registry.prepareCopy(original);
 
         assertEquals(before, original);
-        assertEquals("new:basket", recovered.getList("Inventory", 10).getCompound(0).getString("id"));
+        assertEquals("new:basket", recovered.getListOrEmpty("Inventory").getCompoundOrEmpty(0).getStringOr("id", ""));
 
         CompoundTag expected = before.copy();
 
-        expected.getList("Inventory", 10).getCompound(0).putString("id", "new:basket");
+        expected.getListOrEmpty("Inventory").getCompoundOrEmpty(0).putString("id", "new:basket");
         assertEquals(expected, recovered);
     }
 

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/basalt",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_basalt_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_basalt_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_basalt_horizontal_step",

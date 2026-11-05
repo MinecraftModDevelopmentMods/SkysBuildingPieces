@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/andesite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_andesite_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_andesite_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_andesite_horizontal_step",

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:yellow_terracotta"
-    }
+    "X": "minecraft:yellow_terracotta"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_yellow_stairs",

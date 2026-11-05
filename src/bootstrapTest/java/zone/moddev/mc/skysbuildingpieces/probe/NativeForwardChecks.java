@@ -195,7 +195,7 @@ final class NativeForwardChecks {
             String id = saved.get("id").getAsString();
             BlockState actual = world.getBlockState(position);
             net.minecraft.world.level.block.Block registered = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                    .getValue(net.minecraft.resources.ResourceLocation.parse(id));
+                    .getValue(net.minecraft.resources.Identifier.parse(id));
 
             require(registered instanceof PieceBlock, "Permanent palette registration is missing: " + id);
 
@@ -320,9 +320,9 @@ final class NativeForwardChecks {
             JsonObject saved = value.getAsJsonObject();
             BlockPos position = position(saved);
             net.minecraft.nbt.CompoundTag expected = net.minecraft.nbt.TagParser
-                    .parseTag(saved.get("state").getAsString());
+                    .parseCompoundFully(saved.get("state").getAsString());
 
-            if (expected.getString("Name").equals("minecraft:grass_path")) {
+            if (expected.getStringOr("Name", "").equals("minecraft:grass_path")) {
                 expected.putString("Name", "minecraft:dirt_path");
             }
 
@@ -343,7 +343,7 @@ final class NativeForwardChecks {
             for (JsonElement item : saved.getAsJsonArray("items")) {
                 JsonObject entry = item.getAsJsonObject();
                 ItemStack expected = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
-                        .parseTag(entry.get("stack").getAsString()));
+                        .parseCompoundFully(entry.get("stack").getAsString()));
                 ItemStack actual = chest.getItem(entry.get("slot").getAsInt());
 
                 require(ItemStack.matches(expected, actual),
@@ -357,7 +357,7 @@ final class NativeForwardChecks {
             net.minecraft.world.entity.Entity entity = world.getEntity(java.util.UUID
                     .fromString(saved.get("uuid").getAsString()));
             ItemStack expected = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
-                    .parseTag(saved.get("stack").getAsString()));
+                    .parseCompoundFully(saved.get("stack").getAsString()));
 
             require(entity instanceof net.minecraft.world.entity.item.ItemEntity
                     && ItemStack.matches(expected,
@@ -370,11 +370,15 @@ final class NativeForwardChecks {
             java.util.UUID id = java.util.UUID.fromString(fixture.get("player").getAsString());
             net.minecraft.server.level.ServerPlayer player = NativeProbeItems.player(
                     world, new com.mojang.authlib.GameProfile(id, "PieceFixture"));
-            require(world.getServer().getPlayerList().load(player) != null, "Saved player data is missing");
+            var savedPlayer = world.getServer().getPlayerList().getPlayerIo()
+                    .load(new net.minecraft.server.players.NameAndId(player.getGameProfile()))
+                    .orElseThrow(() -> new AssertionError("Saved player data is missing"));
+            player.load(net.minecraft.world.level.storage.TagValueInput.create(
+                    net.minecraft.util.ProblemReporter.DISCARDING, world.registryAccess(), savedPlayer));
             ItemStack shovel = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
-                    .parseTag(fixture.get("player_shovel").getAsString()));
+                    .parseCompoundFully(fixture.get("player_shovel").getAsString()));
             ItemStack nested = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
-                    .parseTag(fixture.get("player_nested").getAsString()));
+                    .parseCompoundFully(fixture.get("player_nested").getAsString()));
             require(ItemStack.matches(shovel, player.getInventory().getItem(0)),
                     "Player tool lost its damage, enchantment, name or custom data");
             require(ItemStack.matches(nested, player.getInventory().getItem(1)),
@@ -398,9 +402,9 @@ final class NativeForwardChecks {
         }
 
         net.minecraft.nbt.CompoundTag expectedState = net.minecraft.nbt.TagParser
-                .parseTag(fixture.get("world_state").getAsString());
+                .parseCompoundFully(fixture.get("world_state").getAsString());
 
-        require(PiecesWorldState.get(world).save(new net.minecraft.nbt.CompoundTag(), world.registryAccess()).equals(expectedState),
+        require(PiecesWorldState.get(world).saveTag(new net.minecraft.nbt.CompoundTag()).equals(expectedState),
                 "Named-state world data, counters or unknown module fields changed");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_FORWARD_PASS named_states=" + states + " item_units=" + units
                 + " waterlogging=true snow=true schema=1 counters=unchanged");
@@ -464,13 +468,13 @@ final class NativeForwardChecks {
 
             for (JsonElement value : saved.getAsJsonArray("items")) {
                 net.minecraft.nbt.CompoundTag original = net.minecraft.nbt.TagParser
-                        .parseTag(value.getAsString());
-                int slot = original.getByte("Slot") & 255;
+                        .parseCompoundFully(value.getAsString());
+                int slot = original.getByteOr("Slot", (byte) 0) & 255;
                 ItemStack actual = chest.getItem(slot);
 
                 recoveredItem(actual, original);
                 units += actual.getCount();
-                expectedUnits += original.getByte("Count") & 255;
+                expectedUnits += original.getByteOr("Count", (byte) 0) & 255;
             }
         }
 
@@ -485,21 +489,21 @@ final class NativeForwardChecks {
             }
 
             net.minecraft.nbt.CompoundTag original = net.minecraft.nbt.TagParser
-                    .parseTag(saved.get("item").getAsString());
+                    .parseCompoundFully(saved.get("item").getAsString());
             double x = saved.get("x").getAsDouble();
             double y = saved.get("y").getAsDouble();
             double z = saved.get("z").getAsDouble();
             java.util.List<net.minecraft.world.entity.item.ItemEntity> found = world.getEntitiesOfClass(
                     net.minecraft.world.entity.item.ItemEntity.class,
-                    new net.minecraft.world.phys.AABB(x - 8, world.getMinBuildHeight(), z - 8,
-                            x + 8, world.getMaxBuildHeight(), z + 8));
+                    new net.minecraft.world.phys.AABB(x - 8, world.getMinY(), z - 8,
+                            x + 8, world.getMaxY()+1, z + 8));
 
             require(found.size() == 1, "Historical dropped stack is missing or duplicated");
             require(found.get(0).getUUID().toString().equals(LEGACY_DROP_IDENTITIES.getProperty(legacyDropKey(saved))),
                     "Historical dropped entity identity changed");
             recoveredItem(found.get(0).getItem(), original);
             units += found.get(0).getItem().getCount();
-            expectedUnits += original.getByte("Count") & 255;
+            expectedUnits += original.getByteOr("Count", (byte) 0) & 255;
             drops++;
             expectedDrops++;
         }
@@ -528,7 +532,7 @@ final class NativeForwardChecks {
                 int chunkZ = saved.get("z").getAsInt() >> 4;
 
                 if (unopened.add(chunkX + "," + chunkZ)) {
-                    require(rawChunk(world, chunkX, chunkZ).getInt("DataVersion") == 512,
+                    require(rawChunk(world, chunkX, chunkZ).getIntOr("DataVersion", 0) == 512,
                             "The delayed legacy chunk must remain unopened during the first save");
                 }
             }
@@ -553,18 +557,18 @@ final class NativeForwardChecks {
     private static java.util.UUID sourceDropIdentity(ServerLevel world, JsonObject saved) throws Exception {
         net.minecraft.nbt.CompoundTag chunk = rawChunk(world, saved.get("x").getAsInt() >> 4,
                 saved.get("z").getAsInt() >> 4);
-        require(chunk.getInt("DataVersion") <= 1343, "Capture legacy entity identities before data fixing");
-        net.minecraft.nbt.CompoundTag expected = net.minecraft.nbt.TagParser.parseTag(saved.get("item").getAsString());
+        require(chunk.getIntOr("DataVersion", 0) <= 1343, "Capture legacy entity identities before data fixing");
+        net.minecraft.nbt.CompoundTag expected = net.minecraft.nbt.TagParser.parseCompoundFully(saved.get("item").getAsString());
         java.util.List<java.util.UUID> matches = new java.util.ArrayList<>();
-        for (net.minecraft.nbt.Tag value : chunk.getCompound("Level").getList("Entities", 10)) {
+        for (net.minecraft.nbt.Tag value : chunk.getCompoundOrEmpty("Level").getListOrEmpty("Entities")) {
             net.minecraft.nbt.CompoundTag entity = (net.minecraft.nbt.CompoundTag) value;
-            net.minecraft.nbt.ListTag position = entity.getList("Pos", 6);
-            if (entity.getCompound("Item").equals(expected) && position.size() == 3
-                    && Math.abs(position.getDouble(0) - saved.get("x").getAsDouble()) < 8
-                    && Math.abs(position.getDouble(2) - saved.get("z").getAsDouble()) < 8) {
-                require(entity.contains("UUIDMost", 4) && entity.contains("UUIDLeast", 4),
+            net.minecraft.nbt.ListTag position = entity.getListOrEmpty("Pos");
+            if (entity.getCompoundOrEmpty("Item").equals(expected) && position.size() == 3
+                    && Math.abs(position.getDoubleOr(0, Double.NaN) - saved.get("x").getAsDouble()) < 8
+                    && Math.abs(position.getDoubleOr(2, Double.NaN) - saved.get("z").getAsDouble()) < 8) {
+                require(entity.getLong("UUIDMost").isPresent() && entity.getLong("UUIDLeast").isPresent(),
                         "Legacy source drop has no stable UUID");
-                matches.add(new java.util.UUID(entity.getLong("UUIDMost"), entity.getLong("UUIDLeast")));
+                matches.add(new java.util.UUID(entity.getLongOr("UUIDMost", 0L), entity.getLongOr("UUIDLeast", 0L)));
             }
         }
         require(matches.size() == 1, "Legacy source drop is missing or ambiguous");
@@ -604,17 +608,17 @@ final class NativeForwardChecks {
     }
 
     private static void recoveredItem(ItemStack actual, net.minecraft.nbt.CompoundTag original) {
-        String registry = original.getString("id");
-        String material = original.getCompound("tag").getString("material");
+        String registry = original.getStringOr("id", "");
+        String material = original.getCompoundOrEmpty("tag").getStringOr("material", "");
         zone.moddev.mc.skysbuildingpieces.catalogue.Shape shape = zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping
                 .shape(registry, 0);
         ItemStack expected = Pieces.stack(
                 Pieces.state(material, shape, shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.SLAB ? 1 : 0),
                 1);
 
-        require(actual.getItem() == expected.getItem() && actual.getCount() == (original.getByte("Count") & 255),
+        require(actual.getItem() == expected.getItem() && actual.getCount() == (original.getByteOr("Count", (byte) 0) & 255),
                 "Historical item identity and count");
-        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(original.getCompound("tag")),
+        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(original.getCompoundOrEmpty("tag")),
                 "Historical item material, name and unrelated custom data");
     }
 

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/basaltic_glass",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:basaltic_glass_slab"
-    }
+    "X": "mineralogy:basaltic_glass_slab"
   },
   "result": {
     "id": "mineralogy:basaltic_glass",

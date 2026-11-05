@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:glass"
-    }
+    "X": "minecraft:glass"
   },
   "result": {
     "id": "skysbuildingpieces:glass_stairs",

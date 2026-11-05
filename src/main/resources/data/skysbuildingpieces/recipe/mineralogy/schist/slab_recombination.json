@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/schist",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:schist_slab"
-    }
+    "X": "mineralogy:schist_slab"
   },
   "result": {
     "id": "mineralogy:schist",

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_rock_salt_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_rock_salt_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_rock_salt_horizontal_step",

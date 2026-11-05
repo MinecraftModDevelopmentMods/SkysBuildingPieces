@@ -20,7 +20,11 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.network.*;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerPlayerGameMode;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.stats.ServerRecipeBook;
+import static zone.moddev.mc.skysbuildingpieces.probe.NativeRecipeProbe.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -35,15 +39,15 @@ public final class RecipeBookChecks {
         SortedMap<String, JsonObject> entries = new TreeMap<>();
         List<RecipeHolder<?>> recipes = new ArrayList<>();
 
-        for (RecipeHolder<?> holder : world.getRecipeManager().getRecipes()) {
-            ResourceLocation id = holder.id();
+        for (RecipeHolder<?> holder : world.getServer().getRecipeManager().getRecipes()) {
+            Identifier id = holder.id().identifier();
             Recipe<?> recipe = holder.value();
 
             if (id == null || !MODS.contains(id.getNamespace()) || recipe.isSpecial()) {
                 continue;
             }
 
-            Ingredient first = recipe.getIngredients().stream().filter(ingredient -> ingredient != Ingredient.EMPTY)
+            Ingredient first = recipe.placementInfo().ingredients().stream()
                     .findFirst().orElseThrow(() -> new AssertionError("No book ingredients: " + id));
             JsonObject entry = new JsonObject();
 
@@ -103,13 +107,13 @@ public final class RecipeBookChecks {
 
             @Override
             public void send(Packet<?> packet,
-                    net.minecraft.network.PacketSendListener listener) {
+                    io.netty.channel.ChannelFutureListener listener) {
                 sentPackets.add(packet);
             }
 
             @Override
             public void send(Packet<?> packet,
-                    net.minecraft.network.PacketSendListener listener, boolean flush) {
+                    io.netty.channel.ChannelFutureListener listener, boolean flush) {
                 sentPackets.add(packet);
             }
         };
@@ -122,15 +126,18 @@ public final class RecipeBookChecks {
 
         if (savedRecipes.isFile()) {
             try (InputStream input = new FileInputStream(savedRecipes)) {
-                player.getRecipeBook().fromNbt(net.minecraft.nbt.NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap()), world.getRecipeManager());
+                CompoundTag raw = net.minecraft.nbt.NbtIo.readCompressed(input,
+                        net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+                player.getRecipeBook().loadUntrusted(ServerRecipeBook.Packed.CODEC.parse(NbtOps.INSTANCE, raw).getOrThrow(),
+                        id -> world.getServer().getRecipeManager().byKey(id).isPresent());
             } catch (IOException failure) {
                 throw new IllegalStateException(failure);
             }
             for (RecipeHolder<?> holder : recipes) {
                 if (Boolean.getBoolean("skysbuildingpieces.checkAllSkyRecipes")
-                        || holder.id().getNamespace().equals("skysbuildingpieces")
-                        || holder.id().getNamespace().equals("skysbuildingpiecesbop")) {
-                    require(player.getRecipeBook().contains(holder), "Saved recipe book lost " + holder.id());
+                        || holder.id().identifier().getNamespace().equals("skysbuildingpieces")
+                        || holder.id().identifier().getNamespace().equals("skysbuildingpiecesbop")) {
+                    require(player.getRecipeBook().contains(holder.id()), "Saved recipe book lost " + holder.id());
                 }
             }
         }
@@ -139,7 +146,7 @@ public final class RecipeBookChecks {
         List<RecipeHolder<?>> verified = new ArrayList<>();
 
         for (RecipeHolder<?> holder : recipes) {
-            ResourceLocation id = holder.id();
+            Identifier id = holder.id().identifier();
             Recipe<?> recipe = holder.value();
 
             if (!Boolean.getBoolean("skysbuildingpieces.checkAllSkyRecipes")
@@ -151,10 +158,10 @@ public final class RecipeBookChecks {
             verified.add(holder);
 
             AdvancementHolder advancement = world.getServer().getAdvancements()
-                    .get(ResourceLocation.fromNamespaceAndPath(owner(id), "recipes/" + id.getPath()));
+                    .get(Identifier.fromNamespaceAndPath(owner(id), "recipes/" + id.getPath()));
 
             require(advancement != null, "Missing recipe advancement: " + id);
-            require(!recipe.getResultItem(world.registryAccess()).isEmpty(), "Missing book result: " + id);
+            require(!result(recipe, world).isEmpty(), "Missing book result: " + id);
             reset(player, holder, advancement);
             player.getInventory().clearContent();
             player.getInventory().setItem(0, new ItemStack(Items.APPLE));
@@ -162,34 +169,33 @@ public final class RecipeBookChecks {
                     ItemStack changed = player.getInventory().getItem(inventorySlot);
                     if (!changed.isEmpty()) CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), changed);
                 }
-            require(!player.getRecipeBook().contains(holder), "Unrelated item unlocked " + id);
+            require(!player.getRecipeBook().contains(holder.id()), "Unrelated item unlocked " + id);
 
-            Ingredient first = recipe.getIngredients().stream().filter(ingredient -> ingredient != Ingredient.EMPTY)
+            Ingredient first = recipe.placementInfo().ingredients().stream()
                     .findFirst().get();
-            ItemStack input = first.getItems()[0].copy();
+            ItemStack input = example(first);
 
             player.getInventory().setItem(0, input);
             for (int inventorySlot = 0; inventorySlot < player.getInventory().getContainerSize(); inventorySlot++) {
                     ItemStack changed = player.getInventory().getItem(inventorySlot);
                     if (!changed.isEmpty()) CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), changed);
                 }
-            require(player.getRecipeBook().contains(holder), "Ingredient did not unlock " + id);
+            require(player.getRecipeBook().contains(holder.id()), "Ingredient did not unlock " + id);
 
             if (!id.getNamespace().equals("skysgrassslabs") || !id.getPath().equals("turf")) {
                 reset(player, holder, advancement);
                 player.getInventory().clearContent();
-                MinecraftForge.EVENT_BUS
-                        .post(new PlayerEvent.ItemCraftedEvent(player, input, RecombinationChecks.grid(2)));
-                require(player.getRecipeBook().contains(holder), "Crafted ingredient did not unlock " + id);
+                PlayerEvent.ItemCraftedEvent.BUS.post(new PlayerEvent.ItemCraftedEvent(player, input, RecombinationChecks.grid(2)));
+                require(player.getRecipeBook().contains(holder.id()), "Crafted ingredient did not unlock " + id);
             }
             if (id.getPath().contains("recombine") || id.getPath().contains("slab_recombination")) {
-                require(first.getItems().length == 1,
+                require(first.items().count() == 1,
                         "Recombination preview must show the normal item: " + id);
 
                 for (ItemStack orientation : acceptedStacks(first)) {
                     require(first.test(orientation), "Packed ingredient does not match " + id);
 
-                    net.minecraft.world.entity.player.StackedContents autoFill = new net.minecraft.world.entity.player.StackedContents();
+                    net.minecraft.world.entity.player.StackedItemContents autoFill = new net.minecraft.world.entity.player.StackedItemContents();
                     ItemStack available = orientation.copy();
 
                     available.setCount(2);
@@ -202,7 +208,7 @@ public final class RecipeBookChecks {
                     ItemStack changed = player.getInventory().getItem(inventorySlot);
                     if (!changed.isEmpty()) CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), changed);
                 }
-                    require(player.getRecipeBook().contains(holder), "Saved orientation did not unlock " + id);
+                    require(player.getRecipeBook().contains(holder.id()), "Saved orientation did not unlock " + id);
                 }
             }
             if (input.getItem() instanceof zone.moddev.mc.skysbuildingpieces.content.PieceItem) {
@@ -225,13 +231,13 @@ public final class RecipeBookChecks {
                     ItemStack changed = player.getInventory().getItem(inventorySlot);
                     if (!changed.isEmpty()) CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), changed);
                 }
-                    require(!player.getRecipeBook().contains(holder), "Wrong palette material unlocked " + id);
+                    require(!player.getRecipeBook().contains(holder.id()), "Wrong palette material unlocked " + id);
                     player.getInventory().setItem(0, input.copy());
                     for (int inventorySlot = 0; inventorySlot < player.getInventory().getContainerSize(); inventorySlot++) {
                     ItemStack changed = player.getInventory().getItem(inventorySlot);
                     if (!changed.isEmpty()) CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), changed);
                 }
-                    require(player.getRecipeBook().contains(holder),
+                    require(player.getRecipeBook().contains(holder.id()),
                             "Correct flat item failed after negative check " + id);
                     break;
                 }
@@ -242,17 +248,18 @@ public final class RecipeBookChecks {
 
         player.getAdvancements().save();
 
-        net.minecraft.nbt.CompoundTag savedBook = player.getRecipeBook().toNbt();
-        net.minecraft.stats.ServerRecipeBook reloaded = new net.minecraft.stats.ServerRecipeBook();
-
-        reloaded.fromNbt(savedBook, world.getRecipeManager());
+        CompoundTag savedBook = (CompoundTag) ServerRecipeBook.Packed.CODEC
+                .encodeStart(NbtOps.INSTANCE, player.getRecipeBook().pack()).getOrThrow();
+        ServerRecipeBook reloaded = new ServerRecipeBook(world.getServer().getRecipeManager()::listDisplaysForRecipe);
+        reloaded.loadUntrusted(ServerRecipeBook.Packed.CODEC.parse(NbtOps.INSTANCE, savedBook).getOrThrow(),
+                id -> world.getServer().getRecipeManager().byKey(id).isPresent());
 
         for (RecipeHolder<?> holder : verified) {
-            require(reloaded.contains(holder), "Book reload lost " + holder.id());
+            require(reloaded.contains(holder.id()), "Book reload lost " + holder.id());
         }
 
         require(sentPackets.stream()
-                .anyMatch(packet -> packet instanceof net.minecraft.network.protocol.game.ClientboundRecipePacket),
+                .anyMatch(packet -> packet instanceof net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket),
                 "Unlocks did not send recipe-book packets");
 
         try (OutputStream output = new FileOutputStream(savedRecipes)) {
@@ -267,11 +274,11 @@ public final class RecipeBookChecks {
         player.getAdvancements().reload(world.getServer().getAdvancements());
 
         for (RecipeHolder<?> holder : verified) {
-            ResourceLocation id = holder.id();
+            Identifier id = holder.id().identifier();
             Recipe<?> recipe = holder.value();
 
             require(world.getServer().getAdvancements()
-                    .get(ResourceLocation.fromNamespaceAndPath(owner(id), "recipes/" + id.getPath())) != null,
+                    .get(Identifier.fromNamespaceAndPath(owner(id), "recipes/" + id.getPath())) != null,
                     "Advancement reload lost " + id);
         }
 
@@ -281,17 +288,7 @@ public final class RecipeBookChecks {
     }
 
     private static List<ItemStack> acceptedStacks(Ingredient ingredient) {
-        List<ItemStack> stacks = new ArrayList<>();
-
-        for (int packed : ingredient.getStackingIds()) {
-            ItemStack stack = net.minecraft.world.entity.player.StackedContents.fromStackingIndex(packed);
-
-            if (!stack.isEmpty()) {
-                stacks.add(stack);
-            }
-        }
-
-        return stacks;
+        return ingredient.items().map(holder -> new ItemStack(holder.value())).toList();
     }
 
     private static void reset(ServerPlayer player, RecipeHolder<?> holder, AdvancementHolder advancement) {
@@ -302,7 +299,7 @@ public final class RecipeBookChecks {
         }
     }
 
-    private static String owner(ResourceLocation recipe) {
+    private static String owner(Identifier recipe) {
         if (recipe.getNamespace().equals("skysbuildingpieces")) {
             String[] path = recipe.getPath().split("/");
 

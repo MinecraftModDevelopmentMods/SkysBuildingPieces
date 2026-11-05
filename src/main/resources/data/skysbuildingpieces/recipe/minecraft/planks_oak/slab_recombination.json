@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/planks_oak",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "minecraft:oak_slab"
-    }
+    "X": "minecraft:oak_slab"
   },
   "result": {
     "id": "minecraft:oak_planks",

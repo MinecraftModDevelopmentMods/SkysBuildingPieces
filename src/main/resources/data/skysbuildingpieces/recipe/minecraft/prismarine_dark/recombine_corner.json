@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/prismarine_dark",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:prismarine_dark_corner"
-    }
+    "X": "skysbuildingpieces:prismarine_dark_corner"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_dark_horizontal_step",

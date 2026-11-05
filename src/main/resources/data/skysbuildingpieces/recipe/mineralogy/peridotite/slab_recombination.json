@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/peridotite",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:peridotite_slab"
-    }
+    "X": "mineralogy:peridotite_slab"
   },
   "result": {
     "id": "mineralogy:peridotite",

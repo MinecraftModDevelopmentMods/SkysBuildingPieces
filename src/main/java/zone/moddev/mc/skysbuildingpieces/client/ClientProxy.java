@@ -1,42 +1,62 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.world.item.Item;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.world.level.GrassColor;
+import java.util.Optional;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.PathPackResources;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.fml.ModList;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
-import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
-/** Client listeners stay on the mod bus that posts model and colour events. */
+/** Keeps model and colour code out of dedicated servers. */
 public final class ClientProxy {
     private ClientProxy() {
     }
 
-    public static void register() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static void register(BusGroup modBus) {
+        AddPackFindersEvent.BUS.addListener(ClientProxy::mineralogyResources);
+        RegisterColorHandlersEvent.Block.BUS.addListener(ClientProxy::blockColors);
+        ModelEvent.ModifyBakingResult.BUS.addListener(ContinuousGlassModel::bake);
+        FMLClientSetupEvent.getBus(modBus).addListener(ClientProxy::renderLayers);
+    }
 
-        modBus.addListener(ClientProxy::blockColors);
-        modBus.addListener(ClientProxy::itemColors);
-        modBus.addListener(ClientProxy::renderLayers);
-        modBus.addListener(new ContinuousGlassModel.BakeHandler()::bake);
+    private static void mineralogyResources(AddPackFindersEvent event) {
+        if (event.getPackType() != PackType.CLIENT_RESOURCES || !ModList.get().isLoaded("mineralogy")) {
+            return;
+        }
+        var path = ModList.get().getModFileById(SkysBuildingPieces.ID).getFile()
+                .findResource("optional", "mineralogy");
+        var location = new PackLocationInfo("skysbuildingpieces/mineralogy",
+                Component.literal("Sky's Building Pieces: Mineralogy models"), PackSource.BUILT_IN, Optional.empty());
+        Pack pack = Pack.readMetaAndCreate(location, new PathPackResources.PathResourcesSupplier(path),
+                PackType.CLIENT_RESOURCES, new PackSelectionConfig(true, Pack.Position.BOTTOM, false));
+        if (pack == null) {
+            throw new IllegalStateException("The Mineralogy model pack is missing or invalid");
+        }
+        event.addRepositorySource(accept -> accept.accept(pack));
     }
 
     private static void renderLayers(FMLClientSetupEvent event) {
         for (PieceBlock block : Pieces.BLOCKS.values()) {
-            RenderType layer = RenderType.solid();
-            if (block.palette.group.equals("grass")) {
-                layer = RenderType.cutoutMipped();
-            } else if (block.palette.group.equals("clear_glass")) {
-                layer = RenderType.cutout();
-            } else if (block.palette.group.equals("stained_glass") || block.palette.group.equals("ice")) {
-                layer = RenderType.translucent();
-            }
+            ChunkSectionLayer layer = switch (block.palette.group) {
+                case "grass", "clear_glass" -> ChunkSectionLayer.CUTOUT;
+                case "stained_glass", "ice" -> ChunkSectionLayer.TRANSLUCENT;
+                default -> ChunkSectionLayer.SOLID;
+            };
             ItemBlockRenderTypes.setRenderLayer(block, layer);
         }
     }
@@ -44,25 +64,14 @@ public final class ClientProxy {
     private static void blockColors(RegisterColorHandlersEvent.Block event) {
         for (PieceBlock block : Pieces.BLOCKS.values()) {
             if (block.palette.group.equals("grass")) {
-                event.getBlockColors().register(
-                        (state, world, position,
-                                tint) -> tint == 0 ? event.getBlockColors()
-                                        .getColor(Blocks.GRASS_BLOCK.defaultBlockState(), world, position, 0) : -1,
-                        block);
-            }
-        }
-    }
-
-    private static void itemColors(RegisterColorHandlersEvent.Item event) {
-        for (Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
-            if (item instanceof PieceItem && ((PieceItem) item).piece.palette.group.equals("grass")) {
-                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1, item);
-            }
-        }
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
-            if (block.palette.group.equals("grass")) {
-                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1,
-                        block.asItem());
+                event.register((state, world, position, tint) -> {
+                    if (tint != 0) {
+                        return -1;
+                    }
+                    return world != null && position != null
+                            ? BiomeColors.getAverageGrassColor(world, position)
+                            : GrassColor.get(0.5D, 1.0D);
+                }, block);
             }
         }
     }

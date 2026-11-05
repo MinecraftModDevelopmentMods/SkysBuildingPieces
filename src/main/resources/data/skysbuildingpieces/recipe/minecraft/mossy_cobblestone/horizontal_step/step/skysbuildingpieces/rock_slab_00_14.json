@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:mossy_cobblestone_slab"
-    }
+    "X": "minecraft:mossy_cobblestone_slab"
   },
   "result": {
     "id": "skysbuildingpieces:mossy_cobblestone_horizontal_step",

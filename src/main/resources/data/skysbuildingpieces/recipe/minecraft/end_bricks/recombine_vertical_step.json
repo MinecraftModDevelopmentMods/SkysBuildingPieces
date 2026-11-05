@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/end_bricks",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:end_bricks_vertical_step"
-    }
+    "X": "skysbuildingpieces:end_bricks_vertical_step"
   },
   "result": {
     "id": "minecraft:end_stone_brick_slab",

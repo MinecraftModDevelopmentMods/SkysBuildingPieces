@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/grass",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:grass_corner"
-    }
+    "X": "skysbuildingpieces:grass_corner"
   },
   "result": {
     "id": "skysbuildingpieces:grass_step",

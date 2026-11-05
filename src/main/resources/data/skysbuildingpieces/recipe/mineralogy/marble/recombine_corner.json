@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/marble",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_marble_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_marble_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_marble_horizontal_step",

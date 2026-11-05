@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["XX", "XX", "XX"],
   "key": {
-    "X": {
-      "item": "minecraft:lapis_block"
-    }
+    "X": "minecraft:lapis_block"
   },
   "result": {
     "id": "skysbuildingpieces:lapis_block_wall",

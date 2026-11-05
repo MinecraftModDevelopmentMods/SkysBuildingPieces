@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:prismarine_bricks"
-    }
+    "X": "minecraft:prismarine_bricks"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_bricks_slab",

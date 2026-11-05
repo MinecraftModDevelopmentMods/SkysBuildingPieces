@@ -10,7 +10,37 @@ from native_registry_notices import audit_text, profile_for, audit_biome_proof
 
 
 
-def audit_complete_logs(directory):
+def offline_client_notices(text):
+    # The packaged probe uses token 0. Bare Forge produces these same notices
+    # before the local world opens; a different exception still fails.
+    rows = (
+        (r'Download-\d+', 'net.minecraft.client.Minecraft/', 'Failed to fetch user properties',
+         'com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401'),
+        (r'Download-\d+', 'com.mojang.realmsclient.client.RealmsClient/', 'Failed to fetch Realms feature flags',
+         "com.mojang.realmsclient.exception.RealmsServiceException: Realms authentication error with message "
+         "'java.lang.RuntimeException: Failed to parse into SignedJWT: 0'"),
+        (r'IO-Worker-\d+', 'com.mojang.realmsclient.RealmsAvailability/', "Couldn't connect to realms",
+         "com.mojang.realmsclient.exception.RealmsServiceException: Realms authentication error with message "
+         "'java.lang.RuntimeException: Failed to parse into SignedJWT: 0'"),
+    )
+    lines = text.splitlines()
+    notices = set()
+    kept = []
+    for index, line in enumerate(lines):
+        for thread, logger, message, exception in rows:
+            header = r'\[[^\r\n]+\] \[' + thread + r'/ERROR\](?: \[' + re.escape(logger) + r'\])?: '
+            if (re.fullmatch(header + re.escape(message), line)
+                    and index + 1 < len(lines) and lines[index + 1] == exception):
+                if message in notices:
+                    raise ValueError('Repeated offline authentication notice: ' + message)
+                notices.add(message)
+                break
+        else:
+            kept.append(line)
+    return '\n'.join(kept), sorted(notices)
+
+
+def audit_complete_logs(directory, packaged_offline=False):
     """Include rolled first-load logs, so a clean reload cannot hide a failure."""
     paths = sorted(path for path in (Path(directory) / "logs").rglob("*")
                    if path.is_file() and (path.name.endswith(".log") or path.name.endswith(".log.gz")))
@@ -22,6 +52,8 @@ def audit_complete_logs(directory):
                 text = source.read()
         else:
             text = path.read_text(encoding="utf-8")
+        if packaged_offline:
+            text, _ = offline_client_notices(text)
         try:
             audit_text(text, profile_for(directory))
         except ValueError as failure:
@@ -29,12 +61,15 @@ def audit_complete_logs(directory):
     return len(paths)
 
 
-def classify(log, unchanged_defaults):
+def classify(log, unchanged_defaults, packaged_offline=False):
     """Require a complete client login without severe notices."""
+    notices = []
+    if packaged_offline:
+        log, notices = offline_client_notices(log)
     lines = log.splitlines()
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = next((index for index, line in enumerate(lines)
-                    if "Preparing start region for dimension " in line), -1)
+                    if "Starting integrated minecraft server version 1.21.11" in line), -1)
     if "Connected to a modded server." not in log or startup < 0:
         raise ValueError("Native Forge login did not complete normally")
     if not unchanged_defaults:
@@ -42,10 +77,10 @@ def classify(log, unchanged_defaults):
     if severe or "[STDERR/" in log or "[STDERR]" in log:
         raise ValueError("Unexpected client errors: " + repr(severe[:4]))
     return {"empty_handshakes": 0, "native_config_notices": 0,
-            "notices": [], "unchanged_native_defaults": True}
+            "notices": notices, "unchanged_native_defaults": True}
 
 
-def audit(directory, phase, control=False):
+def audit(directory, phase, control=False, packaged_offline=False):
     directory = Path(directory)
     log = (directory / "logs/latest.log").read_text(encoding="utf-8")
     defaults = Path(__file__).resolve().parent.parent / "src/bootstrapTest/defaultconfigs"
@@ -57,8 +92,8 @@ def audit(directory, phase, control=False):
         == tomllib.loads(actual.read_text(encoding="utf-8")) for expected, actual in pairs)
     if not unchanged:
         raise ValueError("Native Forge settings differ from the controlled defaults")
-    receipt = classify(log, unchanged)
-    required = (("FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
+    receipt = classify(log, unchanged, packaged_offline)
+    required = (("FORGE61_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
                 ("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED", "SKY_RECIPE_PREVIEW_MODELS_PASS",
                  "BUILDING_PIECES_CONTINUOUS_GLASS_PASS", "BUILDING_PIECES_COLOURS_PASS"))
     if any(marker not in log for marker in required):
@@ -67,7 +102,7 @@ def audit(directory, phase, control=False):
         raise ValueError("The Forge-only control must complete without handshake errors")
     if list((directory / "crash-reports").glob("*")):
         raise ValueError("Native client produced a crash report")
-    receipt["complete_log_files"] = audit_complete_logs(directory)
+    receipt["complete_log_files"] = audit_complete_logs(directory, packaged_offline)
     receipt["phase"] = phase
     receipt["control_without_sky_mods"] = control
     (directory / (phase + "-log-audit.json")).write_text(

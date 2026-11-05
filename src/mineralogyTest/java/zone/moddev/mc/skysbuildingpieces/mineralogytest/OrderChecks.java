@@ -9,7 +9,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
@@ -23,7 +23,7 @@ final class OrderChecks {
         String[] names = { "basalt", "gneiss", "quartzite" };
 
         for (int index = 0; index < names.length; index++) {
-            rocks[index] = Block.REGISTRY.getObject(new ResourceLocation("mineralogy", names[index])).getDefaultState();
+            rocks[index] = Block.REGISTRY.getObject(new Identifier("mineralogy", names[index])).getDefaultState();
         }
         for (int level = 1; level <= 3; level++) {
             byte[][] hashes = new byte[2][];

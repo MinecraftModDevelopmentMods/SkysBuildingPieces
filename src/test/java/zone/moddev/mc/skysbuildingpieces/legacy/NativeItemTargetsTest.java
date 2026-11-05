@@ -86,9 +86,9 @@ class NativeItemTargetsTest {
         section.put("Palette", palette);
 
         HistoricalItems.restoreNativeTargets(section);
-        assertEquals("minecraft:stone_slab", marked.getString("Name"));
-        assertEquals("top", marked.getCompound("Properties").getString("type"));
-        assertEquals("true", marked.getCompound("Properties").getString("waterlogged"));
+        assertEquals("minecraft:stone_slab", marked.getStringOr("Name", ""));
+        assertEquals("top", marked.getCompoundOrEmpty("Properties").getStringOr("type", ""));
+        assertEquals("true", marked.getCompoundOrEmpty("Properties").getStringOr("waterlogged", ""));
         assertFalse(marked.contains(NumericStateBridge.NATIVE_STATE_ID));
         assertEquals(vanillaBefore, vanilla);
         CompoundTag once = section.copy();
@@ -101,7 +101,7 @@ class NativeItemTargetsTest {
         CompoundTag root = new CompoundTag();
         root.put("item", item());
         CompoundTag invalid = state();
-        invalid.getCompound("Properties").putString("type", "sideways");
+        invalid.getCompoundOrEmpty("Properties").putString("type", "sideways");
         root.put("state", invalid);
         CompoundTag before = root.copy();
 
@@ -120,10 +120,10 @@ class NativeItemTargetsTest {
         assertEquals(before, pending);
         pending.putString("Name", "minecraft:smooth_stone_slab");
         HistoricalItems.finish(pending, 1976);
-        assertEquals("minecraft:stone_slab", pending.getString("Name"));
+        assertEquals("minecraft:stone_slab", pending.getStringOr("Name", ""));
         assertFalse(pending.contains(NumericStateBridge.NATIVE_STATE_ID));
         HistoricalItems.finish(pending, 1976);
-        assertEquals("minecraft:stone_slab", pending.getString("Name"));
+        assertEquals("minecraft:stone_slab", pending.getStringOr("Name", ""));
     }
 
     private CompoundTag state() {

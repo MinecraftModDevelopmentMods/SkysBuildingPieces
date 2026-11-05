@@ -13,8 +13,8 @@ public final class ForgeServerControl {
     private int ticks;
 
     public ForgeServerControl() {
-        MinecraftForge.EVENT_BUS.addListener(this::started);
-        MinecraftForge.EVENT_BUS.addListener(this::tick);
+        ServerStartedEvent.BUS.addListener(this::started);
+        net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(this::tick);
     }
 
     private void started(ServerStartedEvent event) {
@@ -29,10 +29,10 @@ public final class ForgeServerControl {
         server = event.getServer();
     }
 
-    private void tick(TickEvent.ServerTickEvent event) {
+    private void tick(TickEvent.ServerTickEvent.Post event) {
         // Keep the native watcher alive after startup so a delayed self-save notification can be observed.
-        if (server != null && event.phase == TickEvent.Phase.END && ++ticks == 200) {
-            org.apache.logging.log4j.LogManager.getLogger().info("FORGE47_SERVER_CONTROL_PASS started=true sky_mods=false ticks=200");
+        if (server != null && ++ticks == 200) {
+            org.apache.logging.log4j.LogManager.getLogger().info("FORGE61_SERVER_CONTROL_PASS started=true sky_mods=false ticks=200");
             server.halt(false);
         }
     }

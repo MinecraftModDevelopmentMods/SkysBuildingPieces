@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/glass",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:glass_step"
-    }
+    "X": "skysbuildingpieces:glass_step"
   },
   "result": {
     "id": "skysbuildingpieces:glass_slab",

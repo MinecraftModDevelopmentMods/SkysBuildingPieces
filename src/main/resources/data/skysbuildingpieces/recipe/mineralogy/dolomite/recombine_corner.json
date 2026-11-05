@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/dolomite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_dolomite_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_dolomite_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_dolomite_horizontal_step",

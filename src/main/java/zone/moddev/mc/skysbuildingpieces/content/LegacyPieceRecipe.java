@@ -5,7 +5,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.HolderLookup;
@@ -19,7 +18,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
 /** Optional recovery for a legacy piece obtained while its original mod is installed. */
 public final class LegacyPieceRecipe extends CustomRecipe {
-    public static final SimpleCraftingRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(
+    public static final CustomRecipe.Serializer<LegacyPieceRecipe> SERIALIZER = new CustomRecipe.Serializer<>(
             LegacyPieceRecipe::new);
 
     public LegacyPieceRecipe(CraftingBookCategory category) {
@@ -56,7 +55,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
                 return ItemStack.EMPTY;
             }
 
-            String material = LegacyMapping.material(data.copyTag().getString("material"));
+            String material = LegacyMapping.material(data.copyTag().getStringOr("material", ""));
             Shape shape = LegacyMapping.shape(identity, 0);
 
             if (shape == null || !Catalogue.INSTANCE.materials.containsKey(material)
@@ -89,12 +88,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width >= 1 && height >= 1;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<LegacyPieceRecipe> getSerializer() {
         return SERIALIZER;
     }
 

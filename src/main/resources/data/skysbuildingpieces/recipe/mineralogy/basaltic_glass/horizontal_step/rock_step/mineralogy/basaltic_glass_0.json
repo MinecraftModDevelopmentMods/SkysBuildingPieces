@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/mineralogy",
   "pattern": ["X  ", " X ", "  X"],
   "key": {
-    "X": {
-      "item": "mineralogy:basaltic_glass"
-    }
+    "X": "mineralogy:basaltic_glass"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_basaltic_glass_horizontal_step",

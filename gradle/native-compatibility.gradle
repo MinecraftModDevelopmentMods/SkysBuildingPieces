@@ -114,20 +114,3 @@ tasks.register('captureDisabledMineralogyControl', JavaExec) {
         logger.lifecycle('DISABLED_MINERALOGY_CONTROL_PASS errors=0 sky_mods=false')
     }
 }
-
-def orderClasses = layout.buildDirectory.dir('coremod-order-checks/classes')
-def compileOrders = tasks.register('compileCoremodOrderChecks', JavaCompile) {
-    source fileTree('src/coremodTest/java')
-    classpath = files(sourceSets.main.runtimeClasspath)
-    destinationDirectory = orderClasses
-}
-tasks.register('verifyCoexistingCoremods', JavaExec) {
-    dependsOn compileOrders, project.ext.verifyNativeOptionalRuntime, tasks.named('verifyGrassSlabsRelease')
-    classpath = files(orderClasses, sourceSets.main.runtimeClasspath)
-    mainClass = 'zone.moddev.mc.skysbuildingpieces.probe.CoremodOrderChecks'
-    doFirst {
-        args file('src/main/resources/coremods/skysbuildingpieces.js').absolutePath,
-                project.ext.nativeOptionalDevelopmentJars.mineralogy.absolutePath,
-                project.ext.nativeGrassDevelopmentJar.asFile.absolutePath
-    }
-}

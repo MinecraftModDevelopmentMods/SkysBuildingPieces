@@ -71,7 +71,7 @@ public final class RecombinationChecks {
                 : material.equals("minecraft:dirt") ? "dirt_slab" : null;
         Item external = grassSlab == null ? null
                 : net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .getValue(net.minecraft.resources.ResourceLocation.parse("skysgrassslabs:" + grassSlab));
+                        .getValue(net.minecraft.resources.Identifier.parse("skysgrassslabs:" + grassSlab));
 
         if (external != null && external != net.minecraft.world.item.Items.AIR) {
             return new ItemStack(external);
@@ -104,8 +104,7 @@ public final class RecombinationChecks {
                         grid.setItem(upperSlot + size, lower);
 
                         String label = material + " " + shape + " orientation=" + orientation;
-                        var matching = world.getRecipeManager()
-                                .getRecipesFor(RecipeType.CRAFTING, grid.asCraftInput(), world);
+                        var matching = NativeRecipeProbe.matching(grid.asCraftInput(), world);
                         require(!matching.isEmpty(), "two vertically stacked pieces: " + label);
                         for (var holder : matching) {
                             var recipe = holder.value();
@@ -181,7 +180,7 @@ public final class RecombinationChecks {
     }
 
     private static ItemStack result(CraftingContainer grid, ServerLevel world) {
-        return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
+        return world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
                 .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
     }
 

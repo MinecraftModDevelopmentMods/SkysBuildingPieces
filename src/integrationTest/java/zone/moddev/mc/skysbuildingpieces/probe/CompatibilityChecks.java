@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,9 +45,9 @@ public final class CompatibilityChecks {
 
     public static ItemStack legacy(int count) {
         ItemStack stack = new ItemStack(
-                ForgeRegistries.ITEMS.getValue(ResourceLocation.parse("buildingbricks:rock_step")), count);
+                ForgeRegistries.ITEMS.getValue(Identifier.parse("buildingbricks:rock_step")), count);
 
-        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, NativeLegacyChecks.stack("minecraft:stone", count).getCompound("tag").copy());
+        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, NativeLegacyChecks.stack("minecraft:stone", count).getCompoundOrEmpty("tag").copy());
         return stack;
     }
 
@@ -89,11 +89,11 @@ public final class CompatibilityChecks {
 
         player.getInventory().setItem(0, legacy(13));
         player.getEnderChestInventory().setItem(0, legacy(11));
-        MinecraftForge.EVENT_BUS.post(new EntityJoinLevelEvent(player, world));
+        EntityJoinLevelEvent.BUS.post(new EntityJoinLevelEvent(player, world));
         identity(player.getInventory().getItem(0), 13, convert);
         identity(player.getEnderChestInventory().getItem(0), 11, convert);
         player.getInventory().setItem(1, legacy(9));
-        MinecraftForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
+        PlayerEvent.LoadFromFile.BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                 player.getUUID().toString()));
         identity(player.getInventory().getItem(1), 9, convert);
         world.getChunk(new BlockPos(930, 70, 930));
@@ -152,10 +152,10 @@ public final class CompatibilityChecks {
         zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(crate, tag);
 
         ItemStack migrated = MigrationEvents.convert(crate, world);
-        CompoundTag recovered = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getList("Items", 10).getCompound(0);
+        CompoundTag recovered = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getListOrEmpty("Items").getCompoundOrEmpty(0);
 
         identity(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(recovered), 7, convert);
-        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getBoolean("Sealed"),
+        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getBooleanOr("Sealed", false),
                 "Sealed container identity and custom data");
         NativeLegacyChecks.require(MigrationEvents.convert(migrated, world) == migrated,
                 "Live nested inventory is idempotent");
@@ -187,7 +187,7 @@ public final class CompatibilityChecks {
 
     private static void newlyPlaced(ServerLevel world, boolean convert) {
         BlockPos position = new BlockPos(934, 70, 932);
-        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.parse("buildingbricks:rock_step"));
+        Block block = ForgeRegistries.BLOCKS.getValue(Identifier.parse("buildingbricks:rock_step"));
         BlockState old = block.defaultBlockState().setValue((IntegerProperty) block.getStateDefinition().getProperty("meta"),
                 11);
 
@@ -198,8 +198,9 @@ public final class CompatibilityChecks {
 
         tag.putString("material", "minecraft:stone");
         tag.putString("custom", "Keep the old tile in coverage");
-        tile.loadWithComponents(tag, world.registryAccess());
-        MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
+        tile.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(
+                net.minecraft.util.ProblemReporter.DISCARDING, world.registryAccess(), tag));
+        BlockEvent.EntityPlaceEvent.BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
                 Blocks.STONE.defaultBlockState(), NativeProbeItems.player(world)));
         NativeLegacyChecks.require(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(world.getBlockState(position).getBlock()).getNamespace()
                 .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "New placement replacement policy");

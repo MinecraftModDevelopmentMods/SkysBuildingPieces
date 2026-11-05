@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/hornfels",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:hornfels_slab"
-    }
+    "X": "mineralogy:hornfels_slab"
   },
   "result": {
     "id": "mineralogy:hornfels",

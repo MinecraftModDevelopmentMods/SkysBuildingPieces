@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/stonebrick_cracked",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stonebrick_cracked_horizontal_step"
-    }
+    "X": "skysbuildingpieces:stonebrick_cracked_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_cracked_slab",

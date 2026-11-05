@@ -53,7 +53,7 @@ public final class LegacyFixture {
                 }
 
                 Block legacyBlock = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                        .getValue(net.minecraft.resources.ResourceLocation.parse("buildingbricks:" + legacyId));
+                        .getValue(net.minecraft.resources.Identifier.parse("buildingbricks:" + legacyId));
 
                 require(legacyBlock != null, "real legacy block " + legacyId);
                 world.setBlock(pos(entryIndex), legacyBlock.defaultBlockState().setValue(
@@ -68,7 +68,8 @@ public final class LegacyFixture {
 
                 compoundTag.putString("material", material);
                 compoundTag.putString("fixture_note", "material identity, not item damage");
-                tile.loadWithComponents(compoundTag, world.registryAccess());
+                tile.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(
+                net.minecraft.util.ProblemReporter.DISCARDING, world.registryAccess(), compoundTag));
                 tile.setChanged();
             }
 
@@ -106,7 +107,7 @@ public final class LegacyFixture {
 
                     BlockEntity tile = world.getBlockEntity(pos(entryIndex));
 
-                    require(tile != null && tile.saveWithFullMetadata(world.registryAccess()).getString("material").equals(material),
+                    require(tile != null && tile.saveWithFullMetadata(world.registryAccess()).getStringOr("material", "").equals(material),
                             "default material identity");
                 }
             }
@@ -115,14 +116,14 @@ public final class LegacyFixture {
             ItemStack stack = chest.getItem(0);
 
             require(stack != null && stack.getCount() == 23
-                    && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack).getString("custom_label").equals("NBT survives"),
+                    && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack).getStringOr("custom_label", "").equals("NBT survives"),
                     "container count and custom NBT");
             require(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getNamespace()
                     .equals(converted ? "skysbuildingpieces" : "buildingbricks"), "container identity");
 
             CompoundTag saved = new CompoundTag();
 
-            world.getDataStorage().save();
+            world.getDataStorage().saveAndJoin();
 
             if (converted) {
                 PiecesWorldState state = PiecesWorldState.get(world);

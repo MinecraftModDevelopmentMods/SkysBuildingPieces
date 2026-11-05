@@ -9,7 +9,7 @@ import net.minecraftforge.event.server.ServerStartedEvent;
 @Mod("optionalmodcontrol")
 public final class OptionalModControl {
     public OptionalModControl() {
-        MinecraftForge.EVENT_BUS.addListener(this::started);
+        ServerStartedEvent.BUS.addListener(this::started);
     }
 
     private void started(ServerStartedEvent event) {

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/quartzite",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_quartzite_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_quartzite_vertical_step"
   },
   "result": {
     "id": "mineralogy:quartzite_slab",

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/mineralogy",
   "pattern": ["X  ", " X ", "  X"],
   "key": {
-    "X": {
-      "item": "mineralogy:phyllite"
-    }
+    "X": "mineralogy:phyllite"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_phyllite_horizontal_step",

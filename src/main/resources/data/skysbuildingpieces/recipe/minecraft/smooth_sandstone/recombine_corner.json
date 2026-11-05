@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/smooth_sandstone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:smooth_sandstone_corner"
-    }
+    "X": "skysbuildingpieces:smooth_sandstone_corner"
   },
   "result": {
     "id": "skysbuildingpieces:smooth_sandstone_horizontal_step",

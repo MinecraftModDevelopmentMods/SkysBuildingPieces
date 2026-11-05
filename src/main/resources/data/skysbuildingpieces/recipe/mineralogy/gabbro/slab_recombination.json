@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/gabbro",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:gabbro_slab"
-    }
+    "X": "mineralogy:gabbro_slab"
   },
   "result": {
     "id": "mineralogy:gabbro",

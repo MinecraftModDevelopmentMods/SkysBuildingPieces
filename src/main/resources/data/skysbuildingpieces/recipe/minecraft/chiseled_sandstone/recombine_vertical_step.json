@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/chiseled_sandstone",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:chiseled_sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:chiseled_sandstone_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:chiseled_sandstone_slab",

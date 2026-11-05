@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/mineralogy",
   "pattern": ["X  ", " X ", "  X"],
   "key": {
-    "X": {
-      "item": "mineralogy:conglomerate"
-    }
+    "X": "mineralogy:conglomerate"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_conglomerate_horizontal_step",

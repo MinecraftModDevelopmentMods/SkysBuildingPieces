@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/end_bricks",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:end_bricks_corner"
-    }
+    "X": "skysbuildingpieces:end_bricks_corner"
   },
   "result": {
     "id": "skysbuildingpieces:end_bricks_horizontal_step",

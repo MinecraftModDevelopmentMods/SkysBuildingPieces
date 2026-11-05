@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:jungle_slab"
-    }
+    "X": "minecraft:jungle_slab"
   },
   "result": {
     "id": "skysbuildingpieces:planks_jungle_horizontal_step",

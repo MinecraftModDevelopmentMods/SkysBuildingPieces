@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:planks_acacia_vertical_slab"
-    }
+    "X": "skysbuildingpieces:planks_acacia_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:planks_acacia_horizontal_step",

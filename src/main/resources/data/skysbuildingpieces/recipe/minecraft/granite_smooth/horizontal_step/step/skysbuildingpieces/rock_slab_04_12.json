@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": {
-      "item": "minecraft:polished_granite_slab"
-    }
+    "X": "minecraft:polished_granite_slab"
   },
   "result": {
     "id": "skysbuildingpieces:granite_smooth_horizontal_step",

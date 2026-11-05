@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -33,9 +33,9 @@ public final class BuildingPiecesConfig {
     private BuildingPiecesConfig() {
     }
 
-    public static void register() {
+    public static void register(FMLJavaModLoadingContext context) {
         migrateLegacyConfig();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, SPEC);
+        context.registerConfig(ModConfig.Type.COMMON, SPEC);
     }
 
     public static boolean forceReplacement() {

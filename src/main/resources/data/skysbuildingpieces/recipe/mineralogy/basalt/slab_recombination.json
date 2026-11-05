@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/basalt",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "mineralogy:basalt_slab"
-    }
+    "X": "mineralogy:basalt_slab"
   },
   "result": {
     "id": "mineralogy:basalt",

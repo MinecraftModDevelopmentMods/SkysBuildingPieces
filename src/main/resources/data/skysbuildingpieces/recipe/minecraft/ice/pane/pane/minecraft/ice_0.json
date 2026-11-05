@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["XXX", "XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:ice"
-    }
+    "X": "minecraft:ice"
   },
   "result": {
     "id": "skysbuildingpieces:ice_pane",

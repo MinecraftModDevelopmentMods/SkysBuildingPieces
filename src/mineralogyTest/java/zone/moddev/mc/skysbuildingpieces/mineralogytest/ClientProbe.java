@@ -9,7 +9,6 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -20,14 +19,10 @@ public final class ClientProbe extends ProbeProxy {
 
     @Override
     public void init() {
-        MinecraftForge.EVENT_BUS.register(this);
+        TickEvent.ClientTickEvent.Post.BUS.addListener(this::tick);
     }
 
-    @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public void tick(TickEvent.ClientTickEvent.Post event) {
 
         Minecraft minecraft = Minecraft.getMinecraft();
 

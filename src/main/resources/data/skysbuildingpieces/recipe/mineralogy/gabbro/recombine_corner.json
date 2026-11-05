@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/gabbro",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_gabbro_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_gabbro_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_gabbro_horizontal_step",

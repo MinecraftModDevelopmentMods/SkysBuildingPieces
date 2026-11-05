@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/shale",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_shale_horizontal_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_shale_horizontal_step"
   },
   "result": {
     "id": "mineralogy:shale_slab",

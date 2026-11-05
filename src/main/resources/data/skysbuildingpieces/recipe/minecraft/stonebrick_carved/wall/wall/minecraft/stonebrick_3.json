@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["XX", "XX", "XX"],
   "key": {
-    "X": {
-      "item": "minecraft:chiseled_stone_bricks"
-    }
+    "X": "minecraft:chiseled_stone_bricks"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_carved_wall",

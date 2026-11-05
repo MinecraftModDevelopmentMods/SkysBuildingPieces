@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:coal_block_vertical_step"
-    }
+    "X": "skysbuildingpieces:coal_block_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:coal_block_corner",

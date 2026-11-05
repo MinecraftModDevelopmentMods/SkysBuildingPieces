@@ -1,0 +1,95 @@
+{
+  "source_world_sha256": "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095",
+  "snapshot_entries": {
+    "minecraft:block": {
+      "minecraft:chain": 242,
+      "minecraft:grass": 95
+    },
+    "minecraft:entity_type": {
+      "minecraft:boat": 6,
+      "minecraft:chest_boat": 116,
+      "minecraft:potion": 87
+    },
+    "minecraft:item": {
+      "minecraft:chain": 248,
+      "minecraft:grass": 89,
+      "minecraft:pottery_shard_archer": 2115,
+      "minecraft:pottery_shard_arms_up": 2117,
+      "minecraft:pottery_shard_prize": 2116,
+      "minecraft:pottery_shard_skull": 2118,
+      "minecraft:scute": 571
+    },
+    "minecraft:painting_variant": {
+      "minecraft:alban": 2,
+      "minecraft:aztec": 1,
+      "minecraft:aztec2": 3,
+      "minecraft:bomb": 4,
+      "minecraft:burning_skull": 23,
+      "minecraft:bust": 15,
+      "minecraft:courbet": 8,
+      "minecraft:creebet": 11,
+      "minecraft:donkey_kong": 29,
+      "minecraft:earth": 25,
+      "minecraft:fighters": 20,
+      "minecraft:fire": 28,
+      "minecraft:graham": 13,
+      "minecraft:kebab": 0,
+      "minecraft:match": 14,
+      "minecraft:pigscene": 22,
+      "minecraft:plant": 5,
+      "minecraft:pointer": 21,
+      "minecraft:pool": 7,
+      "minecraft:sea": 9,
+      "minecraft:skeleton": 24,
+      "minecraft:skull_and_roses": 18,
+      "minecraft:stage": 16,
+      "minecraft:sunset": 10,
+      "minecraft:void": 17,
+      "minecraft:wanderer": 12,
+      "minecraft:wasteland": 6,
+      "minecraft:water": 27,
+      "minecraft:wind": 26,
+      "minecraft:wither": 19
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:entity.goat.screaming.horn_break": 1311,
+      "minecraft:entity.leash_knot.break": 415,
+      "minecraft:entity.leash_knot.place": 416,
+      "minecraft:entity.puffer_fish.ambient": 666,
+      "minecraft:entity.wolf.howl": 939,
+      "minecraft:item.brush.brush_sand_completed": 1226,
+      "minecraft:item.brush.brushing": 1225,
+      "minecraft:item.goat_horn.play": 1310,
+      "minecraft:music.overworld.jungle_and_forest": 1363
+    }
+  },
+  "inspected_nbt_records": 3464,
+  "typed_uses": {
+    "minecraft:grass": {
+      "kind": "vanilla_block_rename",
+      "positions": 6182
+    },
+    "minecraft:skeleton": {
+      "kind": "spawner_entity_not_painting",
+      "before": 5,
+      "after": 7
+    },
+    "minecraft:water": {
+      "kind": "block_or_fluid_not_painting",
+      "before": 1576,
+      "after": 3360
+    }
+  },
+  "empty_capabilities": {
+    "original": {
+      "data/capabilities.dat": "CCAEE1759ED15CA7A00EC2CE1EEF845A78F17AB1407A0FDFDF7065ACAAF0BD33"
+    },
+    "rewritten": {
+      "data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9"
+    },
+    "control_log_sha256": "6FA79E99CBD8B7C507D44747CC3CD3EB87C9210DAE19B386E957C85B07558E72"
+  }
+}

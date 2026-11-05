@@ -32,7 +32,7 @@ public final class FixtureTool {
         for (int index = 0; index < ids.tagCount(); index++) {
             CompoundNBT entry = ids.getCompoundTagAt(index);
 
-            if (entry.getString("K").equals("minecraft:chest")) {
+            if (entry.getStringOr("K", "").equals("minecraft:chest")) {
                 chestId = entry.getInteger("V");
             }
         }
@@ -54,7 +54,7 @@ public final class FixtureTool {
             CompoundNBT section = null;
 
             for (int index = 0; index < sections.tagCount(); index++) {
-                if (sections.getCompoundTagAt(index).getByte("Y") == 6) {
+                if (sections.getCompoundTagAt(index).getByteOr("Y", (byte) 0) == 6) {
                     section = sections.getCompoundTagAt(index);
                 }
             }
@@ -105,9 +105,9 @@ public final class FixtureTool {
                         int z = chest >> 4;
                         int blockIndex = (108 & 15) << 8 | z << 4 | x;
 
-                        section.getByteArray("Blocks")[blockIndex] = (byte) chestId;
+                        section.getByteArray("Blocks").orElseGet(() -> new byte[0])[blockIndex] = (byte) chestId;
 
-                        byte[] stateMetadata = section.getByteArray("Data");
+                        byte[] stateMetadata = section.getByteArray("Data").orElseGet(() -> new byte[0]);
                         int metadataShift = (blockIndex & 1) * 4;
 
                         // Chest metadata zero has no valid block-state ID in these versions.
@@ -115,7 +115,7 @@ public final class FixtureTool {
                                 & ~(15 << metadataShift)) | 2 << metadataShift);
 
                         if (section.hasKey("Add")) {
-                            byte[] add = section.getByteArray("Add");
+                            byte[] add = section.getByteArray("Add").orElseGet(() -> new byte[0]);
                             int shift = (blockIndex & 1) * 4;
 
                             add[blockIndex >> 1] = (byte) ((add[blockIndex >> 1] & ~(15 << shift))

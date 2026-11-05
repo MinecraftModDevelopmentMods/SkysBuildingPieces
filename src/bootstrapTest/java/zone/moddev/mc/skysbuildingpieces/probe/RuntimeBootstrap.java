@@ -43,14 +43,14 @@ public final class RuntimeBootstrap {
             RecombinationChecks.Audit recombinationAudit, int recipes, int stacks, long resumeAt) {
     }
 
-    public RuntimeBootstrap() {
-        PathChecks.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus(),
+    public RuntimeBootstrap(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext context) {
+        PathChecks.register(context.getModBusGroup(),
                 "buildingpiecesbootstrap");
         PersistenceRegistrationChecks.register(
-                net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
-        MinecraftForge.EVENT_BUS.addListener(this::started);
-        MinecraftForge.EVENT_BUS.addListener(this::tick);
-        net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
+                context.getModBusGroup());
+        ServerStartedEvent.BUS.addListener(this::started);
+        net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(this::tick);
+        net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent.getBus(context.getModBusGroup())
                 .addListener(PersistenceOrderChecks::ready);
         net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                 () -> () -> new ClientProbe().init());
@@ -66,10 +66,7 @@ public final class RuntimeBootstrap {
         }
     }
 
-    private void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event) {
-        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) {
-            return;
-        }
+    private void tick(net.minecraftforge.event.TickEvent.ServerTickEvent.Post event) {
         if (deferredAudit != null) {
             if (System.nanoTime() < deferredAudit.resumeAt()) {
                 return;
@@ -141,6 +138,7 @@ public final class RuntimeBootstrap {
                     recipes = current.finish();
                     stacks = legacyStacks();
                     rawPlayer();
+                    rawRandomSequences();
                     NativeLegacyChecks.run(world);
                     GameplayChecks.run(world);
                     WaterloggingChecks.run(world);
@@ -225,11 +223,8 @@ public final class RuntimeBootstrap {
             }
         }
 
-        CompoundTag rules = world.getGameRules().createTag();
-
-        rules.putString("randomTickSpeed", "0");
-        world.getGameRules().assignFrom(new net.minecraft.world.level.GameRules(
-                new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NbtOps.INSTANCE, rules)), world.getServer());
+        world.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED,
+                0, world.getServer());
 
         int number = 0;
 
@@ -241,7 +236,7 @@ public final class RuntimeBootstrap {
                 String key = Integer.toString(number++);
 
                 if (reload) {
-                    require(NbtUtils.writeBlockState(world.getBlockState(position)).equals(saved.getCompound(key)),
+                    require(NbtUtils.writeBlockState(world.getBlockState(position)).equals(saved.getCompoundOrEmpty(key)),
                             "Client world reload lost " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
                 } else {
                     world.setBlock(position, block.getStateFromMeta(metadata), 18);
@@ -307,7 +302,7 @@ public final class RuntimeBootstrap {
 
                 require(actual.getItem() == expected.getItem() && actual.getCount() == 17,
                         "Legacy material item: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
-                require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(custom) && raw.getByte("Slot") == 4,
+                require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(custom) && raw.getByteOr("Slot", (byte) 0) == 4,
                         "Legacy custom data and inventory slot");
 
                 if (net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem()).getNamespace().equals("minecraft")
@@ -323,10 +318,10 @@ public final class RuntimeBootstrap {
                             fixed = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), fixed, 1343, 1493);
                         }
                         fixed = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), fixed,
-                                intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
+                                intermediate ? 1493 : 1343, 1976).getListOrEmpty("Inventory").getCompoundOrEmpty(0);
                         ItemStack saved = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(fixed);
                         require(saved.getItem() == expected.getItem() && saved.getCount() == 17
-                                && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(saved) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(saved).equals(custom) && fixed.getByte("Slot") == 4,
+                                && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(saved) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(saved).equals(custom) && fixed.getByteOr("Slot", (byte) 0) == 4,
                                 "Native item fixer changed " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem())
                                         + " intermediate=" + intermediate + ": " + fixed);
                     }
@@ -342,6 +337,22 @@ public final class RuntimeBootstrap {
 
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_ITEM_FIXERS_PASS identities=" + nativeItems.size() + " pipelines=2");
         return checked;
+    }
+
+    private static void rawRandomSequences() {
+        CompoundTag oldSequences = new CompoundTag();
+        CompoundTag sequence = new CompoundTag();
+        sequence.putLongArray("source", new long[] {-1435481386322947279L, -7008063121657184808L});
+        oldSequences.put("minecraft:blocks/moss_carpet", sequence);
+        CompoundTag oldFile = new CompoundTag();
+        oldFile.put("data", oldSequences);
+
+        var type = net.minecraft.util.datafix.DataFixTypes.SAVED_DATA_RANDOM_SEQUENCES;
+        var fixer = net.minecraft.util.datafix.DataFixers.getDataFixer();
+        CompoundTag fixed = type.updateToCurrentVersion(fixer, oldFile, 3465).getCompoundOrEmpty("data");
+        require(fixed.getIntOr("salt", -1) == 0 && fixed.getCompoundOrEmpty("sequences").equals(oldSequences),
+                "Vanilla 1.20.1 random sequences must keep their state and use the original default salt");
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RANDOM_SEQUENCE_UPGRADE_PASS");
     }
 
     private static void rawPlayer() {
@@ -369,14 +380,14 @@ public final class RuntimeBootstrap {
         source.put("Inventory", inventory);
 
         CompoundTag upgraded = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), source, 1343, 1976);
-        CompoundTag saved = upgraded.getList("Inventory", 10).getCompound(0);
+        CompoundTag saved = upgraded.getListOrEmpty("Inventory").getCompoundOrEmpty(0);
         ItemStack actual = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(saved);
         ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 23);
 
         require(actual.getItem() == expected.getItem() && actual.getCount() == 23,
                 "The real player data fixer must see the recovered flat item, not the metadata carrier");
-        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).getString("Keep").equals("Unrelated custom data")
-                && actual.getHoverName().getString().equals("Named legacy piece") && saved.getByte("Slot") == 7,
+        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).getStringOr("Keep", "").equals("Unrelated custom data")
+                && actual.getHoverName().getString().equals("Named legacy piece") && saved.getByteOr("Slot", (byte) 0) == 7,
                 "Player data fixing must preserve the custom name, slot and unrelated data");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RAW_PLAYER_FIXER_PASS");
     }

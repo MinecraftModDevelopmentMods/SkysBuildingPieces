@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/wool_lime",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_lime_horizontal_step"
-    }
+    "X": "skysbuildingpieces:wool_lime_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:wool_lime_slab",

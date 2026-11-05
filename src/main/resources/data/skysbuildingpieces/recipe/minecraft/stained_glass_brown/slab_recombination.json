@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/stained_glass_brown",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_glass_brown_slab"
-    }
+    "X": "skysbuildingpieces:stained_glass_brown_slab"
   },
   "result": {
     "id": "minecraft:brown_stained_glass",

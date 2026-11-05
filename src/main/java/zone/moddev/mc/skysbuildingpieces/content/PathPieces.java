@@ -4,6 +4,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -12,29 +14,32 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.common.util.Result;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Flatten a piece and its exposed grass support in one shovel action. */
 public final class PathPieces {
-    @SubscribeEvent
-    public void allowShovelUse(PlayerInteractEvent.RightClickBlock event) {
+    public static void register() {
+        PlayerInteractEvent.RightClickBlock.BUS.addListener(
+                (java.util.function.Predicate<PlayerInteractEvent.RightClickBlock>) new PathPieces()::allowShovelUse);
+    }
+
+    public boolean allowShovelUse(PlayerInteractEvent.RightClickBlock event) {
         if (target(event.getLevel(), event.getPos(), event.getEntity(), event.getItemStack(),
                 event.getFace()) == null) {
-            return;
+            return false;
         }
         // Sneaking bypasses block activation. Finish this valid use here so the
         // shovel acts once, including when a step sits above grass.
         if (event.getEntity().isShiftKeyDown() && activate(event.getLevel(), event.getPos(), event.getEntity(),
                 event.getItemStack(), event.getFace(), event.getHand())) {
-            event.setCanceled(true);
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
-            return;
+            return true;
         }
 
-        event.setUseBlock(Event.Result.ALLOW);
-        event.setUseItem(Event.Result.DENY);
+        event.setUseBlock(Result.ALLOW);
+        event.setUseItem(Result.DENY);
+        return false;
     }
 
     public static boolean activate(Level world, BlockPos position, Player player, ItemStack shovel,
@@ -44,7 +49,7 @@ public final class PathPieces {
         if (path == null) {
             return false;
         }
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return true;
         }
 
@@ -64,7 +69,7 @@ public final class PathPieces {
         world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1, 1);
 
         if (!player.getAbilities().instabuild) {
-            shovel.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
+            shovel.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
         }
 
         return true;
@@ -107,7 +112,7 @@ public final class PathPieces {
     }
 
     static void checkCover(Level world, BlockPos position, BlockState state) {
-        if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
+        if (world.isClientSide() || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
 

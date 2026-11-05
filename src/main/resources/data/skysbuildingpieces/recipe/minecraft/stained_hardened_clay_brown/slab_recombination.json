@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/stained_hardened_clay_brown",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_brown_slab"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_brown_slab"
   },
   "result": {
     "id": "minecraft:brown_terracotta",

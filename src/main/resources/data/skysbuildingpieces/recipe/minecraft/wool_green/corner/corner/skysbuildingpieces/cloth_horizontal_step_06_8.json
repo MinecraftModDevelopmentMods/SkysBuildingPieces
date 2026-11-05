@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_green_horizontal_step"
-    }
+    "X": "skysbuildingpieces:wool_green_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:wool_green_corner",

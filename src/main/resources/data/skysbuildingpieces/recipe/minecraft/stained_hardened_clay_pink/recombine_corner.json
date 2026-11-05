@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/stained_hardened_clay_pink",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_corner"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_pink_corner"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_pink_horizontal_step",

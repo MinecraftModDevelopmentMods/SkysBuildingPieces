@@ -33,7 +33,10 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.AABB;
@@ -131,7 +134,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         };
 
         Block.Properties properties = Block.Properties.of().mapColor(color).strength(1).sound(SoundType.STONE)
-                .dynamicShape().noOcclusion();
+                .dynamicShape().noOcclusion()
+                .setId(ResourceKey.create(Registries.BLOCK, Identifier.parse(palette.registryId())));
 
         // Keep the old solidity rules for covered paths and other pieces.
         if (palette.group.equals("path")) {
@@ -214,7 +218,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public int getLightBlock(BlockState state, BlockGetter world, BlockPos position) {
+    public int getLightBlock(BlockState state) {
         return 0;
     }
 
@@ -553,7 +557,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
         if (!palette.group.equals("path") && tool != null
                 && EnchantmentHelper.getItemEnchantmentLevel(context.getLevel().registryAccess()
-                        .registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), tool) > 0) {
+                        .lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH), tool) > 0) {
             return Collections.singletonList(getSilkTouchDrop(state));
         }
 
@@ -580,13 +584,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos position, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos position, BlockState state, boolean includeData) {
         return palette.shape == Shape.VERTICAL_SLAB ? Pieces.slabDrop(definition(state).id, state)
                 : Pieces.stack(Pieces.state(definition(state).id, palette.shape, orientation(state)), 1);
     }
 
     @Override
-    public boolean canPlaceLiquid(Player player, BlockGetter world, BlockPos position, BlockState state,
+    public boolean canPlaceLiquid(net.minecraft.world.entity.LivingEntity player, BlockGetter world, BlockPos position, BlockState state,
             net.minecraft.world.level.material.Fluid fluid) {
         // Keep an already filled piece from accepting another bucket action.
         return fluid == Fluids.WATER && !state.getValue(SlabBlock.WATERLOGGED);
@@ -598,10 +602,10 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction side, BlockState neighbour, LevelAccessor world,
-            BlockPos position, BlockPos neighbourPos) {
+    public BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess ticks,
+            BlockPos position, Direction side, BlockPos neighbourPos, BlockState neighbour, RandomSource random) {
         if (state.getValue(SlabBlock.WATERLOGGED)) {
-            world.scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            ticks.scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         }
 
         return getActualState(state, world, position);
@@ -617,7 +621,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public void tick(BlockState state, ServerLevel world, BlockPos position, RandomSource random) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return;
         }
 
@@ -628,7 +632,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos position, BlockState oldState, boolean moving) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return;
         }
 
@@ -638,17 +642,17 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos position,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos position,
             Player player, InteractionHand hand, BlockHitResult hit) {
         return PathPieces.activate(world, position, player, stack, hit.getDirection(), hand)
-                ? ItemInteractionResult.sidedSuccess(world.isClientSide)
-                : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                ? InteractionResult.SUCCESS
+                : InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos position, Block changed, BlockPos changedPos,
-            boolean moving) {
-        if (world.isClientSide) {
+    public void neighborChanged(BlockState state, Level world, BlockPos position, Block changed,
+            net.minecraft.world.level.redstone.Orientation orientation, boolean moving) {
+        if (world.isClientSide()) {
             return;
         }
 

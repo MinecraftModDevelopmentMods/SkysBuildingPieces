@@ -38,8 +38,8 @@ public final class NativeLegacyChecks {
 
                 LegacyBridge.prepareLegacyChunk(raw);
 
-                CompoundTag level = raw.getCompound("Level");
-                BlockState actual = LegacyTestScope.staged(level.getList("Sections", 10).getCompound(0), 0);
+                CompoundTag level = raw.getCompoundOrEmpty("Level");
+                BlockState actual = LegacyTestScope.staged(level.getListOrEmpty("Sections").getCompoundOrEmpty(0), 0);
                 Shape shape = LegacyMapping.shape("buildingbricks:rock_step", code);
                 int orientation = LegacyMapping.orientation(shape, code);
 
@@ -47,9 +47,9 @@ public final class NativeLegacyChecks {
                         "Saved step code " + code + " resolved to " + actual);
                 require(((PieceBlock) actual.getBlock()).mask(actual) == Geometry.mask(shape, orientation),
                         "Saved step geometry " + code);
-                require(level.getList("TileEntities", 10).isEmpty(), "Successful conversion removes its old tile");
-                require(level.getCompound("skysbuildingpieces_coverage").getList("retained_tiles", 10).getCompound(0)
-                        .getString("custom").equals("Retain complete tile data"), "Retained tile data");
+                require(level.getListOrEmpty("TileEntities").isEmpty(), "Successful conversion removes its old tile");
+                require(level.getCompoundOrEmpty("skysbuildingpieces_coverage").getListOrEmpty("retained_tiles").getCompoundOrEmpty(0)
+                        .getStringOr("custom", "").equals("Retain complete tile data"), "Retained tile data");
 
                 CompoundTag once = raw.copy();
 
@@ -58,11 +58,11 @@ public final class NativeLegacyChecks {
 
                 CompoundTag fixed = DataFixTypes.CHUNK.update(world.getServer().getFixerUpper(), raw.copy(), 1343, 1976);
 
-                require(contains(fixed.getCompound("Level"), actual), "Native flattening lost step code " + code);
-                require(!fixed.getCompound("Level").getList("Sections", 10).getCompound(0).contains("Blocks"),
+                require(contains(fixed.getCompoundOrEmpty("Level"), actual), "Native flattening lost step code " + code);
+                require(!fixed.getCompoundOrEmpty("Level").getListOrEmpty("Sections").getCompoundOrEmpty(0).contains("Blocks"),
                         "The native data fixer must replace numeric arrays");
                 LegacyBridge.finalizeLegacyChunk(fixed);
-                require(fixed.getCompound("Level").getString("Status").equals("full"), "Recovered chunk remains full");
+                require(fixed.getCompoundOrEmpty("Level").getStringOr("Status", "").equals("full"), "Recovered chunk remains full");
             }
 
             DirtCoverageChecks.run(world);
@@ -157,14 +157,14 @@ public final class NativeLegacyChecks {
     }
 
     private static boolean contains(CompoundTag level, BlockState state) {
-        ListTag sections = level.getList("Sections", 10);
+        ListTag sections = level.getListOrEmpty("Sections");
         CompoundTag expected = NbtUtils.writeBlockState(state);
 
         for (int section = 0; section < sections.size(); section++) {
-            ListTag palette = sections.getCompound(section).getList("Palette", 10);
+            ListTag palette = sections.getCompoundOrEmpty(section).getListOrEmpty("Palette");
 
             for (int index = 0; index < palette.size(); index++) {
-                if (palette.getCompound(index).equals(expected)) {
+                if (palette.getCompoundOrEmpty(index).equals(expected)) {
                     return true;
                 }
             }
@@ -191,7 +191,7 @@ public final class NativeLegacyChecks {
 
     private static void storedInventories(ServerLevel world) {
         CompoundTag root = chunk(LegacyTestScope.STEP_ID, 0, "minecraft:stone");
-        CompoundTag level = root.getCompound("Level");
+        CompoundTag level = root.getCompoundOrEmpty("Level");
         CompoundTag markers = new CompoundTag();
 
         markers.putInt("vanilla", 1);
@@ -204,14 +204,14 @@ public final class NativeLegacyChecks {
 
         ListTag contents = new ListTag();
         CompoundTag raw = stack("minecraft:stone", 17);
-        CompoundTag custom = raw.getCompound("tag").copy();
+        CompoundTag custom = raw.getCompoundOrEmpty("tag").copy();
 
         contents.add(raw);
         cabinet.put("cabinetItems", contents);
-        level.getList("TileEntities", 10).add(cabinet);
+        level.getListOrEmpty("TileEntities").add(cabinet);
         LegacyBridge.prepareChunk(world, root);
-        require(raw.getString("id").startsWith("skysbuildingpieces:"), "Raw inventory in an already covered chunk");
-        require(raw.getByte("Count") == 17 && raw.getByte("cabinetSlot") == 4 && raw.getCompound("tag").equals(custom),
+        require(raw.getStringOr("id", "").startsWith("skysbuildingpieces:"), "Raw inventory in an already covered chunk");
+        require(raw.getByteOr("Count", (byte) 0) == 17 && raw.getByteOr("cabinetSlot", (byte) 0) == 4 && raw.getCompoundOrEmpty("tag").equals(custom),
                 "Container slot, count and unrelated NBT");
 
         ItemStack decoded = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(raw);
@@ -237,8 +237,8 @@ public final class NativeLegacyChecks {
         CompoundTag fixed = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), player, 1343,
                 1976);
 
-        require(fixed.getList("Inventory", 10).getCompound(0).getString("id").startsWith("skysbuildingpieces:")
-                && fixed.getList("EnderItems", 10).getCompound(0).getByte("Count") == 11,
+        require(fixed.getListOrEmpty("Inventory").getCompoundOrEmpty(0).getStringOr("id", "").startsWith("skysbuildingpieces:")
+                && fixed.getListOrEmpty("EnderItems").getCompoundOrEmpty(0).getByteOr("Count", (byte) 0) == 11,
                 "Early native player hook covers main and ender inventories");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RAW_CONTAINER_PASS covered_chunk=true nonstandard_inventory_key=true");
     }

@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/obsidian",
   "pattern": ["X", "X"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:obsidian_horizontal_step"
-    }
+    "X": "skysbuildingpieces:obsidian_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:obsidian_slab",

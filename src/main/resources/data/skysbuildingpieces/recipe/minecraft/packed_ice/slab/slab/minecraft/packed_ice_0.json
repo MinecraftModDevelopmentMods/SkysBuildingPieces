@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/minecraft",
   "pattern": ["XXX"],
   "key": {
-    "X": {
-      "item": "minecraft:packed_ice"
-    }
+    "X": "minecraft:packed_ice"
   },
   "result": {
     "id": "skysbuildingpieces:packed_ice_slab",

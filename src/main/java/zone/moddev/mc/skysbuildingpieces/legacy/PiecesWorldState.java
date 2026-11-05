@@ -3,16 +3,25 @@ package zone.moddev.mc.skysbuildingpieces.legacy;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 /** Keeps migration totals and preserves saved fields this version does not interpret. */
 public final class PiecesWorldState extends SavedData {
     public static final String NAME = "skysbuildingpieces_world_state";
+    // This is our own schema, including saves written before DataVersion was present.
+    static final SavedDataType<PiecesWorldState> TYPE = new SavedDataType<>(NAME, PiecesWorldState::new,
+            CompoundTag.CODEC.xmap(PiecesWorldState::fromTag, state -> state.saveTag(new CompoundTag())), null);
+
     public long blocks, items, chunks;
     public final java.util.Map<String, Long> unresolved = new java.util.TreeMap<String, Long>();
     public final java.util.Map<String, Totals> modules = new java.util.TreeMap<String, Totals>();
 
     public static final class Totals {
-        public long blocks, items, chunks;
+        // This is our own schema, including saves written before DataVersion was present.
+    static final SavedDataType<PiecesWorldState> TYPE = new SavedDataType<>(NAME, PiecesWorldState::new,
+            CompoundTag.CODEC.xmap(PiecesWorldState::fromTag, state -> state.saveTag(new CompoundTag())), null);
+
+    public long blocks, items, chunks;
     }
 
     private Totals totals(String module) {
@@ -59,41 +68,40 @@ public final class PiecesWorldState extends SavedData {
     }
 
     public void load(CompoundTag compoundTag) {
-        int schema = compoundTag.getInt("schema_version");
+        int schema = compoundTag.getIntOr("schema_version", 0);
 
         if (schema != 1) {
             throw new IllegalStateException("Unsupported building-pieces state schema " + schema);
         }
 
-        blocks = compoundTag.getLong("vanilla_blocks");
-        items = compoundTag.getLong("vanilla_items");
-        chunks = compoundTag.getLong("vanilla_chunks");
+        blocks = compoundTag.getLongOr("vanilla_blocks", 0L);
+        items = compoundTag.getLongOr("vanilla_items", 0L);
+        chunks = compoundTag.getLongOr("vanilla_chunks", 0L);
         // Keep unknown fields, including data from later add-ons, when writing this state back.
         retained = compoundTag.copy();
         unresolved.clear();
 
-        CompoundTag issues = compoundTag.getCompound("unresolved");
+        CompoundTag issues = compoundTag.getCompoundOrEmpty("unresolved");
 
-        for (String key : issues.getAllKeys()) {
-            unresolved.put(key, issues.getLong(key));
+        for (String key : issues.keySet()) {
+            unresolved.put(key, issues.getLongOr(key, 0L));
         }
 
         modules.clear();
 
-        CompoundTag savedModules = compoundTag.getCompound("modules");
+        CompoundTag savedModules = compoundTag.getCompoundOrEmpty("modules");
 
-        for (String key : savedModules.getAllKeys()) {
-            CompoundTag saved = savedModules.getCompound(key);
+        for (String key : savedModules.keySet()) {
+            CompoundTag saved = savedModules.getCompoundOrEmpty(key);
             Totals moduleTotals = totals(key);
 
-            moduleTotals.blocks = saved.getLong("blocks");
-            moduleTotals.items = saved.getLong("items");
-            moduleTotals.chunks = saved.getLong("chunks");
+            moduleTotals.blocks = saved.getLongOr("blocks", 0L);
+            moduleTotals.items = saved.getLongOr("items", 0L);
+            moduleTotals.chunks = saved.getLongOr("chunks", 0L);
         }
     }
 
-    @Override
-    public CompoundTag save(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
+    public CompoundTag saveTag(CompoundTag compoundTag) {
         compoundTag.merge(retained);
         compoundTag.putInt("schema_version", 1);
         compoundTag.putLong("vanilla_blocks", blocks);
@@ -108,10 +116,10 @@ public final class PiecesWorldState extends SavedData {
 
         compoundTag.put("unresolved", issues);
 
-        CompoundTag savedModules = compoundTag.getCompound("modules");
+        CompoundTag savedModules = compoundTag.getCompoundOrEmpty("modules");
 
         for (java.util.Map.Entry<String, Totals> entry : modules.entrySet()) {
-            CompoundTag saved = savedModules.getCompound(entry.getKey());
+            CompoundTag saved = savedModules.getCompoundOrEmpty(entry.getKey());
 
             saved.putLong("blocks", entry.getValue().blocks);
             saved.putLong("items", entry.getValue().items);
@@ -133,10 +141,7 @@ public final class PiecesWorldState extends SavedData {
             throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
-        // This is our own schema. The vanilla map fixer rewrites old saved-data envelopes.
-        return ((net.minecraft.server.level.ServerLevel) world).getDataStorage()
-                .computeIfAbsent(new SavedData.Factory<>(PiecesWorldState::new,
-                        (tag, registries) -> fromTag(tag), null), NAME);
+        return ((net.minecraft.server.level.ServerLevel) world).getDataStorage().computeIfAbsent(TYPE);
     }
 
     private static PiecesWorldState fromTag(CompoundTag tag) {

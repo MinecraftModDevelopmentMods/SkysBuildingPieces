@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -81,7 +81,7 @@ public final class MineralogyCompat {
             return null;
         }
 
-        Block target = ForgeRegistries.BLOCKS.getValue(ResourceLocation.parse(replacement));
+        Block target = ForgeRegistries.BLOCKS.getValue(Identifier.parse(replacement));
 
         if (target == null || target == Blocks.AIR) {
             throw new IllegalStateException("Cannot recover " + historicalId
@@ -107,13 +107,13 @@ public final class MineralogyCompat {
         if (value instanceof CompoundTag) {
             CompoundTag compound = (CompoundTag) value;
 
-            if (compound.contains("id", 8) && compound.contains("Count", 99)) {
-                String replacement = replacementId(compound.getString("id"));
+            if (compound.getString("id").isPresent() && compound.getInt("Count").isPresent()) {
+                String replacement = replacementId(compound.getStringOr("id", ""));
 
                 if (replacement != null) {
-                    Block target = formerBlock(compound.getString("id"));
+                    Block target = formerBlock(compound.getStringOr("id", ""));
                     // Validate the saved slot without normalising its placement orientation.
-                    int metadata = compound.getShort("Damage");
+                    int metadata = compound.getShortOr("Damage", (short) 0);
 
                     if (metadata < 0 || metadata > 15) {
                         throw new IllegalStateException("Invalid saved Mineralogy piece metadata: " + metadata);
@@ -123,7 +123,7 @@ public final class MineralogyCompat {
                     changes.add(new StackIdentity(compound, replacement));
                 }
             }
-            for (String key : compound.getAllKeys()) {
+            for (String key : compound.keySet()) {
                 collectStacks(compound.get(key), changes);
             }
         } else if (value instanceof ListTag) {

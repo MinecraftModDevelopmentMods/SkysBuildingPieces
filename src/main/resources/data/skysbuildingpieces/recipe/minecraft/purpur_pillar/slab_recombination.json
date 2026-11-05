@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/purpur_pillar",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:purpur_pillar_slab"
-    }
+    "X": "skysbuildingpieces:purpur_pillar_slab"
   },
   "result": {
     "id": "minecraft:purpur_pillar",
