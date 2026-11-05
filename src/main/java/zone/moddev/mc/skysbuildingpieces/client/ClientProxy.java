@@ -29,11 +29,11 @@ public final class ClientProxy {
     }
 
     public static void register() {
-        AddPackFindersEvent.BUS.addListener(ClientProxy::mineralogyResources);
         ModelEvent.ModifyBakingResult.BUS.addListener(ContinuousGlassModel::bake);
     }
 
-    private static void mineralogyResources(AddPackFindersEvent event) {
+    @SubscribeEvent
+    public static void mineralogyResources(AddPackFindersEvent event) {
         if (event.getPackType() != PackType.CLIENT_RESOURCES || !ModList.isLoaded("mineralogy")) {
             return;
         }
