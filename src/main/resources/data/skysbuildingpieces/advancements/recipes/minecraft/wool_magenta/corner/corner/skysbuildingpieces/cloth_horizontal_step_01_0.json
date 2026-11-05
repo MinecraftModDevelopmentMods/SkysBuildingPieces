@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:wool_magenta_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:wool_magenta_horizontal_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/wool_magenta/corner/corner/skysbuildingpieces/cloth_horizontal_step_01_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/wool_magenta/corner/corner/skysbuildingpieces/cloth_horizontal_step_01_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_magenta_corner"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_magenta_horizontal_step"
     }
   ]

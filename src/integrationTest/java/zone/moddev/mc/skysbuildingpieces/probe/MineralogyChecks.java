@@ -4,7 +4,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.Direction;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -28,8 +28,8 @@ final class MineralogyChecks {
 
         int registered = 0;
 
-        for (Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValues()) {
-            if (net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString().startsWith("skysbuildingpieces:mineralogy_")) {
+        for (Block block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            if (net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString().startsWith("skysbuildingpieces:mineralogy_")) {
                 registered++;
             }
         }

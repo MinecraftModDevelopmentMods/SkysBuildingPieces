@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:quartz_slab",
+    "id": "minecraft:quartz_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:quartz_block_horizontal_step"
     }
   ]

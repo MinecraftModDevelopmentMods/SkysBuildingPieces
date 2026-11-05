@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:glass_wall",
+    "id": "skysbuildingpieces:glass_wall",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:glass_wall"
     }
   ]

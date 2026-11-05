@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_glass_silver_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:stained_glass_silver_vertical_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_glass_silver/slab/rotate/skysbuildingpieces/stained_glass_vertical_slab_02_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_silver/slab/rotate/skysbuildingpieces/stained_glass_vertical_slab_02_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_silver_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_silver_vertical_slab"
     }
   ]

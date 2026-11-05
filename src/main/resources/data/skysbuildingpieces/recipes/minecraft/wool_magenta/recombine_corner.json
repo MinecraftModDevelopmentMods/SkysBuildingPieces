@@ -8,16 +8,16 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_magenta_horizontal_step",
+    "id": "skysbuildingpieces:wool_magenta_horizontal_step",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_magenta_corner"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_magenta_horizontal_step"
     }
   ]

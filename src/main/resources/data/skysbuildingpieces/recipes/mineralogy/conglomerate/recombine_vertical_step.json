@@ -8,20 +8,20 @@
     }
   },
   "result": {
-    "item": "mineralogy:conglomerate_slab",
+    "id": "mineralogy:conglomerate_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "mineralogy:conglomerate_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_conglomerate_vertical_step"
     }
   ]

@@ -8,13 +8,13 @@
     }
   },
   "result": {
-    "item": "minecraft:dark_oak_slab",
+    "id": "minecraft:dark_oak_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_dark_oak_vertical_slab"
     }
   ]

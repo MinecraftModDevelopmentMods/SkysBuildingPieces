@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_glass_cyan_slab"
-            ]
+            "items": ["skysbuildingpieces:stained_glass_cyan_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_glass_cyan/horizontal_step/step/skysbuildingpieces/stained_glass_slab_01_2"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_cyan/horizontal_step/step/skysbuildingpieces/stained_glass_slab_01_2"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_cyan_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_cyan_slab"
     }
   ]

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:prismarine_bricks_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:prismarine_bricks_vertical_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/prismarine_bricks/recombine_vertical_step"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/prismarine_bricks/recombine_vertical_step"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:prismarine_bricks_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:prismarine_bricks_vertical_step"
     }
   ]

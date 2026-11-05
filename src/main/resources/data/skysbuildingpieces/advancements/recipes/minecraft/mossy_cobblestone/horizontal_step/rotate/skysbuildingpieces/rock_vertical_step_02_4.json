@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:mossy_cobblestone_vertical_step"
-            ]
+            "items": ["skysbuildingpieces:mossy_cobblestone_vertical_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/mossy_cobblestone/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_02_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/mossy_cobblestone/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_02_4"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mossy_cobblestone_vertical_step"
     }
   ]

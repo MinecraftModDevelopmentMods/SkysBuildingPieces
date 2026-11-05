@@ -24,7 +24,7 @@ class LoaderHooksTest {
         Map<String, String> targets = new LinkedHashMap<>();
 
         targets.put("skysbuildingpieces_legacy_chunk", "net/minecraft/world/level/chunk/storage/ChunkStorage");
-        targets.put("skysbuildingpieces_legacy_level_registry", "net/minecraftforge/common/ForgeHooks");
+        targets.put("skysbuildingpieces_legacy_level_registry", "net/neoforged/neoforge/common/CommonHooks");
         targets.put("skysbuildingpieces_raw_inventory", "net/minecraft/util/datafix/DataFixTypes");
         targets.put("skysbuildingpieces_native_slab_placement", "net/minecraft/world/item/BlockItem");
         return targets;
@@ -33,7 +33,7 @@ class LoaderHooksTest {
     private ScriptEngine engine() throws Exception {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-        assertNotNull(engine, "Forge 47 transformer tests require the production Java 17 runtime");
+        assertNotNull(engine, "The native transformer tests need NeoForge's script engine");
         engine.eval(new String(Files.readAllBytes(Paths.get("src/main/resources/coremods/skysbuildingpieces.js")),
                 StandardCharsets.UTF_8));
         return engine;
@@ -74,7 +74,7 @@ class LoaderHooksTest {
     }
 
     @Test
-    void realForge47MethodsMatchAndEveryReturnIsWrapped() throws Exception {
+    void realNeoForgeMethodsMatchAndEveryReturnIsWrapped() throws Exception {
         for (Map.Entry<String, String> target : targets().entrySet()) {
             ScriptEngine engine = engine();
             ClassNode node = original(target.getValue());

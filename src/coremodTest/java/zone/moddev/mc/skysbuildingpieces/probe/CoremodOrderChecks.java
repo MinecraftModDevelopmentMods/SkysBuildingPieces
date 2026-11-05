@@ -92,7 +92,7 @@ public final class CoremodOrderChecks {
                     require(calls(method, namespace, "prepareLegacyChunk") == 1,
                             "Missing or repeated entry hook: " + namespace);
                     require(calls(method, namespace, "finalizeLegacyChunk") == returns,
-                            "Every return needs both mods' finalizers: " + namespace);
+                            "Every return needs all three finalizers: " + namespace);
                 }
 
                 new Analyzer<>(new BasicVerifier()).analyze(node.name, method);
@@ -100,7 +100,7 @@ public final class CoremodOrderChecks {
 
             require(methods == 1, "Expected one native chunk-upgrade method");
 
-            ClassNode level = nativeClass("net/minecraftforge/common/ForgeHooks");
+            ClassNode level = nativeClass("net/neoforged/neoforge/common/CommonHooks");
             for (int index : order) {
                 apply(scripts.get(index), level);
             }
@@ -140,7 +140,7 @@ public final class CoremodOrderChecks {
 
     private static ClassNode nativeClass(String name) throws Exception {
         try (InputStream input = CoremodOrderChecks.class.getClassLoader().getResourceAsStream(name + ".class")) {
-            require(input != null, "Native Forge class is missing: " + name);
+            require(input != null, "Native NeoForge class is missing: " + name);
             ClassNode node = new ClassNode();
             new ClassReader(input).accept(node, 0);
             return node;

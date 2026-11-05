@@ -8,16 +8,16 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stonebrick_carved_slab",
+    "id": "skysbuildingpieces:stonebrick_carved_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stonebrick_carved_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stonebrick_carved_vertical_step"
     }
   ]

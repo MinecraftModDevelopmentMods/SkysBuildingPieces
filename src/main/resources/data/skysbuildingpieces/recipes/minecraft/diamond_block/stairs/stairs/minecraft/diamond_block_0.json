@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:diamond_block_stairs",
+    "id": "skysbuildingpieces:diamond_block_stairs",
     "count": 4
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diamond_block_stairs"
     }
   ]

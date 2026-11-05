@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:dirt_coarse_horizontal_step",
+    "id": "skysbuildingpieces:dirt_coarse_horizontal_step",
     "count": 8
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_coarse_horizontal_step"
     }
   ]

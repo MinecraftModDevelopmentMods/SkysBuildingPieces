@@ -8,17 +8,17 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:end_stone_vertical_step",
+    "id": "skysbuildingpieces:end_stone_vertical_step",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:end_stone_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:end_stone_vertical_step"
     }
   ]

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:blue_stained_glass"
-            ]
+            "items": ["minecraft:blue_stained_glass"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_glass_blue/slab/slab/minecraft/stained_glass_11"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_blue/slab/slab/minecraft/stained_glass_11"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_blue_slab"
     }
   ]

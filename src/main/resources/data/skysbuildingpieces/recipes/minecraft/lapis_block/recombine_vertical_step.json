@@ -8,16 +8,16 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:lapis_block_slab",
+    "id": "skysbuildingpieces:lapis_block_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:lapis_block_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:lapis_block_vertical_step"
     }
   ]

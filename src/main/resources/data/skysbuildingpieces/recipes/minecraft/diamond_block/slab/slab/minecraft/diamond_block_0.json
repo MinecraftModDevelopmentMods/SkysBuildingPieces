@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:diamond_block_slab",
+    "id": "skysbuildingpieces:diamond_block_slab",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diamond_block_slab"
     }
   ]

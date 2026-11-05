@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:end_stone_wall",
+    "id": "skysbuildingpieces:end_stone_wall",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:end_stone_wall"
     }
   ]

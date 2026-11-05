@@ -8,17 +8,17 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:smooth_red_sandstone_horizontal_step",
+    "id": "skysbuildingpieces:smooth_red_sandstone_horizontal_step",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:smooth_red_sandstone_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:smooth_red_sandstone_vertical_step"
     }
   ]

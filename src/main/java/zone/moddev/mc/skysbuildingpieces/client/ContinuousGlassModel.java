@@ -14,17 +14,17 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.core.Direction;
-import net.minecraftforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
-import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.bus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
@@ -134,7 +134,7 @@ public final class ContinuousGlassModel implements BakedModel {
     }
 
     @Override
-    public net.minecraftforge.client.ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource random, ModelData data) {
+    public net.neoforged.neoforge.client.ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource random, ModelData data) {
         return original.getRenderTypes(state, random, data);
     }
 
@@ -199,7 +199,7 @@ public final class ContinuousGlassModel implements BakedModel {
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {
                 if (block.palette.shape == Shape.WALL && block.palette.group.contains("glass")) {
-                    walls.add(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString());
+                    walls.add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString());
                 }
             }
 

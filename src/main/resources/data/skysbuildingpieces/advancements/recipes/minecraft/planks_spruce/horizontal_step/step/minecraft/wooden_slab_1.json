@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:spruce_slab"
-            ]
+            "items": ["minecraft:spruce_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/planks_spruce/horizontal_step/step/minecraft/wooden_slab_1"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/planks_spruce/horizontal_step/step/minecraft/wooden_slab_1"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_spruce_horizontal_step"
     }
   ]

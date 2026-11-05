@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:wool_yellow_slab"
-            ]
+            "items": ["skysbuildingpieces:wool_yellow_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/wool_yellow/horizontal_step/step/skysbuildingpieces/cloth_slab_00_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/wool_yellow/horizontal_step/step/skysbuildingpieces/cloth_slab_00_8"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_yellow_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_yellow_slab"
     }
   ]

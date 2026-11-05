@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:andesite_smooth_wall",
+    "id": "skysbuildingpieces:andesite_smooth_wall",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:andesite_smooth_wall"
     }
   ]

@@ -1,0 +1,38 @@
+{
+  "source_world_sha256": "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095",
+  "snapshot_entries": {
+    "minecraft:enchantment": {
+      "minecraft:sweeping": 18
+    },
+    "minecraft:item": {
+      "minecraft:grass": 89,
+      "minecraft:pottery_shard_archer": 2115,
+      "minecraft:pottery_shard_arms_up": 2117,
+      "minecraft:pottery_shard_prize": 2116,
+      "minecraft:pottery_shard_skull": 2118,
+      "minecraft:scute": 571
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:item.brush.brush_sand_completed": 1226,
+      "minecraft:item.brush.brushing": 1225,
+      "minecraft:music.overworld.jungle_and_forest": 1363
+    }
+  },
+  "saved_uses": {
+    "minecraft:empty": 0,
+    "minecraft:sweeping": 0,
+    "minecraft:music.overworld.jungle_and_forest": 0,
+    "minecraft:item.brush.brush_sand_completed": 0,
+    "minecraft:pottery_shard_skull": 0,
+    "minecraft:item.brush.brushing": 0,
+    "minecraft:pottery_shard_archer": 0,
+    "minecraft:grass": 0,
+    "minecraft:pottery_shard_prize": 0,
+    "minecraft:scute": 0,
+    "minecraft:pottery_shard_arms_up": 0
+  },
+  "inspected_nbt_values": 224042
+}

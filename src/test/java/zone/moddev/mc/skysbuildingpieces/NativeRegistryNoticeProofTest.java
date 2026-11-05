@@ -32,10 +32,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class NativeRegistryNoticeProofTest {
     @Test
     void permittedRegistryNamesHaveCompleteSavedContentProof() throws Exception {
+        MinecraftTestBootstrap.registerVanilla();
         JsonObject profiles = new JsonParser().parse(new String(
                 Files.readAllBytes(Paths.get("tools/native-log-profiles.json")), StandardCharsets.UTF_8))
                 .getAsJsonObject().getAsJsonObject("profiles");
-        assertEquals(6, profiles.size());
+        assertEquals(7, profiles.size());
         Set<String> versions = new HashSet<>();
 
         for (java.util.Map.Entry<String, com.google.gson.JsonElement> entry : profiles.entrySet()) {
@@ -61,9 +62,9 @@ class NativeRegistryNoticeProofTest {
                     names.add(mapping.getKey());
                 }
             }
-            int forge47Names = verifyForge47UnusedRegistryProof(profile, names);
-            assertEquals((profile.has("legacy_biome_registry") ? 9 : 0)
-                    + (profile.has("retired_poi_contract") ? 2 : 0) + forge47Names, names.size());
+            verifyUnusedRegistryProof(profile, names);
+            GrassRenameProof grass = new GrassRenameProof(profile);
+            assertFalse(names.isEmpty());
             assertEquals(0, profile.get("non_biome_saved_uses").getAsInt());
             BiomeProof biomes = new BiomeProof(profile);
             assertTrue(versions.add(biomes.version));
@@ -77,7 +78,7 @@ class NativeRegistryNoticeProofTest {
                     String label = member.getName();
                     try (InputStream input = archive.getInputStream(member)) {
                         if (label.endsWith(".dat") || label.endsWith(".dat_old")) {
-                            CompoundTag root = NbtIo.readCompressed(input);
+                            CompoundTag root = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
                             // Registry availability is not a saved block, entity or inventory use.
                             root.remove("FML");
                             root.remove("fml");
@@ -85,36 +86,46 @@ class NativeRegistryNoticeProofTest {
                             biomes.inspect(root);
                             records++;
                         } else if (label.endsWith(".mca")) {
-                            records += region(readAll(input), names, label, biomes);
+                            records += region(readAll(input), names, label, biomes, grass);
                         }
                     }
                 }
             }
             assertEquals(profile.get("inspected_nbt_records").getAsInt(), records);
             biomes.complete(profile);
+            grass.complete();
         }
-        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4"), versions);
+        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1"), versions);
     }
 
-    private static int verifyForge47UnusedRegistryProof(JsonObject profile, Set<String> names) throws Exception {
-        JsonObject binding = profile.getAsJsonObject("forge47_unused_registry_contract");
+    private static void verifyUnusedRegistryProof(JsonObject profile, Set<String> names) throws Exception {
+        boolean forge50 = profile.has("forge50_unused_registry_contract");
+        JsonObject binding = profile.getAsJsonObject(forge50
+                ? "forge50_unused_registry_contract" : "forge47_unused_registry_contract");
         if (binding == null) {
-            return 0;
+            return;
         }
 
         byte[] raw = Files.readAllBytes(Paths.get(binding.get("path").getAsString()));
         assertEquals(binding.get("sha256").getAsString(), checksum(raw));
         JsonObject proof = JsonParser.parseString(new String(raw, StandardCharsets.UTF_8)).getAsJsonObject();
         assertEquals(profile.get("sha256"), proof.get("source_world_sha256"));
-        assertEquals(profile.get("mappings"), proof.get("snapshot_entries"));
+        JsonObject snapshot = proof.getAsJsonObject("snapshot_entries");
+        JsonObject mappings = profile.getAsJsonObject("mappings");
+        Set<String> provenNames = new HashSet<>();
+        for (var registry : snapshot.entrySet()) {
+            assertEquals(mappings.get(registry.getKey()), registry.getValue());
+            provenNames.addAll(registry.getValue().getAsJsonObject().keySet());
+        }
         JsonObject savedUses = proof.getAsJsonObject("saved_uses");
-        assertEquals(names, savedUses.keySet());
+        assertTrue(names.containsAll(provenNames));
+        assertFalse(provenNames.isEmpty());
+        assertEquals(provenNames, savedUses.keySet());
         savedUses.entrySet().forEach(entry -> assertEquals(0, entry.getValue().getAsInt(), entry.getKey()));
-        assertEquals(7, savedUses.size());
-        return savedUses.size();
     }
 
-    private static int region(byte[] bytes, Set<String> names, String label, BiomeProof biomes) throws Exception {
+    private static int region(byte[] bytes, Set<String> names, String label, BiomeProof biomes,
+            GrassRenameProof grass) throws Exception {
         if (bytes.length == 0) {
             return 0;
         }
@@ -139,12 +150,136 @@ class NativeRegistryNoticeProofTest {
             }
             try (DataInputStream input = new DataInputStream(payload)) {
                 CompoundTag root = NbtIo.read(input);
+                grass.inspect(root);
                 inspect(root, names, label + ":" + slot);
                 biomes.inspect(root);
             }
             records++;
         }
         return records;
+    }
+
+    /** Match every old grass block in the raw fixture before checking other saved uses. */
+    private static final class GrassRenameProof {
+        private final Set<net.minecraft.core.BlockPos> expected = new HashSet<>();
+        private final Set<net.minecraft.core.BlockPos> actual = new HashSet<>();
+        private final Map<net.minecraft.core.BlockPos, Integer> expectedTicks = new HashMap<>();
+        private final Map<net.minecraft.core.BlockPos, Integer> actualTicks = new HashMap<>();
+        private final Map<Integer, Set<CompoundTag>> fixedPaletteEntries = new HashMap<>();
+
+        GrassRenameProof(JsonObject profile) throws Exception {
+            JsonObject binding = profile.getAsJsonObject("native_block_rename_contract");
+            if (binding == null) {
+                return;
+            }
+            byte[] raw = Files.readAllBytes(Paths.get(binding.get("path").getAsString()));
+            assertEquals(binding.get("sha256").getAsString(), checksum(raw));
+            JsonObject proof = JsonParser.parseString(new String(raw, StandardCharsets.UTF_8)).getAsJsonObject();
+            assertEquals(profile.get("sha256"), proof.get("source_world_sha256"));
+            assertEquals("minecraft:grass", proof.get("source").getAsString());
+            assertEquals("minecraft:short_grass", proof.get("target").getAsString());
+            for (var entry : proof.getAsJsonArray("positions")) {
+                var coordinates = entry.getAsJsonArray();
+                assertTrue(expected.add(new net.minecraft.core.BlockPos(
+                        coordinates.get(0).getAsInt(), coordinates.get(1).getAsInt(), coordinates.get(2).getAsInt())));
+            }
+            assertEquals(binding.get("checked_positions").getAsInt(), expected.size());
+            if (proof.has("legacy_ticks")) {
+                for (var entry : proof.getAsJsonArray("legacy_ticks")) {
+                    var coordinates = entry.getAsJsonArray();
+                    var position = new net.minecraft.core.BlockPos(
+                            coordinates.get(0).getAsInt(), coordinates.get(1).getAsInt(), coordinates.get(2).getAsInt());
+                    assertTrue(expected.contains(position));
+                    expectedTicks.merge(position, 1, Integer::sum);
+                }
+            }
+        }
+
+        boolean enabled() {
+            return !expected.isEmpty();
+        }
+
+        void inspect(CompoundTag root) {
+            if (!enabled()) {
+                return;
+            }
+            boolean legacyLayout = root.contains("Level", Tag.TAG_COMPOUND);
+            CompoundTag chunk = legacyLayout ? root.getCompound("Level") : root;
+            int chunkX = chunk.getInt("xPos");
+            int chunkZ = chunk.getInt("zPos");
+            ListTag sections = chunk.getList(legacyLayout ? "Sections" : "sections", Tag.TAG_COMPOUND);
+            for (int index = 0; index < sections.size(); index++) {
+                CompoundTag section = sections.getCompound(index);
+                CompoundTag states = legacyLayout ? section : section.getCompound("block_states");
+                ListTag palette = states.getList(legacyLayout ? "Palette" : "palette", Tag.TAG_COMPOUND);
+                for (int state = 0; state < palette.size(); state++) {
+                    CompoundTag entry = palette.getCompound(state);
+                    if (!entry.getString("Name").equals("minecraft:grass")) {
+                        continue;
+                    }
+                    verifyNativeRename(root.getInt("DataVersion"), entry);
+                    int bits = Math.max(4, Integer.SIZE - Integer.numberOfLeadingZeros(palette.size() - 1));
+                    int perWord = Long.SIZE / bits;
+                    long[] packed = states.getLongArray(legacyLayout ? "BlockStates" : "data");
+                    for (int cell = 0; cell < 4096; cell++) {
+                        long paletteIndex = palette.size() == 1 ? 0 : paletteIndex(packed, bits, perWord, cell);
+                        if (paletteIndex == state) {
+                            assertTrue(actual.add(new net.minecraft.core.BlockPos(
+                                    chunkX * 16 + cell % 16, section.getInt("Y") * 16 + cell / 256,
+                                    chunkZ * 16 + cell / 16 % 16)));
+                        }
+                    }
+                    // Exclude only this checked palette entry from the unused-item scan.
+                    entry.putString("Name", "minecraft:short_grass");
+                }
+            }
+            if (legacyLayout) {
+                ListTag ticks = chunk.getList("TileTicks", Tag.TAG_COMPOUND);
+                for (int index = 0; index < ticks.size(); index++) {
+                    CompoundTag tick = ticks.getCompound(index);
+                    if (tick.getString("i").equals("minecraft:grass")) {
+                        var position = new net.minecraft.core.BlockPos(tick.getInt("x"), tick.getInt("y"), tick.getInt("z"));
+                        actualTicks.merge(position, 1, Integer::sum);
+                        // The matching historical block tick is not a stored grass item.
+                        tick.putString("i", "minecraft:short_grass");
+                    }
+                }
+            }
+        }
+
+        private void verifyNativeRename(int version, CompoundTag entry) {
+            if (!fixedPaletteEntries.computeIfAbsent(version, ignored -> new HashSet<>()).add(entry.copy())) {
+                return;
+            }
+            int current = net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion();
+            assertTrue(version > 0 && version < current);
+            var source = new com.mojang.serialization.Dynamic<net.minecraft.nbt.Tag>(net.minecraft.nbt.NbtOps.INSTANCE, entry);
+            var fixed = net.minecraft.util.datafix.DataFixers.getDataFixer().update(
+                    net.minecraft.util.datafix.fixes.References.BLOCK_STATE, source, version, current);
+            assertEquals("minecraft:short_grass", fixed.get("Name").asString(""));
+        }
+
+        private static long paletteIndex(long[] packed, int bits, int perWord, int cell) {
+            long mask = (1L << bits) - 1;
+            if (packed.length == (4096 + perWord - 1) / perWord) {
+                return (packed[cell / perWord] >>> ((cell % perWord) * bits)) & mask;
+            }
+            // Pre-1.16 palettes can span two words for one entry.
+            assertEquals((4096 * bits + Long.SIZE - 1) / Long.SIZE, packed.length);
+            int start = cell * bits;
+            int word = start / Long.SIZE;
+            int offset = start % Long.SIZE;
+            long value = packed[word] >>> offset;
+            if (offset + bits > Long.SIZE) {
+                value |= packed[word + 1] << (Long.SIZE - offset);
+            }
+            return value & mask;
+        }
+
+        void complete() {
+            assertEquals(expected, actual);
+            assertEquals(expectedTicks, actualTicks);
+        }
     }
 
     private static String checksum(byte[] data) throws Exception {

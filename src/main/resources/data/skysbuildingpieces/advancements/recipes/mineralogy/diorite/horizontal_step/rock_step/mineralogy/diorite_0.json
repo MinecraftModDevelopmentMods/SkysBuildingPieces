@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "mineralogy:diorite"
-            ]
+            "items": ["mineralogy:diorite"]
           }
         ]
       }
@@ -20,27 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "mineralogy:diorite"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_diorite_horizontal_step"
     }
   ]

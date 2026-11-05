@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:coarse_dirt"
-            ]
+            "items": ["minecraft:coarse_dirt"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt_coarse/stairs/stairs/minecraft/dirt_1"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt_coarse/stairs/stairs/minecraft/dirt_1"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_coarse_stairs"
     }
   ]

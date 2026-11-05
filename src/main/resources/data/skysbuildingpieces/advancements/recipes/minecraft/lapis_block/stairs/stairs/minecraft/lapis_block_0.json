@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:lapis_block"
-            ]
+            "items": ["minecraft:lapis_block"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/lapis_block/stairs/stairs/minecraft/lapis_block_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/lapis_block/stairs/stairs/minecraft/lapis_block_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:lapis_block_stairs"
     }
   ]

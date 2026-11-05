@@ -8,16 +8,16 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:cobblestone_corner",
+    "id": "skysbuildingpieces:cobblestone_corner",
     "count": 4
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:cobblestone_corner"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:cobblestone_horizontal_step"
     }
   ]

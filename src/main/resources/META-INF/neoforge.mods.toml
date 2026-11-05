@@ -12,29 +12,29 @@ authors="SkyBlade1978"
 description='''Extra building shapes for familiar materials, with built-in Mineralogy support when installed. No world generation.'''
 
 [[dependencies.skysbuildingpieces]]
-modId="forge"
-mandatory=true
-versionRange="${forge_version_range}"
+modId="neoforge"
+type="required"
+versionRange="${neo_version_range}"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.skysbuildingpieces]]
 modId="minecraft"
-mandatory=true
+type="required"
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.skysbuildingpieces]]
 modId="skysgrassslabs"
-mandatory=false
-versionRange="[1.2.0.120012,)"
+type="optional"
+versionRange="[1.2.0.120062,)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.skysbuildingpieces]]
 modId="mineralogy"
-mandatory=false
+type="optional"
 versionRange="[5,)"
 ordering="AFTER"
 side="BOTH"

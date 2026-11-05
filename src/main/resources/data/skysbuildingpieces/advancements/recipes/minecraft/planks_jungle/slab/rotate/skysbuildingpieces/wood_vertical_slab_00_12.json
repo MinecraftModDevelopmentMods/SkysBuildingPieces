@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:planks_jungle_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:planks_jungle_vertical_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/planks_jungle/slab/rotate/skysbuildingpieces/wood_vertical_slab_00_12"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/planks_jungle/slab/rotate/skysbuildingpieces/wood_vertical_slab_00_12"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_jungle_vertical_slab"
     }
   ]

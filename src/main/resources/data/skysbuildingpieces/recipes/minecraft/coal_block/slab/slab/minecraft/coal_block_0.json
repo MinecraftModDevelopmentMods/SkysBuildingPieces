@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:coal_block_slab",
+    "id": "skysbuildingpieces:coal_block_slab",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:coal_block_slab"
     }
   ]

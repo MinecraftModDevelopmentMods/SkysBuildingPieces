@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stonebrick_cracked_wall",
+    "id": "skysbuildingpieces:stonebrick_cracked_wall",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stonebrick_cracked_wall"
     }
   ]

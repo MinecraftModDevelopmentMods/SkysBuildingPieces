@@ -4,9 +4,9 @@ import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.ChunkDataEvent;
-import net.minecraftforge.eventbus.api.*;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.ChunkDataEvent;
+import net.neoforged.bus.api.*;
 
 /** Build-only stand-in for a later material add-on's independent coverage. */
 public final class CoverageContributor {
@@ -48,7 +48,7 @@ public final class CoverageContributor {
         LevelChunk chunk = world.getChunk(72, 72);
         CoverageContributor contributor = new CoverageContributor();
 
-        MinecraftForge.EVENT_BUS.register(contributor);
+        NeoForge.EVENT_BUS.register(contributor);
 
         try {
             for (boolean wrapped : new boolean[] {true, false}) {
@@ -64,8 +64,8 @@ public final class CoverageContributor {
                 }
                 coverage.putInt("vanilla", 1);
                 level.put("skysbuildingpieces_coverage", coverage);
-                MinecraftForge.EVENT_BUS
-                        .post(new ChunkDataEvent.Load(chunk, root, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                NeoForge.EVENT_BUS
+                        .post(new ChunkDataEvent.Load(chunk, root, net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
 
                 if (contributor.visits != previousVisits + 1) {
                     throw new AssertionError("Core coverage must not skip a later add-on");
@@ -76,7 +76,7 @@ public final class CoverageContributor {
                 if (wrapped) {
                     saved.put("Level", new CompoundTag());
                 }
-                MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, chunk.getLevel(), saved));
+                NeoForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, chunk.getLevel(), saved));
 
                 CompoundTag markers = contents(saved).getCompound("skysbuildingpieces_coverage");
 
@@ -84,8 +84,8 @@ public final class CoverageContributor {
                     throw new AssertionError("Independent markers must survive both save handlers");
                 }
 
-                MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved,
-                        net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                NeoForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved,
+                        net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
 
                 if (contributor.visits != previousVisits + 1) {
                     throw new AssertionError("Later add-on coverage must be reload idempotent");
@@ -94,7 +94,7 @@ public final class CoverageContributor {
             }
             org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload schemas=2");
         } finally {
-            MinecraftForge.EVENT_BUS.unregister(contributor);
+            NeoForge.EVENT_BUS.unregister(contributor);
         }
     }
 

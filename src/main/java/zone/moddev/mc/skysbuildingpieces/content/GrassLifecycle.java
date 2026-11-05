@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 /** Standalone grass rules with an optional shared Grass Slabs lifecycle. */
 public final class GrassLifecycle {

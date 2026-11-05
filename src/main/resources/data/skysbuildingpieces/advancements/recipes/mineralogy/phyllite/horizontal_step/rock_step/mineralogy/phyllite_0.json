@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "mineralogy:phyllite"
-            ]
+            "items": ["mineralogy:phyllite"]
           }
         ]
       }
@@ -20,27 +18,22 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:mineralogy/phyllite/horizontal_step/rock_step/mineralogy/phyllite_0"
-    ]
+    "recipes": ["skysbuildingpieces:mineralogy/phyllite/horizontal_step/rock_step/mineralogy/phyllite_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "mineralogy:phyllite"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_phyllite_horizontal_step"
     }
   ]

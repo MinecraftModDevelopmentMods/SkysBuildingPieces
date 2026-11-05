@@ -8,20 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:mineralogy_marble_corner",
+    "id": "skysbuildingpieces:mineralogy_marble_corner",
     "count": 4
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_marble_corner"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_marble_vertical_step"
     }
   ]

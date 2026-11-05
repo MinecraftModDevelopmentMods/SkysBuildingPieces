@@ -8,16 +8,16 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_white_corner",
+    "id": "skysbuildingpieces:wool_white_corner",
     "count": 4
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_white_corner"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_white_vertical_step"
     }
   ]

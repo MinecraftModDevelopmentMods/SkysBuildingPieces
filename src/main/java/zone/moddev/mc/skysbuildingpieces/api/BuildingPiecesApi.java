@@ -39,12 +39,12 @@ public final class BuildingPiecesApi {
 
     /** Register only this contributor's blocks and items from its native registry events. */
     public static void registerBlocks(String namespace,
-            net.minecraftforge.registries.IForgeRegistry<net.minecraft.world.level.block.Block> registry) {
+            net.minecraft.core.Registry<net.minecraft.world.level.block.Block> registry) {
         Pieces.registerNamespaceBlocks(namespace, registry);
     }
 
     public static void registerItems(String namespace,
-            net.minecraftforge.registries.IForgeRegistry<net.minecraft.world.item.Item> registry) {
+            net.minecraft.core.Registry<net.minecraft.world.item.Item> registry) {
         Pieces.registerNamespaceItems(namespace, registry);
     }
 

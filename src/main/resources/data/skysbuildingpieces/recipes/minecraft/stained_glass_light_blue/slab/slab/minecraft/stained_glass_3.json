@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_glass_light_blue_slab",
+    "id": "skysbuildingpieces:stained_glass_light_blue_slab",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_light_blue_slab"
     }
   ]

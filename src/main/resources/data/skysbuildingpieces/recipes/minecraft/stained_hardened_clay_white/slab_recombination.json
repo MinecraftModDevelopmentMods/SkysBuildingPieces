@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:white_terracotta",
+    "id": "minecraft:white_terracotta",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_hardened_clay_white_slab"
     }
   ]

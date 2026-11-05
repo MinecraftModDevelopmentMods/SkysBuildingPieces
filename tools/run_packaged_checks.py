@@ -1,4 +1,4 @@
-"""Run a disposable native Forge profile with exact, already-built artifacts."""
+"""Run a disposable native NeoForge profile with exact, already-built artifacts."""
 
 import argparse
 import hashlib
@@ -11,6 +11,7 @@ import shlex
 import subprocess
 import zipfile
 from native_client_log import audit as audit_client, audit_server
+from native_registry_notices import audit_text, profile_for
 
 
 def digest(path, algorithm="sha256"):
@@ -56,6 +57,9 @@ def verify_native_libraries(directory, artifacts):
                 if not member.lower().endswith(".dll"):
                     continue
                 target = (directory / member).resolve()
+                if not target.is_file():
+                    # Some launchers flatten the extracted native library paths.
+                    target = (directory / Path(member).name).resolve()
                 if not target.is_relative_to(directory.resolve()) or not target.is_file():
                     raise ValueError("Client native library is missing: " + member)
                 if hashlib.sha256(target.read_bytes()).digest() != hashlib.sha256(archive.read(member)).digest():
@@ -66,7 +70,7 @@ def verify_native_libraries(directory, artifacts):
 
 
 def argument_file(java, directory, phase, arguments):
-    # Java 17 argument files avoid Windows' command-line length limit. Quoting
+    # Java argument files avoid Windows' command-line length limit. Quoting
     # each argument also preserves paths containing spaces.
     target = directory / (phase + "-launch-arguments.txt")
     target.write_text("\n".join(json.dumps(str(value), ensure_ascii=False)
@@ -74,17 +78,22 @@ def argument_file(java, directory, phase, arguments):
     return [str(java), "@" + str(target)]
 
 
+def probe_property(options):
+    kind = getattr(options, "probe_kind", "bootstrap")
+    return "-Dskysbuildingpieces." + kind + "Phase=" + options.phase
+
+
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.20.1/1.20.1.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.20.6/1.20.6.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.20.1-forge-47.1.106", "forge-47.1.106")]
+                for name in ("neoforge-20.6.139",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 47.1.106 profile")
+        raise ValueError("The installed client has no NeoForge 20.6.139 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.20.1" or forge["inheritsFrom"] != "1.20.1":
-        raise ValueError("This launcher requires the verified Forge 47 client metadata")
+    if base["id"] != "1.20.6" or forge["inheritsFrom"] != "1.20.6":
+        raise ValueError("This launcher requires the verified NeoForge 20.6 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -100,10 +109,13 @@ def client_command(options, directory):
         path = runtime / "libraries" / artifact["path"]
         if digest(path, "sha1") != artifact["sha1"].upper():
             raise ValueError("Client library checksum changed: " + library["name"])
+        classifier = library["name"].split(":")[-1]
+        if classifier in {"natives-windows-arm64", "natives-windows-x86"}:
+            continue
         classpath.append(path)
-        if library["name"].split(":")[-1] == "natives-windows":
+        if classifier == "natives-windows":
             native_artifacts.append(path)
-    client = runtime / "versions/1.20.1/1.20.1.jar"
+    client = runtime / "versions/1.20.6/1.20.6.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -111,7 +123,20 @@ def client_command(options, directory):
     index = assets / "indexes" / (base["assetIndex"]["id"] + ".json")
     if digest(index, "sha1") != base["assetIndex"]["sha1"].upper():
         raise ValueError("The official client asset index is missing or damaged")
-    natives = (options.natives or runtime.parent / (runtime.name + "-natives")).resolve()
+    natives = (options.natives or directory / "natives").resolve()
+    if options.natives is None:
+        natives.mkdir(exist_ok=True)
+        for artifact in native_artifacts:
+            with zipfile.ZipFile(artifact) as jar:
+                for member in jar.namelist():
+                    if not member.lower().endswith(".dll"):
+                        continue
+                    target = natives / Path(member).name
+                    payload = jar.read(member)
+                    if target.exists() and target.read_bytes() != payload:
+                        raise ValueError("Native library changed between loads: " + target.name)
+                    if not target.exists():
+                        target.write_bytes(payload)
     verify_native_libraries(natives, native_artifacts)
     substitutions = {
         "library_directory": (runtime / "libraries").as_posix(),
@@ -120,7 +145,7 @@ def client_command(options, directory):
     }
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Djava.library.path=" + str(natives),
-                 "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
+                 probe_property(options)]
     for argument in forge["arguments"]["jvm"]:
         for key, value in substitutions.items():
             argument = argument.replace("${" + key + "}", value)
@@ -129,7 +154,7 @@ def client_command(options, directory):
         arguments.append(argument)
     arguments.extend(("-cp", os.pathsep.join(str(path) for path in classpath), forge["mainClass"]))
     arguments.extend(forge["arguments"]["game"])
-    arguments.extend(("--username", "BuildingPiecesChecks", "--version", forge["id"],
+    arguments.extend(("--username", "PiecesChecks", "--version", forge["id"],
                       "--gameDir", str(directory), "--assetsDir", str(assets),
                       "--assetIndex", base["assetIndex"]["id"], "--uuid", "1" * 32,
                       "--accessToken", "0", "--userType", "legacy", "--versionType", "release"))
@@ -139,15 +164,22 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/neoforged/forge/1.20.1-47.1.106" / filename
-    arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
-                 "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
-    for argument in shlex.split(source.read_text(encoding="utf-8")):
-        argument = argument.replace("libraries/", (runtime / "libraries").as_posix() + "/")
-        argument = argument.replace("-DlibraryDirectory=libraries",
-                                    "-DlibraryDirectory=" + (runtime / "libraries").as_posix())
-        arguments.append(argument)
-    arguments.append("--nogui")
+    libraries = runtime / "libraries"
+    source = libraries / "net/neoforged/neoforge/20.6.139" / filename
+    launch = shlex.split(source.read_text(encoding="utf-8"))
+    if "cpw.mods.bootstraplauncher.BootstrapLauncher" not in launch or "20.6.139" not in launch:
+        raise ValueError("Expected the official NeoForge 20.6.139 server arguments")
+    local_libraries = directory / "libraries"
+    if not local_libraries.exists():
+        if os.name == "nt":
+            subprocess.run(["cmd", "/d", "/c", "mklink", "/j", str(local_libraries), str(libraries)],
+                           check=True, capture_output=True)
+        else:
+            local_libraries.symlink_to(libraries, target_is_directory=True)
+    if local_libraries.resolve() != libraries.resolve():
+        raise ValueError("The disposable server is not using the selected NeoForge installation")
+    arguments = ["-Xmx3g", probe_property(options),
+                 *launch, "nogui"]
     return argument_file(options.java, directory, options.phase, arguments)
 
 
@@ -158,7 +190,8 @@ def prepare(options, directory):
     mods = directory / "mods"
     mods.mkdir()
     receipts = []
-    for source in (options.mod, options.probe, *options.extra_mod):
+    inputs = ([options.mod] if options.mod else []) + [options.probe, *options.extra_mod]
+    for source in inputs:
         if not source.is_file():
             raise ValueError("Missing exact runtime artifact: " + str(source))
         target = mods / source.name
@@ -180,7 +213,8 @@ def prepare(options, directory):
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
-    profile = {"persistence_order": options.persistence_order,
+    profile = {"probe_kind": getattr(options, "probe_kind", "bootstrap"),
+               "persistence_order": options.persistence_order,
                "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
     (directory / "qualification-options.json").write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
     if options.fixture:
@@ -194,16 +228,32 @@ def prepare(options, directory):
         biomes = options.fixture.with_suffix(".biomes.json")
         if biomes.is_file():
             shutil.copyfile(biomes, directory / "forward-biomes.json")
+        renamed_blocks = options.fixture.with_suffix(".forge50-grass-rename.json")
+        if renamed_blocks.is_file():
+            shutil.copyfile(renamed_blocks, directory / "forward-block-renames.json")
         shutil.copyfile(directory / "world/level.dat", directory / "source-level.dat")
 
 
-def audit(directory, phase, mode):
+def audit_console(directory, phase):
+    """Include loader diagnostics that can happen before Minecraft opens its logs."""
+    path = directory / (phase + "-console.log")
+    console = path.read_text(encoding="utf-8")
+    status_error = re.search(r"(?m)^(?:ERROR|FATAL) Status(?:Console)?Listener\b.*", console)
+    if status_error:
+        raise ValueError("Unexpected loader logging failure: " + status_error[0])
+    audit_text(console, profile_for(directory))
+
+
+def audit(directory, phase, mode, probe_kind="bootstrap"):
+    audit_console(directory, phase)
     if mode == "client":
         audit_client(directory, phase)
     else:
         log = (directory / "logs/latest.log").read_text(encoding="utf-8")
         audit_server(directory, phase)
-        required = ("Done (", "BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS " + phase)
+        marker = ("BUILDING_PIECES_PROBE_PASS " if probe_kind == "integration"
+                  else "BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS ")
+        required = ("Done (", marker + phase)
         missing = [marker for marker in required if marker not in log]
         if missing:
             raise ValueError("Packaged runtime completion checks are missing: " + repr(missing))
@@ -217,6 +267,7 @@ def main():
     for option in ("java", "runtime", "directory", "mod", "probe"):
         parser.add_argument("--" + option, type=Path, required=True)
     parser.add_argument("--mode", choices=("server", "client"), required=True)
+    parser.add_argument("--probe-kind", choices=("bootstrap", "integration"), default="bootstrap")
     parser.add_argument("--phase", required=True)
     parser.add_argument("--assets", type=Path)
     parser.add_argument("--natives", type=Path)
@@ -232,9 +283,12 @@ def main():
     if options.fresh:
         prepare(options, directory)
     else:
-        profile = {"persistence_order": options.persistence_order,
+        profile = {"probe_kind": options.probe_kind,
+                   "persistence_order": options.persistence_order,
                    "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
-        if json.loads((directory / "qualification-options.json").read_text(encoding="utf-8")) != profile:
+        saved_profile = json.loads((directory / "qualification-options.json").read_text(encoding="utf-8"))
+        saved_profile.setdefault("probe_kind", "bootstrap")
+        if saved_profile != profile:
             raise ValueError("Qualification options changed between loads")
         expected = json.loads((directory / "artifact-inputs.json").read_text(encoding="utf-8"))
         actual = [{"name": path.name, "sha256": digest(path)} for path in
@@ -256,10 +310,10 @@ def main():
         command.insert(1, "-Dskysbuildingpieces.persistenceOrder=" + options.persistence_order)
     # Do not inherit development mod output into a packaged launch.
     environment = {key: value for key, value in os.environ.items() if key not in ("MOD_CLASSES", "target")}
-    with (directory / (options.phase + "-console.log")).open("w", encoding="utf-8") as output:
+    with (directory / (options.phase + "-console.log")).open("x", encoding="utf-8") as output:
         subprocess.run(command, cwd=directory, env=environment, stdout=output,
                        stderr=subprocess.STDOUT, check=True, timeout=600)
-    audit(directory, options.phase, options.mode)
+    audit(directory, options.phase, options.mode, options.probe_kind)
     print("PACKAGED_CHECK_PASS", options.mode, options.phase, directory.name)
 
 

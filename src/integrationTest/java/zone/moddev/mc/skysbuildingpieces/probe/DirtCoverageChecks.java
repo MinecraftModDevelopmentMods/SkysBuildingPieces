@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.level.ChunkDataEvent;
+import net.neoforged.neoforge.event.level.ChunkDataEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
@@ -53,7 +53,7 @@ public final class DirtCoverageChecks {
 
             LegacyBridge.finalizeLegacyChunk(raw);
             events.load(
-                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
             NativeLegacyChecks.require(totals.blocks == blocks + orientation + 1 && totals.chunks == chunks,
                     "New dirt coverage must not count the chunk twice");
 

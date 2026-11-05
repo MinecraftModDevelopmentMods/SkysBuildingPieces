@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:diorite_slab",
+    "id": "minecraft:diorite_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diorite_horizontal_step"
     }
   ]

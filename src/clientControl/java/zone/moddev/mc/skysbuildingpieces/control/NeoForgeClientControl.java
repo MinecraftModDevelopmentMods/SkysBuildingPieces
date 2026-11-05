@@ -3,25 +3,21 @@ package zone.moddev.mc.skysbuildingpieces.control;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.common.Mod;
 
-/** A Forge-only login control, compiled and launched without the Sky mods. */
-@Mod("forgeclientcontrol")
-public final class ForgeClientControl {
+/** A NeoForge-only login control, compiled and launched without the Sky mods. */
+@Mod("neoforgeclientcontrol")
+public final class NeoForgeClientControl {
     private boolean started;
     private int joinedTicks;
     private long worldStarted;
 
-    public ForgeClientControl() {
-        MinecraftForge.EVENT_BUS.addListener(this::tick);
+    public NeoForgeClientControl() {
+        NeoForge.EVENT_BUS.addListener(this::tick);
     }
 
-    private void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    private void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
 
         Minecraft client = Minecraft.getInstance();
 
@@ -30,7 +26,7 @@ public final class ForgeClientControl {
         if (started && client.level == null) {
             confirmDisposableWorld(client);
             if (System.nanoTime() - worldStarted > java.util.concurrent.TimeUnit.SECONDS.toNanos(180)) {
-                org.apache.logging.log4j.LogManager.getLogger().error("Disposable Forge control world did not start",
+                org.apache.logging.log4j.LogManager.getLogger().error("Disposable NeoForge control world did not start",
                         new AssertionError("Native client startup timed out"));
                 client.stop();
                 return;
@@ -39,19 +35,22 @@ public final class ForgeClientControl {
         if (!started) {
             started = true;
             worldStarted = System.nanoTime();
-            LevelSettings settings = new LevelSettings("Forge Login Control", GameType.CREATIVE, false,
+            LevelSettings settings = new LevelSettings("NeoForge Login Control", GameType.CREATIVE, false,
                     net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.GameRules(),
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions);
+                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.screen);
         } else if (client.player != null && client.level != null && ++joinedTicks >= 40) {
-            if (net.minecraftforge.fml.ModList.get().isLoaded("skysbuildingpieces")
-                    || net.minecraftforge.fml.ModList.get().isLoaded("skysgrassslabs")) {
-                throw new AssertionError("The Forge-only control contains a Sky mod");
+            if (net.neoforged.fml.ModList.get().isLoaded("skysbuildingpieces")
+                    || net.neoforged.fml.ModList.get().isLoaded("skysgrassslabs")) {
+                throw new AssertionError("The NeoForge-only control contains a Sky mod");
             }
 
-            org.apache.logging.log4j.LogManager.getLogger().info("FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false");
+            org.apache.logging.log4j.LogManager.getLogger().info("NEOFORGE_CLIENT_CONTROL_PASS joined=true sky_mods=false");
+            client.level.disconnect();
+            client.disconnect(new net.minecraft.client.gui.screens.GenericMessageScreen(
+                    net.minecraft.network.chat.Component.translatable("menu.savingLevel")));
             client.stop();
         }
     }
@@ -82,7 +81,7 @@ public final class ForgeClientControl {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
                     button.onPress();
-                    System.out.println("FORGE47_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
+                    System.out.println("NEOFORGE_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;
             }

@@ -8,17 +8,17 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:wool_silver_vertical_step",
+    "id": "skysbuildingpieces:wool_silver_vertical_step",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_silver_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_silver_vertical_step"
     }
   ]

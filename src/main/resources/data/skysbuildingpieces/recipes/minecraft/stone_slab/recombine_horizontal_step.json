@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:smooth_stone_slab",
+    "id": "minecraft:smooth_stone_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stone_slab_horizontal_step"
     }
   ]

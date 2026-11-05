@@ -1,7 +1,7 @@
 modLoader="javafml"
-loaderVersion="[45,)"
+loaderVersion="[2,)"
 license="LGPL-2.1-only"
 [[mods]]
-modId="forgeclientcontrol"
+modId="neoforgeclientcontrol"
 version="1"
 displayName="Forge Client Control"

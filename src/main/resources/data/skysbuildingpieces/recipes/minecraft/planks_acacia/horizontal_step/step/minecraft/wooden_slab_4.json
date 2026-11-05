@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:planks_acacia_horizontal_step",
+    "id": "skysbuildingpieces:planks_acacia_horizontal_step",
     "count": 4
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_acacia_horizontal_step"
     }
   ]

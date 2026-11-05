@@ -8,17 +8,17 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stonebrick_cracked_slab",
+    "id": "skysbuildingpieces:stonebrick_cracked_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stonebrick_cracked_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stonebrick_cracked_vertical_slab"
     }
   ]

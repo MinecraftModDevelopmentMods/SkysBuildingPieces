@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysgrassslabs:dirt_slab"
-            ]
+            "items": ["skysgrassslabs:dirt_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt/horizontal_step/step/skysgrassslabs/dirt_slab_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt/horizontal_step/step/skysgrassslabs/dirt_slab_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysgrassslabs:dirt_slab"
     }
   ]

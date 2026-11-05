@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:birch_slab"
-            ]
+            "items": ["minecraft:birch_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/planks_birch/horizontal_step/step/minecraft/wooden_slab_2"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/planks_birch/horizontal_step/step/minecraft/wooden_slab_2"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_birch_horizontal_step"
     }
   ]

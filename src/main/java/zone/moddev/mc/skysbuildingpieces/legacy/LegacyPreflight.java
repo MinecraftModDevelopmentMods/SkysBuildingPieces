@@ -135,7 +135,7 @@ final class LegacyPreflight {
                                         }
                                         if ((!LegacyMapping.owned(name) && name.startsWith("buildingbricks:")
                                                 && !grassOwned(name)
-                                                && !net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks"))
+                                                && !net.neoforged.fml.ModList.get().isLoaded("buildingbricks"))
                                                 || skyOwned(name) && !HistoricalFullBlocks.historical(name)) {
                                             throw blocked(name + " placed block");
                                         }
@@ -175,7 +175,7 @@ final class LegacyPreflight {
 
         if (levelFile.isFile()) {
             try (InputStream input = new FileInputStream(levelFile)) {
-                stacks(NbtIo.readCompressed(input));
+                stacks(NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap()));
             }
         }
 
@@ -185,7 +185,7 @@ final class LegacyPreflight {
         if (files != null) {
             for (File file : files) {
                 try (InputStream input = new FileInputStream(file)) {
-                    stacks(NbtIo.readCompressed(input));
+                    stacks(NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap()));
                 }
             }
         }
@@ -200,7 +200,7 @@ final class LegacyPreflight {
             CompoundTag compoundTag = (CompoundTag) value;
             String registryId = compoundTag.getString("id");
 
-            if (compoundTag.contains("Count", 99)) {
+            if (HistoricalItems.isStack(compoundTag)) {
                 HistoricalFullBlocks.resolve(registryId, compoundTag.getShort("Damage"));
 
                 zone.moddev.mc.skysbuildingpieces.content.PieceBlock palette = LegacyBridge.palette(registryId);
@@ -209,18 +209,18 @@ final class LegacyPreflight {
                     palette.palette.material(compoundTag.getShort("Damage"));
                 }
                 if (skyOwned(registryId) && palette == null && !HistoricalFullBlocks.historical(registryId)
-                        && !net.minecraftforge.registries.ForgeRegistries.ITEMS
+                        && !net.minecraft.core.registries.BuiltInRegistries.ITEM
                                 .containsKey(new net.minecraft.resources.ResourceLocation(registryId))) {
                     throw blocked(registryId + " item; restore its Sky add-on and dependencies");
                 }
-                if (!net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")
+                if (!net.neoforged.fml.ModList.get().isLoaded("buildingbricks")
                         && registryId.startsWith("buildingbricks:") && !LegacyMapping.owned(registryId)
                         && !grassOwned(registryId)) {
                     throw blocked(registryId + " item");
                 }
             }
-            if (compoundTag.contains("Count", 99) && LegacyBridge.active() && LegacyMapping.owned(registryId)) {
-                String material = LegacyMapping.material(compoundTag.getCompound("tag").getString("material"));
+            if (HistoricalItems.isStack(compoundTag) && LegacyBridge.active() && LegacyMapping.owned(registryId)) {
+                String material = LegacyMapping.material(HistoricalItems.customData(compoundTag).getString("material"));
                 Shape shape = LegacyMapping.shape(registryId, 0);
 
                 if (!LegacyMapping.allowedMaterial(material, shape)

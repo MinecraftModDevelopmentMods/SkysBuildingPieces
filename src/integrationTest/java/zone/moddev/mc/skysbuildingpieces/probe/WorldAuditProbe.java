@@ -5,9 +5,8 @@ import java.nio.file.*;
 import java.util.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.legacy.*;
 
 /** Loads only indexed existing chunks in a disposable full-world copy. */
@@ -30,7 +29,7 @@ public final class WorldAuditProbe {
 
         int registryCount = 0;
 
-        for (net.minecraft.world.level.block.Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValues()) {
+        for (net.minecraft.world.level.block.Block block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
             registryCount++;
         }
 
@@ -89,15 +88,12 @@ public final class WorldAuditProbe {
             }
         }
 
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WORLD_AUDIT_INDEX " + chunks.size());
     }
 
     @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
         try {
             for (int entryIndex = 0; entryIndex < batch && next < chunks.size(); entryIndex++) {
                 int[] point = chunks.get(next++);
@@ -142,7 +138,7 @@ public final class WorldAuditProbe {
                         throw new AssertionError(
                                 "Qualified encountered inventory count: " + items + " instead of 1170");
                     }
-                    if (net.minecraftforge.fml.ModList.get().isLoaded("skysbuildingpiecesbop")) {
+                    if (net.neoforged.fml.ModList.get().isLoaded("skysbuildingpiecesbop")) {
                         PiecesWorldState.Totals bop = state.modules.get("biomesoplenty");
 
                         if (bop == null || bop.blocks != 601 || bop.items != 52) {
@@ -202,7 +198,7 @@ public final class WorldAuditProbe {
 
                 org.apache.logging.log4j.LogManager.getLogger().info(
                         "BUILDING_PIECES_WORLD_AUDIT_PASS blocks=" + blocks + " items=" + items + " reload=" + reload);
-                MinecraftForge.EVENT_BUS.unregister(this);
+                NeoForge.EVENT_BUS.unregister(this);
                 server.halt(false);
             }
         } catch (Throwable failure) {

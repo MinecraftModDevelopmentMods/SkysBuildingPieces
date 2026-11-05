@@ -13,7 +13,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -30,7 +29,7 @@ public final class WaterloggingChecks {
         world.setBlock(position.below(), Blocks.STONE.defaultBlockState(), 2);
         world.removeBlock(position.above(), false);
 
-        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = NativeProbeItems.player(world);
         int tested = 0;
         int decays = 0;
 
@@ -42,8 +41,8 @@ public final class WaterloggingChecks {
                 String material = block.definition(dry).id;
 
                 world.setBlock(position, dry, 18);
-                require(block.canPlaceLiquid(world, position, dry, Fluids.WATER), "Dry piece accepts water");
-                require(!block.canPlaceLiquid(world, position, dry, Fluids.LAVA), "Pieces reject lava waterlogging");
+                require(block.canPlaceLiquid(player, world, position, dry, Fluids.WATER), "Dry piece accepts water");
+                require(!block.canPlaceLiquid(player, world, position, dry, Fluids.LAVA), "Pieces reject lava waterlogging");
                 require(block.placeLiquid(world, position, dry, Fluids.WATER.getSource(false)),
                         "Water enters the native fluid container");
 
@@ -58,15 +57,15 @@ public final class WaterloggingChecks {
                 require((preserved || decayed) && wet.getValue(SlabBlock.WATERLOGGED)
                         && wet.getFluidState().getType() == Fluids.WATER,
                         "Waterlogging preserves geometry, allowing wet soil decay: " + dry + " became " + wet);
-                require(!block.canPlaceLiquid(world, position, wet, Fluids.WATER)
+                require(!block.canPlaceLiquid(player, world, position, wet, Fluids.WATER)
                         && !block.placeLiquid(world, position, wet, Fluids.WATER.getSource(false)),
                         "An already wet piece rejects another water placement");
                 require(world.getFluidTicks().hasScheduledTick(position, Fluids.WATER),
                         "Waterlogging schedules the native fluid tick");
-                require(block.pickupBlock(world, position, wet).is(Items.WATER_BUCKET)
+                require(block.pickupBlock(player, world, position, wet).is(Items.WATER_BUCKET)
                         && !world.getBlockState(position).getValue(SlabBlock.WATERLOGGED),
                         "Bucket pickup leaves the same dry piece");
-                require(block.pickupBlock(world, position, world.getBlockState(position)).isEmpty(),
+                require(block.pickupBlock(player, world, position, world.getBlockState(position)).isEmpty(),
                         "Water cannot be collected twice");
 
                 if (material.equals("minecraft:grass") || material.equals("minecraft:grass_path")) {
@@ -76,15 +75,15 @@ public final class WaterloggingChecks {
 
                     shovel.setDamageValue(7);
 
-                    CompoundTag before = shovel.save(new CompoundTag());
+                    CompoundTag before = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.save(shovel);
 
                     require(!PathPieces.activate(world, position, player, shovel, Direction.UP, InteractionHand.MAIN_HAND)
-                            && before.equals(shovel.save(new CompoundTag())),
+                            && before.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.save(shovel)),
                             "Wet pieces cannot consume shovel durability");
 
                     BlockState current = world.getBlockState(position);
 
-                    current.getBlock().tick(current, world, position, net.minecraft.util.RandomSource.create(0));
+                    current.tick(world, position, net.minecraft.util.RandomSource.create(0));
 
                     BlockState expected = Pieces.state("minecraft:dirt", block.palette.shape, block.orientation(dry));
                     BlockState actual = world.getBlockState(position);
@@ -94,7 +93,7 @@ public final class WaterloggingChecks {
                                     .mask(expected),
                             "Wet grass and paths decay to matching waterlogged dirt: " + dry + " became " + actual
                                     + ", expected " + expected);
-                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(world, position, actual, false),
+                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(world, position, actual),
                             "Wet dirt cannot grow grass through bonemeal");
                     decays++;
                 }

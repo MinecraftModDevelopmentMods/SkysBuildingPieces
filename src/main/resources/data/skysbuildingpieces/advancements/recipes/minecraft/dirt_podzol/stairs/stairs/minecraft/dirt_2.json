@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:podzol"
-            ]
+            "items": ["minecraft:podzol"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt_podzol/stairs/stairs/minecraft/dirt_2"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt_podzol/stairs/stairs/minecraft/dirt_2"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_podzol_stairs"
     }
   ]

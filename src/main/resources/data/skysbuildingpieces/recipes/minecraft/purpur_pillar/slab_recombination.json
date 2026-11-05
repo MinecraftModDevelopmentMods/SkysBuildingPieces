@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:purpur_pillar",
+    "id": "minecraft:purpur_pillar",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:purpur_pillar_slab"
     }
   ]

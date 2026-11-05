@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -43,12 +43,12 @@ public final class Pieces {
         initialized = true;
     }
 
-    public static void registerBlocks(IForgeRegistry<Block> registry) {
+    public static void registerBlocks(Registry<Block> registry) {
         registerNamespaceBlocks(SkysBuildingPieces.ID, registry);
     }
 
     /** Called on the contributor's own mod bus, keeping registry ownership correct. */
-    public static void registerNamespaceBlocks(String namespace, IForgeRegistry<Block> registry) {
+    public static void registerNamespaceBlocks(String namespace, Registry<Block> registry) {
         Catalogue.INSTANCE.freeze();
 
         for (Catalogue.Palette palette : Catalogue.INSTANCE.palettes) {
@@ -58,23 +58,23 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            registry.register(new ResourceLocation(palette.registryId()), block);
+            Registry.register(registry, new ResourceLocation(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
         }
     }
 
-    public static void registerItems(IForgeRegistry<Item> registry) {
+    public static void registerItems(Registry<Item> registry) {
         registerNamespaceItems(SkysBuildingPieces.ID, registry);
         // Retain old item identities, creating their intrusive holders only
         // while Forge has opened the item registry.
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
             Item item = new Item(new Item.Properties().stacksTo(1));
             RETIRED_TEMPLATES.put(name, item);
-            registry.register(new ResourceLocation(SkysBuildingPieces.ID, "template_" + name), item);
+            Registry.register(registry, new ResourceLocation(SkysBuildingPieces.ID, "template_" + name), item);
         }
     }
 
-    public static void registerNamespaceItems(String namespace, IForgeRegistry<Item> registry) {
+    public static void registerNamespaceItems(String namespace, Registry<Item> registry) {
         for (PieceBlock block : BLOCKS.values()) {
             if (!block.palette.namespace.equals(namespace)) {
                 continue;
@@ -84,7 +84,7 @@ public final class Pieces {
             // entries use the flat items below.
             BlockItem carrier = new BlockItem(block, new Item.Properties());
 
-            registry.register(new ResourceLocation(block.palette.registryId()), carrier);
+            Registry.register(registry, new ResourceLocation(block.palette.registryId()), carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -95,7 +95,7 @@ public final class Pieces {
 
                 PieceItem item = new PieceItem(block, material);
 
-                registry.register(new ResourceLocation(identifier), item);
+                Registry.register(registry, new ResourceLocation(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -131,7 +131,7 @@ public final class Pieces {
     private static BlockState nativeState(JsonElement value) {
         JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
         String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(identifier));
+        Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(identifier));
 
         if (block == null || block == Blocks.AIR) {
             if (definition != null && definition.has("fallback")) {
@@ -304,7 +304,7 @@ public final class Pieces {
             throw new IllegalArgumentException("Invalid saved piece metadata: " + registryId + ":" + metadata);
         }
         for (PieceBlock block : BLOCKS.values()) {
-            if (ForgeRegistries.BLOCKS.getKey(block).toString().equals(registryId)) {
+            if (BuiltInRegistries.BLOCK.getKey(block).toString().equals(registryId)) {
                 String material = block.palette.material(metadata);
                 Shape shape = block.palette.shape;
                 BlockState canonical = state(material, shape, shape == Shape.SLAB ? 1 : 0);

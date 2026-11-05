@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:mycelium"
-            ]
+            "items": ["minecraft:mycelium"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt_mycelium/horizontal_step/soil_step/minecraft/mycelium_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt_mycelium/horizontal_step/soil_step/minecraft/mycelium_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_mycelium_horizontal_step"
     }
   ]

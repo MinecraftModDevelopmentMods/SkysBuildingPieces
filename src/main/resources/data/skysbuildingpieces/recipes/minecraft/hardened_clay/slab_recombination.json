@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:terracotta",
+    "id": "minecraft:terracotta",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:hardened_clay_slab"
     }
   ]

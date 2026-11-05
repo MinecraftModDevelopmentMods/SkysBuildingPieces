@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:oak_slab",
+    "id": "minecraft:oak_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_oak_horizontal_step"
     }
   ]

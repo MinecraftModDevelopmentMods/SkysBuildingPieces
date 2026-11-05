@@ -8,20 +8,20 @@
     }
   },
   "result": {
-    "item": "mineralogy:novaculite_slab",
+    "id": "mineralogy:novaculite_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "mineralogy:novaculite_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_novaculite_vertical_step"
     }
   ]

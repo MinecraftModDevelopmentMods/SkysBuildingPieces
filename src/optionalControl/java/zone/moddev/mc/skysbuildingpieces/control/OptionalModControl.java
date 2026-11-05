@@ -1,15 +1,15 @@
 package zone.moddev.mc.skysbuildingpieces.control;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 /** A dependency-only startup control, launched without any Sky content. */
 @Mod("optionalmodcontrol")
 public final class OptionalModControl {
     public OptionalModControl() {
-        MinecraftForge.EVENT_BUS.addListener(this::started);
+        NeoForge.EVENT_BUS.addListener(this::started);
     }
 
     private void started(ServerStartedEvent event) {

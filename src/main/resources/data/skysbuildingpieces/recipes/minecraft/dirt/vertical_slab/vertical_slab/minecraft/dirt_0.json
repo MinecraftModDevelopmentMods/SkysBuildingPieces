@@ -8,19 +8,19 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:dirt_vertical_slab",
+    "id": "skysbuildingpieces:dirt_vertical_slab",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:not",
+      "type": "neoforge:not",
       "value": {
-        "type": "forge:item_exists",
+        "type": "neoforge:item_exists",
         "item": "skysgrassslabs:dirt_slab"
       }
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_vertical_slab"
     }
   ]

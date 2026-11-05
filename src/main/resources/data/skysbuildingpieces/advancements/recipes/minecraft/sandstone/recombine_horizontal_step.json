@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:sandstone_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:sandstone_horizontal_step"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/sandstone/recombine_horizontal_step"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/sandstone/recombine_horizontal_step"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:sandstone_horizontal_step"
     }
   ]

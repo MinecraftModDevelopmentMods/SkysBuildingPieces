@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:iron_block",
+    "id": "minecraft:iron_block",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:iron_block_slab"
     }
   ]

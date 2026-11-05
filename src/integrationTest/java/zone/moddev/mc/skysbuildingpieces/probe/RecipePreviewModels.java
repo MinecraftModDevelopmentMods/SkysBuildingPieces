@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -22,8 +23,9 @@ final class RecipePreviewModels {
         int recipes = 0;
         int previews = 0;
 
-        for (Recipe<?> recipe : minecraft.getConnection().getRecipeManager().getRecipes()) {
-            ResourceLocation id = recipe.getId();
+        for (RecipeHolder<?> holder : minecraft.getConnection().getRecipeManager().getRecipes()) {
+            ResourceLocation id = holder.id();
+            Recipe<?> recipe = holder.value();
 
             if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isSpecial()) {
                 continue;
@@ -51,7 +53,7 @@ final class RecipePreviewModels {
             throw new AssertionError("Empty recipe preview: " + recipe);
         }
 
-        String label = recipe + " -> " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
+        String label = recipe + " -> " + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
         BakedModel model = minecraft.getItemRenderer().getModel(stack, null, null, 0);
         BakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
                 .getMissingModel();

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:diamond_block_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:diamond_block_horizontal_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/diamond_block/vertical_step/rotate/skysbuildingpieces/metal_horizontal_step_00_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/diamond_block/vertical_step/rotate/skysbuildingpieces/metal_horizontal_step_00_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diamond_block_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diamond_block_vertical_step"
     }
   ]

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:lapis_block_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:lapis_block_horizontal_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/lapis_block/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_04_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/lapis_block/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_04_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:lapis_block_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:lapis_block_vertical_step"
     }
   ]

@@ -14,8 +14,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.fml.ModList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
@@ -73,7 +73,19 @@ public final class MineralogyCompat {
         return FORMER_PATHS.contains(path) ? SkysBuildingPieces.ID + ":mineralogy_" + path : null;
     }
 
-    /** Forge remapping retains metadata and item NBT for saves made with the unreleased add-on. */
+    /** Resolve retired palette names before a chunk or inventory is decoded. */
+    public static void registerFormerAliases(net.minecraft.core.Registry<?> registry) {
+        if (!ModList.get().isLoaded("mineralogy")) {
+            return;
+        }
+        for (String path : FORMER_PATHS) {
+            ResourceLocation former = new ResourceLocation(ASSETS, path);
+            zone.moddev.mc.skysbuildingpieces.legacy.LegacyRegistryAliases.register(
+                    registry, former, new ResourceLocation(replacementId(former.toString())));
+        }
+    }
+
+    /** Find the palette whose metadata and item data match the old add-on. */
     public static Block formerBlock(String historicalId) {
         String replacement = replacementId(historicalId);
 
@@ -81,7 +93,7 @@ public final class MineralogyCompat {
             return null;
         }
 
-        Block target = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(replacement));
+        Block target = BuiltInRegistries.BLOCK.get(new ResourceLocation(replacement));
 
         if (target == null || target == Blocks.AIR) {
             throw new IllegalStateException("Cannot recover " + historicalId

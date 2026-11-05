@@ -12,14 +12,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
@@ -31,13 +29,16 @@ public final class RuntimeProbe {
     private int startupTicks;
     private boolean needsGameplay;
 
-    public RuntimeProbe() {
-        PathChecks.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus(),
+    public RuntimeProbe(net.neoforged.bus.api.IEventBus modBus) {
+        CompatibilityChecks.registerHandler(modBus);
+        PathChecks.register(modBus,
                 "buildingpiecesprobe");
         PersistenceRegistrationChecks.register(
-                net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
-        MinecraftForge.EVENT_BUS.register(this);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> new ClientProbe().init());
+                modBus);
+        NeoForge.EVENT_BUS.register(this);
+        if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+            new ClientProbe().init();
+        }
     }
 
     @SubscribeEvent
@@ -53,8 +54,8 @@ public final class RuntimeProbe {
     }
 
     @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        if (server == null || ran || event.phase != TickEvent.Phase.END) {
+    public void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        if (server == null || ran) {
             return;
         }
 
@@ -110,6 +111,9 @@ public final class RuntimeProbe {
                 org.apache.logging.log4j.LogManager.getLogger().info("RECIPE_BOOK_PHASE_PASS " + phase);
             } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
+            } else if (phase.equals("compat")) {
+                NativeLegacyChecks.run(world);
+                CompatibilityChecks.run(world);
             } else {
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
@@ -122,9 +126,6 @@ public final class RuntimeProbe {
                 RecipeBookChecks.run(world);
                 PresentationChecks.run(world);
 
-                if (phase.equals("compat")) {
-                    CompatibilityChecks.run(world);
-                }
                 if (ModList.get().isLoaded("skysbuildingpiecesbop") && !phase.startsWith("client")) {
                     Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks")
                             .getMethod("run", ServerLevel.class).invoke(null, world);
@@ -175,7 +176,7 @@ public final class RuntimeProbe {
 
         if (reload) {
             try (FileInputStream input = new FileInputStream(file)) {
-                saved = NbtIo.readCompressed(input);
+                saved = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
             }
         }
 
@@ -191,7 +192,7 @@ public final class RuntimeProbe {
                     if (!NbtUtils.writeBlockState(world.getBlockState(position))
                             .equals(saved.getCompound("" + number))) {
                         throw new AssertionError(
-                                "Saved client grid lost " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
+                                "Saved client grid lost " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block) + " / " + metadata);
                     }
                 } else {
                     world.setBlock(position, block.getStateFromMeta(metadata), 18);

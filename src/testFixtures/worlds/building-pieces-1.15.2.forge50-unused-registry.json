@@ -1,0 +1,46 @@
+{
+  "source_world_sha256": "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525",
+  "snapshot_entries": {
+    "minecraft:enchantment": {
+      "minecraft:sweeping": 17
+    },
+    "minecraft:entity_type": {
+      "minecraft:zombie_pigman": 57
+    },
+    "minecraft:item": {
+      "minecraft:grass": 76,
+      "minecraft:scute": 519,
+      "minecraft:zombie_pigman_spawn_egg": 754
+    },
+    "minecraft:memory_module_type": {
+      "minecraft:golem_last_seen_time": 24,
+      "minecraft:opened_doors": 16
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:entity.zombie_pigman.ambient": 799,
+      "minecraft:entity.zombie_pigman.angry": 800,
+      "minecraft:entity.zombie_pigman.death": 801,
+      "minecraft:entity.zombie_pigman.hurt": 802,
+      "minecraft:music.nether": 420
+    }
+  },
+  "saved_uses": {
+    "minecraft:entity.zombie_pigman.angry": 0,
+    "minecraft:opened_doors": 0,
+    "minecraft:entity.zombie_pigman.hurt": 0,
+    "minecraft:music.nether": 0,
+    "minecraft:zombie_pigman_spawn_egg": 0,
+    "minecraft:golem_last_seen_time": 0,
+    "minecraft:zombie_pigman": 0,
+    "minecraft:empty": 0,
+    "minecraft:entity.zombie_pigman.ambient": 0,
+    "minecraft:grass": 0,
+    "minecraft:sweeping": 0,
+    "minecraft:entity.zombie_pigman.death": 0,
+    "minecraft:scute": 0
+  },
+  "inspected_nbt_values": 506769
+}

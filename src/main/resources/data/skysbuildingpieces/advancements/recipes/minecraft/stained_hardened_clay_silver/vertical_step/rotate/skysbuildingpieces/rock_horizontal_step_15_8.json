@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_hardened_clay_silver_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:stained_hardened_clay_silver_horizontal_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_silver/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_15_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_silver/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_15_8"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_hardened_clay_silver_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_hardened_clay_silver_vertical_step"
     }
   ]

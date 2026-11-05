@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:lapis_block",
+    "id": "minecraft:lapis_block",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:lapis_block_slab"
     }
   ]

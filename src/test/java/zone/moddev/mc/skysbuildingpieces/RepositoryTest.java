@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RepositoryTest {
     @Test
     void runtimeHarnessDoesNotClaimTheNormalMinecraftPort() throws Exception {
-        String build = new String(Files.readAllBytes(Paths.get("build.gradle")), StandardCharsets.UTF_8);
+        String build = Files.readString(Paths.get("tools/run_packaged_checks.py"), StandardCharsets.UTF_8);
 
         assertTrue(build.contains("server-ip=127.0.0.1"));
         assertTrue(build.contains("server-port=0"));
@@ -61,7 +61,7 @@ class RepositoryTest {
             target.load(reader);
         }
 
-        assertTrue(ciWorkflow.contains("master-" + target.getProperty("minecraft_version")));
+        assertTrue(ciWorkflow.contains("master-" + target.getProperty("minecraft_version") + "-neo"));
         assertTrue(ciWorkflow.contains("if-no-files-found: error"));
 
         for (String classifier : new String[] { "", "-sources", "-javadoc" }) {

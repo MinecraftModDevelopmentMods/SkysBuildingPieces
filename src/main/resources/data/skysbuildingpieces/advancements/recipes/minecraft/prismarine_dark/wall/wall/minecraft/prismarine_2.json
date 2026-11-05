@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:dark_prismarine"
-            ]
+            "items": ["minecraft:dark_prismarine"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/prismarine_dark/wall/wall/minecraft/prismarine_2"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/prismarine_dark/wall/wall/minecraft/prismarine_2"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:prismarine_dark_wall"
     }
   ]

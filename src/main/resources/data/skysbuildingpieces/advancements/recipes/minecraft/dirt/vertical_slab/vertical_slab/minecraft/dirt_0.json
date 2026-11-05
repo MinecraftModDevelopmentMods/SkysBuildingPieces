@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:dirt"
-            ]
+            "items": ["minecraft:dirt"]
           }
         ]
       }
@@ -20,26 +18,21 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/dirt/vertical_slab/vertical_slab/minecraft/dirt_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/dirt/vertical_slab/vertical_slab/minecraft/dirt_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:not",
+      "type": "neoforge:not",
       "value": {
-        "type": "forge:item_exists",
+        "type": "neoforge:item_exists",
         "item": "skysgrassslabs:dirt_slab"
       }
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:dirt_vertical_slab"
     }
   ]

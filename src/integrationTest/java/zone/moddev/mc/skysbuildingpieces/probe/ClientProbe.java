@@ -16,9 +16,8 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
 /** Client resource bake check; never shipped with the mod. */
@@ -26,19 +25,17 @@ public final class ClientProbe extends ProbeProxy {
     private boolean ran;
     private boolean startedWorld;
     private long worldStarted;
+    private long leaveAfter;
 
     public void init() {
         if (System.getProperty("skysbuildingpieces.integrationPhase",
                 System.getProperty("skysbuildingpieces.bootstrapPhase", "")).startsWith("client")) {
-            MinecraftForge.EVENT_BUS.register(this);
+            NeoForge.EVENT_BUS.register(this);
         }
     }
 
     @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
 
         Minecraft minecraft = Minecraft.getInstance();
 
@@ -46,6 +43,20 @@ public final class ClientProbe extends ProbeProxy {
 
         if (ClientStatus.failure != null) {
             minecraft.stop();
+            return;
+        }
+
+        if (leaveAfter != 0) {
+            if (System.nanoTime() >= leaveAfter) {
+                if (!minecraft.isPaused() || minecraft.level == null) {
+                    throw new AssertionError("The disposable integrated server did not pause before closing");
+                }
+                // Leave the world as the pause menu does, before shutting down the client.
+                minecraft.level.disconnect();
+                minecraft.disconnect(new net.minecraft.client.gui.screens.GenericMessageScreen(
+                        Component.translatable("menu.savingLevel")));
+                minecraft.stop();
+            }
             return;
         }
 
@@ -71,8 +82,10 @@ public final class ClientProbe extends ProbeProxy {
                     if (count != 1) throw new AssertionError("Missing or duplicate native creative entry: " + entry);
                 }
                 org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED");
-                minecraft.stop();
                 startedWorld = false;
+                // Pause world ticks so the local connection can finish sending chunk data.
+                minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
+                leaveAfter = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
             }
 
             return;
@@ -86,7 +99,7 @@ public final class ClientProbe extends ProbeProxy {
             var availableCreative = PiecesTab.entries();
 
             for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
-                if (availableCreative.containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(retired))) {
+                if (availableCreative.containsKey(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(retired))) {
                     throw new AssertionError("Retired template appears in creative inventory");
                 }
             }
@@ -94,7 +107,7 @@ public final class ClientProbe extends ProbeProxy {
             net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> creative = net.minecraft.core.NonNullList
                     .create();
 
-            for (net.minecraft.world.item.Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
+            for (net.minecraft.world.item.Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
                 if (!(item instanceof PieceItem)) {
                     continue;
                 }
@@ -108,8 +121,8 @@ public final class ClientProbe extends ProbeProxy {
                                         .get(piece.material),
                                 piece.piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
 
-                if (hidden == availableCreative.containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item))) {
-                    throw new AssertionError("Incorrect creative visibility " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item));
+                if (hidden == availableCreative.containsKey(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item))) {
+                    throw new AssertionError("Incorrect creative visibility " + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item));
                 }
             }
 
@@ -118,7 +131,7 @@ public final class ClientProbe extends ProbeProxy {
             java.util.Set<String> entries = new java.util.HashSet<String>();
 
             for (net.minecraft.world.item.ItemStack stack : creative) {
-                String key = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+                String key = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
 
                 if (!entries.add(key)) {
                     throw new AssertionError("Duplicate creative entry " + key);
@@ -173,8 +186,8 @@ public final class ClientProbe extends ProbeProxy {
 
             for (String name : new String[] { "stone_formations", "jelled_poison", "legacy_bop_stone_formations",
                     "legacy_bop_jelled_poison", "legacy_bop_tree_moss" }) {
-                net.minecraft.world.level.block.Block block = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                        .getValue(new net.minecraft.resources.ResourceLocation("skysbuildingpiecesbop:" + name));
+                net.minecraft.world.level.block.Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                        .get(new net.minecraft.resources.ResourceLocation("skysbuildingpiecesbop:" + name));
 
                 if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
                     continue;
@@ -200,8 +213,8 @@ public final class ClientProbe extends ProbeProxy {
                     "buildingbricks:dirt_slab", "buildingbrickscompatvanilla:grass_slab",
                     "skysbuildingpiecesbop:retired_rocks", "skysbuildingpiecesbop:legacy_bop_stone",
                     "skysbuildingpiecesbop:legacy_bop_crag_rock" }) {
-                net.minecraft.world.level.block.Block block = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                        .getValue(new net.minecraft.resources.ResourceLocation(name));
+                net.minecraft.world.level.block.Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                        .get(new net.minecraft.resources.ResourceLocation(name));
 
                 if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
                     continue;
@@ -240,7 +253,7 @@ public final class ClientProbe extends ProbeProxy {
                 startedWorld = true;
                 worldStarted = System.nanoTime();
                 if (new File(minecraft.gameDirectory, "saves/building-pieces-world/level.dat").isFile()) {
-                    minecraft.createWorldOpenFlows().loadLevel(new net.minecraft.client.gui.screens.TitleScreen(), "building-pieces-world");
+                    minecraft.createWorldOpenFlows().openWorld("building-pieces-world", () -> minecraft.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
                 } else {
                     net.minecraft.world.level.LevelSettings settings = new net.minecraft.world.level.LevelSettings(
                             "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE, false,
@@ -248,7 +261,7 @@ public final class ClientProbe extends ProbeProxy {
                             net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
                     minecraft.createWorldOpenFlows().createFreshLevel("building-pieces-world", settings,
                             new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions);
+                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, minecraft.screen);
                 }
             }
         } catch (Throwable failure) {
@@ -308,19 +321,19 @@ public final class ClientProbe extends ProbeProxy {
             BlockState state = block.defaultBlockState();
 
             var layers = client.getBlockRenderer().getBlockModel(state).getRenderTypes(state,
-                    net.minecraft.util.RandomSource.create(0), net.minecraftforge.client.model.data.ModelData.EMPTY);
+                    net.minecraft.util.RandomSource.create(0), net.neoforged.neoforge.client.model.data.ModelData.EMPTY);
             if (client.getBlockColors().getColor(state, client.level, sample, 0) != expected
                     || client.getBlockColors().getColor(state, client.level, sample, 1) != -1
                     || !layers.contains(net.minecraft.client.renderer.RenderType.cutoutMipped())
                     || layers.contains(net.minecraft.client.renderer.RenderType.solid())) {
-                throw new AssertionError("Grass-piece biome tint or render layer: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block));
+                throw new AssertionError("Grass-piece biome tint or render layer: " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block));
             }
 
             net.minecraft.world.item.ItemStack stack = Pieces.stack(state, 1);
 
             if (client.getItemColors().getColor(stack, 0) != inventory
                     || client.getItemColors().getColor(stack, 1) != -1) {
-                throw new AssertionError("Grass-piece inventory tint: " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()));
+                throw new AssertionError("Grass-piece inventory tint: " + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()));
             }
 
             checked++;

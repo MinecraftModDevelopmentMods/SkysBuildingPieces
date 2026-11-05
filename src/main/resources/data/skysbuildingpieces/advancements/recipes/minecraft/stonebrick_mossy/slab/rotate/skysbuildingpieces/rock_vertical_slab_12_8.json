@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stonebrick_mossy_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:stonebrick_mossy_vertical_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stonebrick_mossy/slab/rotate/skysbuildingpieces/rock_vertical_slab_12_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stonebrick_mossy/slab/rotate/skysbuildingpieces/rock_vertical_slab_12_8"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
     }
   ]

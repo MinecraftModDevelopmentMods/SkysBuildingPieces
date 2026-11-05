@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:dark_prismarine_slab",
+    "id": "minecraft:dark_prismarine_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:prismarine_dark_vertical_step"
     }
   ]

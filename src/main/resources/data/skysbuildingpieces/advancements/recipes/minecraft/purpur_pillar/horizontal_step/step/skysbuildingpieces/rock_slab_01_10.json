@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:purpur_pillar_slab"
-            ]
+            "items": ["skysbuildingpieces:purpur_pillar_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/purpur_pillar/horizontal_step/step/skysbuildingpieces/rock_slab_01_10"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/purpur_pillar/horizontal_step/step/skysbuildingpieces/rock_slab_01_10"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:purpur_pillar_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:purpur_pillar_slab"
     }
   ]

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
@@ -12,15 +12,16 @@ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 
 /** Unlock the next cut even when a crafted piece is still on the table cursor. */
-@Mod.EventBusSubscriber(
+@EventBusSubscriber(
         modid = SkysBuildingPieces.ID)
 public final class RecipeBookDiscovery {
     private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
@@ -40,8 +41,9 @@ public final class RecipeBookDiscovery {
 
         ingredient.setItem(0, event.getCrafting().copy());
 
-        for (Recipe<?> recipe : player.getServer().getRecipeManager().getRecipes()) {
-            ResourceLocation id = recipe.getId();
+        for (RecipeHolder<?> holder : player.getServer().getRecipeManager().getRecipes()) {
+            ResourceLocation id = holder.id();
+            Recipe<?> recipe = holder.value();
 
             if (!OWNERS.contains(id.getNamespace()) || recipe.isSpecial()
                     || recipe.getIngredients().stream().noneMatch(input -> input.test(event.getCrafting()))) {
@@ -58,22 +60,22 @@ public final class RecipeBookDiscovery {
                 }
             }
 
-            Advancement advancement = player.getServer().getAdvancements()
-                    .getAdvancement(new ResourceLocation(owner, "recipes/" + id.getPath()));
+            AdvancementHolder advancement = player.getServer().getAdvancements()
+                    .get(new ResourceLocation(owner, "recipes/" + id.getPath()));
 
             if (advancement == null) {
                 continue;
             }
 
-            Criterion recipeCriterion = advancement.getCriteria().get("has_the_recipe");
+            Criterion<?> recipeCriterion = advancement.value().criteria().get("has_the_recipe");
 
             if (recipeCriterion == null
-                    || !(recipeCriterion.getTrigger() instanceof RecipeUnlockedTrigger.TriggerInstance)
-                    || !((RecipeUnlockedTrigger.TriggerInstance) recipeCriterion.getTrigger()).matches(recipe)) {
+                    || !(recipeCriterion.triggerInstance() instanceof RecipeUnlockedTrigger.TriggerInstance trigger)
+                    || !trigger.matches(holder)) {
                 continue;
             }
-            for (Map.Entry<String, Criterion> criterion : advancement.getCriteria().entrySet()) {
-                CriterionTriggerInstance predicate = criterion.getValue().getTrigger();
+            for (Map.Entry<String, Criterion<?>> criterion : advancement.value().criteria().entrySet()) {
+                CriterionTriggerInstance predicate = criterion.getValue().triggerInstance();
 
                 if (predicate instanceof InventoryChangeTrigger.TriggerInstance
                         && ((InventoryChangeTrigger.TriggerInstance) predicate).matches(ingredient, event.getCrafting(),

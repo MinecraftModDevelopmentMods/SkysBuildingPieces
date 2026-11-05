@@ -46,8 +46,8 @@ final class PieceNames {
         // Java modules keep another mod's assets outside this class's resource
         // lookup. Read an add-on's own file without changing its language keys.
         if (input == null) {
-            net.minecraftforge.forgespi.language.IModFileInfo owner =
-                    net.minecraftforge.fml.ModList.get().getModFileById(namespace);
+            net.neoforged.neoforgespi.language.IModFileInfo owner =
+                    net.neoforged.fml.ModList.get().getModFileById(namespace);
             if (owner != null) {
                 java.nio.file.Path language = owner.getFile().findResource("assets", namespace, "lang", "en_us.json");
                 if (java.nio.file.Files.isRegularFile(language)) {

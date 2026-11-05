@@ -11,13 +11,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.ServerStartedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.SidedProxy;
+import net.neoforged.fml.common.event.FMLPreInitializationEvent;
+import net.neoforged.fml.common.event.ServerStartedEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.gameevent.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -38,18 +38,18 @@ public final class RuntimeProbe {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
         proxy.init();
     }
 
     @Mod.EventHandler
     public void started(ServerStartedEvent event) {
-        server = net.minecraftforge.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
+        server = net.neoforged.fml.common.FMLCommonHandler.instance().getMinecraftServerInstance();
     }
 
     @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        if (ran || server == null || event.phase != TickEvent.Phase.END) {
+    public void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        if (ran || server == null) {
             return;
         }
 
@@ -78,7 +78,7 @@ public final class RuntimeProbe {
 
             require(registeredBlocks == 35, "The actual block registry exceeds the 35-ID budget");
 
-            String generation = net.minecraftforge.fml.common.Loader.isModLoaded("skysterrainsmoother")
+            String generation = net.neoforged.fml.common.Loader.isModLoaded("skysterrainsmoother")
                     ? SmoothingChecks.generated(world)
                     : "";
 
@@ -124,7 +124,7 @@ public final class RuntimeProbe {
                 zone.moddev.mc.skysbuildingpieces.probe.GameplayChecks.run(world);
             }
 
-            int smoother = net.minecraftforge.fml.common.Loader.isModLoaded("skysterrainsmoother")
+            int smoother = net.neoforged.fml.common.Loader.isModLoaded("skysterrainsmoother")
                     ? SmoothingChecks.run(world)
                     : 0;
 
@@ -163,7 +163,7 @@ public final class RuntimeProbe {
             }
         } catch (Throwable failure) {
             failure.printStackTrace();
-            net.minecraftforge.fml.common.FMLCommonHandler.instance().exitJava(2, true);
+            net.neoforged.fml.common.FMLCommonHandler.instance().exitJava(2, true);
         }
     }
 

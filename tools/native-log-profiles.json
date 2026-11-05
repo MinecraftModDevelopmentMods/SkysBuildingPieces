@@ -5,26 +5,42 @@
       "sha256": "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209",
       "source_jar_sha256": "8A0A1DEA2A4A6C069519C7B1BCF28331186FF2DF6284DB72C2FFDB8178FC84D4",
       "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 94
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 17
+        },
         "minecraft:entity_type": {
           "minecraft:zombie_pigman": 56
         },
         "minecraft:item": {
+          "minecraft:grass": 76,
+          "minecraft:scute": 519,
           "minecraft:zombie_pigman_spawn_egg": 753
         },
         "minecraft:memory_module_type": {
           "minecraft:golem_last_seen_time": 24,
           "minecraft:opened_doors": 16
         },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
         "minecraft:sound_event": {
+          "minecraft:entity.parrot.imitate.enderman": 446,
+          "minecraft:entity.parrot.imitate.panda": 454,
+          "minecraft:entity.parrot.imitate.polar_bear": 457,
+          "minecraft:entity.parrot.imitate.wolf": 470,
+          "minecraft:entity.parrot.imitate.zombie_pigman": 472,
           "minecraft:entity.zombie_pigman.ambient": 784,
           "minecraft:entity.zombie_pigman.angry": 785,
           "minecraft:entity.zombie_pigman.death": 786,
           "minecraft:entity.zombie_pigman.hurt": 787,
           "minecraft:music.nether": 400
-        },
-        "minecraft:point_of_interest_type": {
-          "minecraft:nitwit": 11,
-          "minecraft:unemployed": 0
         }
       },
       "saved_uses": 0,
@@ -41,6 +57,17 @@
       "retired_poi_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.14.4.retired-poi.json",
         "sha256": "DD2BC04B3FA5264A66B8974EA31C3B48A6F48C37DE67BF6DC70305E6CF1EE4C2"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 0,
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.forge50-grass-rename.json",
+        "sha256": "C1987F5A36074B8EB99B4FA442B04808EAAAA283710513F8640B83877F5FDA30"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.forge50-unused-registry.json",
+        "sha256": "925ED46BDD7EAE19D4C090E87A962B647E53F7BEBB288976722BC1C1556323E1"
       }
     },
     "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525": {
@@ -48,15 +75,30 @@
       "sha256": "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525",
       "source_jar_sha256": "94A5BAA4B3DC025A338A60BAC27B3E5BBAD4AE0CE494BA5EC1F852E401A704F7",
       "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 94
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 17
+        },
         "minecraft:entity_type": {
           "minecraft:zombie_pigman": 57
         },
         "minecraft:item": {
+          "minecraft:grass": 76,
+          "minecraft:scute": 519,
           "minecraft:zombie_pigman_spawn_egg": 754
         },
         "minecraft:memory_module_type": {
           "minecraft:golem_last_seen_time": 24,
           "minecraft:opened_doors": 16
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
         },
         "minecraft:sound_event": {
           "minecraft:entity.zombie_pigman.ambient": 799,
@@ -64,10 +106,6 @@
           "minecraft:entity.zombie_pigman.death": 801,
           "minecraft:entity.zombie_pigman.hurt": 802,
           "minecraft:music.nether": 420
-        },
-        "minecraft:point_of_interest_type": {
-          "minecraft:nitwit": 11,
-          "minecraft:unemployed": 0
         }
       },
       "saved_uses": 14400,
@@ -84,10 +122,38 @@
       "retired_poi_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.15.2.retired-poi.json",
         "sha256": "89E156C6208A59AEE60CEA1182B339A0D2B4EC2928373FD3C33952199E1008FF"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 20363,
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.forge50-grass-rename.json",
+        "sha256": "1125ADF48F137CB2B00434905294A18785FFBA1CD81338F48F461702ED61ECB3"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.forge50-unused-registry.json",
+        "sha256": "DEFF6E8BE4347F344C9EFF49E8D71C6BAF25241464201760DF4CADFBA8928072"
       }
     },
     "B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F": {
       "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
         "minecraft:worldgen/biome": {
           "minecraft:badlands": 37,
           "minecraft:badlands_plateau": 39,
@@ -168,10 +234,6 @@
           "minecraft:wooded_badlands_plateau": 38,
           "minecraft:wooded_hills": 18,
           "minecraft:wooded_mountains": 34
-        },
-        "minecraft:point_of_interest_type": {
-          "minecraft:nitwit": 11,
-          "minecraft:unemployed": 0
         }
       },
       "fixture": "src/testFixtures/worlds/building-pieces-1.16.5.zip",
@@ -194,10 +256,38 @@
       "retired_poi_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.16.5.retired-poi.json",
         "sha256": "506DA915D5C20AE71C18FB317BA9A7321BFAED507EB15BB7E5DE8B59F8528A35"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 20365,
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.forge50-grass-rename.json",
+        "sha256": "98212D1CDB2068D0CF6A55C65B0C8D4958B07349CBF7865A6869C17140F54921"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.forge50-unused-registry.json",
+        "sha256": "65570D6B02F06AC808F79D60B88FB0481BFEFF0327E1BFF03C25BF7B378BBFA9"
       }
     },
     "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67": {
       "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
         "minecraft:worldgen/biome": {
           "minecraft:badlands": 37,
           "minecraft:badlands_plateau": 39,
@@ -280,10 +370,6 @@
           "minecraft:wooded_badlands_plateau": 38,
           "minecraft:wooded_hills": 18,
           "minecraft:wooded_mountains": 34
-        },
-        "minecraft:point_of_interest_type": {
-          "minecraft:nitwit": 11,
-          "minecraft:unemployed": 0
         }
       },
       "fixture": "src/testFixtures/worlds/building-pieces-1.17.1.zip",
@@ -306,6 +392,17 @@
       "retired_poi_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.17.1.retired-poi.json",
         "sha256": "C5424560C9760C454AE85B82DC15AC2E4ECEE0353370FFEFC29B7087BE88F641"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 23326,
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.forge50-grass-rename.json",
+        "sha256": "50041BF669198B48297C54FE4FB7DC820199084AA0850057D07C40C67E20855F"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.forge50-unused-registry.json",
+        "sha256": "490719FDD17186B193AC50BC113C9FCFD82D66B6D768667DC704FFCDCE37825C"
       }
     },
     "85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49": {
@@ -313,6 +410,23 @@
       "sha256": "85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49",
       "source_jar_sha256": "82709CF16A7282DB5562BE5FCC2F417D0F103620EAE86DBDE9E0CBD760B51B5A",
       "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
         "minecraft:worldgen/biome": {
           "minecraft:badlands": 37,
           "minecraft:bamboo_jungle": 168,
@@ -375,10 +489,6 @@
           "minecraft:windswept_hills": 55,
           "minecraft:windswept_savanna": 58,
           "minecraft:wooded_badlands": 60
-        },
-        "minecraft:point_of_interest_type": {
-          "minecraft:nitwit": 11,
-          "minecraft:unemployed": 0
         }
       },
       "saved_uses": 0,
@@ -398,6 +508,17 @@
       "retired_poi_contract": {
         "path": "src/testFixtures/worlds/building-pieces-1.18.2.retired-poi.json",
         "sha256": "8BA0EDD066627A2B5D014354000A7720FB4FF364F2544594AE0523D23AD50B45"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 6182,
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.forge50-grass-rename.json",
+        "sha256": "676FCB6DDB78667A151B20811CAEDF8800A9706E3B7A53E2D14898FFB18C51B1"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.forge50-unused-registry.json",
+        "sha256": "B48D5E09DBCED2AE6407774C37478F76BEC9B5BFEB425BA577FAA9EA9365EBBE"
       }
     },
     "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095": {
@@ -415,11 +536,22 @@
         "renamed_cells": 0
       },
       "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
         "minecraft:item": {
+          "minecraft:grass": 89,
           "minecraft:pottery_shard_archer": 2115,
           "minecraft:pottery_shard_arms_up": 2117,
           "minecraft:pottery_shard_prize": 2116,
-          "minecraft:pottery_shard_skull": 2118
+          "minecraft:pottery_shard_skull": 2118,
+          "minecraft:scute": 571
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
         },
         "minecraft:sound_event": {
           "minecraft:item.brush.brush_sand_completed": 1226,
@@ -427,9 +559,53 @@
           "minecraft:music.overworld.jungle_and_forest": 1363
         }
       },
-      "forge47_unused_registry_contract": {
-        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge47-unused-registry.json",
-        "sha256": "C94BF0F5B7836FE498B3A114825099BBD2BD268412FEA8CBF21F161576587885"
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 6182,
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge50-grass-rename.json",
+        "sha256": "D893D373C6E9726B489417BAAA26BECC4358DB67A384E2775B85B0FAC5249D76"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge50-unused-registry.json",
+        "sha256": "062BC86221557CB0BA675D4E823B6E6B1E6E98ED492A8FF4367954B528B07344"
+      }
+    },
+    "910789BEF774D2D2B20CDCBEEB08D6E0296D7C2B714267B8EA4CCB49F1DF6324": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.20.1.zip",
+      "sha256": "910789BEF774D2D2B20CDCBEEB08D6E0296D7C2B714267B8EA4CCB49F1DF6324",
+      "source_jar_sha256": "C4ABB48E52DE06508D3610E5463F55AF1ADB496E22BFE5EAFE4515BB52209F44",
+      "saved_uses": 0,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 354,
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        }
+      },
+      "native_block_rename_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.20.1.forge50-grass-rename.json",
+        "sha256": "62917879AD1736B6887385977FF7CD79390CAB8C34786E9D4DE14E491ABA3211",
+        "checked_positions": 6182,
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass"
+      },
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.20.1.biomes.json",
+        "sha256": "4217E21FF7089E158F23F63E81DDD8DE822745DD790D424E8950426A4B9380D8",
+        "source": "1.20.1",
+        "checked_cells": 528384,
+        "renamed_cells": 0
       }
     }
   },

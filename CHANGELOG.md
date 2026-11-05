@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.120062 — Minecraft 1.20.6, NeoForge
+
+- Bring the building pieces and recipes to NeoForge 1.20.6.
+- Keep the names and custom data on pieces when you rotate them in a crafting grid.
+- Keep existing piece IDs and supported world upgrades, including optional Mineralogy pieces.
+
 ## 0.3.8.120012
 
 - Bring the building pieces, creative tab and continuous glass walls to NeoForge 1.20.1.

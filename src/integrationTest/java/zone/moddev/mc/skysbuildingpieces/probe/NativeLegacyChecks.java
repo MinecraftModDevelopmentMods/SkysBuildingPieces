@@ -8,7 +8,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -214,7 +214,7 @@ public final class NativeLegacyChecks {
         require(raw.getByte("Count") == 17 && raw.getByte("cabinetSlot") == 4 && raw.getCompound("tag").equals(custom),
                 "Container slot, count and unrelated NBT");
 
-        ItemStack decoded = ItemStack.of(raw);
+        ItemStack decoded = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(raw);
 
         require(!decoded.isEmpty() && decoded.getCount() == 17, "Recovered stack deserializes normally");
 
@@ -248,7 +248,7 @@ public final class NativeLegacyChecks {
 
         assertAbort(bad, false);
 
-        CompoundTag crate = new ItemStack(Blocks.CHEST).save(new CompoundTag());
+        CompoundTag crate = NativeProbeItems.save(new ItemStack(Blocks.CHEST));
         ListTag contents = new ListTag();
 
         contents.add(stack("minecraft:stone", 7));

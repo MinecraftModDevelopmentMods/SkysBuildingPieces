@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:birch_slab",
+    "id": "minecraft:birch_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_birch_horizontal_step"
     }
   ]

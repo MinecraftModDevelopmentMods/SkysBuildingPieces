@@ -176,6 +176,7 @@ final class NativeForwardChecks {
             world.setChunkForced(chunk.getPos().x, chunk.getPos().z, false);
         }
         if (fixture.has("kind") && fixture.get("kind").getAsString().equals("named")) {
+            checkNativeBlockRenames(world);
             namedPieces(world, fixture);
             return;
         }
@@ -193,8 +194,8 @@ final class NativeForwardChecks {
                     saved.get("z").getAsInt());
             String id = saved.get("id").getAsString();
             BlockState actual = world.getBlockState(position);
-            net.minecraft.world.level.block.Block registered = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                    .getValue(new net.minecraft.resources.ResourceLocation(id));
+            net.minecraft.world.level.block.Block registered = net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                    .get(new net.minecraft.resources.ResourceLocation(id));
 
             require(registered instanceof PieceBlock, "Permanent palette registration is missing: " + id);
 
@@ -231,7 +232,7 @@ final class NativeForwardChecks {
         for (int slot = 0; slot < 20; slot++) {
             ItemStack stack = chest.getItem(slot);
 
-            require(stack.getCount() == slot + 1 && stack.hasTag() && stack.getTag().contains("path_fixture"),
+            require(stack.getCount() == slot + 1 && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(stack) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack).contains("path_fixture"),
                     "Saved path inventory count and custom data: " + slot);
             require(stack.getHoverName().getString().equals("Path fixture " + slot),
                     "Saved custom item name: " + slot);
@@ -248,6 +249,67 @@ final class NativeForwardChecks {
                 .isFile(), "Original registry snapshot survives in its sidecar");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_FORWARD_PASS states=" + checked + " derived=" + derived
                 + " item_units=" + units + " schema=1 counters=unchanged");
+    }
+
+    private static void checkNativeBlockRenames(ServerLevel world) throws java.io.IOException {
+        java.nio.file.Path path = java.nio.file.Path.of("forward-block-renames.json");
+        if (!java.nio.file.Files.isRegularFile(path)) {
+            return;
+        }
+        JsonObject contract = com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(path))
+                .getAsJsonObject();
+        require(contract.get("source").getAsString().equals("minecraft:grass")
+                        && contract.get("target").getAsString().equals("minecraft:short_grass"),
+                "Unexpected block rename in the native fixture");
+        java.util.Map<BlockPos, JsonObject> postProcessing = new java.util.HashMap<>();
+        if (contract.has("post_processing")) {
+            for (JsonElement value : contract.getAsJsonArray("post_processing")) {
+                JsonObject expected = value.getAsJsonObject();
+                var coordinates = expected.getAsJsonArray("position");
+                var position = new BlockPos(coordinates.get(0).getAsInt(), coordinates.get(1).getAsInt(),
+                        coordinates.get(2).getAsInt());
+                require(postProcessing.put(position, expected) == null, "Duplicate native post-processing position");
+            }
+        }
+        int checked = 0;
+        int processed = 0;
+        boolean preHeightChange = contract.has("post_processing");
+        BlockPos.MutableBlockPos position = new BlockPos.MutableBlockPos();
+        for (JsonElement value : contract.getAsJsonArray("positions")) {
+            var coordinates = value.getAsJsonArray();
+            position.set(coordinates.get(0).getAsInt(), coordinates.get(1).getAsInt(), coordinates.get(2).getAsInt());
+            BlockState state = world.getBlockState(position);
+            JsonObject expected = postProcessing.remove(position);
+            if (!state.is(net.minecraft.world.level.block.Blocks.SHORT_GRASS)) {
+                // After old chunk promotion, vanilla can replace unsupported or flooded plants.
+                boolean flooded = state.is(net.minecraft.world.level.block.Blocks.WATER);
+                boolean unsupported = !net.minecraft.world.level.block.Blocks.SHORT_GRASS.defaultBlockState()
+                        .canSurvive(world, position);
+                boolean matchesRecordedChange = expected != null
+                        && blockId(state).equals(expected.get("target").getAsString())
+                        && blockId(world.getBlockState(position.below())).equals(expected.get("support").getAsString());
+                boolean naturalUpdate = flooded || (state.isAir() && unsupported);
+                require(preHeightChange && naturalUpdate
+                                && (matchesRecordedChange || expected == null || flooded),
+                        "Unexpected vanilla grass post-processing at " + position);
+                processed++;
+            }
+            checked++;
+        }
+        require(postProcessing.isEmpty() && checked == contract.get("checked_positions").getAsInt(),
+                "Incomplete native block rename audit");
+        org.apache.logging.log4j.LogManager.getLogger().info(
+                "BUILDING_PIECES_NATIVE_BLOCK_RENAME_PASS source=minecraft:grass target=minecraft:short_grass positions={}",
+                checked);
+        if (preHeightChange) {
+            org.apache.logging.log4j.LogManager.getLogger().info(
+                    "BUILDING_PIECES_NATIVE_OLD_GRASS_POST_PROCESSING retained={} water_or_unsupported={}",
+                    checked - processed, processed);
+        }
+    }
+
+    private static String blockId(BlockState state) {
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
     }
 
     private static void namedPieces(ServerLevel world, JsonObject fixture) throws Exception {
@@ -280,7 +342,7 @@ final class NativeForwardChecks {
 
             for (JsonElement item : saved.getAsJsonArray("items")) {
                 JsonObject entry = item.getAsJsonObject();
-                ItemStack expected = ItemStack.of(net.minecraft.nbt.TagParser
+                ItemStack expected = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
                         .parseTag(entry.get("stack").getAsString()));
                 ItemStack actual = chest.getItem(entry.get("slot").getAsInt());
 
@@ -294,7 +356,7 @@ final class NativeForwardChecks {
             JsonObject saved = value.getAsJsonObject();
             net.minecraft.world.entity.Entity entity = world.getEntity(java.util.UUID
                     .fromString(saved.get("uuid").getAsString()));
-            ItemStack expected = ItemStack.of(net.minecraft.nbt.TagParser
+            ItemStack expected = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
                     .parseTag(saved.get("stack").getAsString()));
 
             require(entity instanceof net.minecraft.world.entity.item.ItemEntity
@@ -306,12 +368,12 @@ final class NativeForwardChecks {
 
         if (fixture.has("player")) {
             java.util.UUID id = java.util.UUID.fromString(fixture.get("player").getAsString());
-            net.minecraftforge.common.util.FakePlayer player = net.minecraftforge.common.util.FakePlayerFactory.get(
+            net.minecraft.server.level.ServerPlayer player = NativeProbeItems.player(
                     world, new com.mojang.authlib.GameProfile(id, "PieceFixture"));
             require(world.getServer().getPlayerList().load(player) != null, "Saved player data is missing");
-            ItemStack shovel = ItemStack.of(net.minecraft.nbt.TagParser
+            ItemStack shovel = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
                     .parseTag(fixture.get("player_shovel").getAsString()));
-            ItemStack nested = ItemStack.of(net.minecraft.nbt.TagParser
+            ItemStack nested = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(net.minecraft.nbt.TagParser
                     .parseTag(fixture.get("player_nested").getAsString()));
             require(ItemStack.matches(shovel, player.getInventory().getItem(0)),
                     "Player tool lost its damage, enchantment, name or custom data");
@@ -338,7 +400,7 @@ final class NativeForwardChecks {
         net.minecraft.nbt.CompoundTag expectedState = net.minecraft.nbt.TagParser
                 .parseTag(fixture.get("world_state").getAsString());
 
-        require(PiecesWorldState.get(world).save(new net.minecraft.nbt.CompoundTag()).equals(expectedState),
+        require(PiecesWorldState.get(world).save(new net.minecraft.nbt.CompoundTag(), world.registryAccess()).equals(expectedState),
                 "Named-state world data, counters or unknown module fields changed");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_NATIVE_FORWARD_PASS named_states=" + states + " item_units=" + units
                 + " waterlogging=true snow=true schema=1 counters=unchanged");
@@ -552,7 +614,7 @@ final class NativeForwardChecks {
 
         require(actual.getItem() == expected.getItem() && actual.getCount() == (original.getByte("Count") & 255),
                 "Historical item identity and count");
-        require(actual.hasTag() && actual.getTag().equals(original.getCompound("tag")),
+        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(original.getCompound("tag")),
                 "Historical item material, name and unrelated custom data");
     }
 

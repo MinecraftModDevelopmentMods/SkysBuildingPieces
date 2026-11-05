@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:emerald_block_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:emerald_block_vertical_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/emerald_block/slab/rotate/skysbuildingpieces/metal_vertical_slab_00_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/emerald_block/slab/rotate/skysbuildingpieces/metal_vertical_slab_00_4"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:emerald_block_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:emerald_block_vertical_slab"
     }
   ]

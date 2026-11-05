@@ -7,9 +7,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.junit.jupiter.api.Test;
@@ -18,7 +23,11 @@ class RecipeUnlockPredicateTest {
     @Test
     void nativeItemPredicatesRejectUnrelatedInventoryItems() throws Exception {
         MinecraftTestBootstrap.registerVanilla();
+        ItemStack stone = vanillaStack(Items.STONE);
+        ItemStack stick = vanillaStack(Items.STICK);
         Path directory = Path.of("src/main/resources/data/skysbuildingpieces/advancements/recipes");
+        var ops = RegistryOps.create(JsonOps.INSTANCE,
+                RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY));
         int checked = 0;
         try (java.util.stream.Stream<Path> paths = Files.walk(directory)) {
             for (Path path : (Iterable<Path>) paths.filter(file -> file.toString().endsWith(".json"))::iterator) {
@@ -43,9 +52,9 @@ class RecipeUnlockPredicateTest {
                             identities.add("minecraft:stone");
                             predicate.add("items", identities);
                         }
-                        ItemPredicate nativePredicate = ItemPredicate.fromJson(predicate);
-                        assertTrue(nativePredicate.matches(new ItemStack(Items.STONE, 64)), path.toString());
-                        assertFalse(nativePredicate.matches(new ItemStack(Items.STICK, 64)),
+                        ItemPredicate nativePredicate = ItemPredicate.CODEC.parse(ops, predicate).getOrThrow();
+                        assertTrue(nativePredicate.test(stone), path.toString());
+                        assertFalse(nativePredicate.test(stick),
                                 "An unrelated item must not unlock " + path);
                         assertTrue(original.has("items") && !original.has("item"), path.toString());
                         ++checked;
@@ -54,5 +63,9 @@ class RecipeUnlockPredicateTest {
             }
         }
         assertTrue(checked > 1400, "Check every ordinary recipe unlock");
+    }
+
+    private static ItemStack vanillaStack(Item item) {
+        return new ItemStack(item, 64);
     }
 }

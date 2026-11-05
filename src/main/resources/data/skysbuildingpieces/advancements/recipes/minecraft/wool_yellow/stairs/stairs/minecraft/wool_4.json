@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:yellow_wool"
-            ]
+            "items": ["minecraft:yellow_wool"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/wool_yellow/stairs/stairs/minecraft/wool_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/wool_yellow/stairs/stairs/minecraft/wool_4"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_yellow_stairs"
     }
   ]

@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:obsidian",
+    "id": "minecraft:obsidian",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:obsidian_slab"
     }
   ]

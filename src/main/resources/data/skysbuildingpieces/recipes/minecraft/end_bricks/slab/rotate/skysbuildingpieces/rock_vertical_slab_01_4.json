@@ -8,13 +8,13 @@
     }
   },
   "result": {
-    "item": "minecraft:end_stone_brick_slab",
+    "id": "minecraft:end_stone_brick_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:end_bricks_vertical_slab"
     }
   ]

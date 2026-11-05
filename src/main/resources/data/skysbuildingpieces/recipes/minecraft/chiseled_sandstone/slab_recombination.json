@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:chiseled_sandstone",
+    "id": "minecraft:chiseled_sandstone",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:chiseled_sandstone_slab"
     }
   ]

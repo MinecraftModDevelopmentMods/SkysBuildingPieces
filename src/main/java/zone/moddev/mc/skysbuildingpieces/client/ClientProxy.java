@@ -5,10 +5,9 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GrassColor;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -18,8 +17,7 @@ public final class ClientProxy {
     private ClientProxy() {
     }
 
-    public static void register() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static void register(IEventBus modBus) {
 
         modBus.addListener(ClientProxy::blockColors);
         modBus.addListener(ClientProxy::itemColors);
@@ -54,7 +52,7 @@ public final class ClientProxy {
     }
 
     private static void itemColors(RegisterColorHandlersEvent.Item event) {
-        for (Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
+        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
             if (item instanceof PieceItem && ((PieceItem) item).piece.palette.group.equals("grass")) {
                 event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1, item);
             }

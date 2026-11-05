@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:green_wool",
+    "id": "minecraft:green_wool",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:wool_green_slab"
     }
   ]

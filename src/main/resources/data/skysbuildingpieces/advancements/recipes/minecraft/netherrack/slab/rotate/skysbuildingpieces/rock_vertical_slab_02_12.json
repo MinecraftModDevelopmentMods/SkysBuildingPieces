@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:netherrack_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:netherrack_vertical_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/netherrack/slab/rotate/skysbuildingpieces/rock_vertical_slab_02_12"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/netherrack/slab/rotate/skysbuildingpieces/rock_vertical_slab_02_12"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:netherrack_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:netherrack_vertical_slab"
     }
   ]

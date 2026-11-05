@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:jungle_slab",
+    "id": "minecraft:jungle_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:planks_jungle_horizontal_step"
     }
   ]

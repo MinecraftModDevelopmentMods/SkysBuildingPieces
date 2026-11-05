@@ -24,31 +24,23 @@ public final class MinecraftTestBootstrap {
     public static synchronized void registerVanilla() {
         if (initialized) return;
         try {
-            Class<?> loader = Class.forName("net.minecraftforge.fml.loading.FMLLoader");
-            Class<?> versionInfo = Class.forName("net.minecraftforge.fml.loading.VersionInfo");
-            Object forgeVersion = versionInfo
-                    .getConstructor(String.class, String.class, String.class, String.class)
-                    .newInstance("47.1.106", "1.20.1", "20230612.114412", "net.neoforged");
-            set(loader, "versionInfo", forgeVersion);
             SharedConstants.tryDetectVersion();
+            if (!SharedConstants.getCurrentVersion().getName().equals("1.20.6")) {
+                throw new IllegalStateException("Wrong Minecraft version for the focused tests");
+            }
             // Plain JUnit has no ModLauncher event transformation. Build the
-            // registries here; real Forge launches cover the networking bootstrap.
+            // registries here; real NeoForge launches cover the networking bootstrap.
             set(Bootstrap.class, "isBootstrapped", true);
             net.minecraft.core.registries.BuiltInRegistries.BLOCK.size();
             net.minecraft.core.registries.BuiltInRegistries.bootStrap();
-            net.minecraftforge.registries.GameData.vanillaSnapshot();
-            // Focused tests create blocks outside Forge's normal registration event.
+            // Focused tests create blocks outside NeoForge's normal registration event.
             ((net.minecraft.core.MappedRegistry<?>)
                     net.minecraft.core.registries.BuiltInRegistries.BLOCK).unfreeze();
             ((net.minecraft.core.MappedRegistry<?>)
                     net.minecraft.core.registries.BuiltInRegistries.ITEM).unfreeze();
-            ((net.minecraftforge.registries.ForgeRegistry<?>)
-                    net.minecraftforge.registries.ForgeRegistries.BLOCKS).unfreeze();
-            ((net.minecraftforge.registries.ForgeRegistry<?>)
-                    net.minecraftforge.registries.ForgeRegistries.ITEMS).unfreeze();
             initialized = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to initialize the Forge 45 test runtime",
+            throw new IllegalStateException("Unable to initialize the NeoForge 20.6 test runtime",
                     exception);
         }
     }

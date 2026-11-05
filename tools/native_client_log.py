@@ -1,4 +1,4 @@
-"""Check Forge 47 completion, native settings and unexpected errors."""
+"""Check NeoForge completion, native settings and unexpected errors."""
 
 import argparse
 import gzip
@@ -35,36 +35,41 @@ def classify(log, unchanged_defaults):
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = next((index for index, line in enumerate(lines)
                     if "Preparing start region for dimension " in line), -1)
-    if "Connected to a modded server." not in log or startup < 0:
-        raise ValueError("Native Forge login did not complete normally")
+    login = next((index for index, line in enumerate(lines) if " logged in with entity id " in line), -1)
+    joined = next((index for index, line in enumerate(lines) if line.endswith(" joined the game")), -1)
+    if not 0 <= startup < login <= joined:
+        raise ValueError("NeoForge login did not complete normally")
     if not unchanged_defaults:
-        raise ValueError("Native Forge settings changed")
+        raise ValueError("NeoForge settings changed")
     if severe or "[STDERR/" in log or "[STDERR]" in log:
         raise ValueError("Unexpected client errors: " + repr(severe[:4]))
     return {"empty_handshakes": 0, "native_config_notices": 0,
             "notices": [], "unchanged_native_defaults": True}
 
 
+def unchanged_native_settings(directory, names):
+    defaults = Path(__file__).resolve().parent.parent / "src/bootstrapTest/defaultconfigs/config"
+    return all((directory / "config" / name).is_file()
+               and tomllib.loads((defaults / name).read_text(encoding="utf-8"))
+               == tomllib.loads((directory / "config" / name).read_text(encoding="utf-8"))
+               for name in names)
+
+
 def audit(directory, phase, control=False):
     directory = Path(directory)
     log = (directory / "logs/latest.log").read_text(encoding="utf-8")
-    defaults = Path(__file__).resolve().parent.parent / "src/bootstrapTest/defaultconfigs"
-    servers = list((directory / "saves").glob("*/serverconfig/forge-server.toml"))
-    pairs = [(defaults / "config/forge-client.toml", directory / "config/forge-client.toml")]
-    pairs.extend((defaults / "defaultconfigs/forge-server.toml", server) for server in servers)
-    unchanged = len(servers) == 1 and all(
-        actual.is_file() and tomllib.loads(expected.read_text(encoding="utf-8"))
-        == tomllib.loads(actual.read_text(encoding="utf-8")) for expected, actual in pairs)
+    unchanged = unchanged_native_settings(directory, (
+        "fml.toml", "neoforge-client.toml", "neoforge-common.toml", "neoforge-server.toml"))
     if not unchanged:
-        raise ValueError("Native Forge settings differ from the controlled defaults")
+        raise ValueError("NeoForge settings differ from the controlled defaults")
     receipt = classify(log, unchanged)
-    required = (("FORGE47_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
+    required = (("NEOFORGE_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
                 ("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED", "SKY_RECIPE_PREVIEW_MODELS_PASS",
                  "BUILDING_PIECES_CONTINUOUS_GLASS_PASS", "BUILDING_PIECES_COLOURS_PASS"))
     if any(marker not in log for marker in required):
         raise ValueError("Native client completion checks are missing")
     if control and receipt["empty_handshakes"] != 0:
-        raise ValueError("The Forge-only control must complete without handshake errors")
+        raise ValueError("The NeoForge-only control must complete without handshake errors")
     if list((directory / "crash-reports").glob("*")):
         raise ValueError("Native client produced a crash report")
     receipt["complete_log_files"] = audit_complete_logs(directory)
@@ -92,11 +97,7 @@ def classify_server(log, debug, unchanged_defaults, profile=None):
 
 def audit_server(directory, phase):
     directory = Path(directory)
-    defaults = Path(__file__).resolve().parent.parent / 'src/bootstrapTest/defaultconfigs'
-    expected = defaults / 'defaultconfigs/forge-server.toml'
-    actual = directory / 'world/serverconfig/forge-server.toml'
-    unchanged = actual.is_file() and tomllib.loads(expected.read_text(encoding='utf-8')) == tomllib.loads(
-        actual.read_text(encoding='utf-8'))
+    unchanged = unchanged_native_settings(directory, ("fml.toml", "neoforge-common.toml", "neoforge-server.toml"))
     receipt = classify_server((directory / 'logs/latest.log').read_text(encoding='utf-8'),
                               (directory / 'logs/debug.log').read_text(encoding='utf-8'), unchanged, profile_for(directory))
     if list((directory / 'crash-reports').glob('*')):
@@ -117,4 +118,4 @@ if __name__ == "__main__":
     options = parser.parse_args()
     result = (audit_server(options.directory, options.phase) if options.server else
               audit(options.directory, options.phase, options.control))
-    print("FORGE47_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))
+    print("NEOFORGE_NATIVE_LOG_AUDIT_PASS", json.dumps(result, sort_keys=True))

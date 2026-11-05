@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:stained_hardened_clay_yellow_wall",
+    "id": "skysbuildingpieces:stained_hardened_clay_yellow_wall",
     "count": 6
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_hardened_clay_yellow_wall"
     }
   ]

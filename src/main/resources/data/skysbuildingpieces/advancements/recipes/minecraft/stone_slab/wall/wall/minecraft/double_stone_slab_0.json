@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:smooth_stone"
-            ]
+            "items": ["minecraft:smooth_stone"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stone_slab/wall/wall/minecraft/double_stone_slab_0"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stone_slab/wall/wall/minecraft/double_stone_slab_0"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stone_slab_wall"
     }
   ]

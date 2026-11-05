@@ -1,7 +1,7 @@
-"""Generate Forge 31 recipes from permanent material and shape catalogues.
+"""Generate NeoForge 20.6 recipes from permanent material and shape catalogues.
 
 The catalogue keeps source-world identities; recipes use the flattened item IDs.
-Optional inputs and matching advancements share the same Forge conditions.
+Optional inputs and matching advancements share the same NeoForge conditions.
 """
 import argparse
 import copy
@@ -25,7 +25,7 @@ def item_id(spec):
 
 
 def exists(item):
-    return {'type': 'forge:item_exists', 'item': item}
+    return {'type': 'neoforge:item_exists', 'item': item}
 
 
 def canonical_pattern(rows):
@@ -59,7 +59,7 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
             inputs = recipe['ingredients']
             if len(inputs) == len(pattern) and all(accepts(value) for value in inputs):
                 result = recipe['result']
-                if (result['item'], result.get('count', 1)) != output:
+                if (result.get('id', result.get('item')), result.get('count', 1)) != output:
                     return True
             continue
         if recipe.get('type') != 'minecraft:crafting_shaped':
@@ -70,7 +70,7 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
         inputs = list(recipe['key'].values())
         if all(accepts(value) for value in inputs):
             result = recipe['result']
-            if (result['item'], result.get('count', 1)) != output:
+            if (result.get('id', result.get('item')), result.get('count', 1)) != output:
                 return True
     return False
 
@@ -128,7 +128,7 @@ def prepare(resources, native_recipes=(), tags=None):
                 return
             conditions = list(extra)
             if module == 'mineralogy':
-                conditions.append({'type': 'forge:mod_loaded', 'modid': 'mineralogy'})
+                conditions.append({'type': 'neoforge:mod_loaded', 'modid': 'mineralogy'})
             for identity in sorted({ingredient, output}):
                 if not identity.startswith('minecraft:'):
                     conditions.append(exists(identity))
@@ -136,11 +136,11 @@ def prepare(resources, native_recipes=(), tags=None):
                     'category': 'building',
                     'group': 'skysbuildingpieces/' + path.split('/')[-2],
                     'pattern': rows, 'key': {'X': {'item': ingredient}},
-                    'result': {'item': output, 'count': count}}
+                    'result': {'id': output, 'count': count}}
             if preserve:
                 body['preserve_tag'] = True
             if conditions:
-                body['conditions'] = conditions
+                body['neoforge:conditions'] = conditions
             if path in recipes:
                 if recipes[path] != body:
                     raise ValueError('Conflicting generated recipe ID: ' + path)
@@ -155,7 +155,7 @@ def prepare(resources, native_recipes=(), tags=None):
                 'requirements': [['has_ingredient', 'has_the_recipe']],
                 'rewards': {'recipes': ['skysbuildingpieces:' + path]}}
             if conditions:
-                advancement['conditions'] = copy.deepcopy(conditions)
+                advancement['neoforge:conditions'] = copy.deepcopy(conditions)
             advancements['recipes/' + path] = advancement
 
         for material in materials:
@@ -215,7 +215,7 @@ def prepare(resources, native_recipes=(), tags=None):
             if slab is None and vertical is not None:
                 cut('vertical_slab', 'vertical_slab', full)
             elif identity == 'minecraft:dirt' and vertical is not None:
-                cut('vertical_slab', 'vertical_slab', full, [{'type': 'forge:not', 'value': exists(slab)}])
+                cut('vertical_slab', 'vertical_slab', full, [{'type': 'neoforge:not', 'value': exists(slab)}])
             if not material.get('fullBlockStepRecipe', False):
                 if slab is not None:
                     cut('horizontal_step', 'step', slab)
@@ -246,7 +246,7 @@ def prepare(resources, native_recipes=(), tags=None):
                 # Ordinary dirt still has its vertical slab when Grass Slabs is absent.
                 if identity == 'minecraft:dirt' and slab is not None and vertical is not None:
                     add(base + '/recombine_' + shape + '_without_grass_slabs', ['X', 'X'], source,
-                        vertical, 1, [{'type': 'forge:not', 'value': exists(slab)}])
+                        vertical, 1, [{'type': 'neoforge:not', 'value': exists(slab)}])
 
     recipes['legacy_piece'] = {'type': 'skysbuildingpieces:legacy_piece'}
     return recipes, advancements

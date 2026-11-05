@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:dirt",
+    "id": "minecraft:dirt",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysgrassslabs:dirt_slab"
     }
   ]

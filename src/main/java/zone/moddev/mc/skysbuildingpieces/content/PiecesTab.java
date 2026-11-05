@@ -10,16 +10,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Keep new pieces and the native shapes they reuse together in one tab. */
-@Mod.EventBusSubscriber(modid = SkysBuildingPieces.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = SkysBuildingPieces.ID, bus = EventBusSubscriber.Bus.MOD)
 public final class PiecesTab {
     public static CreativeModeTab INSTANCE;
 
@@ -38,9 +38,9 @@ public final class PiecesTab {
     public static Map<ResourceLocation, ItemStack> entries() {
         Map<ResourceLocation, ItemStack> entries = new LinkedHashMap<>();
 
-        for (Item item : ForgeRegistries.ITEMS.getValues()) {
+        for (Item item : BuiltInRegistries.ITEM) {
             if (item instanceof PieceItem && ((PieceItem) item).visibleInCreativeTab()) {
-                entries.put(ForgeRegistries.ITEMS.getKey(item), new ItemStack(item));
+                entries.put(BuiltInRegistries.ITEM.getKey(item), new ItemStack(item));
             }
         }
 
@@ -56,7 +56,7 @@ public final class PiecesTab {
 
                 ItemStack nativeItem = Pieces.stack(Pieces.state(material.id, shape, shape == Shape.SLAB ? 1 : 0), 1);
                 if (nativeItem != null) {
-                    entries.putIfAbsent(ForgeRegistries.ITEMS.getKey(nativeItem.getItem()), nativeItem);
+                    entries.putIfAbsent(BuiltInRegistries.ITEM.getKey(nativeItem.getItem()), nativeItem);
                 }
             }
         }

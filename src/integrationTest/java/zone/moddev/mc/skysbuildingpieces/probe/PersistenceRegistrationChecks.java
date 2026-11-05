@@ -1,10 +1,10 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import java.lang.reflect.Field;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import org.apache.logging.log4j.LogManager;
 
 /** Checks queued activation; native read/write wrappers are checked separately. */
@@ -22,9 +22,10 @@ public final class PersistenceRegistrationChecks {
     }
 
     private static void beforeQueuedWork(FMLCommonSetupEvent event) {
-        require(count(CORE) == 0 && count(GRASS) == 0,
-                "Sky persistence hooks must wait until parallel setup has finished");
-        LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_BEFORE_PASS sky_hooks=0");
+        require(count(CORE) == 0, "Building Pieces must wait until parallel setup has finished");
+        require(count(GRASS) == (ModList.get().isLoaded("skysgrassslabs") ? 1 : 0),
+                "Grass Slabs installs its server listener during construction on NeoForge");
+        LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_BEFORE_PASS core=0 grass={}", count(GRASS));
     }
 
     private static void afterQueuedWork(FMLLoadCompleteEvent event) {
@@ -37,7 +38,7 @@ public final class PersistenceRegistrationChecks {
                     "Grass Slabs must register exactly one persistence hook");
             require(count(MINERALOGY) == (ModList.get().isLoaded("mineralogy") ? 1 : 0),
                     "Mineralogy's independent persistence hook must remain installed");
-            LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_AFTER_PASS mechanism=forge_level_hooks core={} grass={} mineralogy={}",
+            LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_AFTER_PASS mechanism=neoforge_level_hooks core={} grass={} mineralogy={}",
                     count(CORE), count(GRASS), count(MINERALOGY));
         });
     }
@@ -48,10 +49,11 @@ public final class PersistenceRegistrationChecks {
         try {
             Class<?> owner = Class.forName(prefix.substring(0, prefix.length() - 1));
             if (prefix.equals(MINERALOGY)) {
-                var capture = owner.getMethod("captureLegacyLevelData", net.minecraft.nbt.CompoundTag.class,
+                var capture = owner.getMethod("captureLegacyLevelData",
+                        net.minecraft.nbt.CompoundTag.class,
                         net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory.class);
                 var fallback = owner.getMethod("onServerAboutToStart",
-                        net.minecraftforge.event.server.ServerAboutToStartEvent.class);
+                        net.neoforged.neoforge.event.server.ServerAboutToStartEvent.class);
                 require(java.lang.reflect.Modifier.isStatic(capture.getModifiers()),
                         "Mineralogy's capture API must be static");
                 require(java.lang.reflect.Modifier.isStatic(fallback.getModifiers()),

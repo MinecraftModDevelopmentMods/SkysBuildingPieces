@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:cut_red_sandstone_slab"
-            ]
+            "items": ["minecraft:cut_red_sandstone_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/smooth_red_sandstone/stairs/stairs/skysbuildingpieces/rock_slab_01_12"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/smooth_red_sandstone/stairs/stairs/skysbuildingpieces/rock_slab_01_12"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:smooth_red_sandstone_stairs"
     }
   ]

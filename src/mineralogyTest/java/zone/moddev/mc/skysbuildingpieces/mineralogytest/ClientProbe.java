@@ -8,9 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.gameevent.TickEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -20,14 +20,11 @@ public final class ClientProbe extends ProbeProxy {
 
     @Override
     public void init() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public void tick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
 
         Minecraft minecraft = Minecraft.getMinecraft();
 
@@ -82,7 +79,7 @@ public final class ClientProbe extends ProbeProxy {
             }
         } catch (Throwable failure) {
             failure.printStackTrace();
-            net.minecraftforge.fml.common.FMLCommonHandler.instance().exitJava(2, true);
+            net.neoforged.fml.common.FMLCommonHandler.instance().exitJava(2, true);
         }
     }
 

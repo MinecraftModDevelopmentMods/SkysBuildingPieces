@@ -8,17 +8,17 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:granite_smooth_vertical_step",
+    "id": "skysbuildingpieces:granite_smooth_vertical_step",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:granite_smooth_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:granite_smooth_vertical_step"
     }
   ]

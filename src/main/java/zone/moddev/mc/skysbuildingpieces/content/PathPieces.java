@@ -10,10 +10,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.bus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Flatten a piece and its exposed grass support in one shovel action. */
@@ -33,8 +33,8 @@ public final class PathPieces {
             return;
         }
 
-        event.setUseBlock(Event.Result.ALLOW);
-        event.setUseItem(Event.Result.DENY);
+        event.setUseBlock(TriState.TRUE);
+        event.setUseItem(TriState.FALSE);
     }
 
     public static boolean activate(Level world, BlockPos position, Player player, ItemStack shovel,
@@ -64,7 +64,7 @@ public final class PathPieces {
         world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1, 1);
 
         if (!player.getAbilities().instabuild) {
-            shovel.hurtAndBreak(1, player, entity -> entity.broadcastBreakEvent(hand));
+            shovel.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
         }
 
         return true;

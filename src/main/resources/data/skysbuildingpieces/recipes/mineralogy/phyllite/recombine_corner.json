@@ -8,20 +8,20 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:mineralogy_phyllite_horizontal_step",
+    "id": "skysbuildingpieces:mineralogy_phyllite_horizontal_step",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_phyllite_corner"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_phyllite_horizontal_step"
     }
   ]

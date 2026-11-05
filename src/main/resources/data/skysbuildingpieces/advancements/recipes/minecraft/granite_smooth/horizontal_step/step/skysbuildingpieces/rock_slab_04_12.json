@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:polished_granite_slab"
-            ]
+            "items": ["minecraft:polished_granite_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/granite_smooth/horizontal_step/step/skysbuildingpieces/rock_slab_04_12"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/granite_smooth/horizontal_step/step/skysbuildingpieces/rock_slab_04_12"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:granite_smooth_horizontal_step"
     }
   ]

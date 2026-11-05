@@ -8,13 +8,13 @@
     }
   },
   "result": {
-    "item": "minecraft:polished_diorite_slab",
+    "id": "minecraft:polished_diorite_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diorite_smooth_vertical_slab"
     }
   ]

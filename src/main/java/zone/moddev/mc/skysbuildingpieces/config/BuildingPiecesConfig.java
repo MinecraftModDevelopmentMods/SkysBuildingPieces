@@ -6,19 +6,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.loading.FMLPaths;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 
 /** Recovery choices are read at startup; old Forge CFG files are kept intact. */
 public final class BuildingPiecesConfig {
-    private static final ForgeConfigSpec SPEC;
-    private static final ForgeConfigSpec.BooleanValue FORCE_REPLACEMENT;
+    private static final ModConfigSpec SPEC;
+    private static final ModConfigSpec.BooleanValue FORCE_REPLACEMENT;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder.push("compat");
         FORCE_REPLACEMENT = builder
@@ -33,9 +33,9 @@ public final class BuildingPiecesConfig {
     private BuildingPiecesConfig() {
     }
 
-    public static void register() {
+    public static void register(ModContainer container) {
         migrateLegacyConfig();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, SPEC);
+        container.registerConfig(ModConfig.Type.COMMON, SPEC);
     }
 
     public static boolean forceReplacement() {

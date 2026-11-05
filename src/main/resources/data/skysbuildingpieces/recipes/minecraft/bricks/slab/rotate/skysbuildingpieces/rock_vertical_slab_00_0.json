@@ -8,13 +8,13 @@
     }
   },
   "result": {
-    "item": "minecraft:brick_slab",
+    "id": "minecraft:brick_slab",
     "count": 1
   },
   "preserve_tag": true,
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:bricks_vertical_slab"
     }
   ]

@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "skysbuildingpieces:diorite_smooth_horizontal_step",
+    "id": "skysbuildingpieces:diorite_smooth_horizontal_step",
     "count": 4
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diorite_smooth_horizontal_step"
     }
   ]

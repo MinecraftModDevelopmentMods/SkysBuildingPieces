@@ -8,20 +8,20 @@
     }
   },
   "result": {
-    "item": "mineralogy:hornfels_slab",
+    "id": "mineralogy:hornfels_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "mineralogy"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "mineralogy:hornfels_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:mineralogy_hornfels_horizontal_step"
     }
   ]

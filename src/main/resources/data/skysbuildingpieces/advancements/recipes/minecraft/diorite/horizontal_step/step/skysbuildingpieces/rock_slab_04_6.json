@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:diorite_slab"
-            ]
+            "items": ["minecraft:diorite_slab"]
           }
         ]
       }
@@ -20,19 +18,14 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/diorite/horizontal_step/step/skysbuildingpieces/rock_slab_04_6"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/diorite/horizontal_step/step/skysbuildingpieces/rock_slab_04_6"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:diorite_horizontal_step"
     }
   ]

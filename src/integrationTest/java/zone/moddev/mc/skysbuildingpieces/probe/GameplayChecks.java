@@ -25,7 +25,6 @@ import net.minecraft.core.*;
 import net.minecraft.resources.*;
 import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
@@ -55,7 +54,7 @@ public final class GameplayChecks {
     }
 
     public static void run(ServerLevel world) {
-        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = NativeProbeItems.player(world);
 
         player.getAbilities().instabuild = false;
 
@@ -95,8 +94,8 @@ public final class GameplayChecks {
             // Vanilla items consume the action on the server; Sky items retain their explicit success result.
             boolean nativeConsumption = result == InteractionResult.CONSUME && !(item.getItem() instanceof PieceItem);
             require((result == InteractionResult.SUCCESS || nativeConsumption) && item.getCount() == 1,
-                    "own placement and consumption " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(pieceBlock) + " item="
-                            + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item.getItem()) + " result=" + result + " count=" + item.getCount()
+                    "own placement and consumption " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(pieceBlock) + " item="
+                            + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item.getItem()) + " result=" + result + " count=" + item.getCount()
                             + " placed=" + world.getBlockState(position));
 
             BlockState state = world.getBlockState(position);
@@ -113,7 +112,7 @@ public final class GameplayChecks {
                 BlockState equivalent = Pieces.state(pieceBlock.palette.materials.get(0), pieceBlock.palette.shape, 0);
 
                 require(state.getBlock() == equivalent.getBlock(), "own placement uses the material's shape: "
-                        + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(pieceBlock) + " placed " + state + ", expected " + equivalent);
+                        + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(pieceBlock) + " placed " + state + ", expected " + equivalent);
                 state = pieceBlock.getStateFromMeta(0);
                 world.setBlock(position, state, 2);
             }
@@ -218,7 +217,7 @@ public final class GameplayChecks {
                 BlockState grass = Pieces.state("minecraft:grass", shape, orientation);
 
                 world.setBlock(position, grass, 2);
-                grass.getBlock().tick(grass, world, position, net.minecraft.util.RandomSource.create(0));
+                grass.tick(world, position, net.minecraft.util.RandomSource.create(0));
                 require(world.getBlockState(position).equals(Pieces.state("minecraft:dirt", shape, orientation)),
                         "covered grass decay preserves geometry: " + shape + " / " + orientation + " became "
                                 + world.getBlockState(position));
@@ -534,13 +533,13 @@ public final class GameplayChecks {
                                 "material drop and metadata");
                     }
                     if (materialDefinition.soil()) {
-                        for (Block plant : new Block[] { Blocks.GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
+                        for (Block plant : new Block[] { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
                             BlockState full = Pieces.nativeState(materialDefinition, "full");
                             boolean nativeSupport = full.getBlock().canSustainPlant(full, world, position, Direction.UP,
-                                    (net.minecraftforge.common.IPlantable) plant);
+                                    (net.neoforged.neoforge.common.IPlantable) plant);
 
                             require(pieceBlock.canSustainPlant(state, world, position, Direction.UP,
-                                    (net.minecraftforge.common.IPlantable) plant) == (nativeSupport
+                                    (net.neoforged.neoforge.common.IPlantable) plant) == (nativeSupport
                                             && Geometry.completeTop(pieceBlock.mask(state))),
                                     "native plants need complete upper faces " + materialDefinition.id + " "
                                             + pieceBlock.orientation(state));
@@ -562,8 +561,8 @@ public final class GameplayChecks {
                 return Pieces.stack(horizontal, 1);
             }
 
-            Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                    .getValue(new ResourceLocation("skysgrassslabs:dirt_slab"));
+            Item dirt = net.minecraft.core.registries.BuiltInRegistries.ITEM
+                    .get(new ResourceLocation("skysgrassslabs:dirt_slab"));
 
             if (material.equals("minecraft:dirt") && dirt != null && dirt != Items.AIR) {
                 return new ItemStack(dirt, 1);
@@ -588,15 +587,15 @@ public final class GameplayChecks {
                 NonNullList<ItemStack> creative = NonNullList.create();
 
                 net.minecraft.world.item.Item hidden = Pieces.stack(block.defaultBlockState(), 1).getItem();
-                if (PiecesTab.entries().containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(hidden))) {
+                if (PiecesTab.entries().containsKey(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(hidden))) {
                     creative.add(new ItemStack(hidden));
                 }
                 require(creative.isEmpty(), "vertical slabs absent from creative tab");
             }
         }
 
-        Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                .getValue(new ResourceLocation("skysgrassslabs:dirt_slab"));
+        Item dirt = net.minecraft.core.registries.BuiltInRegistries.ITEM
+                .get(new ResourceLocation("skysgrassslabs:dirt_slab"));
 
         if (dirt != null && dirt != Items.AIR) {
             for (Direction occupied : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
@@ -626,15 +625,19 @@ public final class GameplayChecks {
 
         PlacementVeto veto = new PlacementVeto();
 
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(veto);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.register(veto);
 
         try {
-            require(use(oak, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .1f, 1,
-                    .5f) != InteractionResult.SUCCESS && veto.seen && world.isEmptyBlock(position) && oak.getCount() == 2,
+            InteractionResult result = use(oak, player, world, position.below(), InteractionHand.MAIN_HAND,
+                    Direction.UP, .1f, 1, .5f);
+            // Forge 50 restores the hand with a copy of the original stack.
+            require(result == InteractionResult.FAIL && veto.seen && world.isEmptyBlock(position)
+                            && ItemStack.matches(player.getMainHandItem(), new ItemStack(Blocks.OAK_SLAB, 2)),
                     "Forge placement protection rolls back the exact native slab placement");
         } finally {
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(veto);
         }
+        oak = player.getMainHandItem();
 
         clearAround(world, position);
         world.setBlock(position, Blocks.OAK_TRAPDOOR.defaultBlockState(), 2);
@@ -648,7 +651,7 @@ public final class GameplayChecks {
                 "block activation takes priority and happens exactly once");
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 
-        if (net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")) {
+        if (net.neoforged.fml.ModList.get().isLoaded("buildingbricks")) {
             BlockState unchanged = world.getBlockState(position);
 
             require(NativeSlabPlacement.place(oak, player, world, position, InteractionHand.MAIN_HAND, Direction.UP,
@@ -689,7 +692,7 @@ public final class GameplayChecks {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 
                     tag.putString("custom_label", "Preserved slab");
-                    stack.setTag(tag);
+                    zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, tag);
                     player.setItemInHand(hand, stack);
                     InteractionResult placement = use(stack, player, world, anchor, hand, face, hitX,
                             face == Direction.UP ? 1 : 0, hitZ);
@@ -698,7 +701,7 @@ public final class GameplayChecks {
                     require(world.getBlockState(position)
                             .equals(Pieces.state(material.id, slabShape(occupied), slabOrientation(occupied))),
                             "native slab selects six orientations " + material.id);
-                    require(stack.getCount() == 2 && tag.equals(stack.getTag()),
+                    require(stack.getCount() == 2 && tag.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack)),
                             "native hook consumes once and preserves NBT");
                     require(use(stack, player, world, position, hand, occupied.getOpposite(), .5f, .5f,
                             .5f).consumesAction(),
@@ -716,7 +719,7 @@ public final class GameplayChecks {
     }
 
     private static ItemStack ownSlab(PieceBlock block, String material) {
-        for (Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
             if (item instanceof PieceItem) {
                 PieceItem piece = (PieceItem) item;
 
@@ -726,14 +729,14 @@ public final class GameplayChecks {
             }
         }
 
-        throw new AssertionError("Missing registered slab item: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + material);
+        throw new AssertionError("Missing registered slab item: " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block) + " / " + material);
     }
 
     public static final class PlacementVeto {
         boolean seen;
 
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public void place(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        @net.neoforged.bus.api.SubscribeEvent
+        public void place(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event) {
             seen = true;
             event.setCanceled(true);
         }

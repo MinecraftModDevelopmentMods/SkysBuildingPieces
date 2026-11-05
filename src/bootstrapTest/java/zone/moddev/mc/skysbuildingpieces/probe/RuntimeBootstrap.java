@@ -22,11 +22,12 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -37,40 +38,67 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge;
 public final class RuntimeBootstrap {
     private MinecraftServer pendingServer;
     private int startupTicks;
+    private DeferredAudit deferredAudit;
 
-    public RuntimeBootstrap() {
-        PathChecks.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus(),
+    private record DeferredAudit(MinecraftServer server, RecipeChecks.Audit recipeAudit,
+            RecombinationChecks.Audit recombinationAudit, int recipes, int stacks, long resumeAt) {
+    }
+
+    public RuntimeBootstrap(net.neoforged.bus.api.IEventBus modBus) {
+        PathChecks.register(modBus,
                 "buildingpiecesbootstrap");
         PersistenceRegistrationChecks.register(
-                net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());
-        MinecraftForge.EVENT_BUS.addListener(this::started);
-        MinecraftForge.EVENT_BUS.addListener(this::tick);
-        net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
+                modBus);
+        NeoForge.EVENT_BUS.addListener(this::started);
+        NeoForge.EVENT_BUS.addListener(this::tick);
+        modBus
                 .addListener(PersistenceOrderChecks::ready);
-        net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
-                () -> () -> new ClientProbe().init());
+        if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+            new ClientProbe().init();
+        }
     }
 
     private void started(ServerStartedEvent event) {
         pendingServer = event.getServer();
         startupTicks = 0;
-        if (System.getProperty("skysbuildingpieces.bootstrapPhase", "").startsWith("forward")) {
-            NativeForwardChecks.prepare(pendingServer.getLevel(Level.OVERWORLD));
+        String phase = System.getProperty("skysbuildingpieces.bootstrapPhase", "");
+        ServerLevel world = pendingServer.getLevel(Level.OVERWORLD);
+        if (phase.startsWith("forward")) {
+            NativeForwardChecks.prepare(world);
+        } else if (phase.startsWith("client")) {
+            prepareClientGrid(world);
         } else {
-            GameplayChecks.prepare(pendingServer.getLevel(Level.OVERWORLD));
+            GameplayChecks.prepare(world);
         }
     }
 
-    private void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event) {
-        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || pendingServer == null) {
+    private void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        if (deferredAudit != null) {
+            if (System.nanoTime() < deferredAudit.resumeAt()) {
+                return;
+            }
+            DeferredAudit next = deferredAudit;
+            deferredAudit = null;
+            audit(next.server(), next);
+            return;
+        }
+        if (pendingServer == null) {
             return;
         }
         if (++startupTicks < 20) {
             return;
         }
         ServerLevel world = pendingServer.getLevel(Level.OVERWORLD);
-        boolean forward = System.getProperty("skysbuildingpieces.bootstrapPhase", "").startsWith("forward");
-        if (!(forward ? NativeForwardChecks.ready(world) : GameplayChecks.ready(world))) {
+        String phase = System.getProperty("skysbuildingpieces.bootstrapPhase", "");
+        boolean ready;
+        if (phase.startsWith("forward")) {
+            ready = NativeForwardChecks.ready(world);
+        } else if (phase.startsWith("client")) {
+            ready = clientGridChunksReady(world);
+        } else {
+            ready = GameplayChecks.ready(world);
+        }
+        if (!ready) {
             if (startupTicks > 1200) {
                 org.apache.logging.log4j.LogManager.getLogger().error("The native fixture never finished loading its chunks and entities");
                 pendingServer.halt(false);
@@ -82,10 +110,10 @@ public final class RuntimeBootstrap {
         pendingServer = null;
         // Entity storage is asynchronous in 1.17. Run after normal server ticks
         // make the fixture visible, keeping every collision assertion intact.
-        audit(server);
+        audit(server, null);
     }
 
-    private void audit(MinecraftServer server) {
+    private void audit(MinecraftServer server, DeferredAudit pending) {
         ServerLevel world = server.getLevel(Level.OVERWORLD);
         String phase = System.getProperty("skysbuildingpieces.bootstrapPhase", "");
         File root = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile();
@@ -106,25 +134,42 @@ public final class RuntimeBootstrap {
                 zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
+            } else if (phase.startsWith("client")) {
+                // The dedicated server exercises crafting and migration exhaustively.
+                // Here a real client must load, render and reopen the native piece states.
+                PresentationChecks.connectedGlass(world);
+                clientGrid(world, phase.endsWith("reload"));
+                ClientStatus.complete = true;
+                return;
             } else {
-                recipes = RecipeChecks.run(world);
-                stacks = legacyStacks();
-                rawPlayer();
-                NativeLegacyChecks.run(world);
-                GameplayChecks.run(world);
-                WaterloggingChecks.run(world);
-                PathChecks.run(world);
-                SharedGrassChecks.run(world);
-                MineralogyChecks.run();
-                RecombinationChecks.run(world);
-                PresentationChecks.run(world);
-
-                if (phase.startsWith("client")) {
-                    PresentationChecks.connectedGlass(world);
-                    clientGrid(world, phase.endsWith("reload"));
-                    ClientStatus.complete = true;
+                if (pending == null || pending.recombinationAudit() == null) {
+                    RecipeChecks.Audit current = pending == null
+                            ? new RecipeChecks.Audit(world) : pending.recipeAudit();
+                    if (!current.advance(24)) {
+                        defer(server, current, null, 0, 0);
+                        return;
+                    }
+                    recipes = current.finish();
+                    stacks = legacyStacks();
+                    rawPlayer();
+                    NativeLegacyChecks.run(world);
+                    GameplayChecks.run(world);
+                    WaterloggingChecks.run(world);
+                    PathChecks.run(world);
+                    SharedGrassChecks.run(world);
+                    MineralogyChecks.run();
+                    defer(server, null, new RecombinationChecks.Audit(world), recipes, stacks);
                     return;
                 }
+                recipes = pending.recipes();
+                stacks = pending.stacks();
+                RecombinationChecks.Audit combinations = pending.recombinationAudit();
+                if (!combinations.advance(4)) {
+                    defer(server, null, combinations, recipes, stacks);
+                    return;
+                }
+                combinations.finish();
+                PresentationChecks.run(world);
 
                 // This check reloads server resources. Run it on the dedicated
                 // server, away from the integrated client's login handshake.
@@ -161,17 +206,52 @@ public final class RuntimeBootstrap {
             ClientStatus.failure = failure;
             // World creation waits for server readiness on the render thread.
             // Report a failed probe there too, so it exits instead of waiting forever.
-            net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
-                    () -> () -> net.minecraft.client.Minecraft.getInstance().delayCrash(
-                            net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
+            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+                net.minecraft.client.Minecraft.getInstance().delayCrash(
+                        net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check"));
+            }
             server.halt(false);
         } finally {
             if (phase.startsWith("forward")) {
                 NativeForwardChecks.release(world);
-            } else {
+            } else if (deferredAudit == null) {
                 GameplayChecks.release(world);
             }
         }
+    }
+
+    private void defer(MinecraftServer server, RecipeChecks.Audit recipes, RecombinationChecks.Audit combinations,
+            int recipesChecked, int stacks) {
+        // Let the server catch up between batches while keeping the watchdog active.
+        long resumeAt = System.nanoTime() + java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(75);
+        deferredAudit = new DeferredAudit(server, recipes, combinations, recipesChecked, stacks, resumeAt);
+    }
+
+    private static BlockPos clientGridPosition(int index) {
+        return new BlockPos(500 + (index & 63), 180 + ((index >> 6) & 15), 500 + (index >> 10));
+    }
+
+    private static java.util.Set<ChunkPos> clientGridChunks() {
+        int states = Pieces.BLOCKS.values().stream()
+                .mapToInt(block -> block.palette.materials.size() * block.palette.shape.states).sum();
+        java.util.Set<ChunkPos> chunks = new java.util.LinkedHashSet<>();
+        for (int index = 0; index < states; index++) {
+            chunks.add(new ChunkPos(clientGridPosition(index)));
+        }
+        return chunks;
+    }
+
+    private static void prepareClientGrid(ServerLevel world) {
+        // The grid sits outside the player's view. Keep its chunks ticking until shutdown so the
+        // integrated server saves them even when it pauses as soon as the client checks finish.
+        for (ChunkPos chunk : clientGridChunks()) {
+            world.setChunkForced(chunk.x, chunk.z, true);
+            world.getChunk(chunk.x, chunk.z);
+        }
+    }
+
+    private static boolean clientGridChunksReady(ServerLevel world) {
+        return clientGridChunks().stream().allMatch(chunk -> world.getChunkSource().isPositionTicking(chunk.toLong()));
     }
 
     private static void clientGrid(ServerLevel world, boolean reload) throws Exception {
@@ -180,7 +260,7 @@ public final class RuntimeBootstrap {
 
         if (reload) {
             try (FileInputStream input = new FileInputStream(file)) {
-                saved = NbtIo.readCompressed(input);
+                saved = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
             }
         }
 
@@ -196,12 +276,14 @@ public final class RuntimeBootstrap {
             int values = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < values; metadata++) {
-                BlockPos position = new BlockPos(500 + (number & 63), 180 + (number >> 6 & 15), 500 + (number >> 10));
+                BlockPos position = clientGridPosition(number);
                 String key = Integer.toString(number++);
 
                 if (reload) {
-                    require(NbtUtils.writeBlockState(world.getBlockState(position)).equals(saved.getCompound(key)),
-                            "Client world reload lost " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
+                    CompoundTag expected = saved.getCompound(key);
+                    CompoundTag actual = NbtUtils.writeBlockState(world.getBlockState(position));
+                    require(actual.equals(expected), "Client world reload changed " + position
+                            + " from " + expected + " to " + actual);
                 } else {
                     world.setBlock(position, block.getStateFromMeta(metadata), 18);
                 }
@@ -211,7 +293,7 @@ public final class RuntimeBootstrap {
             // Take the snapshot after all neighbours have been placed, retaining the native connection and stair states
             // as well as palette values.
             for (int index = 0; index < number; index++) {
-                BlockPos position = new BlockPos(500 + (index & 63), 180 + (index >> 6 & 15), 500 + (index >> 10));
+                BlockPos position = clientGridPosition(index);
                 BlockState state = world.getBlockState(position);
                 PieceBlock block = (PieceBlock) state.getBlock();
 
@@ -250,7 +332,7 @@ public final class RuntimeBootstrap {
             for (int metadata = 0; metadata < assigned; metadata++) {
                 CompoundTag raw = new CompoundTag();
 
-                raw.putString("id", net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString());
+                raw.putString("id", net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString());
                 raw.putShort("Damage", (short) metadata);
                 raw.putByte("Count", (byte) 17);
                 raw.putByte("Slot", (byte) 4);
@@ -261,15 +343,15 @@ public final class RuntimeBootstrap {
                 raw.put("tag", custom);
                 LegacyBridge.prepareStack(raw);
 
-                ItemStack actual = ItemStack.of(raw);
-                ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 17);
+                ItemStack actual = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(raw);
+                ItemStack expected = Pieces.legacyItem(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString(), metadata, 17);
 
                 require(actual.getItem() == expected.getItem() && actual.getCount() == 17,
-                        "Legacy material item: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block) + " / " + metadata);
-                require(actual.hasTag() && actual.getTag().equals(custom) && raw.getByte("Slot") == 4,
+                        "Legacy material item: " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block) + " / " + metadata);
+                require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).equals(custom) && raw.getByte("Slot") == 4,
                         "Legacy custom data and inventory slot");
 
-                if (net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem()).getNamespace().equals("minecraft")
+                if (net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(expected.getItem()).getNamespace().equals("minecraft")
                         && nativeItems.add(expected.getItem())) {
                     // Native item names can have an older meaning. Check the chosen target after both the direct
                     // fixer and the chunk loader's intermediate-version route, not only our own raw conversion.
@@ -283,10 +365,10 @@ public final class RuntimeBootstrap {
                         }
                         fixed = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), fixed,
                                 intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
-                        ItemStack saved = ItemStack.of(fixed);
+                        ItemStack saved = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(fixed);
                         require(saved.getItem() == expected.getItem() && saved.getCount() == 17
-                                && saved.hasTag() && saved.getTag().equals(custom) && fixed.getByte("Slot") == 4,
-                                "Native item fixer changed " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(expected.getItem())
+                                && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(saved) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(saved).equals(custom) && fixed.getByte("Slot") == 4,
+                                "Native item fixer changed " + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(expected.getItem())
                                         + " intermediate=" + intermediate + ": " + fixed);
                     }
                 }
@@ -310,7 +392,7 @@ public final class RuntimeBootstrap {
         ListTag inventory = new ListTag();
         CompoundTag stack = new CompoundTag();
 
-        stack.putString("id", net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString());
+        stack.putString("id", net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString());
         stack.putShort("Damage", (short) metadata);
         stack.putByte("Count", (byte) 23);
         stack.putByte("Slot", (byte) 7);
@@ -329,12 +411,12 @@ public final class RuntimeBootstrap {
 
         CompoundTag upgraded = net.minecraft.util.datafix.DataFixTypes.PLAYER.update(net.minecraft.util.datafix.DataFixers.getDataFixer(), source, 1343, 1976);
         CompoundTag saved = upgraded.getList("Inventory", 10).getCompound(0);
-        ItemStack actual = ItemStack.of(saved);
-        ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 23);
+        ItemStack actual = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(saved);
+        ItemStack expected = Pieces.legacyItem(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString(), metadata, 23);
 
         require(actual.getItem() == expected.getItem() && actual.getCount() == 23,
                 "The real player data fixer must see the recovered flat item, not the metadata carrier");
-        require(actual.hasTag() && actual.getTag().getString("Keep").equals("Unrelated custom data")
+        require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).getString("Keep").equals("Unrelated custom data")
                 && actual.getHoverName().getString().equals("Named legacy piece") && saved.getByte("Slot") == 7,
                 "Player data fixing must preserve the custom name, slot and unrelated data");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_RAW_PLAYER_FIXER_PASS");

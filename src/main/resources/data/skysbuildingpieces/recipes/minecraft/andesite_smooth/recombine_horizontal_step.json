@@ -8,12 +8,12 @@
     }
   },
   "result": {
-    "item": "minecraft:polished_andesite_slab",
+    "id": "minecraft:polished_andesite_slab",
     "count": 1
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:andesite_smooth_horizontal_step"
     }
   ]

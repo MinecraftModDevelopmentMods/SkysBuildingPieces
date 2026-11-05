@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_hardened_clay_purple_vertical_slab"
-            ]
+            "items": ["skysbuildingpieces:stained_hardened_clay_purple_vertical_slab"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_hardened_clay_purple/slab/rotate/skysbuildingpieces/rock_vertical_slab_08_4"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_purple/slab/rotate/skysbuildingpieces/rock_vertical_slab_08_4"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_hardened_clay_purple_slab"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_hardened_clay_purple_vertical_slab"
     }
   ]

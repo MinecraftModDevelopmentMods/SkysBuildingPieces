@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "skysbuildingpieces:stained_glass_blue_horizontal_step"
-            ]
+            "items": ["skysbuildingpieces:stained_glass_blue_horizontal_step"]
           }
         ]
       }
@@ -20,23 +18,18 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/stained_glass_blue/vertical_step/rotate/skysbuildingpieces/stained_glass_horizontal_step_05_8"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_blue/vertical_step/rotate/skysbuildingpieces/stained_glass_horizontal_step_05_8"]
   },
-  "conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_blue_horizontal_step"
     },
     {
-      "type": "forge:item_exists",
+      "type": "neoforge:item_exists",
       "item": "skysbuildingpieces:stained_glass_blue_vertical_step"
     }
   ]

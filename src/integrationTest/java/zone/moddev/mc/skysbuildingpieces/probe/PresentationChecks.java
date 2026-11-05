@@ -13,7 +13,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.TorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
@@ -22,7 +21,6 @@ import net.minecraft.core.*;
 import net.minecraft.resources.*;
 import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.FakePlayerFactory;
 
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.*;
@@ -176,7 +174,7 @@ public final class PresentationChecks {
 
         ItemStack named = Pieces.stack(Pieces.state("minecraft:gold_block", Shape.WALL, 0), 1);
 
-        named.setHoverName(net.minecraft.network.chat.Component.literal("My Wall"));
+        named.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("My Wall"));
         require(named.getHoverName().getString().equals("My Wall"), "custom item names are preserved");
 
         int checked = 0;
@@ -306,7 +304,7 @@ public final class PresentationChecks {
     private static void torches(ServerLevel world) {
         BlockPos pos = new BlockPos(-524, 90, -524);
         Direction[] sides = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
-        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = NativeProbeItems.player(world);
 
         player.getAbilities().instabuild = false;
 
@@ -318,8 +316,7 @@ public final class PresentationChecks {
             }
             for (int material = 0; material < block.palette.materials.size(); material++) {
                 for (int connections = 0; connections < 16; connections++) {
-                    for (TorchBlock torch : new TorchBlock[] { (TorchBlock) Blocks.TORCH,
-                            (TorchBlock) Blocks.REDSTONE_TORCH }) {
+                    for (Block torch : new Block[] { Blocks.TORCH, Blocks.REDSTONE_TORCH }) {
                         BlockState wall = block.getStateFromMeta(material);
 
                         world.setBlock(pos, wall, 3);
@@ -333,8 +330,8 @@ public final class PresentationChecks {
                             }
                         }
 
-                        require(torch.canSurvive(torch.defaultBlockState(), world, pos.above()),
-                                "wall supports a top torch " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block));
+                        require(torch.defaultBlockState().canSurvive(world, pos.above()),
+                                "wall supports a top torch " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block));
 
                         ItemStack stack = new ItemStack(Item.byBlock(torch), 2);
 
@@ -347,7 +344,7 @@ public final class PresentationChecks {
                         BlockState placed = world.getBlockState(pos.above());
 
                         require(placed.getBlock() == torch && stack.getCount() == 1, "upright torch consumes one item");
-                        torch.neighborChanged(placed, world, pos.above(), block, pos, false);
+                        placed.handleNeighborChanged(world, pos.above(), block, pos, false);
                         require(world.getBlockState(pos.above()).getBlock() == torch, "torch survives a neighbour update");
 
                         if (wall.hasProperty(WallBlock.UP)) {
@@ -403,12 +400,12 @@ public final class PresentationChecks {
 
             field.setAccessible(true);
 
-            net.minecraftforge.client.model.data.ModelProperty<Integer> property = (net.minecraftforge.client.model.data.ModelProperty<Integer>) field
+            net.neoforged.neoforge.client.model.data.ModelProperty<Integer> property = (net.neoforged.neoforge.client.model.data.ModelProperty<Integer>) field
                     .get(null);
             zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel model = new zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel(
                     null);
-            net.minecraftforge.client.model.data.ModelData data = model.getModelData(world, position, state,
-                    net.minecraftforge.client.model.data.ModelData.EMPTY);
+            net.neoforged.neoforge.client.model.data.ModelData data = model.getModelData(world, position, state,
+                    net.neoforged.neoforge.client.model.data.ModelData.EMPTY);
 
             require(data.has(property), "glass joins are present in render-only model data");
             return data.get(property);
