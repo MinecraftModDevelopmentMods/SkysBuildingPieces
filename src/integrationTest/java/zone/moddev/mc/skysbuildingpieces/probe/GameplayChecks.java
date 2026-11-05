@@ -503,6 +503,16 @@ public final class GameplayChecks {
                     require(actualFire == expectedFire, "native flammability " + materialDefinition.id + " actual="
                             + actualFire + " expected=" + expectedFire);
                     require(actualSpread == expectedSpread, "native fire spread");
+                    Block[] plants = { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.DANDELION,
+                            Blocks.RED_MUSHROOM, Blocks.WHEAT };
+                    boolean[] nativeSurvival = new boolean[plants.length];
+                    if (materialDefinition.soil()) {
+                        for (int index = 0; index < plants.length; index++) {
+                            nativeSurvival[index] = plants[index].defaultBlockState()
+                                    .canSurvive(world, position.above());
+                        }
+                    }
+
                     world.setBlock(position, state, 2);
                     require(ItemStack.matches(pieceBlock.getCloneItemStack(world, position, state),
                             expectedDrop(materialDefinition.id, pieceBlock, state)),
@@ -535,17 +545,13 @@ public final class GameplayChecks {
                                 "material drop and metadata");
                     }
                     if (materialDefinition.soil()) {
-                        for (Block plant : new Block[] { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
-                            BlockState full = Pieces.nativeState(materialDefinition, "full");
-                            var nativeSupport = full.canSustainPlant(world, position, Direction.UP,
-                                    plant.defaultBlockState());
-                            var expected = Geometry.completeTop(pieceBlock.mask(state))
-                                    ? nativeSupport : net.neoforged.neoforge.common.util.TriState.FALSE;
-
-                            require(state.canSustainPlant(world, position, Direction.UP, plant.defaultBlockState())
-                                            == expected,
+                        for (int index = 0; index < plants.length; index++) {
+                            BlockState plant = plants[index].defaultBlockState();
+                            boolean expected = Geometry.completeTop(pieceBlock.mask(state))
+                                    && nativeSurvival[index];
+                            require(plant.canSurvive(world, position.above()) == expected,
                                     "native plants need complete upper faces " + materialDefinition.id + " "
-                                            + pieceBlock.orientation(state));
+                                            + pieceBlock.orientation(state) + " for " + plant);
                         }
                     }
                 }

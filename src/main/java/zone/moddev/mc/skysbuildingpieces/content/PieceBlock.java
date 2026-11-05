@@ -319,7 +319,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
         BlockState full = Pieces.nativeState(definition(state), "full");
 
-        return full.canSustainPlant(world, position, face, plant);
+        return PlantSoilView.supports(full, world, position, face, plant);
     }
 
     private boolean completeTop(BlockState state) {
