@@ -79,9 +79,9 @@ public final class MineralogyCompat {
             return;
         }
         for (String path : FORMER_PATHS) {
-            ResourceLocation former = new ResourceLocation(ASSETS, path);
+            ResourceLocation former = ResourceLocation.fromNamespaceAndPath(ASSETS, path);
             zone.moddev.mc.skysbuildingpieces.legacy.LegacyRegistryAliases.register(
-                    registry, former, new ResourceLocation(replacementId(former.toString())));
+                    registry, former, ResourceLocation.parse(replacementId(former.toString())));
         }
     }
 
@@ -93,7 +93,7 @@ public final class MineralogyCompat {
             return null;
         }
 
-        Block target = BuiltInRegistries.BLOCK.get(new ResourceLocation(replacement));
+        Block target = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(replacement));
 
         if (target == null || target == Blocks.AIR) {
             throw new IllegalStateException("Cannot recover " + historicalId

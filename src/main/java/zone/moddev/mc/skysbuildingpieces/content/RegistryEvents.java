@@ -33,13 +33,13 @@ public final class RegistryEvents {
             items();
         } else if (event.getRegistryKey().equals(Registries.SOUND_EVENT)) {
             LegacyRegistryAliases.register(BuiltInRegistries.SOUND_EVENT,
-                    new ResourceLocation("minecraft:item.sweet_berries.pick_from_bush"),
+                    ResourceLocation.parse("minecraft:item.sweet_berries.pick_from_bush"),
                     BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES));
         } else if (event.getRegistryKey().equals(Registries.RECIPE_SERIALIZER)) {
             Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
-                    new ResourceLocation(SkysBuildingPieces.ID, "cutting"), CuttingRecipe.SERIALIZER);
+                    ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "cutting"), CuttingRecipe.SERIALIZER);
             Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
-                    new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece"), LegacyPieceRecipe.SERIALIZER);
+                    ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece"), LegacyPieceRecipe.SERIALIZER);
         }
     }
 
@@ -47,22 +47,22 @@ public final class RegistryEvents {
         SkysBuildingPieces.HOLDER = new Block(Block.Properties.of().mapColor(MapColor.STONE)
                 .strength(-1.0F, 3_600_000.0F));
         Pieces.registerBlocks(BuiltInRegistries.BLOCK);
-        LegacyRegistryAliases.register(BuiltInRegistries.BLOCK, new ResourceLocation("minecraft:grass_path"),
-                new ResourceLocation("minecraft:dirt_path"));
+        LegacyRegistryAliases.register(BuiltInRegistries.BLOCK, ResourceLocation.parse("minecraft:grass_path"),
+                ResourceLocation.parse("minecraft:dirt_path"));
         MineralogyCompat.registerFormerAliases(BuiltInRegistries.BLOCK);
-        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece_holder"),
+        Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece_holder"),
                 SkysBuildingPieces.HOLDER);
     }
 
     private static void items() {
         Pieces.registerItems(BuiltInRegistries.ITEM);
-        LegacyRegistryAliases.register(BuiltInRegistries.ITEM, new ResourceLocation("minecraft:grass_path"),
-                new ResourceLocation("minecraft:dirt_path"));
+        LegacyRegistryAliases.register(BuiltInRegistries.ITEM, ResourceLocation.parse("minecraft:grass_path"),
+                ResourceLocation.parse("minecraft:dirt_path"));
         MineralogyCompat.registerFormerAliases(BuiltInRegistries.ITEM);
 
         BlockItem holder = new BlockItem(SkysBuildingPieces.HOLDER, new Item.Properties());
 
-        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece_holder"), holder);
+        Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece_holder"), holder);
     }
 
 }

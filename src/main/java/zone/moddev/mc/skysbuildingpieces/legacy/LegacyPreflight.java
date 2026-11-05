@@ -210,7 +210,7 @@ final class LegacyPreflight {
                 }
                 if (skyOwned(registryId) && palette == null && !HistoricalFullBlocks.historical(registryId)
                         && !net.minecraft.core.registries.BuiltInRegistries.ITEM
-                                .containsKey(new net.minecraft.resources.ResourceLocation(registryId))) {
+                                .containsKey(net.minecraft.resources.ResourceLocation.parse(registryId))) {
                     throw blocked(registryId + " item; restore its Sky add-on and dependencies");
                 }
                 if (!net.neoforged.fml.ModList.get().isLoaded("buildingbricks")

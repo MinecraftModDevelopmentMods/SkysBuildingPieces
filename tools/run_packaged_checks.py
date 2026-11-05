@@ -85,15 +85,15 @@ def probe_property(options):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.20.6/1.20.6.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.21.1/1.21.1.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("neoforge-20.6.139",)]
+                for name in ("neoforge-21.1.247",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 20.6.139 profile")
+        raise ValueError("The installed client has no NeoForge 21.1.247 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.20.6" or forge["inheritsFrom"] != "1.20.6":
-        raise ValueError("This launcher requires the verified NeoForge 20.6 client metadata")
+    if base["id"] != "1.21.1" or forge["inheritsFrom"] != "1.21.1":
+        raise ValueError("This launcher requires the verified NeoForge 21.1 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -115,7 +115,22 @@ def client_command(options, directory):
         classpath.append(path)
         if classifier == "natives-windows":
             native_artifacts.append(path)
-    client = runtime / "versions/1.20.6/1.20.6.jar"
+    # NeoForge discovers these installer outputs under library_directory itself.
+    installed_libraries = {
+        "net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar":
+            "A649BD3CE77F122D0F83AE1B37B4B303E662470F928B9BEE5FBC76580805FFD4",
+        "net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-extra.jar":
+            "FD02F80F4EEC9DFAA1714CB62595D013CBAC03D52D19DD0623D1922B999C40B7",
+        "net/neoforged/neoforge/21.1.247/neoforge-21.1.247-client.jar":
+            "8E3563A078289F0F07EE6F87F1C8651294387639C8355983EE207CB753F08B7F",
+        "net/neoforged/neoforge/21.1.247/neoforge-21.1.247-universal.jar":
+            "B55D3551E9B0D9B68FA4C47A2122DEAF4019B549D8DF3C74D9A27B2E43C9718A",
+    }
+    for name, expected in installed_libraries.items():
+        path = runtime / "libraries" / name
+        if digest(path) != expected:
+            raise ValueError("NeoForge installer output checksum changed: " + name)
+    client = runtime / "versions/1.21.1/1.21.1.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -165,10 +180,10 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/neoforged/neoforge/20.6.139" / filename
+    source = libraries / "net/neoforged/neoforge/21.1.247" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    if "cpw.mods.bootstraplauncher.BootstrapLauncher" not in launch or "20.6.139" not in launch:
-        raise ValueError("Expected the official NeoForge 20.6.139 server arguments")
+    if "cpw.mods.bootstraplauncher.BootstrapLauncher" not in launch or "21.1.247" not in launch:
+        raise ValueError("Expected the official NeoForge 21.1.247 server arguments")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":

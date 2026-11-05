@@ -72,7 +72,7 @@ public final class RecipeChecks {
                             assertManager(grid, world, recipe.getResultItem(world.registryAccess()), id.toString());
                             require(input.getCount() == 17, "Restore lookup changed its input");
                             grid.setItem((slot + 1) % (size * size), input.copy());
-                            require(!recipe.matches(grid, world), "Restore recipe accepts an extra block");
+                            require(!recipe.matches(grid.asCraftInput(), world), "Restore recipe accepts an extra block");
                             variants++;
                         }
                     }
@@ -119,13 +119,13 @@ public final class RecipeChecks {
                                     }
                                 }
 
-                                require(recipe.matches(grid, world), "Offset or mirrored recipe: " + id);
+                                require(recipe.matches(grid.asCraftInput(), world), "Offset or mirrored recipe: " + id);
 
                                 ItemStack expected = recipe.getResultItem(world.registryAccess()).copy();
 
                                 assertManager(grid, world, expected, id.toString());
 
-                                for (ItemStack remainder : recipe.getRemainingItems(grid)) {
+                                for (ItemStack remainder : recipe.getRemainingItems(grid.asCraftInput())) {
                                     require(remainder.isEmpty(), "Cutting consumes ingredients without a tool remainder");
                                 }
 
@@ -144,12 +144,12 @@ public final class RecipeChecks {
 
                                 require(input.getCount() == 17, "Recipe lookup changed an input stack");
                                 grid.setItem(first, new ItemStack(Items.APPLE));
-                                require(!recipe.matches(grid, world), "Wrong material accepted: " + id);
+                                require(!recipe.matches(grid.asCraftInput(), world), "Wrong material accepted: " + id);
                                 grid.setItem(first, input);
 
                                 if (empty >= 0) {
                                     grid.setItem(empty, input.copy());
-                                    require(!recipe.matches(grid, world), "Extra material accepted: " + id);
+                                    require(!recipe.matches(grid.asCraftInput(), world), "Extra material accepted: " + id);
                                     grid.setItem(empty, ItemStack.EMPTY);
                                 }
                                 if (recipe instanceof CuttingRecipe) {
@@ -164,7 +164,7 @@ public final class RecipeChecks {
                                     zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(named, tag.copy());
                                     assertManager(grid, world, named, "Rotation keeps the complete custom tag");
 
-                                    ItemStack result = recipe.assemble(grid, world.registryAccess());
+                                    ItemStack result = recipe.assemble(grid.asCraftInput(), world.registryAccess());
 
                                     CompoundTag resultData = NativeProbeItems.custom(result);
                                     resultData.putString("custom_label", "Changed result");
@@ -253,7 +253,7 @@ public final class RecipeChecks {
                 }
             }
 
-            require(ItemStack.matches(decoded.assemble(grid, world.registryAccess()), recipe.assemble(grid, world.registryAccess())),
+            require(ItemStack.matches(decoded.assemble(grid.asCraftInput(), world.registryAccess()), recipe.assemble(grid.asCraftInput(), world.registryAccess())),
                     "Network assembly changed: " + id);
         } finally {
             buffer.release();
@@ -261,7 +261,7 @@ public final class RecipeChecks {
     }
 
     private static void nativeRecipe(ServerLevel world, String path, Item output, int count) {
-        Recipe<?> recipe = world.getRecipeManager().byKey(new ResourceLocation("minecraft", path))
+        Recipe<?> recipe = world.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("minecraft", path))
                 .orElseThrow(() -> new AssertionError("Missing native recipe: " + path)).value();
         CraftingContainer grid = grid(3);
         int width = recipe instanceof ShapedRecipe ? ((ShapedRecipe) recipe).getWidth() : 3;
@@ -302,25 +302,25 @@ public final class RecipeChecks {
             zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(paper, custom.copy());
             assertManager(grid, world, paper, "retired template recycling");
 
-            CraftingRecipe recycling = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world).orElseThrow().value();
+            CraftingRecipe recycling = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world).orElseThrow().value();
 
-            for (ItemStack remainder : recycling.getRemainingItems(grid)) {
+            for (ItemStack remainder : recycling.getRemainingItems(grid.asCraftInput())) {
                 require(remainder.isEmpty(), "Recycling consumes the retired template");
             }
 
             grid.setItem(0, new ItemStack(Items.STONE));
-            require(!recycling.matches(grid, world), "Old templates must not cut new pieces");
+            require(!recycling.matches(grid.asCraftInput(), world), "Old templates must not cut new pieces");
         }
     }
 
     private static void assertManager(CraftingContainer grid, ServerLevel world, ItemStack expected, String label) {
-        ItemStack actual = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.value().assemble(grid, world.registryAccess())).orElse(ItemStack.EMPTY);
+        ItemStack actual = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
+                .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
 
         require(ItemStack.matches(expected, actual), "Crafting manager selects " + label);
 
-        for (RecipeHolder<CraftingRecipe> recipe : world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, grid, world)) {
-            require(ItemStack.matches(expected, recipe.value().assemble(grid, world.registryAccess())),
+        for (RecipeHolder<CraftingRecipe> recipe : world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, grid.asCraftInput(), world)) {
+            require(ItemStack.matches(expected, recipe.value().assemble(grid.asCraftInput(), world.registryAccess())),
                     "Conflicting recipe for " + label + ": " + recipe.id());
         }
     }

@@ -1,4 +1,4 @@
-"""Negative controls for Forge 47 server completion and native settings."""
+"""Check NeoForge server completion, native settings and older registry notices."""
 
 from pathlib import Path
 import shutil
@@ -6,7 +6,7 @@ import gzip
 import tempfile
 import unittest
 
-from native_client_log import audit_server, classify_server
+from native_client_log import audit_server, classify_server, unchanged_native_settings
 from native_registry_notices import audit_biome_proof, validate_registry_proofs
 
 
@@ -28,6 +28,21 @@ class NativeServerLogTest(unittest.TestCase):
     def test_config_change_is_rejected(self):
         with self.assertRaises(ValueError):
             classify_server(LOG, DETAILS, False)
+
+    def test_omitted_empty_dependency_overrides_do_not_hide_real_overrides(self):
+        root = Path(__file__).resolve().parent.parent
+        defaults = root / "src/bootstrapTest/defaultconfigs/config/fml.toml"
+        without_table = defaults.read_text(encoding="utf-8").replace("dependencyOverrides = {}", "")
+        with tempfile.TemporaryDirectory() as work:
+            directory = Path(work)
+            config = directory / "config"
+            config.mkdir()
+            actual = config / "fml.toml"
+            actual.write_text(without_table, encoding="utf-8")
+            self.assertTrue(unchanged_native_settings(directory, ("fml.toml",)))
+            actual.write_text(without_table + '\ndependencyOverrides.skysbuildingpieces = ["-skysgrassslabs"]\n',
+                              encoding="utf-8")
+            self.assertFalse(unchanged_native_settings(directory, ("fml.toml",)))
 
     def test_late_notice_is_rejected(self):
         with self.assertRaises(ValueError):

@@ -34,7 +34,7 @@ public final class LegacyPolicyMod {
         if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.BLOCK)) {
             for (int index = 0; index < NAMES.length; index++) {
                 BLOCKS[index] = new LegacyBlock();
-                net.minecraft.core.Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation("buildingbricks", NAMES[index]), BLOCKS[index]);
+                net.minecraft.core.Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath("buildingbricks", NAMES[index]), BLOCKS[index]);
             }
         } else if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.ITEM)) {
             for (Block block : BLOCKS) {
@@ -44,7 +44,7 @@ public final class LegacyPolicyMod {
         } else if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE)) {
             materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
             net.minecraft.core.Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                    new ResourceLocation("buildingbricks", "material"), materialType);
+                    ResourceLocation.fromNamespaceAndPath("buildingbricks", "material"), materialType);
         }
     }
 

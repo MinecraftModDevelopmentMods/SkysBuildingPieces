@@ -251,11 +251,11 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.20.6' || project.neo_version != '20.6.139' ||
+        if (project.minecraft_version != '1.21.1' || project.neo_version != '21.1.247' ||
                 project.loader_name != 'neoforge' || project.loader_code != '2' ||
                 project.java_version != '21' || project.java_toolchain_version != '21.0.7+6' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 1.20.6 release metadata')
+            throw new GradleException('Unexpected 1.21.1 release metadata')
         }
     }
 }

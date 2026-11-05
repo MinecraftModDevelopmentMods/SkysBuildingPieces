@@ -187,7 +187,7 @@ public final class ClientProbe extends ProbeProxy {
             for (String name : new String[] { "stone_formations", "jelled_poison", "legacy_bop_stone_formations",
                     "legacy_bop_jelled_poison", "legacy_bop_tree_moss" }) {
                 net.minecraft.world.level.block.Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                        .get(new net.minecraft.resources.ResourceLocation("skysbuildingpiecesbop:" + name));
+                        .get(net.minecraft.resources.ResourceLocation.parse("skysbuildingpiecesbop:" + name));
 
                 if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
                     continue;
@@ -214,7 +214,7 @@ public final class ClientProbe extends ProbeProxy {
                     "skysbuildingpiecesbop:retired_rocks", "skysbuildingpiecesbop:legacy_bop_stone",
                     "skysbuildingpiecesbop:legacy_bop_crag_rock" }) {
                 net.minecraft.world.level.block.Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                        .get(new net.minecraft.resources.ResourceLocation(name));
+                        .get(net.minecraft.resources.ResourceLocation.parse(name));
 
                 if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
                     continue;

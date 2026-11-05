@@ -61,7 +61,7 @@ public final class RecipeBookDiscovery {
             }
 
             AdvancementHolder advancement = player.getServer().getAdvancements()
-                    .get(new ResourceLocation(owner, "recipes/" + id.getPath()));
+                    .get(ResourceLocation.fromNamespaceAndPath(owner, "recipes/" + id.getPath()));
 
             if (advancement == null) {
                 continue;

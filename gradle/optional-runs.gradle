@@ -8,7 +8,7 @@ def rocks = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { rocks.load(it) }
 
 def grassJar = providers.gradleProperty('grassSlabsMainJar').orElse(
-        "../../SkysGrassSlabs1206NEO/SkysGrassSlabs/build/libs/SkysGrassSlabs-${grass.version}.jar")
+        "../../SkysGrassSlabs1211NEO/SkysGrassSlabs/build/libs/SkysGrassSlabs-${grass.version}.jar")
 def oreJar = providers.gradleProperty('oreSpawnMainJar').orElse(rocks.getProperty('orespawn.path'))
 def rockJar = providers.gradleProperty('mineralogyMainJar').orElse(rocks.getProperty('mineralogy.path'))
 

@@ -38,11 +38,11 @@ public final class PathChecks {
             if (!event.getRegistryKey().equals(net.minecraft.core.registries.Registries.ITEM)) return;
             compatibleShovel = new Item(new Item.Properties().durability(50)) {
                 @Override
-                public boolean canPerformAction(ItemStack stack, net.neoforged.neoforge.common.ToolAction action) {
-                    return action == net.neoforged.neoforge.common.ToolActions.SHOVEL_FLATTEN;
+                public boolean canPerformAction(ItemStack stack, net.neoforged.neoforge.common.ItemAbility action) {
+                    return action == net.neoforged.neoforge.common.ItemAbilities.SHOVEL_FLATTEN;
                 }
             };
-            net.minecraft.core.Registry.register(net.minecraft.core.registries.BuiltInRegistries.ITEM, new ResourceLocation(namespace, "flattening_tool"), compatibleShovel);
+            net.minecraft.core.Registry.register(net.minecraft.core.registries.BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, "flattening_tool"), compatibleShovel);
         });
     }
 
@@ -131,7 +131,9 @@ public final class PathChecks {
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
-                    silkTool.enchant(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, 1);
+                    silkTool.enchant(world.registryAccess()
+                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
                     require(ItemStack.matches(
                             Block.getDrops(expected, world, position, null, player, silkTool).get(0),
                             Pieces.stack(Pieces.state("minecraft:dirt", shape, orientation), 1)),
@@ -333,17 +335,17 @@ public final class PathChecks {
 
     private static int slabs(ServerLevel world, ServerPlayer player, BlockPos position) {
         if (!net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                .containsKey(new ResourceLocation("skysgrassslabs", "grass_slab"))) {
+                .containsKey(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", "grass_slab"))) {
             return 0;
         }
 
         Block path = net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                .get(new ResourceLocation("skysgrassslabs", "path_slab"));
+                .get(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", "path_slab"));
         int checks = 0;
 
         for (String name : new String[] { "dirt_slab", "grass_slab" }) {
             Block slab = net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                    .get(new ResourceLocation("skysgrassslabs", name));
+                    .get(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", name));
 
             for (net.minecraft.world.level.block.state.properties.SlabType half : new net.minecraft.world.level.block.state.properties.SlabType[] {
                     net.minecraft.world.level.block.state.properties.SlabType.BOTTOM, net.minecraft.world.level.block.state.properties.SlabType.TOP }) {

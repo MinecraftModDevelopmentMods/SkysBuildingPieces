@@ -25,7 +25,7 @@ class RecipeUnlockPredicateTest {
         MinecraftTestBootstrap.registerVanilla();
         ItemStack stone = vanillaStack(Items.STONE);
         ItemStack stick = vanillaStack(Items.STICK);
-        Path directory = Path.of("src/main/resources/data/skysbuildingpieces/advancements/recipes");
+        Path directory = Path.of("src/main/resources/data/skysbuildingpieces/advancement/recipes");
         var ops = RegistryOps.create(JsonOps.INSTANCE,
                 RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY));
         int checked = 0;

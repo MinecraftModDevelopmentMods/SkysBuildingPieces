@@ -88,7 +88,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (methods !== 1 || replacements !== 1) {
-                    throw new Error("Sky's Building Pieces could not prepare the NeoForge 20.6 biome palette width");
+                    throw new Error("Sky's Building Pieces could not prepare the NeoForge 21.1 biome palette width");
                 }
                 return classNode;
             }
@@ -120,7 +120,7 @@ function initializeCoreMod() {
                                 instruction.name === callback) ++existingCalls;
                     }
                     if (existingCalls > 1) {
-                        throw new Error("Sky's Building Pieces found duplicate NeoForge 20.6 level hooks");
+                        throw new Error("Sky's Building Pieces found duplicate NeoForge 21.1 level hooks");
                     }
                     if (existingCalls === 1) continue;
                     var prefix = new InsnList();
@@ -132,7 +132,7 @@ function initializeCoreMod() {
                     method.instructions.insert(prefix);
                 }
                 if (readMethods !== 1 || writeMethods !== 1) {
-                    throw new Error("Sky's Building Pieces could not find the exact NeoForge 20.6 level methods");
+                    throw new Error("Sky's Building Pieces could not find the exact NeoForge 21.1 level methods");
                 }
                 return classNode;
             }
@@ -166,7 +166,7 @@ function initializeCoreMod() {
                         var sizeInstruction = previousOpcode(instruction);
                         var current = integerValue(sizeInstruction);
                         if (target < 0 || (current !== vanilla && current !== target)) {
-                            throw new Error("Sky's Building Pieces found an unexpected NeoForge 20.6 " +
+                            throw new Error("Sky's Building Pieces found an unexpected NeoForge 21.1 " +
                                     "BlockStateData array layout");
                         }
                         if (current === vanilla || !(sizeInstruction instanceof LdcInsnNode)) {
@@ -176,7 +176,7 @@ function initializeCoreMod() {
                     }
                 }
                 if (!registerExposed || arraysSeen !== 2) {
-                    throw new Error("Sky's Building Pieces could not prepare NeoForge 20.6 BlockStateData");
+                    throw new Error("Sky's Building Pieces could not prepare NeoForge 21.1 BlockStateData");
                 }
                 return classNode;
             }
@@ -213,7 +213,7 @@ function initializeCoreMod() {
                     method.maxStack = Math.max(method.maxStack, 4);
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one NeoForge 20.6 hardness method, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one NeoForge 21.1 hardness method, found " + matches);
                 }
                 return type;
             }
@@ -250,11 +250,11 @@ function initializeCoreMod() {
                         }
                     }
                     if (returns === 0) {
-                        throw new Error("Sky's Building Pieces found no NeoForge 20.6 chunk return");
+                        throw new Error("Sky's Building Pieces found no NeoForge 21.1 chunk return");
                     }
                     if (preparations !== 0 || finalizations !== 0) {
                         if (preparations !== 1 || finalizations !== returns) {
-                            throw new Error("Sky's Building Pieces found a partial NeoForge 20.6 chunk patch");
+                            throw new Error("Sky's Building Pieces found a partial NeoForge 21.1 chunk patch");
                         }
                         patched = true;
                         continue;
@@ -285,7 +285,7 @@ function initializeCoreMod() {
                     patched = true;
                 }
                 if (!patched || matches !== 1) {
-                    throw new Error("Sky's Building Pieces could not patch NeoForge 20.6 ChunkStorage");
+                    throw new Error("Sky's Building Pieces could not patch NeoForge 21.1 ChunkStorage");
                 }
                 return classNode;
             }
@@ -324,12 +324,12 @@ function initializeCoreMod() {
                             }
                         }
                         if (returns === 0) {
-                            throw new Error("Sky's Building Pieces: NeoForge 20.6 NBT updater has no return");
+                            throw new Error("Sky's Building Pieces: NeoForge 21.1 NBT updater has no return");
                         }
                     }
                 }
                 if (matches !== 1) {
-                    throw new Error("Sky's Building Pieces: expected one NeoForge 20.6 NBT updater, found " + matches);
+                    throw new Error("Sky's Building Pieces: expected one NeoForge 21.1 NBT updater, found " + matches);
                 }
                 return type;
             }

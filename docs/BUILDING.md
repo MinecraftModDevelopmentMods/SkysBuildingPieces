@@ -1,6 +1,6 @@
 # Building and running the mod
 
-This branch uses Minecraft 1.20.6, NeoForge 20.6.139 and Temurin Java 21.0.7+6.
+This branch uses Minecraft 1.21.1, NeoForge 21.1.247 and Temurin Java 21.0.7+6.
 Use the Gradle 9.2.1 wrapper included in the checkout.
 
 ```text

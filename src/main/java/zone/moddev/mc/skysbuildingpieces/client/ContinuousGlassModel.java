@@ -17,7 +17,6 @@ import net.minecraft.core.Direction;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 
@@ -89,30 +88,17 @@ public final class ContinuousGlassModel implements BakedModel {
         List<BakedQuad> result = new ArrayList<BakedQuad>(quads.size());
 
         for (BakedQuad quad : quads) {
-            // 1.15 quads use the block vertex format; they no longer carry a format of their own.
+            // Baked block quads use the shared vertex layout.
             VertexFormat format = DefaultVertexFormat.BLOCK;
-            int position = -1;
-            int texture = -1;
-
-            for (int elementIndex = 0; elementIndex < format.getElements().size(); elementIndex++) {
-                VertexFormatElement element = format.getElements().get(elementIndex);
-
-                if (element.getUsage() == VertexFormatElement.Usage.POSITION
-                        && element.getType() == VertexFormatElement.Type.FLOAT) {
-                    position = format.getOffset(elementIndex) / 4;
-                }
-                if (element.getUsage() == VertexFormatElement.Usage.UV
-                        && element.getType() == VertexFormatElement.Type.FLOAT && element.getIndex() == 0) {
-                    texture = format.getOffset(elementIndex) / 4;
-                }
-            }
-            if (position < 0 || texture < 0) {
+            int positionOffset = format.getOffset(VertexFormatElement.POSITION);
+            int textureOffset = format.getOffset(VertexFormatElement.UV0);
+            if (positionOffset < 0 || textureOffset < 0) {
                 result.add(quad);
                 continue;
             }
 
-            int[] data = GlassWallTexture.trim(quad.getVertices(), format.getIntegerSize(), position,
-                    texture, joins);
+            int[] data = GlassWallTexture.trim(quad.getVertices(), format.getVertexSize() / Integer.BYTES,
+                    positionOffset / Integer.BYTES, textureOffset / Integer.BYTES, joins);
 
             result.add(data == quad.getVertices() ? quad
                     : new BakedQuad(data, quad.getTintIndex(), quad.getDirection(), quad.getSprite(),
@@ -207,13 +193,11 @@ public final class ContinuousGlassModel implements BakedModel {
         }
     }
 
-    static void install(Map<ResourceLocation, BakedModel> registry, BakedModel missing, Set<String> walls) {
+    static void install(Map<ModelResourceLocation, BakedModel> registry, BakedModel missing, Set<String> walls) {
         IdentityHashMap<BakedModel, ContinuousGlassModel> wrapped = new IdentityHashMap<BakedModel, ContinuousGlassModel>();
 
-        for (ResourceLocation key : new ArrayList<>(registry.keySet())) {
-            if (!(key instanceof ModelResourceLocation)
-                    || ((ModelResourceLocation) key).getVariant().equals("inventory")
-                    || !walls.contains(key.getNamespace() + ":" + key.getPath())) {
+        for (ModelResourceLocation key : new ArrayList<>(registry.keySet())) {
+            if (key.variant().equals("inventory") || !walls.contains(key.id().toString())) {
                 continue;
             }
 

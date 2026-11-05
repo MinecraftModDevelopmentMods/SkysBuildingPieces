@@ -53,7 +53,7 @@ public final class LegacyFixture {
                 }
 
                 Block legacyBlock = net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                        .get(new net.minecraft.resources.ResourceLocation("buildingbricks:" + legacyId));
+                        .get(net.minecraft.resources.ResourceLocation.parse("buildingbricks:" + legacyId));
 
                 require(legacyBlock != null, "real legacy block " + legacyId);
                 world.setBlock(pos(entryIndex), legacyBlock.defaultBlockState().setValue(

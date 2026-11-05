@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluids;
@@ -50,7 +51,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.neoforged.neoforge.common.IPlantable;
+import net.neoforged.neoforge.common.util.TriState;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -309,16 +310,16 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos position, Direction face,
-            IPlantable plant) {
+    public TriState canSustainPlant(BlockState state, BlockGetter world, BlockPos position, Direction face,
+            BlockState plant) {
         if (face != Direction.UP || !completeTop(state) || !definition(state).soil()
                 || state.getValue(SlabBlock.WATERLOGGED)) {
-            return false;
+            return TriState.FALSE;
         }
 
         BlockState full = Pieces.nativeState(definition(state), "full");
 
-        return full.getBlock().canSustainPlant(full, world, position, face, plant);
+        return full.canSustainPlant(world, position, face, plant);
     }
 
     private boolean completeTop(BlockState state) {
@@ -551,7 +552,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         ItemStack tool = context.getOptionalParameter(LootContextParams.TOOL);
 
         if (!palette.group.equals("path") && tool != null
-                && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+                && EnchantmentHelper.getItemEnchantmentLevel(context.getLevel().registryAccess()
+                        .registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), tool) > 0) {
             return Collections.singletonList(getSilkTouchDrop(state));
         }
 

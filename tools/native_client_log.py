@@ -49,10 +49,19 @@ def classify(log, unchanged_defaults):
 
 def unchanged_native_settings(directory, names):
     defaults = Path(__file__).resolve().parent.parent / "src/bootstrapTest/defaultconfigs/config"
-    return all((directory / "config" / name).is_file()
-               and tomllib.loads((defaults / name).read_text(encoding="utf-8"))
-               == tomllib.loads((directory / "config" / name).read_text(encoding="utf-8"))
-               for name in names)
+    for name in names:
+        path = directory / "config" / name
+        if not path.is_file():
+            return False
+        expected = tomllib.loads((defaults / name).read_text(encoding="utf-8"))
+        actual = tomllib.loads(path.read_text(encoding="utf-8"))
+        if name == "fml.toml":
+            # Fresh 21.1 installs write an empty table. Older copies can omit it.
+            expected.setdefault("dependencyOverrides", {})
+            actual.setdefault("dependencyOverrides", {})
+        if actual != expected:
+            return False
+    return True
 
 
 def audit(directory, phase, control=False):

@@ -31,7 +31,7 @@ public final class PiecesTab {
                     .icon(() -> new ItemStack(Blocks.BRICK_STAIRS))
                     .displayItems((parameters, output) -> entries().values().forEach(output::accept))
                     .build();
-            registry.register(new ResourceLocation(SkysBuildingPieces.ID, "pieces"), INSTANCE);
+            registry.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
         });
     }
 

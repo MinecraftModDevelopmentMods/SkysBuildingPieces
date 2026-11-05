@@ -17,7 +17,7 @@ west; corners use those directions for NW, NE, SE and SW respectively.
 
 Sky's Terrain Smoother uses this lookup without depending on palette internals.
 Building Pieces never generates terrain itself. It optionally joins Grass
-Slabs' grass-form integration, using 1.2.0.120062 or later on Minecraft 1.20.6.
+Slabs' grass-form integration, using 1.2.0.121012 or later on Minecraft 1.21.1.
 It works without either Grass Slabs or Terrain Smoother installed.
 
 Mineralogy is supported directly. Its presence adds 35 fixed rock-piece
@@ -25,7 +25,7 @@ palettes during construction; no add-on or compile-time Mineralogy
 dependency is required. The original rocks, textures and slabs remain owned
 by Mineralogy. Disabled native slabs are not used in recipes or smoothing.
 
-On NeoForge 20.6, call `registerBlocks(namespace, registry)` and
+On NeoForge 21.1, call `registerBlocks(namespace, registry)` and
 `registerItems(namespace, registry)` from the contributor's own mod-bus `RegisterEvent`
 listener. Pass `BuiltInRegistries.BLOCK` during `Registries.BLOCK` and
 `BuiltInRegistries.ITEM` during `Registries.ITEM`. Catalogue registration must finish before any block registry event;

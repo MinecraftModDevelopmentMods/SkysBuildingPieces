@@ -579,7 +579,7 @@ public final class LegacyBridge {
         }
         if (LegacyPreflight.skyOwned(registry) && !HistoricalFullBlocks.historical(registry)
                 && !net.minecraft.core.registries.BuiltInRegistries.ITEM
-                        .containsKey(new net.minecraft.resources.ResourceLocation(registry))) {
+                        .containsKey(net.minecraft.resources.ResourceLocation.parse(registry))) {
             throw new RecoveryAbort("Cannot recover " + registry + ". Restore its Sky add-on before loading.", null);
         }
 
@@ -587,7 +587,7 @@ public final class LegacyBridge {
         // convert or count them again.
         if (HistoricalFullBlocks.historical(registry) && !stack.contains("Damage", 99)
                 && !HistoricalFullBlocks.recoveryHolder(registry) && net.minecraft.core.registries.BuiltInRegistries.ITEM
-                        .containsKey(new net.minecraft.resources.ResourceLocation(registry))) {
+                        .containsKey(net.minecraft.resources.ResourceLocation.parse(registry))) {
             return;
         }
 

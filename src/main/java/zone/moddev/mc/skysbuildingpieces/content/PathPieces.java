@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -76,7 +76,7 @@ public final class PathPieces {
             return null;
         }
 
-        if (!shovel.canPerformAction(ToolActions.SHOVEL_FLATTEN) || !world.isEmptyBlock(position.above())
+        if (!shovel.canPerformAction(ItemAbilities.SHOVEL_FLATTEN) || !world.isEmptyBlock(position.above())
                 || !player.mayUseItemAt(position, face, shovel)) {
             return null;
         }

@@ -58,7 +58,7 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            Registry.register(registry, new ResourceLocation(palette.registryId()), block);
+            Registry.register(registry, ResourceLocation.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
         }
     }
@@ -70,7 +70,7 @@ public final class Pieces {
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
             Item item = new Item(new Item.Properties().stacksTo(1));
             RETIRED_TEMPLATES.put(name, item);
-            Registry.register(registry, new ResourceLocation(SkysBuildingPieces.ID, "template_" + name), item);
+            Registry.register(registry, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name), item);
         }
     }
 
@@ -84,7 +84,7 @@ public final class Pieces {
             // entries use the flat items below.
             BlockItem carrier = new BlockItem(block, new Item.Properties());
 
-            Registry.register(registry, new ResourceLocation(block.palette.registryId()), carrier);
+            Registry.register(registry, ResourceLocation.parse(block.palette.registryId()), carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -95,7 +95,7 @@ public final class Pieces {
 
                 PieceItem item = new PieceItem(block, material);
 
-                Registry.register(registry, new ResourceLocation(identifier), item);
+                Registry.register(registry, ResourceLocation.parse(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -131,7 +131,7 @@ public final class Pieces {
     private static BlockState nativeState(JsonElement value) {
         JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
         String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
-        Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(identifier));
+        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(identifier));
 
         if (block == null || block == Blocks.AIR) {
             if (definition != null && definition.has("fallback")) {

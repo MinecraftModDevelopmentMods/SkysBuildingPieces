@@ -15,11 +15,11 @@ class LegacyRegistryAliasesTest {
     @Test
     void repeatsTheSameRenameWithoutReplacingAnotherEntry() {
         MinecraftTestBootstrap.registerVanilla();
-        var key = ResourceKey.<String>createRegistryKey(new ResourceLocation("test", "pieces"));
+        var key = ResourceKey.<String>createRegistryKey(ResourceLocation.fromNamespaceAndPath("test", "pieces"));
         var registry = new MappedRegistry<>(key, Lifecycle.stable());
-        var former = new ResourceLocation("test", "former");
-        var replacement = new ResourceLocation("test", "replacement");
-        var other = new ResourceLocation("test", "other");
+        var former = ResourceLocation.fromNamespaceAndPath("test", "former");
+        var replacement = ResourceLocation.fromNamespaceAndPath("test", "replacement");
+        var other = ResourceLocation.fromNamespaceAndPath("test", "other");
         Registry.register(registry, replacement, "replacement");
         Registry.register(registry, other, "other");
 

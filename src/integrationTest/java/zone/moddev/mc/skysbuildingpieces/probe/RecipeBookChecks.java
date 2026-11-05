@@ -151,7 +151,7 @@ public final class RecipeBookChecks {
             verified.add(holder);
 
             AdvancementHolder advancement = world.getServer().getAdvancements()
-                    .get(new ResourceLocation(owner(id), "recipes/" + id.getPath()));
+                    .get(ResourceLocation.fromNamespaceAndPath(owner(id), "recipes/" + id.getPath()));
 
             require(advancement != null, "Missing recipe advancement: " + id);
             require(!recipe.getResultItem(world.registryAccess()).isEmpty(), "Missing book result: " + id);
@@ -271,7 +271,7 @@ public final class RecipeBookChecks {
             Recipe<?> recipe = holder.value();
 
             require(world.getServer().getAdvancements()
-                    .get(new ResourceLocation(owner(id), "recipes/" + id.getPath())) != null,
+                    .get(ResourceLocation.fromNamespaceAndPath(owner(id), "recipes/" + id.getPath())) != null,
                     "Advancement reload lost " + id);
         }
 
