@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysgrassslabs:dirt_slab"
+      "type": "neoforge:registered",
+      "value": "skysgrassslabs:dirt_slab"
     }
   ]
 }

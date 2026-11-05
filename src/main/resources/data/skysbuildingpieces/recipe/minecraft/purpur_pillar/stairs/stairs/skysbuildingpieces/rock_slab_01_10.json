@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:purpur_pillar_slab"
-    }
+    "X": "skysbuildingpieces:purpur_pillar_slab"
   },
   "result": {
     "id": "skysbuildingpieces:purpur_pillar_stairs",
@@ -13,12 +15,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:purpur_pillar_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:purpur_pillar_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:purpur_pillar_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:purpur_pillar_stairs"
     }
   ]
 }

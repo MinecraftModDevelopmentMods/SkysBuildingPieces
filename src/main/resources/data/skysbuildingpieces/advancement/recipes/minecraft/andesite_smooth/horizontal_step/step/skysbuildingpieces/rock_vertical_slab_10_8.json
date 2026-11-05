@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:andesite_smooth_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:andesite_smooth_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:andesite_smooth_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:andesite_smooth_vertical_slab"
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "type": "skysbuildingpieces:cutting",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_amphibolite_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_amphibolite_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step",
@@ -18,12 +18,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_amphibolite_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_amphibolite_vertical_step"
     }
   ]
 }

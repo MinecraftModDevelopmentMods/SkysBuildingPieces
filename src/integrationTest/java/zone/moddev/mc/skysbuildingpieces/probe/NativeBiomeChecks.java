@@ -51,7 +51,7 @@ public final class NativeBiomeChecks {
         boolean expandedHeight = data.get("format").getAsString().equals("zlib-u8-quart-volume-v2");
         int minimumQuartY = expandedHeight ? data.get("min_quart_y").getAsInt() : 0;
         int expectedCells = expandedHeight ? data.get("quart_height").getAsInt() * 16 : 1024;
-        var registry = world.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME);
+        var registry = world.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME);
         long cells = 0;
         long renamed = 0;
         for (JsonElement entry : data.getAsJsonArray("chunks")) {

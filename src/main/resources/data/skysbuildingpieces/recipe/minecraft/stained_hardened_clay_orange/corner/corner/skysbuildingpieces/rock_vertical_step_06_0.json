@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_orange_vertical_step"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_orange_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_orange_corner",
@@ -13,12 +13,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_orange_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_hardened_clay_orange_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_orange_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_hardened_clay_orange_vertical_step"
     }
   ]
 }

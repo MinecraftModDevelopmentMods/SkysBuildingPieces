@@ -14,7 +14,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.chunk.storage.SimpleRegionStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import zone.moddev.mc.skysbuildingpieces.MinecraftTestBootstrap;
@@ -74,7 +74,7 @@ class HistoricalBiomeSchemaTest {
                 MessageDigest.getInstance("SHA-256").digest(original));
         assertEquals("1140725D866D437EDEF10E36C898EE8EAAC67D1F4A928F56EE0B0DA8802F1BC4", hash);
         CompoundTag source = NbtIo.readCompressed(fixture, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
-        byte[] columns = source.getCompound("Level").getByteArray("Biomes");
+        byte[] columns = source.getCompoundOrEmpty("Level").getByteArray("Biomes").orElseGet(() -> new byte[0]);
         if (mixed) {
             // Alternate real mod-biome columns with vanilla IDs whose names changed.
             for (int row = 0; row < 16; row++) {
@@ -84,15 +84,14 @@ class HistoricalBiomeSchemaTest {
                     }
                 }
             }
-            source.getCompound("Level").putByteArray("Biomes", columns);
+            source.getCompoundOrEmpty("Level").putByteArray("Biomes", columns);
         }
         Field active = HistoricalBiomes.class.getDeclaredField("active");
         active.setAccessible(true);
         Object previous = active.get(null);
-        try (ChunkStorage storage = new ChunkStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
-                temporary, DataFixers.getDataFixer(), false)) {
-            CompoundTag control = storage.upgradeChunkTag(Level.OVERWORLD, () -> null,
-                    source.copy(), Optional.empty());
+        try (SimpleRegionStorage storage = new SimpleRegionStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
+                temporary, DataFixers.getDataFixer(), false, net.minecraft.util.datafix.DataFixTypes.CHUNK)) {
+            CompoundTag control = storage.upgradeChunkTag(source.copy(), 0, MinecraftTestBootstrap.overworldUpgradeContext());
             // This build-only alias stands in for an add-on's registered replacement.
             // The fixture remains untouched and no production BOP mapping is added.
             active.set(null, new HistoricalBiomes.Mappings(
@@ -101,18 +100,17 @@ class HistoricalBiomeSchemaTest {
                     name -> 901));
             CompoundTag prepared = source.copy();
             assertTrue(HistoricalBiomes.prepare(prepared));
-            CompoundTag fixed = storage.upgradeChunkTag(Level.OVERWORLD, () -> null,
-                    prepared, Optional.empty());
+            CompoundTag fixed = storage.upgradeChunkTag(prepared, 0, MinecraftTestBootstrap.overworldUpgradeContext());
             assertFalse(fixed.contains("Level"), "The native upgrader must reach the 1.18 chunk format");
             HistoricalBiomes.finish(fixed);
             assertFalse(fixed.contains("skysbuildingpieces_biomes"), "Pending recovery must be completed");
             assertFalse(fixed.contains("skysbuildingpieces_biome_names"));
-            ListTag sections = fixed.getList("sections", 10);
-            ListTag nativeSections = control.getList("sections", 10);
+            ListTag sections = fixed.getListOrEmpty("sections");
+            ListTag nativeSections = control.getListOrEmpty("sections");
             assertTrue(sections.size() >= 16);
             for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-                CompoundTag actual = sections.getCompound(sectionIndex).getCompound("biomes");
-                CompoundTag baseline = nativeSections.getCompound(sectionIndex).getCompound("biomes");
+                CompoundTag actual = sections.getCompoundOrEmpty(sectionIndex).getCompoundOrEmpty("biomes");
+                CompoundTag baseline = nativeSections.getCompoundOrEmpty(sectionIndex).getCompoundOrEmpty("biomes");
                 for (int cell = 0; cell < 64; cell++) {
                     int column = (cell & 3) * 4 + 2;
                     int row = (cell >> 2 & 3) * 4 + 2;
@@ -131,15 +129,15 @@ class HistoricalBiomeSchemaTest {
     }
 
     private static String biome(CompoundTag container, int cell) {
-        ListTag palette = container.getList("palette", 8);
+        ListTag palette = container.getListOrEmpty("palette");
         assertFalse(palette.isEmpty());
         if (palette.size() == 1) {
-            return palette.getString(0);
+            return palette.getStringOr(0, "");
         }
         int bits = 32 - Integer.numberOfLeadingZeros(palette.size() - 1);
         int perLong = 64 / bits;
-        long[] data = container.getLongArray("data");
+        long[] data = container.getLongArray("data").orElseGet(() -> new long[0]);
         int index = (int) (data[cell / perLong] >>> (cell % perLong * bits) & ((1L << bits) - 1));
-        return palette.getString(index);
+        return palette.getStringOr(index, "");
     }
 }

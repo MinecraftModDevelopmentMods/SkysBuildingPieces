@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:end_bricks_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:end_bricks_vertical_step"
     }
   ]
 }

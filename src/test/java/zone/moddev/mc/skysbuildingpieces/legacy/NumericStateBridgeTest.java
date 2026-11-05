@@ -100,8 +100,8 @@ class NumericStateBridgeTest {
     @Test
     void restoredStagingTargetsUseRegisteredRecoveryBeforeBlockDeserialization() {
         HistoricalItems.register("staging_target_test",
-                root -> root.getCompound("BlockState").getString("Name").equals("missing:retired_native_log"),
-                root -> root.getCompound("BlockState").putString("Name", "minecraft:birch_log"));
+                root -> root.getCompoundOrEmpty("BlockState").getStringOr("Name", "").equals("missing:retired_native_log"),
+                root -> root.getCompoundOrEmpty("BlockState").putString("Name", "minecraft:birch_log"));
 
         CompoundTag state = new CompoundTag();
         CompoundTag properties = new CompoundTag();
@@ -119,12 +119,12 @@ class NumericStateBridgeTest {
 
         NumericStateBridge.begin(new LinkedHashMap<>(), saved);
 
-        CompoundTag restored = NumericStateBridge.saveStaging().getCompound(0);
+        CompoundTag restored = NumericStateBridge.saveStaging().getCompoundOrEmpty(0);
         CompoundTag expected = state.copy();
 
         expected.putString("Name", "minecraft:birch_log");
-        assertEquals(2000 << 4 | 7, restored.getInt("encoded"));
-        assertEquals(expected, restored.getCompound("state"));
+        assertEquals(2000 << 4 | 7, restored.getIntOr("encoded", 0));
+        assertEquals(expected, restored.getCompoundOrEmpty("state"));
         assertEquals(before, saved);
     }
 
@@ -144,8 +144,8 @@ class NumericStateBridgeTest {
         assertEquals(original, saved, "Reading a sidecar must not mutate the supplied NBT");
         assertEquals(Blocks.DIRT_PATH.defaultBlockState(), NumericStateBridge.stagedState(11198));
         ListTag current = NumericStateBridge.saveStaging();
-        assertEquals(11198, current.getCompound(0).getInt("encoded"));
-        assertEquals("minecraft:dirt_path", current.getCompound(0).getCompound("state").getString("Name"));
+        assertEquals(11198, current.getCompoundOrEmpty(0).getIntOr("encoded", 0));
+        assertEquals("minecraft:dirt_path", current.getCompoundOrEmpty(0).getCompoundOrEmpty("state").getStringOr("Name", ""));
         NumericStateBridge.begin(new LinkedHashMap<>(), current);
         assertEquals(current, NumericStateBridge.saveStaging(), "A reload must not repeat recovery");
         assertEquals(11198, NumericStateBridge.encode(Blocks.DIRT_PATH.defaultBlockState()));

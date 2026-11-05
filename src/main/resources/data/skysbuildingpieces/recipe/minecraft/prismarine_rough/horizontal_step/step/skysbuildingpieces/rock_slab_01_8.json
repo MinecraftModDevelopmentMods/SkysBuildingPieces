@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X ", " X"],
+  "pattern": [
+    "X ",
+    " X"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:prismarine_slab"
-    }
+    "X": "minecraft:prismarine_slab"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_rough_horizontal_step",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:prismarine_rough_horizontal_step"
     }
   ]
 }

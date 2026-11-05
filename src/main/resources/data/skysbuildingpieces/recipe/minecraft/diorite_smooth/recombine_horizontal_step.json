@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/diorite_smooth",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:diorite_smooth_horizontal_step"
-    }
+    "X": "skysbuildingpieces:diorite_smooth_horizontal_step"
   },
   "result": {
     "id": "minecraft:polished_diorite_slab",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diorite_smooth_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:diorite_smooth_horizontal_step"
     }
   ]
 }

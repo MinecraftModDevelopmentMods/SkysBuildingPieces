@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:sandstone_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:sandstone_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:sandstone_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:sandstone_vertical_step"
     }
   ]
 }

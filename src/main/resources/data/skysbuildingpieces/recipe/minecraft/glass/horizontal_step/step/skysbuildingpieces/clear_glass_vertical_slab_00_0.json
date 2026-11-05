@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X ", " X"],
+  "pattern": [
+    "X ",
+    " X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:glass_vertical_slab"
-    }
+    "X": "skysbuildingpieces:glass_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:glass_step",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_vertical_slab"
     }
   ]
 }

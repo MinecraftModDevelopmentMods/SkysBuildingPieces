@@ -1,11 +1,11 @@
 {
   "type": "skysbuildingpieces:cutting",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stone_slab_vertical_slab"
-    }
+    "X": "skysbuildingpieces:stone_slab_vertical_slab"
   },
   "result": {
     "id": "minecraft:smooth_stone_slab",
@@ -14,8 +14,8 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stone_slab_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stone_slab_vertical_slab"
     }
   ]
 }

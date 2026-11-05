@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:granite_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:granite_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:granite_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:granite_vertical_step"
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/snow",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:snow_slab"
-    }
+    "X": "skysbuildingpieces:snow_slab"
   },
   "result": {
     "id": "minecraft:snow_block",
@@ -13,8 +13,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:snow_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:snow_slab"
     }
   ]
 }

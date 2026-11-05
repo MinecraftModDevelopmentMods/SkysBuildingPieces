@@ -1,11 +1,11 @@
 {
   "type": "skysbuildingpieces:cutting",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:glass_vertical_slab"
-    }
+    "X": "skysbuildingpieces:glass_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:glass_slab",
@@ -14,12 +14,12 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_vertical_slab"
     }
   ]
 }

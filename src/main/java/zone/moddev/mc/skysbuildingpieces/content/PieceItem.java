@@ -10,6 +10,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.core.BlockPos;
@@ -34,7 +37,8 @@ public final class PieceItem extends Item {
     }
 
     private static Item.Properties properties(PieceBlock block, String material) {
-        return new Item.Properties();
+        Identifier id = Identifier.parse(PaletteItemIds.itemId(block.palette, material));
+        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
     }
 
     boolean visibleInCreativeTab() {
@@ -60,7 +64,8 @@ public final class PieceItem extends Item {
     }
 
     @Override
-    public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
+    public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType,
+            net.minecraft.world.level.block.entity.FuelValues fuels) {
         return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
     }
 

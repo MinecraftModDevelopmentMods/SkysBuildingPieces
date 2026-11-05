@@ -1,4 +1,4 @@
-"""Negative controls for the exact Forge 47 native log classification."""
+"""Controls for the NeoForge 1.21.11 client log checks."""
 
 import unittest
 import json
@@ -13,7 +13,7 @@ import run_packaged_checks
 
 LOGIN = ("[Server thread/INFO]: PiecesChecks logged in with entity id 21 at (0, 64, 0)\n"
          "[Server thread/INFO]: PiecesChecks joined the game")
-START = "[Server thread/INFO] [MinecraftServer/]: Preparing start region for dimension minecraft:overworld"
+START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 1.21.11"
 NOTICE = "[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: Forge config just got changed on the file system!"
 PAYLOAD = "[Client thread/ERROR] [net.minecraftforge.fml.network.simple.IndexedMessageCodec/SIMPLENET]: Received empty payload on channel fml:handshake"
 
@@ -61,6 +61,17 @@ class NativeClientLogTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             classify("\n".join((START, LOGIN, "[STDERR/]: java.lang.IllegalStateException")), True)
 
+    def test_only_the_packaged_offline_authentication_notice_is_accepted(self):
+        auth = ("[00:00:00] [Download-2/ERROR] [minecraft/Minecraft]: Failed to fetch user properties\n"
+                "com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401")
+        log = "\n".join((auth, START, LOGIN))
+        self.assertEqual(classify(log, True, packaged_offline=True)["notices"],
+                         ["Failed to fetch user properties"])
+        with self.assertRaises(ValueError):
+            classify(log, True)
+        with self.assertRaises(ValueError):
+            classify(log.replace("Status: 401", "Status: 503"), True, packaged_offline=True)
+
 
 class NativeClientFilesTest(unittest.TestCase):
     def setUp(self):
@@ -77,8 +88,8 @@ class NativeClientFilesTest(unittest.TestCase):
 
     def test_native_defaults_with_different_order_and_comments(self):
         client = self.directory / "config/neoforge-client.toml"
-        settings = tomllib.loads(client.read_text(encoding="utf-8"))["client"]
-        client.write_text("[client]\n" + "\n".join(
+        settings = tomllib.loads(client.read_text(encoding="utf-8"))
+        client.write_text("# Native defaults, reordered\n" + "\n".join(
             name + " = " + json.dumps(value) for name, value in reversed(list(settings.items()))),
             encoding="utf-8")
         receipt = audit(self.directory, "control", True)

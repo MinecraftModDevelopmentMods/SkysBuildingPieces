@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/stained_glass_white",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_glass_white_slab"
-    }
+    "X": "skysbuildingpieces:stained_glass_white_slab"
   },
   "result": {
     "id": "minecraft:white_stained_glass",
@@ -13,8 +13,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_white_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_glass_white_slab"
     }
   ]
 }

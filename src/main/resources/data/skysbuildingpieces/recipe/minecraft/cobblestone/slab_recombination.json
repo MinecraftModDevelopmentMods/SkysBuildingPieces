@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/cobblestone",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "minecraft:cobblestone_slab"
-    }
+    "X": "minecraft:cobblestone_slab"
   },
   "result": {
     "id": "minecraft:cobblestone",

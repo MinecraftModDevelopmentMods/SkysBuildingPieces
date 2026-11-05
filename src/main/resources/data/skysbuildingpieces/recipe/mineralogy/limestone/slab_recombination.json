@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/limestone",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:limestone_slab"
-    }
+    "X": "mineralogy:limestone_slab"
   },
   "result": {
     "id": "mineralogy:limestone",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:limestone"
+      "type": "neoforge:registered",
+      "value": "mineralogy:limestone"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:limestone_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:limestone_slab"
     }
   ]
 }

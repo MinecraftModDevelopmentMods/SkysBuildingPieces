@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_red_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_red_stairs"
     }
   ]
 }

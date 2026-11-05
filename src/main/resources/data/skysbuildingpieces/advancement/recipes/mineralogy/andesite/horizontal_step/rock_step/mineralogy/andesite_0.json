@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:andesite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:andesite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_andesite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_andesite_horizontal_step"
     }
   ]
 }

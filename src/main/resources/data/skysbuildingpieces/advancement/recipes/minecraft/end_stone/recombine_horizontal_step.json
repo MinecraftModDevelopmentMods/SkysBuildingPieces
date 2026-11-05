@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:end_stone_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:end_stone_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:end_stone_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:end_stone_slab"
     }
   ]
 }

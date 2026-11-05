@@ -1,11 +1,11 @@
 {
   "type": "skysbuildingpieces:cutting",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
-    }
+    "X": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
   },
   "result": {
     "id": "minecraft:mossy_stone_brick_slab",
@@ -14,8 +14,8 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
     }
   ]
 }

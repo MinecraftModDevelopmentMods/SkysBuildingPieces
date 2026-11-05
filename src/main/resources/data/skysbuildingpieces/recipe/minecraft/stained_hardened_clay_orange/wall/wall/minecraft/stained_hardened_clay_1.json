@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XX", "XX", "XX"],
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:orange_terracotta"
-    }
+    "X": "minecraft:orange_terracotta"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_orange_wall",
@@ -13,8 +15,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_orange_wall"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_hardened_clay_orange_wall"
     }
   ]
 }

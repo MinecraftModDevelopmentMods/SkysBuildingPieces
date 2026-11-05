@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:packed_ice_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:packed_ice_step"
     }
   ]
 }

@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:marble"
+      "type": "neoforge:registered",
+      "value": "mineralogy:marble"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:marble_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:marble_slab"
     }
   ]
 }

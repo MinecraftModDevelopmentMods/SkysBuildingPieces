@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/slate",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:slate_slab"
-    }
+    "X": "mineralogy:slate_slab"
   },
   "result": {
     "id": "mineralogy:slate",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:slate"
+      "type": "neoforge:registered",
+      "value": "mineralogy:slate"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:slate_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:slate_slab"
     }
   ]
 }

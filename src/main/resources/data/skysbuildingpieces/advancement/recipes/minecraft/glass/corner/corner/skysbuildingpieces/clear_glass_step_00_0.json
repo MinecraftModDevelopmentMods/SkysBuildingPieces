@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_step"
     }
   ]
 }

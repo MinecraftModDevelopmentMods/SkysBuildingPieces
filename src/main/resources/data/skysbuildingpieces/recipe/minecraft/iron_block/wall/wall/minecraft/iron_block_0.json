@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XX", "XX", "XX"],
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:iron_block"
-    }
+    "X": "minecraft:iron_block"
   },
   "result": {
     "id": "skysbuildingpieces:iron_block_wall",
@@ -13,8 +15,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:iron_block_wall"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:iron_block_wall"
     }
   ]
 }

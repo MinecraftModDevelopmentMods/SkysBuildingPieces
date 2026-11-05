@@ -25,7 +25,7 @@ def item_id(spec):
 
 
 def exists(item):
-    return {'type': 'neoforge:item_exists', 'item': item}
+    return {'type': 'neoforge:registered', 'value': item}
 
 
 def canonical_pattern(rows):
@@ -43,6 +43,8 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
     def accepts(value, visited=frozenset()):
         if isinstance(value, list):
             return any(accepts(entry, visited) for entry in value)
+        if isinstance(value, str):
+            value = {'tag': value[1:]} if value.startswith('#') else {'item': value}
         if 'item' in value:
             return value['item'] == ingredient
         if 'tag' in value:
@@ -135,7 +137,7 @@ def prepare(resources, native_recipes=(), tags=None):
             body = {'type': 'skysbuildingpieces:cutting' if preserve else 'minecraft:crafting_shaped',
                     'category': 'building',
                     'group': 'skysbuildingpieces/' + path.split('/')[-2],
-                    'pattern': rows, 'key': {'X': {'item': ingredient}},
+                    'pattern': rows, 'key': {'X': ingredient},
                     'result': {'id': output, 'count': count}}
             if preserve:
                 body['preserve_tag'] = True

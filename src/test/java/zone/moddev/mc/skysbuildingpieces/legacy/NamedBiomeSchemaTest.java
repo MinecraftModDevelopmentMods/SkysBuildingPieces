@@ -12,7 +12,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.chunk.storage.SimpleRegionStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import zone.moddev.mc.skysbuildingpieces.MinecraftTestBootstrap;
@@ -54,7 +54,7 @@ class NamedBiomeSchemaTest {
         assertEquals("FBDF087B300AE3F9DAA6D55D46049E49051EBD931C52FCDF3734BEA234FDB4F5",
                 java.util.HexFormat.of().withUpperCase().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)));
         CompoundTag source = NbtIo.readCompressed(fixture, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
-        int[] cells = source.getCompound("Level").getIntArray("Biomes");
+        int[] cells = source.getCompoundOrEmpty("Level").getIntArray("Biomes").orElseGet(() -> new int[0]);
         assertEquals(1024, cells.length);
         for (int cell = 0; cell < cells.length; cell++) {
             assertEquals(52, cells[cell], "The original gravel-beach fixture changed");
@@ -62,35 +62,33 @@ class NamedBiomeSchemaTest {
                 cells[cell] = (cell & 1) == 0 ? 17 : 35;
             }
         }
-        source.getCompound("Level").putIntArray("Biomes", cells);
+        source.getCompoundOrEmpty("Level").putIntArray("Biomes", cells);
         CompoundTag original = source.copy();
-        try (ChunkStorage storage = new ChunkStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
-                temporary, DataFixers.getDataFixer(), false)) {
-            CompoundTag control = storage.upgradeChunkTag(Level.OVERWORLD, () -> null,
-                    source.copy(), Optional.empty());
+        try (SimpleRegionStorage storage = new SimpleRegionStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
+                temporary, DataFixers.getDataFixer(), false, net.minecraft.util.datafix.DataFixTypes.CHUNK)) {
+            CompoundTag control = storage.upgradeChunkTag(source.copy(), 0, MinecraftTestBootstrap.overworldUpgradeContext());
             CompoundTag prepared = source.copy();
             HistoricalBiomes.preserveNamed(prepared, cells, Map.of(52, "minecraft:stony_shore"));
             CompoundTag once = prepared.copy();
             HistoricalBiomes.preserveNamed(prepared, cells, Map.of(52, "minecraft:stony_shore"));
             assertEquals(once, prepared, "Two early wrappers must stage the same recovery safely");
-            CompoundTag fixed = storage.upgradeChunkTag(Level.OVERWORLD, () -> null,
-                    prepared, Optional.empty());
+            CompoundTag fixed = storage.upgradeChunkTag(prepared, 0, MinecraftTestBootstrap.overworldUpgradeContext());
             HistoricalBiomes.finish(fixed);
             assertFalse(fixed.contains("skysbuildingpieces_biomes"));
             assertFalse(fixed.contains("skysbuildingpieces_biome_names"));
-            ListTag sections = fixed.getList("sections", 10);
-            ListTag nativeSections = control.getList("sections", 10);
+            ListTag sections = fixed.getListOrEmpty("sections");
+            ListTag nativeSections = control.getListOrEmpty("sections");
             assertTrue(sections.size() >= 24, "The native Overworld height expansion must run");
             int checked = 0;
             for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-                CompoundTag section = sections.getCompound(sectionIndex);
+                CompoundTag section = sections.getCompoundOrEmpty(sectionIndex);
                 for (int cell = 0; cell < 64; cell++) {
-                    int height = Math.max(0, Math.min(63, section.getByte("Y") * 4 + (cell >> 4)));
+                    int height = Math.max(0, Math.min(63, section.getByteOr("Y", (byte) 0) * 4 + (cell >> 4)));
                     int sourceIndex = height * 16 + (cell & 15);
                     String expected = cells[sourceIndex] == 52 ? "minecraft:stony_shore"
-                            : biome(nativeSections.getCompound(sectionIndex).getCompound("biomes"), cell);
-                    assertEquals(expected, biome(section.getCompound("biomes"), cell),
-                            "section=" + section.getByte("Y") + ", cell=" + cell);
+                            : biome(nativeSections.getCompoundOrEmpty(sectionIndex).getCompoundOrEmpty("biomes"), cell);
+                    assertEquals(expected, biome(section.getCompoundOrEmpty("biomes"), cell),
+                            "section=" + section.getByteOr("Y", (byte) 0) + ", cell=" + cell);
                     checked++;
                 }
             }
@@ -104,14 +102,14 @@ class NamedBiomeSchemaTest {
     }
 
     private static String biome(CompoundTag container, int cell) {
-        ListTag palette = container.getList("palette", 8);
+        ListTag palette = container.getListOrEmpty("palette");
         assertFalse(palette.isEmpty());
         if (palette.size() == 1) {
-            return palette.getString(0);
+            return palette.getStringOr(0, "");
         }
         int bits = 32 - Integer.numberOfLeadingZeros(palette.size() - 1);
         int perLong = 64 / bits;
-        long[] data = container.getLongArray("data");
-        return palette.getString((int) (data[cell / perLong] >>> (cell % perLong * bits) & ((1L << bits) - 1)));
+        long[] data = container.getLongArray("data").orElseGet(() -> new long[0]);
+        return palette.getString((int) (data[cell / perLong] >>> (cell % perLong * bits) & ((1L << bits) - 1))).orElseThrow();
     }
 }

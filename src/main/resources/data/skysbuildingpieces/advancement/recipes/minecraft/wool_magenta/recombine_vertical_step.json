@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_magenta_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_magenta_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_magenta_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_magenta_vertical_step"
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/wool_pink",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_pink_slab"
-    }
+    "X": "skysbuildingpieces:wool_pink_slab"
   },
   "result": {
     "id": "minecraft:pink_wool",
@@ -13,8 +13,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_pink_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_pink_slab"
     }
   ]
 }

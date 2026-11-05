@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:purpur_pillar_wall"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:purpur_pillar_wall"
     }
   ]
 }

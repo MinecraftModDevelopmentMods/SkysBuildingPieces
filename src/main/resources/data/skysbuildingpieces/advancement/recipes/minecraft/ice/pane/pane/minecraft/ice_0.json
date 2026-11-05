@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:ice_pane"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:ice_pane"
     }
   ]
 }

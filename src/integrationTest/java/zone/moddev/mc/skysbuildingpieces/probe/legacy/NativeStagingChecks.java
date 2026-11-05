@@ -72,8 +72,8 @@ public final class NativeStagingChecks {
                                 1343, 1493);
                     }
                     CompoundTag fixed = DataFixTypes.CHUNK.update(world.getServer().getFixerUpper(), source, intermediate ? 1493 : 1343, 1976);
-                    ListTag palette = fixed.getCompound("Level").getList("Sections", 10).getCompound(0)
-                            .getList("Palette", 10);
+                    ListTag palette = fixed.getCompoundOrEmpty("Level").getListOrEmpty("Sections").getCompoundOrEmpty(0)
+                            .getListOrEmpty("Palette");
 
                     boolean retained = false;
                     for (int entry = 0; entry < palette.size(); entry++) {
@@ -82,7 +82,7 @@ public final class NativeStagingChecks {
                         // the complete material and state to match the staged block.
                         BlockState decoded = NbtUtils.readBlockState(world.registryAccess()
                                 .lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK),
-                                palette.getCompound(entry));
+                                palette.getCompoundOrEmpty(entry));
                         retained |= decoded.equals(expected);
                     }
                     if (!retained) {
@@ -127,11 +127,11 @@ public final class NativeStagingChecks {
                 if (intermediate) {
                     sourceData = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, 1343, 1493);
                 }
-                CompoundTag upgraded = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, intermediate ? 1493 : 1343, 1976).getList("Inventory", 10).getCompound(0);
+                CompoundTag upgraded = DataFixTypes.PLAYER.update(world.getServer().getFixerUpper(), sourceData, intermediate ? 1493 : 1343, 1976).getListOrEmpty("Inventory").getCompoundOrEmpty(0);
                 net.minecraft.world.item.ItemStack result = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(upgraded);
 
                 if (result.getItem() != net.minecraft.world.item.Items.STONE_SLAB || result.getCount() != 37
-                        || !zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(result) || !custom.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(result)) || upgraded.getByte("Slot") != 7
+                        || !zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(result) || !custom.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(result)) || upgraded.getByteOr("Slot", (byte) 0) != 7
                         || upgraded.contains(HistoricalItems.NATIVE_ITEM_ID)) {
                     throw new AssertionError("Vanilla data fixing changed the recovered rough-stone slab item"
                             + " intermediate=" + intermediate + ": " + upgraded);

@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XXX"],
+  "pattern": [
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:iron_block"
-    }
+    "X": "minecraft:iron_block"
   },
   "result": {
     "id": "skysbuildingpieces:iron_block_slab",
@@ -13,8 +13,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:iron_block_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:iron_block_slab"
     }
   ]
 }

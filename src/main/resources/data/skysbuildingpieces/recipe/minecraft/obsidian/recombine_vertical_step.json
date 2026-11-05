@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/obsidian",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:obsidian_vertical_step"
-    }
+    "X": "skysbuildingpieces:obsidian_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:obsidian_slab",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:obsidian_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:obsidian_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:obsidian_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:obsidian_vertical_step"
     }
   ]
 }

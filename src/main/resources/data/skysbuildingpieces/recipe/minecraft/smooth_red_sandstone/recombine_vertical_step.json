@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/smooth_red_sandstone",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:smooth_red_sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:smooth_red_sandstone_vertical_step"
   },
   "result": {
     "id": "minecraft:cut_red_sandstone_slab",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:smooth_red_sandstone_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:smooth_red_sandstone_vertical_step"
     }
   ]
 }

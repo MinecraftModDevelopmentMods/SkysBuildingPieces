@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:planks_acacia_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:planks_acacia_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:planks_acacia_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:planks_acacia_vertical_slab"
     }
   ]
 }

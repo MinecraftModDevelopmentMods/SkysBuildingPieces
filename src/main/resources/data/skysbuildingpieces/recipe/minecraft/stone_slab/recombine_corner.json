@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/stone_slab",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stone_slab_corner"
-    }
+    "X": "skysbuildingpieces:stone_slab_corner"
   },
   "result": {
     "id": "skysbuildingpieces:stone_slab_horizontal_step",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stone_slab_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stone_slab_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stone_slab_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stone_slab_horizontal_step"
     }
   ]
 }

@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:rhyolite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:rhyolite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:rhyolite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:rhyolite_slab"
     }
   ]
 }

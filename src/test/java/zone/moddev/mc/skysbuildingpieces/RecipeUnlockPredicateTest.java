@@ -10,11 +10,10 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,8 @@ class RecipeUnlockPredicateTest {
     @Test
     void nativeItemPredicatesRejectUnrelatedInventoryItems() throws Exception {
         MinecraftTestBootstrap.registerVanilla();
-        ItemStack stone = vanillaStack(Items.STONE);
-        ItemStack stick = vanillaStack(Items.STICK);
+        ItemStack stone = new ItemStack(Items.STONE, 64);
+        ItemStack stick = new ItemStack(Items.STICK, 64);
         Path directory = Path.of("src/main/resources/data/skysbuildingpieces/advancement/recipes");
         var ops = RegistryOps.create(JsonOps.INSTANCE,
                 RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY));
@@ -65,7 +64,4 @@ class RecipeUnlockPredicateTest {
         assertTrue(checked > 1400, "Check every ordinary recipe unlock");
     }
 
-    private static ItemStack vanillaStack(Item item) {
-        return new ItemStack(item, 64);
-    }
 }

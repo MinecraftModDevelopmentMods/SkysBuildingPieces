@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:pegmatite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:pegmatite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:pegmatite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:pegmatite_slab"
     }
   ]
 }

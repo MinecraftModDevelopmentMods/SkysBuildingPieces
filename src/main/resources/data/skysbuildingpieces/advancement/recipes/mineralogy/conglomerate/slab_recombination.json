@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:conglomerate"
+      "type": "neoforge:registered",
+      "value": "mineralogy:conglomerate"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:conglomerate_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:conglomerate_slab"
     }
   ]
 }

@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/grass_path",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:grass_path_step"
-    }
+    "X": "skysbuildingpieces:grass_path_step"
   },
   "result": {
     "id": "skysgrassslabs:path_slab",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:grass_path_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:grass_path_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysgrassslabs:path_slab"
+      "type": "neoforge:registered",
+      "value": "skysgrassslabs:path_slab"
     }
   ]
 }

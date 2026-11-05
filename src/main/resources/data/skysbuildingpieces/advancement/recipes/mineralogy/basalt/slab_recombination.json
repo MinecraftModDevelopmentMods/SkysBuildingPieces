@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basalt"
+      "type": "neoforge:registered",
+      "value": "mineralogy:basalt"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basalt_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:basalt_slab"
     }
   ]
 }

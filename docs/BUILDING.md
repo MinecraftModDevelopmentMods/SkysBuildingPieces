@@ -1,10 +1,11 @@
 # Building and running the mod
 
-This branch uses Minecraft 1.21.1, NeoForge 21.1.247 and Temurin Java 21.0.7+6.
+This branch uses Minecraft 1.21.11, NeoForge 21.11.45 and Temurin Java 21.0.7+6.
 Use the Gradle 9.2.1 wrapper included in the checkout.
 
 ```text
-gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
+gradlew clean
+gradlew check build javadoc verifyReleaseArtifacts writeReleaseChecksums
 gradlew eclipse verifyEclipseConfiguration -Declipse.application=org.eclipse.ui.ide.workbench
 ```
 

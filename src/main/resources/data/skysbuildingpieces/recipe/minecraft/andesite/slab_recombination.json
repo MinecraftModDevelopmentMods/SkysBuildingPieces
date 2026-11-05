@@ -3,9 +3,7 @@
   "group": "skysbuildingpieces/andesite",
   "pattern": ["XX"],
   "key": {
-    "X": {
-      "item": "minecraft:andesite_slab"
-    }
+    "X": "minecraft:andesite_slab"
   },
   "result": {
     "id": "minecraft:andesite",

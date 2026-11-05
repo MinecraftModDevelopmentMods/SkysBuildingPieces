@@ -85,15 +85,15 @@ def probe_property(options):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.21.1/1.21.1.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.21.11/1.21.11.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("neoforge-21.1.247",)]
+                for name in ("neoforge-21.11.45",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 21.1.247 profile")
+        raise ValueError("The installed client has no NeoForge 21.11.45 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.21.1" or forge["inheritsFrom"] != "1.21.1":
-        raise ValueError("This launcher requires the verified NeoForge 21.1 client metadata")
+    if base["id"] != "1.21.11" or forge["inheritsFrom"] != "1.21.11":
+        raise ValueError("This launcher requires the verified NeoForge 21.11 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -115,22 +115,18 @@ def client_command(options, directory):
         classpath.append(path)
         if classifier == "natives-windows":
             native_artifacts.append(path)
-    # NeoForge discovers these installer outputs under library_directory itself.
+    # NeoForge locates the patched game and universal jar through the library directory.
     installed_libraries = {
-        "net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar":
-            "A649BD3CE77F122D0F83AE1B37B4B303E662470F928B9BEE5FBC76580805FFD4",
-        "net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-extra.jar":
-            "FD02F80F4EEC9DFAA1714CB62595D013CBAC03D52D19DD0623D1922B999C40B7",
-        "net/neoforged/neoforge/21.1.247/neoforge-21.1.247-client.jar":
-            "8E3563A078289F0F07EE6F87F1C8651294387639C8355983EE207CB753F08B7F",
-        "net/neoforged/neoforge/21.1.247/neoforge-21.1.247-universal.jar":
-            "B55D3551E9B0D9B68FA4C47A2122DEAF4019B549D8DF3C74D9A27B2E43C9718A",
+        "net/neoforged/minecraft-client-patched/21.11.45/minecraft-client-patched-21.11.45.jar":
+            "55F9848BFD0EC0562B1DE17CDBBA519D8B6895F232469684128A51C3D87437AA",
+        "net/neoforged/neoforge/21.11.45/neoforge-21.11.45-universal.jar":
+            "0D9AB82C37319ED6514E8E28E5AB357BA5E9B8043EE4621333CF45B743039CBA",
     }
     for name, expected in installed_libraries.items():
         path = runtime / "libraries" / name
         if digest(path) != expected:
             raise ValueError("NeoForge installer output checksum changed: " + name)
-    client = runtime / "versions/1.21.1/1.21.1.jar"
+    client = runtime / "versions/1.21.11/1.21.11.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -180,10 +176,10 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/neoforged/neoforge/21.1.247" / filename
+    source = libraries / "net/neoforged/neoforge/21.11.45" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    if "cpw.mods.bootstraplauncher.BootstrapLauncher" not in launch or "21.1.247" not in launch:
-        raise ValueError("Expected the official NeoForge 21.1.247 server arguments")
+    if "net.neoforged.fml.startup.Server" not in launch or "21.11.45" not in launch:
+        raise ValueError("Expected the official NeoForge 21.11.45 server arguments")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":
@@ -249,20 +245,23 @@ def prepare(options, directory):
         shutil.copyfile(directory / "world/level.dat", directory / "source-level.dat")
 
 
-def audit_console(directory, phase):
+def audit_console(directory, phase, packaged_offline=False):
     """Include loader diagnostics that can happen before Minecraft opens its logs."""
     path = directory / (phase + "-console.log")
     console = path.read_text(encoding="utf-8")
     status_error = re.search(r"(?m)^(?:ERROR|FATAL) Status(?:Console)?Listener\b.*", console)
     if status_error:
         raise ValueError("Unexpected loader logging failure: " + status_error[0])
+    if packaged_offline:
+        from native_client_log import offline_client_notices
+        console, _ = offline_client_notices(console)
     audit_text(console, profile_for(directory))
 
 
-def audit(directory, phase, mode, probe_kind="bootstrap"):
-    audit_console(directory, phase)
+def audit(directory, phase, mode, probe_kind="bootstrap", packaged_offline=False):
+    audit_console(directory, phase, packaged_offline)
     if mode == "client":
-        audit_client(directory, phase)
+        audit_client(directory, phase, packaged_offline=packaged_offline)
     else:
         log = (directory / "logs/latest.log").read_text(encoding="utf-8")
         audit_server(directory, phase)
@@ -328,7 +327,8 @@ def main():
     with (directory / (options.phase + "-console.log")).open("x", encoding="utf-8") as output:
         subprocess.run(command, cwd=directory, env=environment, stdout=output,
                        stderr=subprocess.STDOUT, check=True, timeout=600)
-    audit(directory, options.phase, options.mode, options.probe_kind)
+    audit(directory, options.phase, options.mode, options.probe_kind,
+          packaged_offline=options.mode == "client")
     print("PACKAGED_CHECK_PASS", options.mode, options.phase, directory.name)
 
 

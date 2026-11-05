@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_cracked_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stonebrick_cracked_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_cracked_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stonebrick_cracked_vertical_slab"
     }
   ]
 }

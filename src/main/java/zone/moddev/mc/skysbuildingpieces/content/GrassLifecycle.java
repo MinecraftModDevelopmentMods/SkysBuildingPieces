@@ -83,7 +83,7 @@ public final class GrassLifecycle {
     }
 
     public static void repairSupport(Level world, BlockPos position, BlockState state) {
-        if (!world.isClientSide && grass(state) && coversSupport(state) && world.isLoaded(position.below())
+        if (!world.isClientSide() && grass(state) && coversSupport(state) && world.isLoaded(position.below())
                 && world.getBlockState(position.below()).getBlock() == Blocks.GRASS_BLOCK) {
             world.setBlock(position.below(), Blocks.DIRT.defaultBlockState(), 2);
         }
@@ -97,7 +97,7 @@ public final class GrassLifecycle {
     }
 
     public static void tick(Level world, BlockPos position, BlockState state, RandomSource random) {
-        if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
+        if (world.isClientSide() || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
 
@@ -160,7 +160,7 @@ public final class GrassLifecycle {
         BlockPos above = position.above();
 
         return world.getMaxLocalRawBrightness(above) >= 4
-                || world.getBlockState(above).getLightBlock(world, above) < world.getMaxLightLevel();
+                || world.getBlockState(above).getLightBlock() < 15;
     }
 
     private static boolean viableTarget(Level world, BlockPos position) {
@@ -184,7 +184,7 @@ public final class GrassLifecycle {
             return false;
         }
 
-        return world.getMaxLocalRawBrightness(above) >= 4 && cover.getLightBlock(world, above) < world.getMaxLightLevel()
+        return world.getMaxLocalRawBrightness(above) >= 4 && cover.getLightBlock() < 15
                 && world.getFluidState(above).isEmpty();
     }
 }

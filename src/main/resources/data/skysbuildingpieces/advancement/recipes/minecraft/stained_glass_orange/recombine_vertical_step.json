@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_orange_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_glass_orange_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_orange_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_glass_orange_vertical_step"
     }
   ]
 }

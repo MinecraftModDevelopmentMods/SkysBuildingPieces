@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:andesite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:andesite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:andesite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:andesite_slab"
     }
   ]
 }

@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_yellow_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_glass_yellow_stairs"
     }
   ]
 }

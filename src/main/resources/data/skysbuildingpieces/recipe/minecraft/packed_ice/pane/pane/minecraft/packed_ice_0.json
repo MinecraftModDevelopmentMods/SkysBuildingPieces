@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XXX", "XXX"],
+  "pattern": [
+    "XXX",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:packed_ice"
-    }
+    "X": "minecraft:packed_ice"
   },
   "result": {
     "id": "skysbuildingpieces:packed_ice_pane",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_pane"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:packed_ice_pane"
     }
   ]
 }

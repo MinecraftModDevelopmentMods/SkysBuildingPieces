@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_diabase_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_diabase_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_diabase_corner",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_diabase_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_diabase_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_diabase_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_diabase_vertical_step"
     }
   ]
 }

@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:andesite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:andesite_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:andesite_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:andesite_vertical_step"
     }
   ]
 }

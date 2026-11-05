@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/diorite",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:diorite_slab"
-    }
+    "X": "mineralogy:diorite_slab"
   },
   "result": {
     "id": "mineralogy:diorite",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:diorite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:diorite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:diorite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:diorite_slab"
     }
   ]
 }

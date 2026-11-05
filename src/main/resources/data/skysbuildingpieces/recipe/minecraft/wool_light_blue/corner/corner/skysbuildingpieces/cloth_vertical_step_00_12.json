@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_light_blue_vertical_step"
-    }
+    "X": "skysbuildingpieces:wool_light_blue_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:wool_light_blue_corner",
@@ -13,12 +13,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_light_blue_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_light_blue_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_light_blue_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_light_blue_vertical_step"
     }
   ]
 }

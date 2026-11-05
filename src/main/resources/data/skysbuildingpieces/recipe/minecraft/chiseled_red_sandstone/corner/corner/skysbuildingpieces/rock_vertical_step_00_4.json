@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:chiseled_red_sandstone_corner",
@@ -13,12 +13,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_red_sandstone_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
     }
   ]
 }

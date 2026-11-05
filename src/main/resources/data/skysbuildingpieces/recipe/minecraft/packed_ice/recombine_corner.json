@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/packed_ice",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:packed_ice_corner"
-    }
+    "X": "skysbuildingpieces:packed_ice_corner"
   },
   "result": {
     "id": "skysbuildingpieces:packed_ice_step",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:packed_ice_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:packed_ice_step"
     }
   ]
 }

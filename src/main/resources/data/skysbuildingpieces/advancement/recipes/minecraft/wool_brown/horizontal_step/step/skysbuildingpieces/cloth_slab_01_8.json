@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_brown_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_brown_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_brown_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_brown_slab"
     }
   ]
 }

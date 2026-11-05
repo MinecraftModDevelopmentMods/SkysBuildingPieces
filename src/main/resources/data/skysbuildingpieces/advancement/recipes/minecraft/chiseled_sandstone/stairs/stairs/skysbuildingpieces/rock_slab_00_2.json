@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_sandstone_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_sandstone_stairs"
     }
   ]
 }

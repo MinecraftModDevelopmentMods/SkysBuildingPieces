@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:phyllite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:phyllite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:phyllite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:phyllite_slab"
     }
   ]
 }

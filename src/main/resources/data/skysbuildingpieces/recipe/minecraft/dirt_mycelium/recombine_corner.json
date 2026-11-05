@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/dirt_mycelium",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:dirt_mycelium_corner"
-    }
+    "X": "skysbuildingpieces:dirt_mycelium_corner"
   },
   "result": {
     "id": "skysbuildingpieces:dirt_mycelium_horizontal_step",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_mycelium_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_mycelium_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_mycelium_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_mycelium_horizontal_step"
     }
   ]
 }

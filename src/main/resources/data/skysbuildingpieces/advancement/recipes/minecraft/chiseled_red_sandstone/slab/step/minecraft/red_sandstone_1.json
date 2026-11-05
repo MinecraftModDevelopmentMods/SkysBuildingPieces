@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
     }
   ]
 }

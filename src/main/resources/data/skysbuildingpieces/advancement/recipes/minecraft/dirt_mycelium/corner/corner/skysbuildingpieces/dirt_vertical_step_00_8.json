@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_mycelium_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_mycelium_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_mycelium_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_mycelium_vertical_step"
     }
   ]
 }

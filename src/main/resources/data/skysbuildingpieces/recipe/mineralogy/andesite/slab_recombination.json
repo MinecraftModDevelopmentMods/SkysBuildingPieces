@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/andesite",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:andesite_slab"
-    }
+    "X": "mineralogy:andesite_slab"
   },
   "result": {
     "id": "mineralogy:andesite",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:andesite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:andesite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:andesite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:andesite_slab"
     }
   ]
 }

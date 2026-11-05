@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:bricks_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:bricks_vertical_slab"
     }
   ]
 }

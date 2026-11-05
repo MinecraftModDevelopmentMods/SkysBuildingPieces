@@ -202,8 +202,8 @@ class NativeServerFilesTest(unittest.TestCase):
 
     def test_changed_defaults_fail(self):
         original = self.config.read_text()
-        changed = original.replace('advertiseDedicatedServerToLan = true',
-                                   'advertiseDedicatedServerToLan = false')
+        changed = original.replace('advertiseDedicatedServerToLan = false',
+                                   'advertiseDedicatedServerToLan = true')
         self.assertNotEqual(original, changed, "The negative control must alter a native setting")
         self.config.write_text(changed)
         with self.assertRaises(ValueError):

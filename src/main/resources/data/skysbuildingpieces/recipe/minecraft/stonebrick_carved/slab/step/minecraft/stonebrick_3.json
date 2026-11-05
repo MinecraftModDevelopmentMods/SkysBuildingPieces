@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X ", " X"],
+  "pattern": [
+    "X ",
+    " X"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:chiseled_stone_bricks"
-    }
+    "X": "minecraft:chiseled_stone_bricks"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_carved_slab",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stonebrick_carved_slab"
     }
   ]
 }

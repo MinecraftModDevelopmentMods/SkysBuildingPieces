@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/dolomite",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:dolomite_slab"
-    }
+    "X": "mineralogy:dolomite_slab"
   },
   "result": {
     "id": "mineralogy:dolomite",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:dolomite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:dolomite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:dolomite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:dolomite_slab"
     }
   ]
 }

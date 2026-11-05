@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_novaculite_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_novaculite_vertical_step"
     }
   ]
 }

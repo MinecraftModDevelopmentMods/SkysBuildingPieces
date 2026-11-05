@@ -49,10 +49,10 @@ final class PieceNames {
             net.neoforged.neoforgespi.language.IModFileInfo owner =
                     net.neoforged.fml.ModList.get().getModFileById(namespace);
             if (owner != null) {
-                java.nio.file.Path language = owner.getFile().findResource("assets", namespace, "lang", "en_us.json");
-                if (java.nio.file.Files.isRegularFile(language)) {
+                var language = owner.getFile().getContents().get("assets/" + namespace + "/lang/en_us.json");
+                if (language != null) {
                     try {
-                        input = java.nio.file.Files.newInputStream(language);
+                        input = language.open();
                     } catch (java.io.IOException failure) {
                         throw new IllegalStateException("Cannot open the piece names for " + namespace, failure);
                     }

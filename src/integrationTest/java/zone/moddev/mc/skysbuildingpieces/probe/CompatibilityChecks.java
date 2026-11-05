@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,21 +18,25 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.common.NeoForge;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.EntityBlock;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.items.ItemStackHandler;
 import net.minecraft.core.registries.BuiltInRegistries;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.content.LegacyPieceRecipe;
@@ -48,9 +51,9 @@ public final class CompatibilityChecks {
 
     public static ItemStack legacy(int count) {
         ItemStack stack = new ItemStack(
-                BuiltInRegistries.ITEM.get(ResourceLocation.parse("buildingbricks:rock_step")), count);
+                BuiltInRegistries.ITEM.getValue(Identifier.parse("buildingbricks:rock_step")), count);
 
-        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, NativeLegacyChecks.stack("minecraft:stone", count).getCompound("tag").copy());
+        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, NativeLegacyChecks.stack("minecraft:stone", count).getCompoundOrEmpty("tag").copy());
         return stack;
     }
 
@@ -92,11 +95,11 @@ public final class CompatibilityChecks {
 
         player.getInventory().setItem(0, legacy(13));
         player.getEnderChestInventory().setItem(0, legacy(11));
-        NeoForge.EVENT_BUS.post(new EntityJoinLevelEvent(player, world));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new EntityJoinLevelEvent(player, world));
         identity(player.getInventory().getItem(0), 13, convert);
         identity(player.getEnderChestInventory().getItem(0), 11, convert);
         player.getInventory().setItem(1, legacy(9));
-        NeoForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new PlayerEvent.LoadFromFile(player, world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
                 player.getUUID().toString()));
         identity(player.getInventory().getItem(1), 9, convert);
         world.getChunk(new BlockPos(930, 70, 930));
@@ -120,19 +123,32 @@ public final class CompatibilityChecks {
         world.setBlock(handlerPosition, handlerBlock.defaultBlockState(), 2);
         HandlerTile tile = (HandlerTile) world.getBlockEntity(handlerPosition);
         NativeLegacyChecks.require(tile != null, "Policy fixture item handler is installed");
-        tile.handler.setStackInSlot(0, legacy(17));
+        ItemStack refused = legacy(11);
+        tile.handler.set(0, ItemResource.of(legacy(17)), 17);
+        tile.handler.set(1, ItemResource.of(refused), 11);
 
         Method scan = MigrationEvents.class.getDeclaredMethod("containers", BlockEntity.class);
 
         scan.setAccessible(true);
+        long itemsBefore = 0;
+        if (convert) {
+            LegacyBridge.report(world);
+            itemsBefore = zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState.get(world).items;
+        }
         scan.invoke(null, tile);
-        identity(tile.handler.getStackInSlot(0), 17, convert);
-
-        CompoundTag once = tile.handler.serializeNBT(world.registryAccess());
+        ItemStack once = tile.stack(0);
+        identity(once, 17, convert);
+        NativeLegacyChecks.require(ItemStack.matches(refused, tile.stack(1)),
+                "A slot refusing the migrated item retains the full old stack and its data");
 
         scan.invoke(null, tile);
-        NativeLegacyChecks.require(once.equals(tile.handler.serializeNBT(world.registryAccess())),
+        NativeLegacyChecks.require(ItemStack.matches(once, tile.stack(0)) && ItemStack.matches(refused, tile.stack(1)),
                 "Shared handler faces convert only once");
+        if (convert) {
+            LegacyBridge.report(world);
+            NativeLegacyChecks.require(zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState.get(world).items
+                    - itemsBefore == 17, "Only the committed transaction advances the item total");
+        }
         world.removeBlock(handlerPosition, false);
 
         BlockPos chestPosition = position.east();
@@ -157,10 +173,10 @@ public final class CompatibilityChecks {
         zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(crate, tag);
 
         ItemStack migrated = MigrationEvents.convert(crate, world);
-        CompoundTag recovered = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getList("Items", 10).getCompound(0);
+        CompoundTag recovered = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getListOrEmpty("Items").getCompoundOrEmpty(0);
 
         identity(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(recovered), 7, convert);
-        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getBoolean("Sealed"),
+        NativeLegacyChecks.require(migrated.getItem() == crate.getItem() && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(migrated).getBooleanOr("Sealed", false),
                 "Sealed container identity and custom data");
         NativeLegacyChecks.require(MigrationEvents.convert(migrated, world) == migrated,
                 "Live nested inventory is idempotent");
@@ -192,7 +208,7 @@ public final class CompatibilityChecks {
 
     private static void newlyPlaced(ServerLevel world, boolean convert) {
         BlockPos position = new BlockPos(934, 70, 932);
-        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("buildingbricks:rock_step"));
+        Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse("buildingbricks:rock_step"));
         BlockState old = block.defaultBlockState().setValue((IntegerProperty) block.getStateDefinition().getProperty("meta"),
                 11);
 
@@ -203,8 +219,9 @@ public final class CompatibilityChecks {
 
         tag.putString("material", "minecraft:stone");
         tag.putString("custom", "Keep the old tile in coverage");
-        tile.loadWithComponents(tag, world.registryAccess());
-        NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
+        tile.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(
+                net.minecraft.util.ProblemReporter.DISCARDING, world.registryAccess(), tag));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(world.dimension(), world, position),
                 Blocks.STONE.defaultBlockState(), NativeProbeItems.player(world)));
         NativeLegacyChecks.require(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(world.getBlockState(position).getBlock()).getNamespace()
                 .equals(convert ? "skysbuildingpieces" : "buildingbricks"), "New placement replacement policy");
@@ -239,19 +256,22 @@ public final class CompatibilityChecks {
     private static BlockEntityType<HandlerTile> handlerType;
 
     static void registerHandler(IEventBus modBus) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("buildingpiecesprobe", "item_handler_fixture");
+        Identifier id = Identifier.fromNamespaceAndPath("buildingpiecesprobe", "item_handler_fixture");
         modBus.addListener((RegisterEvent event) -> {
-            event.register(Registries.BLOCK, id, () -> handlerBlock = new HandlerBlock());
-            event.register(Registries.BLOCK_ENTITY_TYPE, id,
-                    () -> handlerType = BlockEntityType.Builder.of(HandlerTile::new, handlerBlock).build(null));
+            if (event.getRegistryKey().equals(Registries.BLOCK)) {
+                handlerBlock = Registry.register(BuiltInRegistries.BLOCK, id, new HandlerBlock(id));
+            } else if (event.getRegistryKey().equals(Registries.BLOCK_ENTITY_TYPE)) {
+                handlerType = new BlockEntityType<>(HandlerTile::new, java.util.Set.of(handlerBlock));
+                Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id, handlerType);
+            }
         });
         modBus.addListener((RegisterCapabilitiesEvent event) ->
-                event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, handlerType, (tile, side) -> tile.handler));
+                event.registerBlockEntity(Capabilities.Item.BLOCK, handlerType, (tile, side) -> tile.handler));
     }
 
     private static final class HandlerBlock extends Block implements EntityBlock {
-        private HandlerBlock() {
-            super(Block.Properties.of());
+        HandlerBlock(Identifier id) {
+            super(Block.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id)));
         }
 
         @Override
@@ -261,10 +281,20 @@ public final class CompatibilityChecks {
     }
 
     public static final class HandlerTile extends BlockEntity {
-        final ItemStackHandler handler = new ItemStackHandler(2);
+        final ItemStacksResourceHandler handler = new ItemStacksResourceHandler(2) {
+            @Override
+            public boolean isValid(int slot, ItemResource resource) {
+                return slot == 0 || BuiltInRegistries.ITEM.getKey(resource.getItem()).getNamespace()
+                        .equals("buildingbricks");
+            }
+        };
 
         HandlerTile(BlockPos position, BlockState state) {
             super(handlerType, position, state);
+        }
+
+        ItemStack stack(int slot) {
+            return handler.getResource(slot).toStack(handler.getAmountAsInt(slot));
         }
     }
 }

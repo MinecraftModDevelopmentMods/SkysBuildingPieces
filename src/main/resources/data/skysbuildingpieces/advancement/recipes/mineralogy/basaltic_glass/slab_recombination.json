@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basaltic_glass"
+      "type": "neoforge:registered",
+      "value": "mineralogy:basaltic_glass"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basaltic_glass_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:basaltic_glass_slab"
     }
   ]
 }

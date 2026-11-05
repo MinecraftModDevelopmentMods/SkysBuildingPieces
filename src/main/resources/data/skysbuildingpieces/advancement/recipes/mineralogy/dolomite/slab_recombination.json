@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:dolomite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:dolomite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:dolomite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:dolomite_slab"
     }
   ]
 }

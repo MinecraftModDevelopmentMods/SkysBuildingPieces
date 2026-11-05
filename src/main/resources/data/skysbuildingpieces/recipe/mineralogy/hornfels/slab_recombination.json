@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/hornfels",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:hornfels_slab"
-    }
+    "X": "mineralogy:hornfels_slab"
   },
   "result": {
     "id": "mineralogy:hornfels",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:hornfels"
+      "type": "neoforge:registered",
+      "value": "mineralogy:hornfels"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:hornfels_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:hornfels_slab"
     }
   ]
 }

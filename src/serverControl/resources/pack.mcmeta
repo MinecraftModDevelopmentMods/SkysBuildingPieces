@@ -1,10 +1,10 @@
 {
-  "pack": {
-    "description": "Sky's Building Pieces resources",
-    "pack_format": 34,
-    "supported_formats": {
-      "min_inclusive": 34,
-      "max_inclusive": 48
+    "pack": {
+        "description": "Forge server startup control",
+        "max_format": 94,
+        "min_format": [
+            94,
+            1
+        ]
     }
-  }
 }

@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:prismarine_bricks_slab"
-    }
+    "X": "skysbuildingpieces:prismarine_bricks_slab"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_bricks_stairs",
@@ -13,12 +15,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_bricks_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:prismarine_bricks_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_bricks_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:prismarine_bricks_stairs"
     }
   ]
 }

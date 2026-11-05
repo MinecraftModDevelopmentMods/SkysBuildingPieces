@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/hardened_clay",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:hardened_clay_horizontal_step"
-    }
+    "X": "skysbuildingpieces:hardened_clay_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:hardened_clay_slab",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:hardened_clay_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:hardened_clay_slab"
     }
   ]
 }

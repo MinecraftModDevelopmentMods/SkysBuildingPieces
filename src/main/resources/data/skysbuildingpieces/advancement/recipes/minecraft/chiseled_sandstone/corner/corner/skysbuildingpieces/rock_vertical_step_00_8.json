@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_sandstone_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_sandstone_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:chiseled_sandstone_vertical_step"
     }
   ]
 }

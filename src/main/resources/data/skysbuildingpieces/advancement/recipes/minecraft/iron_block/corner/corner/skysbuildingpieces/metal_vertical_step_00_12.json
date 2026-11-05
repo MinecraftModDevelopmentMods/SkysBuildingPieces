@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:iron_block_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:iron_block_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:iron_block_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:iron_block_vertical_step"
     }
   ]
 }

@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diamond_block_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:diamond_block_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diamond_block_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:diamond_block_horizontal_step"
     }
   ]
 }

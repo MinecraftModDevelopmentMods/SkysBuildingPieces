@@ -9,7 +9,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,7 +19,7 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Keep new pieces and the native shapes they reuse together in one tab. */
-@EventBusSubscriber(modid = SkysBuildingPieces.ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = SkysBuildingPieces.ID)
 public final class PiecesTab {
     public static CreativeModeTab INSTANCE;
 
@@ -31,12 +31,12 @@ public final class PiecesTab {
                     .icon(() -> new ItemStack(Blocks.BRICK_STAIRS))
                     .displayItems((parameters, output) -> entries().values().forEach(output::accept))
                     .build();
-            registry.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
+            registry.register(Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
         });
     }
 
-    public static Map<ResourceLocation, ItemStack> entries() {
-        Map<ResourceLocation, ItemStack> entries = new LinkedHashMap<>();
+    public static Map<Identifier, ItemStack> entries() {
+        Map<Identifier, ItemStack> entries = new LinkedHashMap<>();
 
         for (Item item : BuiltInRegistries.ITEM) {
             if (item instanceof PieceItem && ((PieceItem) item).visibleInCreativeTab()) {

@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:netherrack"
-    }
+    "X": "minecraft:netherrack"
   },
   "result": {
     "id": "skysbuildingpieces:netherrack_stairs",
@@ -13,8 +15,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:netherrack_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:netherrack_stairs"
     }
   ]
 }

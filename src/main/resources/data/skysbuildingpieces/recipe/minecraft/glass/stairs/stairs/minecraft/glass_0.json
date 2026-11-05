@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:glass"
-    }
+    "X": "minecraft:glass"
   },
   "result": {
     "id": "skysbuildingpieces:glass_stairs",
@@ -13,8 +15,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:glass_stairs"
     }
   ]
 }

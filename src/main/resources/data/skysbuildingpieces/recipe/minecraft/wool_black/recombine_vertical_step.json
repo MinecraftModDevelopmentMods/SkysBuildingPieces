@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/wool_black",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_black_vertical_step"
-    }
+    "X": "skysbuildingpieces:wool_black_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:wool_black_slab",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_black_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_black_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_black_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_black_vertical_step"
     }
   ]
 }

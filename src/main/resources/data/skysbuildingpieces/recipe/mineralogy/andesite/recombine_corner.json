@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/andesite",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_andesite_corner"
-    }
+    "X": "skysbuildingpieces:mineralogy_andesite_corner"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_andesite_horizontal_step",
@@ -17,12 +18,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_andesite_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_andesite_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_andesite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_andesite_horizontal_step"
     }
   ]
 }

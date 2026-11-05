@@ -1,11 +1,11 @@
 {
   "type": "skysbuildingpieces:cutting",
   "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:hardened_clay_vertical_slab"
-    }
+    "X": "skysbuildingpieces:hardened_clay_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:hardened_clay_slab",
@@ -14,12 +14,12 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:hardened_clay_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:hardened_clay_vertical_slab"
     }
   ]
 }

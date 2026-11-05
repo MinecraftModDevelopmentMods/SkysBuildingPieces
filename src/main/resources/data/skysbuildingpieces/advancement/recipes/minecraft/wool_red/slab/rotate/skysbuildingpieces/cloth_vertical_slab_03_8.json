@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_red_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_red_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_red_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_red_vertical_slab"
     }
   ]
 }

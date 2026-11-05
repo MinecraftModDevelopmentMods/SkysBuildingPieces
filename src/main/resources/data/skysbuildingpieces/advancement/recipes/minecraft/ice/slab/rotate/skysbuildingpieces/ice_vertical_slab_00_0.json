@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:ice_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:ice_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:ice_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:ice_vertical_slab"
     }
   ]
 }

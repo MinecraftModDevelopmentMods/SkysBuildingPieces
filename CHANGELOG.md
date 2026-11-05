@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.121112
+
+- Bring Building Pieces to Minecraft 1.21.11 on NeoForge.
+- Keep existing pieces, recipes and supported world upgrades.
+- Grass Slabs and Mineralogy are still optional.
+
 ## 0.3.8.121012
 
 - Bring Building Pieces to Minecraft 1.21.1 on NeoForge.

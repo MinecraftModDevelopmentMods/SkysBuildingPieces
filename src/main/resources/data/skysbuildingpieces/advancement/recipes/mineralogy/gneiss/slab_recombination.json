@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gneiss"
+      "type": "neoforge:registered",
+      "value": "mineralogy:gneiss"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gneiss_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:gneiss_slab"
     }
   ]
 }

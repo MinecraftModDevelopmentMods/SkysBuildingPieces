@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:diorite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:diorite_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_diorite_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_diorite_vertical_step"
     }
   ]
 }

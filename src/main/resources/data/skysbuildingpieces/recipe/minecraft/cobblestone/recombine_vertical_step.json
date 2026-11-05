@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/cobblestone",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:cobblestone_vertical_step"
-    }
+    "X": "skysbuildingpieces:cobblestone_vertical_step"
   },
   "result": {
     "id": "minecraft:cobblestone_slab",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:cobblestone_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:cobblestone_vertical_step"
     }
   ]
 }

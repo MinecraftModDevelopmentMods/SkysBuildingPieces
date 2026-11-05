@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gabbro_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:gabbro_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_gabbro_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_gabbro_vertical_step"
     }
   ]
 }

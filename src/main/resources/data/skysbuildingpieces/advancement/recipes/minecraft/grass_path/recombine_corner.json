@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:grass_path_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:grass_path_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:grass_path_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:grass_path_step"
     }
   ]
 }

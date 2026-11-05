@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XX", "XX", "XX"],
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:diamond_block"
-    }
+    "X": "minecraft:diamond_block"
   },
   "result": {
     "id": "skysbuildingpieces:diamond_block_wall",
@@ -13,8 +15,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diamond_block_wall"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:diamond_block_wall"
     }
   ]
 }

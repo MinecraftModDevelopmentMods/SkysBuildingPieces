@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/mineralogy",
-  "pattern": ["X  ", " X ", "  X"],
+  "pattern": [
+    "X  ",
+    " X ",
+    "  X"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:diorite"
-    }
+    "X": "mineralogy:diorite"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_diorite_horizontal_step",
@@ -17,12 +19,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:diorite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:diorite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_diorite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_diorite_horizontal_step"
     }
   ]
 }

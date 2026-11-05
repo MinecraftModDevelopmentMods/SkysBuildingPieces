@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_stairs"
     }
   ]
 }

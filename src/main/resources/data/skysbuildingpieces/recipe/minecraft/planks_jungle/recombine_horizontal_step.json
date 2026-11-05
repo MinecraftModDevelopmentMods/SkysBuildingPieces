@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/planks_jungle",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:planks_jungle_horizontal_step"
-    }
+    "X": "skysbuildingpieces:planks_jungle_horizontal_step"
   },
   "result": {
     "id": "minecraft:jungle_slab",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:planks_jungle_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:planks_jungle_horizontal_step"
     }
   ]
 }

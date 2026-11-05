@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:planks_jungle_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:planks_jungle_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:planks_jungle_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:planks_jungle_vertical_step"
     }
   ]
 }

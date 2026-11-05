@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:prismarine_dark_horizontal_step"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:prismarine_dark_vertical_slab"
     }
   ]
 }

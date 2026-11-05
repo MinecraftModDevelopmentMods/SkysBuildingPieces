@@ -13,8 +13,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -36,7 +36,7 @@ public final class RuntimeProbe {
         PersistenceRegistrationChecks.register(
                 modBus);
         NeoForge.EVENT_BUS.register(this);
-        if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+        if (net.neoforged.fml.loading.FMLEnvironment.getDist() == net.neoforged.api.distmarker.Dist.CLIENT) {
             new ClientProbe().init();
         }
     }
@@ -80,11 +80,11 @@ public final class RuntimeProbe {
 
             // Use the same server commands as an operator; the bulk-copy helper is client-only.
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
-                    "gamerule randomTickSpeed 0");
+                    "gamerule minecraft:random_tick_speed 0");
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(),
-                    "gamerule doFireTick false");
-            if (world.getGameRules().getInt(net.minecraft.world.level.GameRules.RULE_RANDOMTICKING) != 0
-                    || world.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOFIRETICK)) {
+                    "gamerule minecraft:fire_spread_radius_around_player 0");
+            if (world.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED) != 0
+                    || world.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER) != 0) {
                 throw new AssertionError("The disposable runtime rules were not applied");
             }
 
@@ -190,7 +190,7 @@ public final class RuntimeProbe {
 
                 if (reload) {
                     if (!NbtUtils.writeBlockState(world.getBlockState(position))
-                            .equals(saved.getCompound("" + number))) {
+                            .equals(saved.getCompoundOrEmpty("" + number))) {
                         throw new AssertionError(
                                 "Saved client grid lost " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block) + " / " + metadata);
                     }

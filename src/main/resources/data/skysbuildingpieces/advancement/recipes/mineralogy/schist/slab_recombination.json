@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:schist"
+      "type": "neoforge:registered",
+      "value": "mineralogy:schist"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:schist_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:schist_slab"
     }
   ]
 }

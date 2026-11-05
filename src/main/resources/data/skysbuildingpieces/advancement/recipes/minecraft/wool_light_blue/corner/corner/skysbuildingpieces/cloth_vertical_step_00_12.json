@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_light_blue_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_light_blue_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_light_blue_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_light_blue_vertical_step"
     }
   ]
 }

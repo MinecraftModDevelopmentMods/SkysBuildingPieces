@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/mineralogy",
-  "pattern": ["X  ", " X ", "  X"],
+  "pattern": [
+    "X  ",
+    " X ",
+    "  X"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:peridotite"
-    }
+    "X": "mineralogy:peridotite"
   },
   "result": {
     "id": "skysbuildingpieces:mineralogy_peridotite_horizontal_step",
@@ -17,12 +19,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:peridotite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:peridotite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_peridotite_horizontal_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:mineralogy_peridotite_horizontal_step"
     }
   ]
 }

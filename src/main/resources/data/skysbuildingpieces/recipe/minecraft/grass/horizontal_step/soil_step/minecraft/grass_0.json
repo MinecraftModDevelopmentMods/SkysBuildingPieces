@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X ", " X"],
+  "pattern": [
+    "X ",
+    " X"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:grass_block"
-    }
+    "X": "minecraft:grass_block"
   },
   "result": {
     "id": "skysbuildingpieces:grass_step",
@@ -13,8 +14,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:grass_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:grass_step"
     }
   ]
 }

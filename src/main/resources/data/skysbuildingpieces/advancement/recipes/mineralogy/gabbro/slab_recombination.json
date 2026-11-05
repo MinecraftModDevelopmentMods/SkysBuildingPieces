@@ -29,12 +29,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gabbro"
+      "type": "neoforge:registered",
+      "value": "mineralogy:gabbro"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gabbro_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:gabbro_slab"
     }
   ]
 }

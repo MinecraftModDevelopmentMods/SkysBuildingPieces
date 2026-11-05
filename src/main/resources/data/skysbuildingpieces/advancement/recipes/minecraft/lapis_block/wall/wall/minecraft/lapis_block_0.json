@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:lapis_block_wall"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:lapis_block_wall"
     }
   ]
 }

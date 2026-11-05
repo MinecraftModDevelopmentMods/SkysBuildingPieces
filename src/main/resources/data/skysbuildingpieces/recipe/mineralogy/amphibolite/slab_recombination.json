@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/amphibolite",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:amphibolite_slab"
-    }
+    "X": "mineralogy:amphibolite_slab"
   },
   "result": {
     "id": "mineralogy:amphibolite",
@@ -17,12 +17,12 @@
       "modid": "mineralogy"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:amphibolite"
+      "type": "neoforge:registered",
+      "value": "mineralogy:amphibolite"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:amphibolite_slab"
+      "type": "neoforge:registered",
+      "value": "mineralogy:amphibolite_slab"
     }
   ]
 }

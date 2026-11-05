@@ -25,8 +25,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysgrassslabs:dirt_slab"
+      "type": "neoforge:registered",
+      "value": "skysgrassslabs:dirt_slab"
     }
   ]
 }

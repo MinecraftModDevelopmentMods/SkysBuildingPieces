@@ -17,7 +17,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
@@ -58,7 +60,7 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            Registry.register(registry, ResourceLocation.parse(palette.registryId()), block);
+            Registry.register(registry, Identifier.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
         }
     }
@@ -68,9 +70,10 @@ public final class Pieces {
         // Retain old item identities, creating their intrusive holders only
         // while Forge has opened the item registry.
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
-            Item item = new Item(new Item.Properties().stacksTo(1));
+            Identifier id = Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name);
+            Item item = new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).stacksTo(1));
             RETIRED_TEMPLATES.put(name, item);
-            Registry.register(registry, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name), item);
+            Registry.register(registry, id, item);
         }
     }
 
@@ -82,9 +85,11 @@ public final class Pieces {
 
             // Keep the old item identity available for mixed and unopened saves. Normal drops, recipes and creative
             // entries use the flat items below.
-            BlockItem carrier = new BlockItem(block, new Item.Properties());
+            Identifier blockId = Identifier.parse(block.palette.registryId());
+            BlockItem carrier = new BlockItem(block, new Item.Properties().useBlockDescriptionPrefix()
+                    .setId(ResourceKey.create(Registries.ITEM, blockId)));
 
-            Registry.register(registry, ResourceLocation.parse(block.palette.registryId()), carrier);
+            Registry.register(registry, blockId, carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -95,7 +100,7 @@ public final class Pieces {
 
                 PieceItem item = new PieceItem(block, material);
 
-                Registry.register(registry, ResourceLocation.parse(identifier), item);
+                Registry.register(registry, Identifier.parse(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -131,7 +136,7 @@ public final class Pieces {
     private static BlockState nativeState(JsonElement value) {
         JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
         String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
-        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(identifier));
+        Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(identifier));
 
         if (block == null || block == Blocks.AIR) {
             if (definition != null && definition.has("fallback")) {

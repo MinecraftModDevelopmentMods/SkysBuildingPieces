@@ -44,14 +44,14 @@ public final class CuttingRecipe extends ShapedRecipe {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<CuttingRecipe> getSerializer() {
         return SERIALIZER;
     }
 
     public static final class Serializer implements RecipeSerializer<CuttingRecipe> {
         private static final MapCodec<CuttingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
-                        Codec.STRING.optionalFieldOf("group", "").forGetter(CuttingRecipe::getGroup),
+                        Codec.STRING.optionalFieldOf("group", "").forGetter(CuttingRecipe::group),
                         CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC)
                                 .forGetter(CuttingRecipe::category),
                         ShapedRecipePattern.MAP_CODEC.forGetter(recipe -> recipe.pattern),
@@ -79,7 +79,7 @@ public final class CuttingRecipe extends ShapedRecipe {
         }
 
         private static void encode(RegistryFriendlyByteBuf buffer, CuttingRecipe recipe) {
-            buffer.writeUtf(recipe.getGroup());
+            buffer.writeUtf(recipe.group());
             CraftingBookCategory.STREAM_CODEC.encode(buffer, recipe.category());
             ShapedRecipePattern.STREAM_CODEC.encode(buffer, recipe.pattern);
             ItemStack.STREAM_CODEC.encode(buffer, recipe.output);

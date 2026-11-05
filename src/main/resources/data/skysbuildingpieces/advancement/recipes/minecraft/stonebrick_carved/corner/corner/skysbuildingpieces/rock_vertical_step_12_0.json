@@ -25,12 +25,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_corner"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stonebrick_carved_corner"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stonebrick_carved_vertical_step"
     }
   ]
 }

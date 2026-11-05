@@ -1,11 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/wool_brown",
-  "pattern": ["XX"],
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_brown_slab"
-    }
+    "X": "skysbuildingpieces:wool_brown_slab"
   },
   "result": {
     "id": "minecraft:brown_wool",
@@ -13,8 +13,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_brown_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:wool_brown_slab"
     }
   ]
 }

@@ -27,17 +27,17 @@
     {
       "type": "neoforge:not",
       "value": {
-        "type": "neoforge:item_exists",
-        "item": "skysgrassslabs:dirt_slab"
+        "type": "neoforge:registered",
+        "value": "skysgrassslabs:dirt_slab"
       }
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_vertical_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:dirt_vertical_step"
     }
   ]
 }

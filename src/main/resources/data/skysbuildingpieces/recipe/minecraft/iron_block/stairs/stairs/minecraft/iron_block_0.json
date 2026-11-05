@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:iron_block"
-    }
+    "X": "minecraft:iron_block"
   },
   "result": {
     "id": "skysbuildingpieces:iron_block_stairs",
@@ -13,8 +15,8 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:iron_block_stairs"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:iron_block_stairs"
     }
   ]
 }

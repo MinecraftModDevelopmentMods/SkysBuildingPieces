@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "skysbuildingpieces/stained_hardened_clay_red",
-  "pattern": ["X", "X"],
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_red_vertical_step"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_red_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_red_slab",
@@ -13,12 +14,12 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_red_slab"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_hardened_clay_red_slab"
     },
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_red_vertical_step"
+      "type": "neoforge:registered",
+      "value": "skysbuildingpieces:stained_hardened_clay_red_vertical_step"
     }
   ]
 }

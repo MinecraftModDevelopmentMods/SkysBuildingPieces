@@ -10,6 +10,7 @@ import net.neoforged.fml.common.Mod;
 @Mod("neoforgeclientcontrol")
 public final class NeoForgeClientControl {
     private boolean started;
+    private boolean leaving;
     private int joinedTicks;
     private long worldStarted;
 
@@ -21,7 +22,14 @@ public final class NeoForgeClientControl {
 
         Minecraft client = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getWindow().getWindow());
+        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getWindow().handle());
+
+        if (leaving) {
+            if (client.level == null && client.getSingleplayerServer() == null) {
+                client.stop();
+            }
+            return;
+        }
 
         if (started && client.level == null) {
             confirmDisposableWorld(client);
@@ -36,7 +44,8 @@ public final class NeoForgeClientControl {
             started = true;
             worldStarted = System.nanoTime();
             LevelSettings settings = new LevelSettings("NeoForge Login Control", GameType.CREATIVE, false,
-                    net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.GameRules(),
+                    net.minecraft.world.Difficulty.NORMAL, true,
+                    new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS),
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
@@ -48,10 +57,8 @@ public final class NeoForgeClientControl {
             }
 
             org.apache.logging.log4j.LogManager.getLogger().info("NEOFORGE_CLIENT_CONTROL_PASS joined=true sky_mods=false");
-            client.level.disconnect();
-            client.disconnect(new net.minecraft.client.gui.screens.GenericMessageScreen(
-                    net.minecraft.network.chat.Component.translatable("menu.savingLevel")));
-            client.stop();
+            leaving = true;
+            client.disconnectFromWorld(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE);
         }
     }
     private static void confirmDisposableWorld(Minecraft minecraft) {
@@ -80,7 +87,7 @@ public final class NeoForgeClientControl {
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
-                    button.onPress();
+                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
                     System.out.println("NEOFORGE_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;

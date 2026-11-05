@@ -1,40 +1,52 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.world.item.Item;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.world.level.GrassColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.fml.ModList;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
-import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
-/** Client listeners stay on the mod bus that posts model and colour events. */
+/** Keeps model and colour code out of dedicated servers. */
 public final class ClientProxy {
     private ClientProxy() {
     }
 
     public static void register(IEventBus modBus) {
-
+        modBus.addListener(ClientProxy::mineralogyResources);
         modBus.addListener(ClientProxy::blockColors);
-        modBus.addListener(ClientProxy::itemColors);
+        modBus.addListener(ContinuousGlassModel::bake);
         modBus.addListener(ClientProxy::renderLayers);
-        modBus.addListener(new ContinuousGlassModel.BakeHandler()::bake);
+    }
+
+    private static void mineralogyResources(AddPackFindersEvent event) {
+        if (event.getPackType() != PackType.CLIENT_RESOURCES || !ModList.get().isLoaded("mineralogy")) {
+            return;
+        }
+        event.addPackFinders(Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "optional/mineralogy"),
+                PackType.CLIENT_RESOURCES, Component.literal("Sky's Building Pieces: Mineralogy models"),
+                PackSource.BUILT_IN, true, Pack.Position.BOTTOM);
     }
 
     private static void renderLayers(FMLClientSetupEvent event) {
         for (PieceBlock block : Pieces.BLOCKS.values()) {
-            RenderType layer = RenderType.solid();
-            if (block.palette.group.equals("grass")) {
-                layer = RenderType.cutoutMipped();
-            } else if (block.palette.group.equals("clear_glass")) {
-                layer = RenderType.cutout();
-            } else if (block.palette.group.equals("stained_glass") || block.palette.group.equals("ice")) {
-                layer = RenderType.translucent();
-            }
+            ChunkSectionLayer layer = switch (block.palette.group) {
+                case "grass", "clear_glass" -> ChunkSectionLayer.CUTOUT;
+                case "stained_glass", "ice" -> ChunkSectionLayer.TRANSLUCENT;
+                default -> ChunkSectionLayer.SOLID;
+            };
             ItemBlockRenderTypes.setRenderLayer(block, layer);
         }
     }
@@ -42,25 +54,14 @@ public final class ClientProxy {
     private static void blockColors(RegisterColorHandlersEvent.Block event) {
         for (PieceBlock block : Pieces.BLOCKS.values()) {
             if (block.palette.group.equals("grass")) {
-                event.getBlockColors().register(
-                        (state, world, position,
-                                tint) -> tint == 0 ? event.getBlockColors()
-                                        .getColor(Blocks.GRASS_BLOCK.defaultBlockState(), world, position, 0) : -1,
-                        block);
-            }
-        }
-    }
-
-    private static void itemColors(RegisterColorHandlersEvent.Item event) {
-        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
-            if (item instanceof PieceItem && ((PieceItem) item).piece.palette.group.equals("grass")) {
-                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1, item);
-            }
-        }
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
-            if (block.palette.group.equals("grass")) {
-                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1,
-                        block.asItem());
+                event.register((state, world, position, tint) -> {
+                    if (tint != 0) {
+                        return -1;
+                    }
+                    return world != null && position != null
+                            ? BiomeColors.getAverageGrassColor(world, position)
+                            : GrassColor.get(0.5D, 1.0D);
+                }, block);
             }
         }
     }
