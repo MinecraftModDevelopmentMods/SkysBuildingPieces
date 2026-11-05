@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.ModList;
 
@@ -21,7 +23,7 @@ public final class GrassLifecycle {
     }
 
     public static void initialize() {
-        if (!ModList.get().isLoaded("skysgrassslabs")) {
+        if (!ModList.isLoaded("skysgrassslabs")) {
             return;
         }
         try {
@@ -35,7 +37,7 @@ public final class GrassLifecycle {
                         continue;
                     }
 
-                    BlockState canonical = state.setValue(net.minecraft.world.level.block.SnowyDirtBlock.SNOWY, false);
+                    BlockState canonical = state.setValue(net.minecraft.world.level.block.SnowyBlock.SNOWY, false);
                     BlockState dirt = counterpart(canonical, false);
 
                     if (dirt != null && registered.add(canonical)) {
@@ -160,11 +162,16 @@ public final class GrassLifecycle {
         BlockPos above = position.above();
 
         return world.getMaxLocalRawBrightness(above) >= 4
-                || world.getBlockState(above).getLightBlock() < 15;
+                || lightBlocked(world.getBlockState(above)) < 15;
+    }
+
+    private static int lightBlocked(BlockState cover) {
+        return LightEngine.getLightBlockInto(Blocks.AIR.defaultBlockState(), cover,
+                Direction.UP, cover.getLightDampening());
     }
 
     private static boolean viableTarget(Level world, BlockPos position) {
-        if (position.getY() < 0 || position.getY() >= 256 || !world.isLoaded(position)) {
+        if (position.getY() < world.getMinY() || position.getY() > world.getMaxY() || !world.isLoaded(position)) {
             return false;
         }
 
@@ -184,7 +191,7 @@ public final class GrassLifecycle {
             return false;
         }
 
-        return world.getMaxLocalRawBrightness(above) >= 4 && cover.getLightBlock() < 15
+        return world.getMaxLocalRawBrightness(above) >= 4 && lightBlocked(cover) < 15
                 && world.getFluidState(above).isEmpty();
     }
 }

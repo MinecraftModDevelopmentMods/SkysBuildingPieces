@@ -13,8 +13,8 @@ public final class OptionalModControl {
     }
 
     private void started(ServerStartedEvent event) {
-        if (!ModList.get().isLoaded("mineralogy") || !ModList.get().isLoaded("orespawn")
-                || ModList.get().isLoaded("skysbuildingpieces") || ModList.get().isLoaded("skysgrassslabs")) {
+        if (!ModList.isLoaded("mineralogy") || !ModList.isLoaded("orespawn")
+                || ModList.isLoaded("skysbuildingpieces") || ModList.isLoaded("skysgrassslabs")) {
             throw new AssertionError("Dependency control contains the wrong mods");
         }
 

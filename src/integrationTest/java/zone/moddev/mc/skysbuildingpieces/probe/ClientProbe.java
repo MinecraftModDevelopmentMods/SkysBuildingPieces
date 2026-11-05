@@ -2,7 +2,6 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
@@ -11,7 +10,9 @@ import net.minecraft.world.level.GrassColor;
 
 import java.io.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.Direction;
@@ -22,6 +23,7 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 public final class ClientProbe extends ProbeProxy {
     private boolean ran;
     private boolean startedWorld;
+    private boolean confirmedWorld;
     private long worldStarted;
     private boolean requestedRecipes;
     private volatile java.util.Set<net.minecraft.world.item.crafting.display.RecipeDisplayId> expectedRecipes;
@@ -69,6 +71,8 @@ public final class ClientProbe extends ProbeProxy {
                     return;
                 }
                 RecipePreviewModels.check(minecraft, expectedRecipes);
+                // Item components are bound when the world is ready, after the first menu bake.
+                checkCreativeEntries();
                 colours(minecraft);
                 net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(minecraft.level.enabledFeatures(),
                         true, minecraft.level.registryAccess());
@@ -93,83 +97,19 @@ public final class ClientProbe extends ProbeProxy {
         try {
             org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().handle());
 
-            var availableCreative = PiecesTab.entries();
-
-            for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
-                if (availableCreative.containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(retired))) {
-                    throw new AssertionError("Retired template appears in creative inventory");
-                }
-            }
-
-            net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> creative = net.minecraft.core.NonNullList
-                    .create();
-
-            for (net.minecraft.world.item.Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
-                if (!(item instanceof PieceItem)) {
-                    continue;
-                }
-
-                PieceItem piece = (PieceItem) item;
-                boolean hidden = zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.materials
-                        .get(piece.material).replacement() != null
-                        || piece.piece.palette.shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.VERTICAL_SLAB
-                        || Pieces.nativeState(
-                                zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.materials
-                                        .get(piece.material),
-                                piece.piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
-
-                if (hidden == availableCreative.containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item))) {
-                    throw new AssertionError("Incorrect creative visibility " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item));
-                }
-            }
-
-            creative.addAll(availableCreative.values());
-
-            java.util.Set<String> entries = new java.util.HashSet<String>();
-
-            for (net.minecraft.world.item.ItemStack stack : creative) {
-                String key = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
-
-                if (!entries.add(key)) {
-                    throw new AssertionError("Duplicate creative entry " + key);
-                }
-                if (stack.getItem() instanceof PieceItem && ((PieceItem) stack
-                        .getItem()).piece.palette.shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.VERTICAL_SLAB) {
-                    throw new AssertionError("Vertical slab appears in creative inventory");
-                }
-                if (Pieces.RETIRED_TEMPLATES.containsValue(stack.getItem())) {
-                    throw new AssertionError("Retired template in mod tab");
-                }
-            }
-            if (!entries.contains("minecraft:oak_slab")) {
-                throw new AssertionError("Reused oak slab missing from mod tab");
-            }
-            if (entries.contains("skysbuildingpieces:legacy_piece_holder")) {
-                throw new AssertionError("Recovery holder in mod tab");
-            }
-            if (!net.minecraft.client.resources.language.I18n.get("itemGroup.skysbuildingpieces")
-                    .equals("Sky's Building Pieces")) {
-                throw new AssertionError("Missing creative tab name");
-            }
-
-            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CREATIVE_TAB_PASS entries=" + creative.size());
-
-            PresentationChecks.names();
-
             int checked = 0;
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-                    BlockStateModel model = minecraft.getBlockRenderer().getBlockModel(state);
+                    BlockStateModel model = minecraft.getModelManager().getBlockStateModelSet().get(state);
 
-                    if (model == minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
-                            .getMissingBlockStateModel()) {
+                    if (model == minecraft.getModelManager().getBlockStateModelSet().missingModel()) {
                         throw new AssertionError("Missing baked model " + state);
                     }
                     for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH,
                             Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                         for (BakedQuad quad : quads(model, face)) {
-                            if (quad.sprite().contents().name().toString().contains("missingno")) {
+                            if (quad.materialInfo().sprite().contents().name().toString().contains("missingno")) {
                                 throw new AssertionError("Missing sprite " + state);
                             }
                         }
@@ -190,14 +130,13 @@ public final class ClientProbe extends ProbeProxy {
                     continue;
                 }
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-                    BlockStateModel model = minecraft.getBlockRenderer().getBlockModel(state);
+                    BlockStateModel model = minecraft.getModelManager().getBlockStateModelSet().get(state);
 
-                    if (model == minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
-                            .getMissingBlockStateModel()) {
+                    if (model == minecraft.getModelManager().getBlockStateModelSet().missingModel()) {
                         throw new AssertionError("Missing decoration model " + state);
                     }
                     for (BakedQuad quad : quads(model, null)) {
-                        if (quad.sprite().contents().name().toString().contains("missingno")) {
+                        if (quad.materialInfo().sprite().contents().name().toString().contains("missingno")) {
                             throw new AssertionError("Missing decoration texture " + state);
                         }
                     }
@@ -217,16 +156,15 @@ public final class ClientProbe extends ProbeProxy {
                     continue;
                 }
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-                    BlockStateModel model = minecraft.getBlockRenderer().getBlockModel(state);
+                    BlockStateModel model = minecraft.getModelManager().getBlockStateModelSet().get(state);
 
-                    if (model == minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
-                            .getMissingBlockStateModel()) {
+                    if (model == minecraft.getModelManager().getBlockStateModelSet().missingModel()) {
                         throw new AssertionError("Missing recovery model " + state);
                     }
                     for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH,
                             Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                         for (BakedQuad quad : quads(model, face)) {
-                            if (quad.sprite().contents().name().toString().contains("missingno")) {
+                            if (quad.materialInfo().sprite().contents().name().toString().contains("missingno")) {
                                 throw new AssertionError("Missing recovery sprite " + state);
                             }
                         }
@@ -253,8 +191,8 @@ public final class ClientProbe extends ProbeProxy {
                     minecraft.createWorldOpenFlows().openWorld("building-pieces-world", () -> minecraft.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
                 } else {
                     net.minecraft.world.level.LevelSettings settings = new net.minecraft.world.level.LevelSettings(
-                            "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE, false,
-                            net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS),
+                            "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE,
+                            net.minecraft.world.level.LevelSettings.DifficultySettings.DEFAULT, true,
                             net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
                     minecraft.createWorldOpenFlows().createFreshLevel("building-pieces-world", settings,
                             new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
@@ -267,7 +205,73 @@ public final class ClientProbe extends ProbeProxy {
         }
     }
 
-    private static void confirmDisposableWorld(Minecraft minecraft) {
+    private static void checkCreativeEntries() {
+        var availableCreative = PiecesTab.entries();
+
+        for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
+            if (availableCreative.containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(retired))) {
+                throw new AssertionError("Retired template appears in creative inventory");
+            }
+        }
+
+        net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> creative = net.minecraft.core.NonNullList
+                .create();
+
+        for (net.minecraft.world.item.Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
+            if (!(item instanceof PieceItem)) {
+                continue;
+            }
+
+            PieceItem piece = (PieceItem) item;
+            boolean hidden = zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.materials
+                    .get(piece.material).replacement() != null
+                    || piece.piece.palette.shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.VERTICAL_SLAB
+                    || Pieces.nativeState(
+                            zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue.INSTANCE.materials
+                                    .get(piece.material),
+                            piece.piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT)) != null;
+
+            if (hidden == availableCreative.containsKey(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item))) {
+                throw new AssertionError("Incorrect creative visibility " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item));
+            }
+        }
+
+        creative.addAll(availableCreative.values());
+
+        java.util.Set<String> entries = new java.util.HashSet<String>();
+
+        for (net.minecraft.world.item.ItemStack stack : creative) {
+            String key = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+
+            if (!entries.add(key)) {
+                throw new AssertionError("Duplicate creative entry " + key);
+            }
+            if (stack.getItem() instanceof PieceItem && ((PieceItem) stack
+                    .getItem()).piece.palette.shape == zone.moddev.mc.skysbuildingpieces.catalogue.Shape.VERTICAL_SLAB) {
+                throw new AssertionError("Vertical slab appears in creative inventory");
+            }
+            if (Pieces.RETIRED_TEMPLATES.containsValue(stack.getItem())) {
+                throw new AssertionError("Retired template in mod tab");
+            }
+        }
+        if (!entries.contains("minecraft:oak_slab")) {
+            throw new AssertionError("Reused oak slab missing from mod tab");
+        }
+        if (entries.contains("skysbuildingpieces:legacy_piece_holder")) {
+            throw new AssertionError("Recovery holder in mod tab");
+        }
+        if (!net.minecraft.client.resources.language.I18n.get("itemGroup.skysbuildingpieces")
+                .equals("Sky's Building Pieces")) {
+            throw new AssertionError("Missing creative tab name");
+        }
+
+        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CREATIVE_TAB_PASS entries=" + creative.size());
+
+        PresentationChecks.names();
+    }
+
+    private void confirmDisposableWorld(Minecraft minecraft) {
+        if (confirmedWorld) return;
         boolean backup = minecraft.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
         boolean confirmation = minecraft.screen != null
                 && minecraft.screen.getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
@@ -293,6 +297,7 @@ public final class ClientProbe extends ProbeProxy {
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
+                    confirmedWorld = true;
                     button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
                     System.out.println("BUILDING_PIECES_CLIENT_LOAD_PROMPT_CONFIRMED owned_world=true");
                 }
@@ -304,14 +309,32 @@ public final class ClientProbe extends ProbeProxy {
 
 
     private static java.util.List<BakedQuad> quads(BlockStateModel model, Direction face) {
-        return model.collectParts(net.minecraft.util.RandomSource.create(0)).stream()
+        var parts = new java.util.ArrayList<BlockStateModelPart>();
+        model.collectParts(net.minecraft.util.RandomSource.create(0), parts);
+        return parts.stream()
                 .flatMap(part -> part.getQuads(face).stream()).toList();
+    }
+
+    private static java.util.List<BakedQuad> tintedQuads(BlockStateModel model) {
+        return java.util.stream.Stream.concat(quads(model, null).stream(),
+                java.util.Arrays.stream(Direction.values()).flatMap(face -> quads(model, face).stream()))
+                .filter(quad -> quad.materialInfo().isTinted()).toList();
     }
 
     private static void colours(Minecraft client) {
         net.minecraft.core.BlockPos sample = client.player.blockPosition();
-        int expected = client.getBlockColors().getColor(net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState(),
-                client.level, sample, 0);
+        var vanillaGrass = net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState();
+        int expected = client.getBlockColors().getTintSource(vanillaGrass, 0)
+                .colorInWorld(vanillaGrass, client.level, sample);
+        var models = client.getModelManager().getBlockStateModelSet();
+        var vanillaLayers = new java.util.HashMap<net.minecraft.resources.Identifier,
+                net.minecraft.client.renderer.chunk.ChunkSectionLayer>();
+        for (BakedQuad quad : tintedQuads(models.get(vanillaGrass))) {
+            vanillaLayers.put(quad.materialInfo().sprite().contents().name(), quad.materialInfo().layer());
+        }
+        if (vanillaLayers.size() < 2) {
+            throw new AssertionError("Expected vanilla grass top and side overlay textures");
+        }
         int inventory = net.minecraft.world.level.GrassColor.get(.5, 1);
         int checked = 0;
 
@@ -322,13 +345,24 @@ public final class ClientProbe extends ProbeProxy {
 
             BlockState state = block.defaultBlockState();
 
-            var layers = client.getBlockRenderer().getBlockModel(state).getRenderTypes(state,
-                    net.minecraft.util.RandomSource.create(0), net.minecraftforge.client.model.data.ModelData.EMPTY);
-            if (client.getBlockColors().getColor(state, client.level, sample, 0) != expected
-                    || client.getBlockColors().getColor(state, client.level, sample, 1) != -1
-                    || !layers.contains(net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT)
-                    || layers.contains(net.minecraft.client.renderer.chunk.ChunkSectionLayer.SOLID)) {
-                throw new AssertionError("Grass-piece biome tint or render layer: " + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block));
+            var model = client.getModelManager().getBlockStateModelSet().get(state);
+            var colour = client.getBlockColors().getTintSource(state, 0);
+            var shaded = tintedQuads(model);
+            var layers = new java.util.HashMap<net.minecraft.resources.Identifier,
+                    net.minecraft.client.renderer.chunk.ChunkSectionLayer>();
+            for (BakedQuad quad : shaded) {
+                layers.put(quad.materialInfo().sprite().contents().name(), quad.materialInfo().layer());
+            }
+            // Forge 64 chooses a layer per face. Match vanilla's solid top and
+            // cutout overlay instead of requiring a single layer for the whole piece.
+            if (colour == null || colour.colorInWorld(state, client.level, sample) != expected
+                    || client.getBlockColors().getTintSource(state, 1) != null
+                    || !vanillaLayers.equals(layers)) {
+                throw new AssertionError("Grass-piece biome tint or render layer: "
+                        + net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block)
+                        + ", expected layers " + vanillaLayers + ", actual layers " + layers
+                        + ", tint " + (colour == null ? "unregistered" : colour.colorInWorld(state, client.level, sample))
+                        + ", vanilla tint " + expected);
             }
 
             net.minecraft.world.item.ItemStack stack = Pieces.stack(state, 1);

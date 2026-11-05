@@ -26,7 +26,7 @@ public final class RecombinationChecks {
     /** Walks the whole catalogue without doing all of its work in one server tick. */
     static final class Audit {
         private final ServerLevel world;
-        private final boolean legacyInstalled = net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks");
+        private final boolean legacyInstalled = net.minecraftforge.fml.ModList.isLoaded("buildingbricks");
         private final java.util.Iterator<Catalogue.MaterialDef> remaining = Catalogue.INSTANCE.materials.values().iterator();
         private int checks;
 
@@ -108,13 +108,13 @@ public final class RecombinationChecks {
                         require(!matching.isEmpty(), "two vertically stacked pieces: " + label);
                         for (var holder : matching) {
                             var recipe = holder.value();
-                            ItemStack actual = recipe.assemble(grid.asCraftInput(), world.registryAccess());
+                            ItemStack actual = recipe.assemble(grid.asCraftInput());
                             require(ItemStack.matches(expected, actual), "no conflicting recipe for " + label);
                             for (ItemStack remainder : recipe.getRemainingItems(grid.asCraftInput())) {
                                 require(remainder.isEmpty(), "both piece units are consumed");
                             }
                             actual.setCount(9);
-                            require(ItemStack.matches(expected, recipe.assemble(grid.asCraftInput(), world.registryAccess())),
+                            require(ItemStack.matches(expected, recipe.assemble(grid.asCraftInput())),
                                     "each crafting result is an independent one-item copy");
                         }
                         if (cases == 0) {
@@ -181,7 +181,7 @@ public final class RecombinationChecks {
 
     private static ItemStack result(CraftingContainer grid, ServerLevel world) {
         return world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
-                .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
+                .map(recipe -> recipe.value().assemble(grid.asCraftInput())).orElse(ItemStack.EMPTY);
     }
 
     private static void require(boolean condition, String message) {

@@ -37,13 +37,13 @@ public final class NativeSlabPlacement {
                 continue;
             }
 
-            ItemStack stack = Pieces.stack(slab, 1);
+            Item item = Pieces.item(slab);
 
-            if (stack == null) {
+            if (item == null) {
                 continue;
             }
 
-            String previous = materials.put(stack.getItem(), definition.id);
+            String previous = materials.put(item, definition.id);
 
             if (previous != null && !previous.equals(definition.id)) {
                 throw new IllegalStateException(
@@ -82,7 +82,7 @@ public final class NativeSlabPlacement {
 
     public static InteractionResult place(ItemStack stack, Player player, Level world, BlockPos position,
             InteractionHand hand, Direction face, float hitX, float hitY, float hitZ) {
-        if (instance == null || ModList.get().isLoaded("buildingbricks")) {
+        if (instance == null || ModList.isLoaded("buildingbricks")) {
             return null;
         }
 

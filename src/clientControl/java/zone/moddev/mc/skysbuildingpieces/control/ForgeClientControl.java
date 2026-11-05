@@ -36,15 +36,15 @@ public final class ForgeClientControl {
         if (!started) {
             started = true;
             worldStarted = System.nanoTime();
-            LevelSettings settings = new LevelSettings("Forge Login Control", GameType.CREATIVE, false,
-                    net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS),
+            LevelSettings settings = new LevelSettings("Forge Login Control", GameType.CREATIVE,
+                            net.minecraft.world.level.LevelSettings.DifficultySettings.DEFAULT, true,
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
                     net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.screen);
         } else if (client.player != null && client.level != null && ++joinedTicks >= 40) {
-            if (net.minecraftforge.fml.ModList.get().isLoaded("skysbuildingpieces")
-                    || net.minecraftforge.fml.ModList.get().isLoaded("skysgrassslabs")) {
+            if (net.minecraftforge.fml.ModList.isLoaded("skysbuildingpieces")
+                    || net.minecraftforge.fml.ModList.isLoaded("skysgrassslabs")) {
                 throw new AssertionError("The Forge-only control contains a Sky mod");
             }
 

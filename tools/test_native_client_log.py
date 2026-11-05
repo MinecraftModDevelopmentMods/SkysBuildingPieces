@@ -1,4 +1,4 @@
-"""Negative controls for the exact Forge 47 native log classification."""
+"""Negative controls for the Forge 64 launch audit."""
 
 import unittest
 import json
@@ -11,8 +11,9 @@ from native_client_log import audit, classify
 import run_packaged_checks
 
 
-LOGIN = "[Client thread/INFO] [NetworkHooks/]: Connected to a modded server."
-START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 1.21.11"
+LOGIN = ("[time] [Server thread/INFO]: PiecesChecks[local:E:dca4a022] logged in with entity id 25 at (0, 90, 0)\n"
+         "[time] [Server thread/INFO]: PiecesChecks joined the game")
+START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 26.1.2"
 NOTICE = "[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: Forge config just got changed on the file system!"
 PAYLOAD = "[Client thread/ERROR] [net.minecraftforge.fml.network.simple.IndexedMessageCodec/SIMPLENET]: Received empty payload on channel fml:handshake"
 
@@ -27,6 +28,13 @@ class NativeClientLogTest(unittest.TestCase):
         self.assertEqual(receipt["native_config_notices"], 0)
         self.assertEqual(receipt["empty_handshakes"], 0)
         self.assertEqual(receipt["notices"], [])
+
+    def test_incomplete_or_unrelated_login_is_rejected(self):
+        login, joined = LOGIN.splitlines()
+        for invalid in (login, joined, joined + "\n" + login,
+                        LOGIN.replace("PiecesChecks joined", "AnotherPlayer joined")):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "login"):
+                classify("\n".join((START, invalid)), True)
 
     def test_actual_config_change_is_rejected(self):
         with self.assertRaises(ValueError):

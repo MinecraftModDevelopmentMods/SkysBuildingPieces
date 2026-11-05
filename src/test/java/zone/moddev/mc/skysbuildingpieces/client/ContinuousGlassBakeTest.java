@@ -3,9 +3,9 @@ package zone.moddev.mc.skysbuildingpieces.client;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -72,12 +72,17 @@ class ContinuousGlassBakeTest {
 
     private static final class EmptyModel implements BlockStateModel {
         @Override
-        public void collectParts(RandomSource random, List<BlockModelPart> parts) {
+        public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
         }
 
         @Override
-        public TextureAtlasSprite particleIcon() {
+        public Material.Baked particleMaterial() {
             return null;
+        }
+
+        @Override
+        public int materialFlags() {
+            return 0;
         }
     }
 }

@@ -135,7 +135,7 @@ final class LegacyPreflight {
                                         }
                                         if ((!LegacyMapping.owned(name) && name.startsWith("buildingbricks:")
                                                 && !grassOwned(name)
-                                                && !net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks"))
+                                                && !net.minecraftforge.fml.ModList.isLoaded("buildingbricks"))
                                                 || skyOwned(name) && !HistoricalFullBlocks.historical(name)) {
                                             throw blocked(name + " placed block");
                                         }
@@ -213,7 +213,7 @@ final class LegacyPreflight {
                                 .containsKey(net.minecraft.resources.Identifier.parse(registryId))) {
                     throw blocked(registryId + " item; restore its Sky add-on and dependencies");
                 }
-                if (!net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")
+                if (!net.minecraftforge.fml.ModList.isLoaded("buildingbricks")
                         && registryId.startsWith("buildingbricks:") && !LegacyMapping.owned(registryId)
                         && !grassOwned(registryId)) {
                     throw blocked(registryId + " item");

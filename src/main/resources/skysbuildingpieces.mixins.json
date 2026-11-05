@@ -7,6 +7,7 @@
         "BlockStateDataAccessor",
         "BlockStateDataMixin",
         "DataFixTypesMixin",
+        "FileFixerUpperMixin",
         "ForgeHooksMixin",
         "NativeSlabPlacementMixin",
         "PieceHardnessMixin",

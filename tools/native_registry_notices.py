@@ -11,7 +11,7 @@ EMPTY_CAPABILITIES = "Failed to parse saved data for 'SavedDataType[capabilities
 CAPABILITIES_PATHS = {"data/capabilities.dat", "DIM-1/data/capabilities.dat", "DIM1/data/capabilities.dat"}
 
 
-def validate_forge61_proof(root, directory, profile, fixture):
+def validate_historical_registry_proof(root, directory, profile, fixture):
     receipt = profile['forge61_registry_contract']
     raw = (root / receipt['path']).read_bytes()
     proof = json.loads(raw)
@@ -28,10 +28,11 @@ def validate_forge61_proof(root, directory, profile, fixture):
             for name, expected in original.items():
                 actual = hashlib.sha256(archive.read(name)).hexdigest().upper()
                 current = hashlib.sha256((directory / 'world' / name).read_bytes()).hexdigest().upper()
-                if actual != expected or current != rewritten[name]:
-                    raise ValueError('The Forge 61 capability file does not match its control: ' + name)
-    return {**profile, 'mappings': proof['snapshot_entries'],
-            'empty_capabilities_count': len(empty['original']) if empty else 0}
+                # Forge 64 saves capabilities in namespaced dimension data.
+                # The original file is left alone and no parse error is expected.
+                if actual != expected or current != expected:
+                    raise ValueError('The historical capability file changed: ' + name)
+    return {**profile, 'mappings': {}, 'empty_capabilities_count': 0}
 
 
 def validate_registry_proofs(root, profile):
@@ -113,7 +114,7 @@ def profile_for(directory):
             raise ValueError("The native biome contract does not match this source fixture")
     validate_registry_proofs(root, profile)
     if 'forge61_registry_contract' in profile:
-        return validate_forge61_proof(root, Path(directory), profile, fixture)
+        return validate_historical_registry_proof(root, Path(directory), profile, fixture)
     receipt = profile.get("forge52_registry_contract")
     if receipt is not None:
         path = root / receipt["path"]

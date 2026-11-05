@@ -31,11 +31,11 @@ public final class MineralogyCompat {
     }
 
     public static void register() {
-        if (ModList.get().isLoaded(ASSETS)) {
+        if (ModList.isLoaded(ASSETS)) {
             throw new IllegalStateException("Mineralogy pieces are included in Sky's Building Pieces now. "
                     + "Remove the separate Sky's Building Pieces Mineralogy add-on jar.");
         }
-        if (!ModList.get().isLoaded("mineralogy")) {
+        if (!ModList.isLoaded("mineralogy")) {
             return;
         }
 

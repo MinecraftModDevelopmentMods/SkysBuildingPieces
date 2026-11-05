@@ -6,7 +6,7 @@ import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.registries.MissingMappingsEvent;
 import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -30,12 +30,11 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.121111";
+    public static final String VERSION = "0.3.8.2601021";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;
 
-    @SuppressWarnings("removal") // Keep the client renderer out of dedicated servers.
     public SkysBuildingPieces(FMLJavaModLoadingContext context) {
         BusGroup modBus = context.getModBusGroup();
         BuildingPiecesConfig.register(context);
@@ -50,8 +49,9 @@ public final class SkysBuildingPieces {
         MigrationEvents.register();
         PathPieces.register();
         ServerStoppedEvent.BUS.addListener(this::afterServer);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(modBus));
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register();
+        }
     }
 
     private void setup(FMLCommonSetupEvent event) {

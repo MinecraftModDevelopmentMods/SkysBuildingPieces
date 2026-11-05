@@ -52,8 +52,9 @@ public final class RuntimeBootstrap {
         net.minecraftforge.event.TickEvent.ServerTickEvent.Post.BUS.addListener(this::tick);
         net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent.getBus(context.getModBusGroup())
                 .addListener(PersistenceOrderChecks::ready);
-        net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
-                () -> () -> new ClientProbe().init());
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
+            new ClientProbe().init();
+        }
     }
 
     private void started(ServerStartedEvent event) {
@@ -193,9 +194,10 @@ public final class RuntimeBootstrap {
             ClientStatus.failure = failure;
             // World creation waits for server readiness on the render thread.
             // Report a failed probe there too, so it exits instead of waiting forever.
-            net.minecraftforge.fml.DistExecutor.runWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
-                    () -> () -> net.minecraft.client.Minecraft.getInstance().delayCrash(
-                            net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check")));
+            if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
+                net.minecraft.client.Minecraft.getInstance().delayCrash(
+                        net.minecraft.CrashReport.forThrowable(failure, "Building Pieces runtime check"));
+            }
             server.halt(false);
         } finally {
             if (phase.startsWith("forward")) {

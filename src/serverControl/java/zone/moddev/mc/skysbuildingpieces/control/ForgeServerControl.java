@@ -18,7 +18,7 @@ public final class ForgeServerControl {
     }
 
     private void started(ServerStartedEvent event) {
-        ModList.get().getMods().forEach(mod -> {
+        ModList.getMods().forEach(mod -> {
             String identity = mod.getModId();
 
             if (!identity.equals("minecraft") && !identity.equals("forge") && !identity.equals("forgeservercontrol")) {

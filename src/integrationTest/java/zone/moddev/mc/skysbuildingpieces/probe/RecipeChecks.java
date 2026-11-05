@@ -166,7 +166,7 @@ public final class RecipeChecks {
                                     zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(named, tag.copy());
                                     assertManager(grid, world, named, "Rotation keeps the complete custom tag");
 
-                                    ItemStack result = recipe.assemble(grid.asCraftInput(), world.registryAccess());
+                                    ItemStack result = recipe.assemble(grid.asCraftInput());
 
                                     CompoundTag resultData = NativeProbeItems.custom(result);
                                     resultData.putString("custom_label", "Changed result");
@@ -260,7 +260,7 @@ public final class RecipeChecks {
                 }
             }
 
-            require(ItemStack.matches(decoded.assemble(grid.asCraftInput(), world.registryAccess()), recipe.assemble(grid.asCraftInput(), world.registryAccess())),
+            require(ItemStack.matches(decoded.assemble(grid.asCraftInput()), recipe.assemble(grid.asCraftInput())),
                     "Network assembly changed: " + id);
         } finally {
             buffer.release();
@@ -353,12 +353,12 @@ public final class RecipeChecks {
 
     private static void assertManager(CraftingContainer grid, ServerLevel world, ItemStack expected, String label) {
         ItemStack actual = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
-                .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
+                .map(recipe -> recipe.value().assemble(grid.asCraftInput())).orElse(ItemStack.EMPTY);
 
         require(ItemStack.matches(expected, actual), "Crafting manager selects " + label);
 
         for (RecipeHolder<CraftingRecipe> recipe : NativeRecipeProbe.matching(grid.asCraftInput(), world)) {
-            require(ItemStack.matches(expected, recipe.value().assemble(grid.asCraftInput(), world.registryAccess())),
+            require(ItemStack.matches(expected, recipe.value().assemble(grid.asCraftInput())),
                     "Conflicting recipe for " + label + ": " + recipe.id());
         }
     }

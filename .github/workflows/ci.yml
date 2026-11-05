@@ -1,19 +1,19 @@
-name: Sky's Building Pieces 1.21.11 CI
+name: Sky's Building Pieces 26.1.2 CI
 
 on:
   push:
     branches:
-      - master-1.21.11
+      - master-26.1.2
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.21.11
+      - master-26.1.2
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.21.11-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-26.1.2-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -26,33 +26,15 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Install pinned Java 25 ForgeGradle Mavenizer runtime
+      - name: Install pinned Java 25 runtime and toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '25.0.3+9.0.LTS'
 
-      - name: Install Java 8 for legacy fixture launchers
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '8.0.502+7'
-
-      - name: Install pinned Java 21 compilation toolchain
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '21.0.7+6.0.LTS'
-
       - name: Pin production Java
         run: |
-          echo "SBP_JAVA21_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-
-      - name: Install pinned Java 21 Gradle runtime
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '21.0.7+6.0.LTS'
+          echo "SBP_JAVA25_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
 
       - name: Bootstrap Forge from an empty cache
         shell: bash
@@ -67,7 +49,7 @@ jobs:
           gradle_args=(
             classes test
             --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -83,7 +65,7 @@ jobs:
           gradle_args=(
             classes test
             --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
@@ -98,29 +80,16 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Read target build metadata
+      - name: Read target Java metadata
         id: target
         shell: bash
         run: |
           set -euo pipefail
           value() { sed -n "s/^$1=//p" gradle.properties; }
-          echo "java_setup_version=$(value java_toolchain_version)" >> "$GITHUB_OUTPUT"
-          echo "java_version=$(value java_version)" >> "$GITHUB_OUTPUT"
-          echo "gradle_java_version=$(value gradle_java_toolchain_version)" >> "$GITHUB_OUTPUT"
+          test "$(value java_toolchain_version)" = "$(value gradle_java_toolchain_version)"
+          echo "java_setup_version=$(value java_setup_version)" >> "$GITHUB_OUTPUT"
 
-      - name: Install pinned Java 25 ForgeGradle Mavenizer runtime
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '25.0.3+9.0.LTS'
-
-      - name: Install pinned Java 8 Forge launcher toolchain
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '8.0.502+7'
-
-      - name: Install target production toolchain
+      - name: Install pinned Java 25 runtime and toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -130,17 +99,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          java_version="${{ steps.target.outputs.java_version }}"
-          [[ "$java_version" =~ ^[0-9]+$ ]]
           for prefix in SGS SBP STS; do
-            echo "${prefix}_JAVA${java_version}_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+            echo "${prefix}_JAVA25_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
           done
-
-      - name: Install Java 21 for Gradle
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: ${{ steps.target.outputs.gradle_java_version }}
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
@@ -171,7 +132,7 @@ jobs:
           dependency="$GITHUB_WORKSPACE/.gradle/qualification-sources/grass-slabs"
           chmod +x "$dependency/gradlew"
           "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
           version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
           echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
 
@@ -179,7 +140,7 @@ jobs:
         run: >-
           ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
           verifyEclipseProductionClasspath --no-daemon --stacktrace
-          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME"
           -Dorg.gradle.java.installations.auto-detect=false
           -Dorg.gradle.java.installations.auto-download=false
 
@@ -188,18 +149,18 @@ jobs:
           ORESPAWN_MAVENIZER_OFFLINE: 'true'
         run: >-
           ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
-          -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME"
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.21.11-${{ github.sha }}
+          name: SkysBuildingPieces-26.1.2-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.8.121111.jar
-            build/libs/SkysBuildingPieces-0.3.8.121111-sources.jar
-            build/libs/SkysBuildingPieces-0.3.8.121111-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.8.2601021.jar
+            build/libs/SkysBuildingPieces-0.3.8.2601021-sources.jar
+            build/libs/SkysBuildingPieces-0.3.8.2601021-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -207,7 +168,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.21.11-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-26.1.2-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

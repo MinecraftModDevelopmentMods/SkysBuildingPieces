@@ -139,7 +139,7 @@ public final class WorldAuditProbe {
                         throw new AssertionError(
                                 "Qualified encountered inventory count: " + items + " instead of 1170");
                     }
-                    if (net.minecraftforge.fml.ModList.get().isLoaded("skysbuildingpiecesbop")) {
+                    if (net.minecraftforge.fml.ModList.isLoaded("skysbuildingpiecesbop")) {
                         PiecesWorldState.Totals bop = state.modules.get("biomesoplenty");
 
                         if (bop == null || bop.blocks != 601 || bop.items != 52) {

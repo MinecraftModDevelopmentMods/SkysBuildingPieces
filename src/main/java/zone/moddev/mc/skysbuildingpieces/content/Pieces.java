@@ -253,16 +253,16 @@ public final class Pieces {
         if (result == null || result.hasBlockEntity()) {
             throw new IllegalStateException("No safe replacement geometry for " + material.id);
         }
-        for (Map.Entry<Property<?>, Comparable<?>> property : state.getValues().entrySet()) {
-            if (property.getKey().getName().equals("meta")) {
+        for (Property.Value<?> property : state.getValues().toList()) {
+            if (property.property().getName().equals("meta")) {
                 continue;
             }
 
-            Property<?> target = result.getBlock().getStateDefinition().getProperty(property.getKey().getName());
+            Property<?> target = result.getBlock().getStateDefinition().getProperty(property.property().getName());
 
             if (target != null) {
-                result = withProperty(result, target, property.getValue().toString().toLowerCase(Locale.ROOT));
-            } else if (property.getKey().getName().equals("waterlogged") && Boolean.TRUE.equals(property.getValue())) {
+                result = withProperty(result, target, property.valueName());
+            } else if (property.property().getName().equals("waterlogged") && Boolean.TRUE.equals(property.value())) {
                 throw new IllegalStateException("Material replacement would lose water: " + material.id);
             }
         }
@@ -277,6 +277,11 @@ public final class Pieces {
     }
 
     public static ItemStack stack(BlockState state, int count) {
+        Item item = item(state);
+        return item == null ? null : new ItemStack(item, count);
+    }
+
+    static Item item(BlockState state) {
         if (state == null) {
             return null;
         }
@@ -300,7 +305,7 @@ public final class Pieces {
             item = lookup == null ? state.getBlock().asItem() : lookup.apply(state);
         }
 
-        return item == null || item == Items.AIR ? null : new ItemStack(item, count);
+        return item == Items.AIR ? null : item;
     }
 
     /** Resolve the old palette item while retaining unrelated stack NBT elsewhere. */

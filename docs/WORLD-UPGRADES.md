@@ -13,9 +13,9 @@ material tile data. Sky's Building Pieces resolves both the saved material
 and orientation before replacing a piece. It never guesses from an item's
 temporary material index.
 
-There is no supported BuildingBricks release for Minecraft 1.21.11. Recovery
+There is no supported BuildingBricks release for Minecraft 26.1.2. Recovery
 from an older save is automatic and does not require the replacement setting.
-The permanent Sky palette IDs and orientation values are unchanged. The 1.14
+The permanent Sky palette IDs and orientation values are unchanged. The first 26.1.2 load copies existing migration totals into Minecraft’s namespaced data folder, keeping the old file as a backup. The 1.14
 loader turns old numeric states into named states, preserving the material and
 orientation. Old pieces start dry. Wall connections, joined stairs, snow and
 path supports are refreshed through Minecraft's normal chunk post-processing.

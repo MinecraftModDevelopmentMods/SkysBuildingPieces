@@ -1,6 +1,14 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelResource;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -9,7 +17,8 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 public final class PiecesWorldState extends SavedData {
     public static final String NAME = "skysbuildingpieces_world_state";
     // This is our own schema, including saves written before DataVersion was present.
-    static final SavedDataType<PiecesWorldState> TYPE = new SavedDataType<>(NAME, PiecesWorldState::new,
+    static final SavedDataType<PiecesWorldState> TYPE = new SavedDataType<>(
+            Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, NAME), PiecesWorldState::new,
             CompoundTag.CODEC.xmap(PiecesWorldState::fromTag, state -> state.saveTag(new CompoundTag())), null);
 
     public long blocks, items, chunks;
@@ -17,11 +26,7 @@ public final class PiecesWorldState extends SavedData {
     public final java.util.Map<String, Totals> modules = new java.util.TreeMap<String, Totals>();
 
     public static final class Totals {
-        // This is our own schema, including saves written before DataVersion was present.
-    static final SavedDataType<PiecesWorldState> TYPE = new SavedDataType<>(NAME, PiecesWorldState::new,
-            CompoundTag.CODEC.xmap(PiecesWorldState::fromTag, state -> state.saveTag(new CompoundTag())), null);
-
-    public long blocks, items, chunks;
+        public long blocks, items, chunks;
     }
 
     private Totals totals(String module) {
@@ -137,11 +142,36 @@ public final class PiecesWorldState extends SavedData {
         if (world.getServer() != null) {
             world = world.getServer().getLevel(Level.OVERWORLD);
         }
-        if (!(world instanceof net.minecraft.server.level.ServerLevel)) {
+        if (!(world instanceof ServerLevel serverLevel)) {
             throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
-        return ((net.minecraft.server.level.ServerLevel) world).getDataStorage().computeIfAbsent(TYPE);
+        relocateLegacyState(serverLevel.getServer().getWorldPath(LevelResource.ROOT));
+        return serverLevel.getDataStorage().computeIfAbsent(TYPE);
+    }
+
+    static synchronized void relocateLegacyState(Path worldRoot) {
+        Path source = worldRoot.resolve("data").resolve(NAME + ".dat");
+        Path destination = worldRoot.resolve("dimensions/minecraft/overworld/data")
+                .resolve(SkysBuildingPieces.ID).resolve(NAME + ".dat");
+        if (!Files.isRegularFile(source) || Files.exists(destination)) {
+            return;
+        }
+
+        Path temporary = destination.resolveSibling(destination.getFileName() + ".migration.tmp");
+        try {
+            Files.createDirectories(destination.getParent());
+            Files.copy(source, temporary, StandardCopyOption.REPLACE_EXISTING);
+            Files.move(temporary, destination, StandardCopyOption.ATOMIC_MOVE);
+            SkysBuildingPieces.LOGGER.info("Preserved the Building Pieces migration state in the namespaced data folder");
+        } catch (IOException failure) {
+            try {
+                Files.deleteIfExists(temporary);
+            } catch (IOException cleanupFailure) {
+                failure.addSuppressed(cleanupFailure);
+            }
+            throw new LegacyBridge.RecoveryAbort("Could not preserve the Building Pieces migration state", failure);
+        }
     }
 
     private static PiecesWorldState fromTag(CompoundTag tag) {

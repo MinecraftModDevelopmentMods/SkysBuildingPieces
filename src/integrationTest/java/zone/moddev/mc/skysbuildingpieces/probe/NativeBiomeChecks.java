@@ -39,8 +39,8 @@ public final class NativeBiomeChecks {
             JsonObject row = value.getAsJsonObject();
             ChunkPos position = new ChunkPos(row.get("x").getAsInt(), row.get("z").getAsInt());
             if (tracked.add(position)) {
-                world.setChunkForced(position.x, position.z, true);
-                world.getChunk(position.x, position.z);
+                world.setChunkForced(position.x(), position.z(), true);
+                world.getChunk(position.x(), position.z());
             }
         }
     }

@@ -18,7 +18,7 @@ def gameDirectory = layout.projectDirectory.dir(
 
 def configureVerification = project.ext.configureMineralogyVerificationRun
 
-// Forge 61 uses the same official names in development and in the game.
+// Forge uses the same official names in development and in the game.
 ext.nativeOptionalDevelopmentJars = runtimeSources
 ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
     group = 'verification'

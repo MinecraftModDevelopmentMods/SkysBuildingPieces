@@ -3,34 +3,60 @@ package zone.moddev.mc.skysbuildingpieces.content;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
 /** Rotating a piece keeps its name and any other custom components. */
 public final class CuttingRecipe extends ShapedRecipe {
-    public static final Serializer SERIALIZER = new Serializer();
+    private static final MapCodec<CuttingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    CommonInfo.MAP_CODEC.forGetter(recipe -> recipe.common),
+                    CraftingBookInfo.MAP_CODEC.forGetter(recipe -> recipe.book),
+                    ShapedRecipePattern.MAP_CODEC.forGetter(recipe -> recipe.pattern),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(recipe -> recipe.output),
+                    Codec.BOOL.optionalFieldOf("preserve_tag", false).forGetter(recipe -> recipe.preserveComponents)
+            ).apply(instance, CuttingRecipe::new));
+    private static final StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> STREAM_CODEC =
+            StreamCodec.composite(
+                    CommonInfo.STREAM_CODEC, recipe -> recipe.common,
+                    CraftingBookInfo.STREAM_CODEC, recipe -> recipe.book,
+                    ShapedRecipePattern.STREAM_CODEC, recipe -> recipe.pattern,
+                    ItemStackTemplate.STREAM_CODEC, recipe -> recipe.output,
+                    ByteBufCodecs.BOOL, recipe -> recipe.preserveComponents,
+                    CuttingRecipe::new);
+
+    // Vanilla's shaped recipe exposes a concrete serializer type. This serializer
+    // still reads and writes only cutting recipes, using the native shaped layout.
+    public static final RecipeSerializer<ShapedRecipe> SERIALIZER = new RecipeSerializer<>(
+            CODEC.xmap(recipe -> recipe, CuttingRecipe.class::cast),
+            STREAM_CODEC.map(recipe -> recipe, CuttingRecipe.class::cast));
+
+    private final CommonInfo common;
+    private final CraftingBookInfo book;
     private final ShapedRecipePattern pattern;
-    private final ItemStack output;
+    private final ItemStackTemplate output;
     private final boolean preserveComponents;
 
-    private CuttingRecipe(String group, CraftingBookCategory category, ShapedRecipePattern pattern,
-            ItemStack output, boolean showNotification, boolean preserveComponents) {
-        super(group, category, pattern, output, showNotification);
+    private CuttingRecipe(CommonInfo common, CraftingBookInfo book, ShapedRecipePattern pattern,
+            ItemStackTemplate output, boolean preserveComponents) {
+        super(common, book, pattern, output);
+        this.common = common;
+        this.book = book;
         this.pattern = pattern;
         this.output = output;
         this.preserveComponents = preserveComponents;
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries) {
-        ItemStack result = super.assemble(inventory, registries);
+    public ItemStack assemble(CraftingInput inventory) {
+        ItemStack result = super.assemble(inventory);
         if (preserveComponents) {
             for (int slot = 0; slot < inventory.size(); slot++) {
                 ItemStack input = inventory.getItem(slot);
@@ -44,47 +70,7 @@ public final class CuttingRecipe extends ShapedRecipe {
     }
 
     @Override
-    public RecipeSerializer<CuttingRecipe> getSerializer() {
+    public RecipeSerializer<ShapedRecipe> getSerializer() {
         return SERIALIZER;
-    }
-
-    public static final class Serializer implements RecipeSerializer<CuttingRecipe> {
-        private static final MapCodec<CuttingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
-                        Codec.STRING.optionalFieldOf("group", "").forGetter(CuttingRecipe::group),
-                        CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC)
-                                .forGetter(CuttingRecipe::category),
-                        ShapedRecipePattern.MAP_CODEC.forGetter(recipe -> recipe.pattern),
-                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.output),
-                        Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(CuttingRecipe::showNotification),
-                        Codec.BOOL.optionalFieldOf("preserve_tag", false).forGetter(recipe -> recipe.preserveComponents)
-                ).apply(instance, CuttingRecipe::new));
-        private static final StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> STREAM_CODEC =
-                StreamCodec.of(Serializer::encode, Serializer::decode);
-
-        @Override
-        public MapCodec<CuttingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-
-        private static CuttingRecipe decode(RegistryFriendlyByteBuf buffer) {
-            return new CuttingRecipe(buffer.readUtf(), CraftingBookCategory.STREAM_CODEC.decode(buffer),
-                    ShapedRecipePattern.STREAM_CODEC.decode(buffer), ItemStack.STREAM_CODEC.decode(buffer),
-                    buffer.readBoolean(), buffer.readBoolean());
-        }
-
-        private static void encode(RegistryFriendlyByteBuf buffer, CuttingRecipe recipe) {
-            buffer.writeUtf(recipe.group());
-            CraftingBookCategory.STREAM_CODEC.encode(buffer, recipe.category());
-            ShapedRecipePattern.STREAM_CODEC.encode(buffer, recipe.pattern);
-            ItemStack.STREAM_CODEC.encode(buffer, recipe.output);
-            buffer.writeBoolean(recipe.showNotification());
-            buffer.writeBoolean(recipe.preserveComponents);
-        }
     }
 }

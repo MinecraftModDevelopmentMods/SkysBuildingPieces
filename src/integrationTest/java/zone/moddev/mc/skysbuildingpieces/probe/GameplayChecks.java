@@ -38,7 +38,7 @@ public final class GameplayChecks {
     }
 
     public static boolean ready(ServerLevel world) {
-        long chunk = new net.minecraft.world.level.ChunkPos(FIXTURE_POSITION).toLong();
+        long chunk = net.minecraft.world.level.ChunkPos.pack(FIXTURE_POSITION);
         return world.areEntitiesLoaded(chunk) && world.getChunkSource().isPositionTicking(chunk);
     }
 
@@ -66,7 +66,7 @@ public final class GameplayChecks {
 
         long trackingDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
-        long chunkPosition = new net.minecraft.world.level.ChunkPos(position).toLong();
+        long chunkPosition = net.minecraft.world.level.ChunkPos.pack(position);
         while (!world.getChunkSource().isPositionTicking(chunkPosition) && System.nanoTime() < trackingDeadline) {
             if (!world.getChunkSource().pollTask()) {
                 Thread.yield();
@@ -654,7 +654,7 @@ public final class GameplayChecks {
                 "block activation takes priority and happens exactly once");
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 
-        if (net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")) {
+        if (net.minecraftforge.fml.ModList.isLoaded("buildingbricks")) {
             BlockState unchanged = world.getBlockState(position);
 
             require(NativeSlabPlacement.place(oak, player, world, position, InteractionHand.MAIN_HAND, Direction.UP,

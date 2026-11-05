@@ -39,7 +39,7 @@ public final class LegacyBridge {
 
     public static boolean active() {
         return ready
-                && LegacyMapping.enabled(ModList.get().isLoaded("buildingbricks"), SkysBuildingPieces.forceReplace);
+                && LegacyMapping.enabled(ModList.isLoaded("buildingbricks"), SkysBuildingPieces.forceReplace);
     }
 
     public static boolean recoveryActive() {
@@ -92,8 +92,13 @@ public final class LegacyBridge {
                 || normalized.getFileName().toString().equals("level.dat_old")) {
             normalized = normalized.getParent();
         }
+        CompoundTag snapshot = root.getCompoundOrEmpty("FML");
+        // The file upgrader reads the original snapshot before Forge opens the
+        // relocated save. A later read without FML must not replace it.
+        if (!normalized.equals(capturedDirectory) || !snapshot.isEmpty()) {
+            capturedRegistry = snapshot.copy();
+        }
         capturedDirectory = normalized;
-        capturedRegistry = root.getCompoundOrEmpty("FML").copy();
         SourceLevelData.capture(normalized);
     }
 
@@ -835,7 +840,7 @@ public final class LegacyBridge {
             synchronized (unresolved) {
                 unresolved.put(key, unresolved.getOrDefault(key, 0L) + 1);
             }
-            if (!ModList.get().isLoaded("buildingbricks")) {
+            if (!ModList.isLoaded("buildingbricks")) {
                 throw new RecoveryAbort("Cannot safely recover " + key
                         + ". Restore BuildingBricks and its material add-ons, then load a backup. Upgrade was stopped.",
                         null);

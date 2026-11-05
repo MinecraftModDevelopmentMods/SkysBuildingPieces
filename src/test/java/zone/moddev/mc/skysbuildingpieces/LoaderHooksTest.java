@@ -13,7 +13,7 @@ class LoaderHooksTest {
     @Test
     void theNativeChunkAndInventoryTargetsMatchThisForgeBuild() throws Exception {
         assertNativeReturn("net.minecraft.world.level.chunk.storage.SimpleRegionStorage", "upgradeChunkTag",
-                "(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;",
+                "(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/nbt/CompoundTag;",
                 Opcodes.ARETURN);
         assertNativeReturn("net.minecraft.util.datafix.DataFixTypes", "update",
                 "(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;",
@@ -21,6 +21,11 @@ class LoaderHooksTest {
         assertNativeReturn("net.minecraft.world.level.chunk.storage.SerializableChunkData", "copyOf",
                 "(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;)"
                         + "Lnet/minecraft/world/level/chunk/storage/SerializableChunkData;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraft.util.filefix.FileFixerUpper", "fix",
+                "(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"
+                        + "Lcom/mojang/serialization/Dynamic;Lnet/minecraft/util/worldupdate/UpgradeProgress;)"
+                        + "Lcom/mojang/serialization/Dynamic;",
                 Opcodes.ARETURN);
         assertNativeReturn("net.minecraftforge.common.ForgeHooks", "readAdditionalLevelSaveData",
                 "(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"

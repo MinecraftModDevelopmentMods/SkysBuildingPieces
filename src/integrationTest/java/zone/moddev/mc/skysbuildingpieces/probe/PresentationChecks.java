@@ -255,7 +255,7 @@ public final class PresentationChecks {
                     }
 
                     BlockState actual = block.getActualState(wall, world, pos);
-                    int joined = joins(world, pos, actual);
+                    int joined = GlassModelProbe.joins(world, pos, actual);
 
                     require(joined == matching, "only identical glass materials lose their border");
                     require(actual.getValue(PieceBlock.CONNECTIONS) == connections,
@@ -282,7 +282,7 @@ public final class PresentationChecks {
                     PieceBlock block = (PieceBlock) wall.getBlock();
                     PieceBlock other = (PieceBlock) neighbour.getBlock();
 
-                    int joined = joins(world, pos, block.getActualState(wall, world, pos));
+                    int joined = GlassModelProbe.joins(world, pos, block.getActualState(wall, world, pos));
                     int expected = block.definition(wall).id.equals(other.definition(neighbour).id) ? 1 << side : 0;
 
                     require(joined == expected, "all clear/stained colour pairs keep the correct boundary");
@@ -392,28 +392,6 @@ public final class PresentationChecks {
         return block.getActualState(state, world, position).getShape(world, position).clip(start, end, position);
     }
 
-    @SuppressWarnings("unchecked")
-    private static int joins(ServerLevel world, BlockPos position, BlockState state) {
-        try {
-            Class<?> type = zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel.class;
-            java.lang.reflect.Field field = type.getDeclaredField("JOINS");
-
-            field.setAccessible(true);
-
-            net.minecraftforge.client.model.data.ModelProperty<Integer> property = (net.minecraftforge.client.model.data.ModelProperty<Integer>) field
-                    .get(null);
-            var model = net.minecraft.client.Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-            require(type.isInstance(model), "The baked glass wall uses the continuous model");
-            net.minecraftforge.client.model.data.ModelData data = model.getModelData(world, position, state,
-                    net.minecraftforge.client.model.data.ModelData.EMPTY);
-
-            require(data.has(property), "glass joins are present in render-only model data");
-            return data.get(property);
-        } catch (ReflectiveOperationException failure) {
-            throw new AssertionError("Cannot inspect the native glass model data", failure);
-        }
-    }
-
     private static void require(boolean value, String message) {
         if (!value) {
             throw new AssertionError(message);
@@ -421,7 +399,8 @@ public final class PresentationChecks {
     }
 
     public static void gallery(ServerLevel world) {
-        world.setDayTime(6000);
+        world.getServer().clockManager().setTotalTicks(
+                world.dimensionTypeRegistration().value().defaultClock().orElseThrow(), 6000);
         world.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.ADVANCE_TIME, false, world.getServer());
 
         for (int blockX = 0; blockX <= 12; blockX++) {

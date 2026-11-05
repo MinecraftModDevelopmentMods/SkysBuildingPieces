@@ -7,10 +7,10 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraftforge.registries.ForgeRegistries;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -18,12 +18,8 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
 /** Optional recovery for a legacy piece obtained while its original mod is installed. */
 public final class LegacyPieceRecipe extends CustomRecipe {
-    public static final CustomRecipe.Serializer<LegacyPieceRecipe> SERIALIZER = new CustomRecipe.Serializer<>(
-            LegacyPieceRecipe::new);
-
-    public LegacyPieceRecipe(CraftingBookCategory category) {
-        super(category);
-    }
+    public static final RecipeSerializer<LegacyPieceRecipe> SERIALIZER = new RecipeSerializer<>(
+            MapCodec.unit(LegacyPieceRecipe::new), StreamCodec.unit(new LegacyPieceRecipe()));
 
     private ItemStack result(CraftingInput inventory) {
         ItemStack source = ItemStack.EMPTY;
@@ -83,7 +79,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput inventory) {
         return result(inventory);
     }
 

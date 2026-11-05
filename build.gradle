@@ -35,15 +35,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                'B36CA046DB72E30F27BD38E02B4AE34274ADB51AE1D65BAF9E1D07763755682E',
+                'BB0DACB3DEB2A711CA67DD402D5FDAB5A9847C37C7B9B596DEC7CF37378FA085',
         (mavenizerRuleManifest.asFile):
-                '88F2EE4C6B7C903EB1C7D693C0BEEFC0EFC601C1023FB197F7CBA187B1142DB7',
+                '21D1F5984E735BCEA1B1EFB9F965655796B39538FC91AAED1C3474004710423D',
         (mavenizerSourcePatch.asFile):
-                '88F9035C8545CF1CBC7342C14F2F95076C4E415EDB7A74D585409CFC3F1BDD5C',
+                '7C8EC895E79DF31AFD2CA3B505B43573C7052718A24050832189AAA2D3CC6137',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                'A097E126C606BDC86B34F5DDFB9580228A7C5BC866C6509C6BB362152EBACED7'
+                '7686880D2B0F6BD6ACAFA4F0AB7585189767813174BC36DB675FEC0142440A77'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -69,6 +69,14 @@ fgtools.configure('mavenizer') {
     })
 }
 
+// The Forge launcher runs on the same Java version as Minecraft.
+fgtools.configure('slimelauncher') {
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+        vendor = JvmVendorSpec.ADOPTIUM
+    })
+}
+
 group = project.mod_group
 version = project.mod_version
 base.archivesName = 'SkysBuildingPieces'
@@ -88,29 +96,29 @@ if (versionParts[3] != expectedTargetVersion) {
 ext.functional_version = versionParts[0..2].join('.')
 ext.display_version = project.mod_version
 ext.release_tag = project.mod_version
-def pinnedJava21 = providers.environmentVariable('SBP_JAVA21_HOME')
+def pinnedJava25 = providers.environmentVariable('SBP_JAVA25_HOME')
 // Gradle 9.6.1's ordinary language-level selector prefers the newest cached
-// Java 21. This opt-in specific installation keeps local/CI qualification exact.
-def exactJava21Spec = pinnedJava21.isPresent() ?
+// Java 25. This opt-in specific installation keeps local/CI qualification exact.
+def exactJava25Spec = pinnedJava25.isPresent() ?
         org.gradle.jvm.toolchain.internal.SpecificInstallationToolchainSpec.fromJavaHome(
-                project.services.get(org.gradle.api.internal.provider.PropertyFactory), file(pinnedJava21.get())) : null
+                project.services.get(org.gradle.api.internal.provider.PropertyFactory), file(pinnedJava25.get())) : null
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
     withSourcesJar()
     withJavadocJar()
 }
 
 tasks.withType(JavaCompile).configureEach {
     javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
     options.encoding = 'UTF-8'
     options.compilerArgs.addAll(['-Xmaxerrs', '1000'])
-    if (pinnedJava21.isPresent()) {
-        javaCompiler = javaToolchains.compilerFor(exactJava21Spec)
+    if (pinnedJava25.isPresent()) {
+        javaCompiler = javaToolchains.compilerFor(exactJava25Spec)
     }
 }
 
@@ -124,17 +132,17 @@ tasks.withType(Test).configureEach {
     // These saved-world audits read files outside the compiled test resources.
     inputs.file('tools/native-log-profiles.json')
     inputs.dir('src/testFixtures')
-    if (pinnedJava21.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava21Spec)
+    if (pinnedJava25.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava25Spec)
 }
 tasks.withType(JavaExec).configureEach {
     if (providers.gradleProperty('snapshotRecipeBook').getOrElse('false').toBoolean()) {
         systemProperty 'skysbuildingpieces.snapshotRecipeBook', 'true'
     }
-    if (pinnedJava21.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava21Spec)
+    if (pinnedJava25.isPresent()) javaLauncher = javaToolchains.launcherFor(exactJava25Spec)
 }
 
 tasks.withType(Javadoc).configureEach {
-    if (pinnedJava21.isPresent()) javadocTool = javaToolchains.javadocToolFor(exactJava21Spec)
+    if (pinnedJava25.isPresent()) javadocTool = javaToolchains.javadocToolFor(exactJava25Spec)
     failOnError = true
     options.encoding = 'UTF-8'
     options.addStringOption('Xdoclint:none', '-quiet')
@@ -180,7 +188,7 @@ minecraft {
                     "${mod_id}%%${buildDir}/forge-run-mod-classes/main"
             if (name.toLowerCase(Locale.ROOT).contains('client') &&
                     providers.gradleProperty('forgeClientAssets').isPresent()) {
-                environment 'assetIndex', '29'
+                environment 'assetIndex', '30'
                 environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
                 if (providers.gradleProperty('forgeClientNatives').isPresent()) {
                     environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
@@ -230,7 +238,7 @@ tasks.withType(JavaExec).configureEach { JavaExec runTask ->
 }
 
 // Clone ForgeGradle's generated launch at execution time so verification runs
-// use the same mappings and Java 21 runtime without exposing probe code to the
+// use the same mappings and Java 25 runtime without exposing probe code to the
 // ordinary client or server classpath.
 def configureFromForgeRun = { JavaExec process, String runTaskName, boolean includeMain = true ->
     process.actions.clear()
@@ -533,12 +541,12 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.21.11' || project.forge_version != '61.1.0' ||
-                project.mapping_channel != 'official' || project.mapping_version != '1.21.11' ||
+        if (project.minecraft_version != '26.1.2' || project.forge_version != '64.0.9' ||
+                project.mapping_channel != 'official' || project.mapping_version != '26.1.2' ||
                 project.loader_name != 'forge' || project.loader_code != '1' ||
-                project.java_version != '21' || project.java_toolchain_version != '21.0.7+6' ||
+                project.java_version != '25' || project.java_toolchain_version != '25.0.3+9' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 1.21.11 release metadata')
+            throw new GradleException('Unexpected 26.1.2 release metadata')
         }
     }
 }
@@ -587,7 +595,7 @@ tasks.register('verifyReleaseArtifacts') {
                 if (!entry.directory) {
                     byte[] auditBytes = zip.getInputStream(entry).bytes
                     if (entry.name.endsWith('.class') &&
-                            (((auditBytes[6] & 255) << 8) | (auditBytes[7] & 255)) != 65) {
+                            (((auditBytes[6] & 255) << 8) | (auditBytes[7] & 255)) != 69) {
                         throw new GradleException("Non-Java-16 production class: ${entry.name}")
                     }
                     String content = new String(zip.getInputStream(entry).bytes,
@@ -750,7 +758,7 @@ tasks.register('isolateEclipseProductionRuns') {
                         '  <booleanAttribute key="org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE" value="true"/>' +
                                 System.lineSeparator() + '</launchConfiguration>')
             }
-            ['--cache', '--metadata', '--to-srg', '--to-obf'].each { option ->
+            ['--cache', '--metadata'].each { option ->
                 String prefix = option + ' '
                 int start = contents.indexOf(prefix)
                 if (start < 0) throw new GradleException("${name} is missing ${option}")

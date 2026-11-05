@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.SnowyDirtBlock;
+import net.minecraft.world.level.block.SnowyBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -99,8 +99,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (metadataProperty != null) {
             initial = initial.setValue(metadataProperty, 0);
         }
-        if (initial.hasProperty(SnowyDirtBlock.SNOWY)) {
-            initial = initial.setValue(SnowyDirtBlock.SNOWY, false);
+        if (initial.hasProperty(SnowyBlock.SNOWY)) {
+            initial = initial.setValue(SnowyBlock.SNOWY, false);
         }
         if (initial.hasProperty(CONNECTIONS)) {
             initial = initial.setValue(CONNECTIONS, 0);
@@ -170,7 +170,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         builder.add(SlabBlock.WATERLOGGED);
 
         if (palette.group.equals("grass") || palette.group.equals("dirt")) {
-            builder.add(SnowyDirtBlock.SNOWY);
+            builder.add(SnowyBlock.SNOWY);
         }
         if (palette.group.equals("path")) {
             builder.add(LOWERED_SUPPORT);
@@ -215,11 +215,6 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     public int mask(BlockState state) {
         return palette.shape == Shape.STAIRS ? Geometry.stairs(orientation(state), state.getValue(STAIR_SHAPE).getSerializedName())
                 : Geometry.mask(palette.shape, orientation(state));
-    }
-
-    @Override
-    public int getLightBlock(BlockState state) {
-        return 0;
     }
 
     @Override
@@ -428,7 +423,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     public BlockState getActualState(BlockState state, BlockGetter world, BlockPos position) {
-        if (state.hasProperty(SnowyDirtBlock.SNOWY)) {
+        if (state.hasProperty(SnowyBlock.SNOWY)) {
             boolean snowy = false;
 
             for (Direction side : new Direction[] { Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH,
@@ -438,7 +433,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
                 snowy |= neighbour == Blocks.SNOW_BLOCK || neighbour == Blocks.SNOW;
             }
 
-            state = state.setValue(SnowyDirtBlock.SNOWY, snowy);
+            state = state.setValue(SnowyBlock.SNOWY, snowy);
         }
         if (state.hasProperty(CONNECTIONS)) {
             int connections = 0;
@@ -553,7 +548,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder context) {
-        ItemStack tool = context.getOptionalParameter(LootContextParams.TOOL);
+        var tool = context.getOptionalParameter(LootContextParams.TOOL);
 
         if (!palette.group.equals("path") && tool != null
                 && EnchantmentHelper.getItemEnchantmentLevel(context.getLevel().registryAccess()

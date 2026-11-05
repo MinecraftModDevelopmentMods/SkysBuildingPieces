@@ -91,7 +91,7 @@ class HistoricalBiomeSchemaTest {
         Object previous = active.get(null);
         try (SimpleRegionStorage storage = new SimpleRegionStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
                 temporary, DataFixers.getDataFixer(), false, net.minecraft.util.datafix.DataFixTypes.CHUNK)) {
-            CompoundTag control = storage.upgradeChunkTag(source.copy(), 0, MinecraftTestBootstrap.overworldUpgradeContext());
+            CompoundTag control = storage.upgradeChunkTag(source.copy(), 0, MinecraftTestBootstrap.overworldUpgradeContext(), net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
             // This build-only alias stands in for an add-on's registered replacement.
             // The fixture remains untouched and no production BOP mapping is added.
             active.set(null, new HistoricalBiomes.Mappings(
@@ -100,7 +100,7 @@ class HistoricalBiomeSchemaTest {
                     name -> 901));
             CompoundTag prepared = source.copy();
             assertTrue(HistoricalBiomes.prepare(prepared));
-            CompoundTag fixed = storage.upgradeChunkTag(prepared, 0, MinecraftTestBootstrap.overworldUpgradeContext());
+            CompoundTag fixed = storage.upgradeChunkTag(prepared, 0, MinecraftTestBootstrap.overworldUpgradeContext(), net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
             assertFalse(fixed.contains("Level"), "The native upgrader must reach the 1.18 chunk format");
             HistoricalBiomes.finish(fixed);
             assertFalse(fixed.contains("skysbuildingpieces_biomes"), "Pending recovery must be completed");

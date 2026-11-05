@@ -18,7 +18,7 @@ public final class SharedGrassChecks {
     }
 
     public static void run(ServerLevel world) throws ReflectiveOperationException {
-        if (!ModList.get().isLoaded("skysgrassslabs")) {
+        if (!ModList.isLoaded("skysgrassslabs")) {
             return;
         }
 
@@ -27,7 +27,8 @@ public final class SharedGrassChecks {
         Method tickGrass = api.getMethod("tickGrass", Level.class, BlockPos.class, BlockState.class, RandomSource.class);
         BlockPos position = new BlockPos(-500, 220, -500);
 
-        world.setDayTime(6000);
+        world.getServer().clockManager().setTotalTicks(
+                world.dimensionTypeRegistration().value().defaultClock().orElseThrow(), 6000);
 
         for (int chunkOffsetX = -1; chunkOffsetX <= 1; chunkOffsetX++) {
             for (int chunkOffsetZ = -1; chunkOffsetZ <= 1; chunkOffsetZ++) {

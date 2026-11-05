@@ -47,7 +47,7 @@ final class PieceNames {
         // lookup. Read an add-on's own file without changing its language keys.
         if (input == null) {
             net.minecraftforge.forgespi.language.IModFileInfo owner =
-                    net.minecraftforge.fml.ModList.get().getModFileById(namespace);
+                    net.minecraftforge.fml.ModList.getModFileById(namespace);
             if (owner != null) {
                 java.nio.file.Path language = owner.getFile().findResource("assets", namespace, "lang", "en_us.json");
                 if (java.nio.file.Files.isRegularFile(language)) {

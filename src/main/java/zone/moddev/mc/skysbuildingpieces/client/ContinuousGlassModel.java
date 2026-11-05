@@ -1,21 +1,19 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.model.geom.builders.UVPair;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.model.data.ModelData;
@@ -33,7 +31,7 @@ public final class ContinuousGlassModel implements BlockStateModel {
     };
 
     private final BlockStateModel original;
-    private final Map<PartKey, BlockModelPart> cache = new ConcurrentHashMap<>();
+    private final Map<PartKey, BlockStateModelPart> cache = new ConcurrentHashMap<>();
 
     public ContinuousGlassModel(BlockStateModel original) {
         this.original = original;
@@ -58,24 +56,24 @@ public final class ContinuousGlassModel implements BlockStateModel {
     }
 
     @Override
-    public void collectParts(RandomSource random, List<BlockModelPart> parts) {
+    public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
         original.collectParts(random, parts);
     }
 
     @Override
-    public void collectParts(RandomSource random, List<BlockModelPart> parts,
-            ModelData data, ChunkSectionLayer layer) {
+    public void collectParts(RandomSource random, List<BlockStateModelPart> parts,
+            ModelData data) {
         int firstPart = parts.size();
-        original.collectParts(random, parts, data, layer);
+        original.collectParts(random, parts, data);
         Integer joins = data.get(JOINS);
         if (joins == null || joins == 0) {
             return;
         }
 
         for (int index = firstPart; index < parts.size(); index++) {
-            BlockModelPart part = parts.get(index);
+            BlockStateModelPart part = parts.get(index);
             PartKey key = new PartKey(part, joins);
-            BlockModelPart replacement = cache.get(key);
+            BlockStateModelPart replacement = cache.get(key);
 
             if (replacement == null) {
                 // Ordinary wall models reuse their parts. Keep replacements bounded
@@ -89,28 +87,28 @@ public final class ContinuousGlassModel implements BlockStateModel {
     }
 
     @Override
-    public TextureAtlasSprite particleIcon() {
-        return original.particleIcon();
+    public Material.Baked particleMaterial() {
+        return original.particleMaterial();
     }
 
     @Override
-    public TextureAtlasSprite particleIcon(ModelData data) {
-        return original.particleIcon(data);
+    public Material.Baked particleMaterial(ModelData data) {
+        return original.particleMaterial(data);
     }
 
     @Override
-    public Collection<ChunkSectionLayer> getRenderTypes(BlockState state, RandomSource random, ModelData data) {
-        return original.getRenderTypes(state, random, data);
+    public int materialFlags() {
+        return original.materialFlags();
     }
 
-    private record PartKey(BlockModelPart part, int joins) {}
+    private record PartKey(BlockStateModelPart part, int joins) {}
 
-    private static final class JoinedPart implements BlockModelPart {
-        private final BlockModelPart original;
+    private static final class JoinedPart implements BlockStateModelPart {
+        private final BlockStateModelPart original;
         private final Map<Direction, List<BakedQuad>> faces = new EnumMap<>(Direction.class);
         private final List<BakedQuad> unculled;
 
-        private JoinedPart(BlockModelPart original, int joins) {
+        private JoinedPart(BlockStateModelPart original, int joins) {
             this.original = original;
             unculled = trim(original.getQuads(null), joins);
             for (Direction face : Direction.values()) {
@@ -129,18 +127,13 @@ public final class ContinuousGlassModel implements BlockStateModel {
         }
 
         @Override
-        public TextureAtlasSprite particleIcon() {
-            return original.particleIcon();
+        public Material.Baked particleMaterial() {
+            return original.particleMaterial();
         }
 
         @Override
-        public ChunkSectionLayer layer() {
-            return original.layer();
-        }
-
-        @Override
-        public ChunkSectionLayer layerFast() {
-            return original.layerFast();
+        public int materialFlags() {
+            return original.materialFlags();
         }
     }
 
@@ -168,8 +161,7 @@ public final class ContinuousGlassModel implements BlockStateModel {
 
         return new BakedQuad(quad.position0(), quad.position1(), quad.position2(), quad.position3(),
                 uv(trimmed, 0), uv(trimmed, 1), uv(trimmed, 2), uv(trimmed, 3),
-                quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(),
-                quad.lightEmission(), quad.ambientOcclusion());
+                quad.direction(), quad.materialInfo());
     }
 
     private static long uv(int[] vertices, int vertex) {

@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -37,7 +37,9 @@ public final class RuntimeProbe {
                 context.getModBusGroup());
         ServerStartedEvent.BUS.addListener(this::started);
         TickEvent.ServerTickEvent.Post.BUS.addListener(this::tick);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> new ClientProbe().init());
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            new ClientProbe().init();
+        }
     }
 
     public void started(ServerStartedEvent event) {
@@ -123,7 +125,7 @@ public final class RuntimeProbe {
                 RecipeBookChecks.run(world);
                 PresentationChecks.run(world);
 
-                if (ModList.get().isLoaded("skysbuildingpiecesbop") && !phase.startsWith("client")) {
+                if (ModList.isLoaded("skysbuildingpiecesbop") && !phase.startsWith("client")) {
                     Class.forName("zone.moddev.mc.skysbuildingpiecesbop.probe.BopChecks")
                             .getMethod("run", ServerLevel.class).invoke(null, world);
                 }

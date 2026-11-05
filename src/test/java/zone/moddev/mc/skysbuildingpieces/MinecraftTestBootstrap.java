@@ -7,7 +7,6 @@ import java.util.Optional;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.LoadingModList;
 
 public final class MinecraftTestBootstrap {
     private static boolean initialized;
@@ -27,17 +26,19 @@ public final class MinecraftTestBootstrap {
         if (initialized) return;
         try {
             var versions = FMLLoader.versionInfo();
-            if (!versions.forgeVersion().equals("61.1.0") || !versions.mcVersion().equals("1.21.11")
-                    || !versions.mcpVersion().equals("20251223.124241")) {
+            if (!versions.forgeVersion().equals("64.0.9") || !versions.mcVersion().equals("26.1.2")
+                    || !versions.mcpVersion().equals("20260409.101008")) {
                 throw new IllegalStateException("Wrong Forge or Minecraft version for the focused tests");
             }
             SharedConstants.tryDetectVersion();
             // Plain JUnit has no ModLauncher event transformation. Build the
             // registries here; real Forge launches cover the networking bootstrap.
-            if (FMLLoader.getLoadingModList() == null) {
-                LoadingModList vanillaOnly = LoadingModList.of(List.of(), List.of(), null);
-                vanillaOnly.setBrokenFiles(List.of());
-                set(FMLLoader.class, "loadingModList", vanillaOnly);
+            {
+                Class<?> stateType = Class.forName("net.minecraftforge.fml.loading.ModSorter$State");
+                var constructor = stateType.getDeclaredConstructor(List.class, List.class);
+                constructor.setAccessible(true);
+                set(Class.forName("net.minecraftforge.fml.loading.LoadingModListImpl"), "temp",
+                        constructor.newInstance(List.of(), List.of()));
                 IModuleLayerManager layers = layer -> layer == IModuleLayerManager.Layer.GAME
                         ? Optional.of(ModuleLayer.boot()) : Optional.empty();
                 set(FMLLoader.class, "moduleLayerManager", layers);
@@ -57,7 +58,7 @@ public final class MinecraftTestBootstrap {
                     net.minecraftforge.registries.ForgeRegistries.ITEMS).unfreeze();
             initialized = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to initialize the Forge 61 test runtime",
+            throw new IllegalStateException("Unable to initialize the Forge 64 test runtime",
                     exception);
         }
     }

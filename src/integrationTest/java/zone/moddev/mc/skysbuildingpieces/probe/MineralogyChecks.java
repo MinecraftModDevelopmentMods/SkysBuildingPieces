@@ -17,13 +17,13 @@ final class MineralogyChecks {
         Catalogue.Module rocks = Catalogue.INSTANCE.modules.get("mineralogy");
         boolean disabled = Boolean.getBoolean("skysbuildingpieces.expectMineralogySlabsDisabled");
 
-        if (!ModList.get().isLoaded("mineralogy")) {
+        if (!ModList.isLoaded("mineralogy")) {
             require(!disabled, "The disabled-slab profile is missing Mineralogy");
             require(rocks == null, "Mineralogy pieces registered without Mineralogy");
             return;
         }
 
-        require(!ModList.get().isLoaded("skysbuildingpiecesmineralogy"), "the separate add-on is still installed");
+        require(!ModList.isLoaded("skysbuildingpiecesmineralogy"), "the separate add-on is still installed");
         require(rocks != null && rocks.palettes.size() == 35, "the built-in catalogue is missing");
 
         int registered = 0;

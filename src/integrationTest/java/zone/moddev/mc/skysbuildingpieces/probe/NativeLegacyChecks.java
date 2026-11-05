@@ -28,7 +28,7 @@ public final class NativeLegacyChecks {
         zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
 
         boolean forced = SkysBuildingPieces.forceReplace;
-        boolean installed = ModList.get().isLoaded("buildingbricks");
+        boolean installed = ModList.isLoaded("buildingbricks");
 
         try (LegacyTestScope source = new LegacyTestScope(world)) {
             SkysBuildingPieces.forceReplace = true;

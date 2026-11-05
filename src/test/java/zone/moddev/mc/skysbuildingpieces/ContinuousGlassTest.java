@@ -9,8 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import org.junit.jupiter.api.Test;
-import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
@@ -101,9 +103,10 @@ class ContinuousGlassTest {
             uv[vertex] = UVPair.pack(value(vertices, offset + 4), value(vertices, offset + 5));
         }
         BakedQuad source = new BakedQuad(positions[0], positions[1], positions[2], positions[3],
-                uv[0], uv[1], uv[2], uv[3], 3, Direction.WEST, null, false, 4, false);
+                uv[0], uv[1], uv[2], uv[3], Direction.WEST,
+                new BakedQuad.MaterialInfo(null, ChunkSectionLayer.TRANSLUCENT, null, 3, false, 4));
         List<BakedQuad> original = List.of(source);
-        BlockModelPart basePart = new BlockModelPart() {
+        BlockStateModelPart basePart = new BlockStateModelPart() {
             @Override
             public List<BakedQuad> getQuads(Direction face) {
                 return face == Direction.WEST ? original : List.of();
@@ -115,34 +118,41 @@ class ContinuousGlassTest {
             }
 
             @Override
-            public TextureAtlasSprite particleIcon() {
+            public Material.Baked particleMaterial() {
                 return null;
             }
 
             @Override
-            public ChunkSectionLayer layer() {
-                return ChunkSectionLayer.TRANSLUCENT;
+            public int materialFlags() {
+                return BakedQuad.FLAG_TRANSLUCENT;
             }
         };
         BlockStateModel base = new BlockStateModel() {
             @Override
-            public void collectParts(RandomSource random, List<BlockModelPart> parts) {
+            public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
                 parts.add(basePart);
             }
 
             @Override
-            public TextureAtlasSprite particleIcon() {
+            public Material.Baked particleMaterial() {
                 return null;
+            }
+
+            @Override
+            public int materialFlags() {
+                return basePart.materialFlags();
             }
         };
         ContinuousGlassModel model = new ContinuousGlassModel(base);
-        assertSame(basePart, model.collectParts(RandomSource.create(0)).getFirst());
-        assertSame(basePart, model.collectParts(RandomSource.create(0), data(0), null).getFirst());
-        BlockModelPart joined = model.collectParts(RandomSource.create(0), data(5), null).getFirst();
-        assertSame(joined, model.collectParts(RandomSource.create(123), data(5), null).getFirst());
-        assertEquals(ChunkSectionLayer.TRANSLUCENT, joined.layer());
+        var parts = new java.util.ArrayList<BlockStateModelPart>();
+        model.collectParts(RandomSource.create(0), parts);
+        assertSame(basePart, parts.getFirst());
+        assertSame(basePart, part(model, 0, 0));
+        BlockStateModelPart joined = part(model, 0, 5);
+        assertSame(joined, part(model, 123, 5));
+        assertEquals(BakedQuad.FLAG_TRANSLUCENT, joined.materialFlags());
         assertFalse(joined.useAmbientOcclusion());
-        assertSame(basePart.particleIcon(), joined.particleIcon());
+        assertSame(basePart.particleMaterial(), joined.particleMaterial());
 
         List<BakedQuad> quads = joined.getQuads(Direction.WEST);
         assertThrows(UnsupportedOperationException.class, quads::clear);
@@ -155,12 +165,14 @@ class ContinuousGlassTest {
             assertEquals(UVPair.pack(value(expected, offset + 4), value(expected, offset + 5)),
                     trimmed.packedUV(vertex));
         }
-        assertEquals(source.tintIndex(), trimmed.tintIndex());
         assertEquals(source.direction(), trimmed.direction());
-        assertEquals(source.shade(), trimmed.shade());
-        assertEquals(source.ambientOcclusion(), trimmed.ambientOcclusion());
-        assertEquals(source.lightEmission(), trimmed.lightEmission());
-        assertSame(source.sprite(), trimmed.sprite());
+        assertSame(source.materialInfo(), trimmed.materialInfo());
+    }
+
+    private static BlockStateModelPart part(ContinuousGlassModel model, int seed, int joins) {
+        var parts = new java.util.ArrayList<BlockStateModelPart>();
+        model.collectParts(RandomSource.create(seed), parts, data(joins));
+        return parts.getFirst();
     }
 
     private static ModelData data(int joins) {

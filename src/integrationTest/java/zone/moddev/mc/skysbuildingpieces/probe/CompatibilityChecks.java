@@ -52,7 +52,7 @@ public final class CompatibilityChecks {
     }
 
     public static void run(ServerLevel world) throws Exception {
-        if (!ModList.get().isLoaded("buildingbricks")) {
+        if (!ModList.isLoaded("buildingbricks")) {
             throw new AssertionError("Installed-mod policy checks require their build-only fixture");
         }
 
@@ -173,11 +173,11 @@ public final class CompatibilityChecks {
 
         grid.setItem(0, legacy(1));
 
-        LegacyPieceRecipe recipe = new LegacyPieceRecipe(net.minecraft.world.item.crafting.CraftingBookCategory.BUILDING);
+        LegacyPieceRecipe recipe = new LegacyPieceRecipe();
 
         NativeLegacyChecks.require(recipe.matches(grid.asCraftInput(), world),
                 "Explicit bridge recipe works independently of replacement");
-        identity(recipe.assemble(grid.asCraftInput(), net.minecraft.core.RegistryAccess.EMPTY), 1, true);
+        identity(recipe.assemble(grid.asCraftInput()), 1, true);
         drop.discard();
         frame.discard();
         world.removeBlock(position.north(), false);

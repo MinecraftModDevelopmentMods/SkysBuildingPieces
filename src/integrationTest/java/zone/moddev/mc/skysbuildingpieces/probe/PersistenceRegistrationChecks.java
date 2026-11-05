@@ -23,7 +23,7 @@ public final class PersistenceRegistrationChecks {
 
     private static void beforeQueuedWork(FMLCommonSetupEvent event) {
         require(count(CORE) == 0, "Building Pieces must wait until parallel setup has finished");
-        require(count(GRASS) == (ModList.get().isLoaded("skysgrassslabs") ? 1 : 0),
+        require(count(GRASS) == (ModList.isLoaded("skysgrassslabs") ? 1 : 0),
                 "Grass Slabs installs its server listener during construction on Forge 61");
         LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_BEFORE_PASS core=0 grass={}", count(GRASS));
     }
@@ -32,11 +32,11 @@ public final class PersistenceRegistrationChecks {
         event.enqueueWork(() -> {
             require(!Thread.currentThread().getName().startsWith("modloading-worker"),
                     "Queued verification must run outside parallel mod loading");
-            require(count(CORE) == (ModList.get().isLoaded("skysbuildingpieces") ? 1 : 0),
+            require(count(CORE) == (ModList.isLoaded("skysbuildingpieces") ? 1 : 0),
                     "Building Pieces must register exactly one persistence hook");
-            require(count(GRASS) == (ModList.get().isLoaded("skysgrassslabs") ? 1 : 0),
+            require(count(GRASS) == (ModList.isLoaded("skysgrassslabs") ? 1 : 0),
                     "Grass Slabs must register exactly one persistence hook");
-            require(count(MINERALOGY) == (ModList.get().isLoaded("mineralogy") ? 1 : 0),
+            require(count(MINERALOGY) == (ModList.isLoaded("mineralogy") ? 1 : 0),
                     "Mineralogy's independent persistence hook must remain installed");
             LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_AFTER_PASS mechanism=forge_level_hooks core={} grass={} mineralogy={}",
                     count(CORE), count(GRASS), count(MINERALOGY));
@@ -44,8 +44,8 @@ public final class PersistenceRegistrationChecks {
     }
 
     private static long count(String prefix) {
-        if (prefix.equals(GRASS) && !ModList.get().isLoaded("skysgrassslabs")) return 0;
-        if (prefix.equals(MINERALOGY) && !ModList.get().isLoaded("mineralogy")) return 0;
+        if (prefix.equals(GRASS) && !ModList.isLoaded("skysgrassslabs")) return 0;
+        if (prefix.equals(MINERALOGY) && !ModList.isLoaded("mineralogy")) return 0;
         try {
             Class<?> owner = Class.forName(prefix.substring(0, prefix.length() - 1));
             if (prefix.equals(MINERALOGY)) {

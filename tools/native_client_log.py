@@ -69,8 +69,20 @@ def classify(log, unchanged_defaults, packaged_offline=False):
     lines = log.splitlines()
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = next((index for index, line in enumerate(lines)
-                    if "Starting integrated minecraft server version 1.21.11" in line), -1)
-    if "Connected to a modded server." not in log or startup < 0:
+                    if "Starting integrated minecraft server version 26.1.2" in line), -1)
+    server_info = r"\[[^\r\n]+\] \[Server thread/INFO\](?: \[[^\r\n]+\])?: "
+    player = None
+    joined = False
+    for line in lines[startup + 1:] if startup >= 0 else ():
+        login = re.fullmatch(server_info
+                             + r"([A-Za-z0-9_]{1,16})\[local:E:[0-9a-f]+\] logged in with entity id \d+ at \(.+\)",
+                             line)
+        if login:
+            player = login[1]
+        elif player and re.fullmatch(server_info + re.escape(player) + " joined the game", line):
+            joined = True
+            break
+    if not joined:
         raise ValueError("Native Forge login did not complete normally")
     if not unchanged_defaults:
         raise ValueError("Native Forge settings changed")

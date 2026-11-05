@@ -20,3 +20,6 @@ gradlew text eol=lf
 .gitattributes text eol=lf
 *.js text eol=lf
 ci-fixtures/tools/** -text
+
+# Keep the signed-off registry proof bytes unchanged on every checkout.
+src/testFixtures/worlds/*.forge61-registry.json -text whitespace=cr-at-eol

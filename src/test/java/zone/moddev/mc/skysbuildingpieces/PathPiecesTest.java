@@ -99,6 +99,13 @@ class PathPiecesTest {
                     JsonObject extended = lowered.getAsJsonArray("elements").get(cell).getAsJsonObject();
                     double base = original.getAsJsonArray("from").get(1).getAsDouble();
 
+                    // The base can extend below the block, but its texture stays on the sprite.
+                    for (JsonElement face : extended.getAsJsonObject("faces").asMap().values()) {
+                        for (JsonElement coordinate : face.getAsJsonObject().getAsJsonArray("uv")) {
+                            assertTrue(coordinate.getAsDouble() >= 0 && coordinate.getAsDouble() <= 16);
+                        }
+                    }
+
                     assertEquals(base == 0 ? -1 : base, extended.getAsJsonArray("from").get(1).getAsDouble());
                     assertEquals(original.getAsJsonArray("to"), extended.getAsJsonArray("to"));
                     assertEquals(original.getAsJsonArray("from").get(0), extended.getAsJsonArray("from").get(0));
