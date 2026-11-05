@@ -32,7 +32,8 @@ abstract class SimpleRegionStorageMixin {
 
     @Inject(
             method = "upgradeChunkTag(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;",
-            at = @At("RETURN"))
+            // Finish before older compatibility mixins that cancel the remaining return callbacks.
+            at = @At("RETURN"), order = 900)
     private void skysbuildingpieces$finalizeLegacyChunk(CompoundTag chunk,
             int fallbackDataVersion, @Nullable CompoundTag context,
             CallbackInfoReturnable<CompoundTag> callback) {
