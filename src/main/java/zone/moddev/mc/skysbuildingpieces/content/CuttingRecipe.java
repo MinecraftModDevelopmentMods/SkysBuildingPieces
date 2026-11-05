@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -29,10 +29,10 @@ public final class CuttingRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inventory, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries) {
         ItemStack result = super.assemble(inventory, registries);
         if (preserveComponents) {
-            for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            for (int slot = 0; slot < inventory.size(); slot++) {
                 ItemStack input = inventory.getItem(slot);
                 if (!input.isEmpty()) {
                     result.applyComponents(input.getComponentsPatch());

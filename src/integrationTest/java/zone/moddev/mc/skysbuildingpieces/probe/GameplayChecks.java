@@ -510,7 +510,9 @@ public final class GameplayChecks {
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
-                    silkTool.enchant(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, 1);
+                    silkTool.enchant(world.registryAccess()
+                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
 
                     BlockState silkState = materialDefinition.type.equals("path")
                             ? Pieces.state("minecraft:dirt", pieceBlock.palette.shape, orientation)
@@ -562,7 +564,7 @@ public final class GameplayChecks {
             }
 
             Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                    .getValue(new ResourceLocation("skysgrassslabs:dirt_slab"));
+                    .getValue(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
 
             if (material.equals("minecraft:dirt") && dirt != null && dirt != Items.AIR) {
                 return new ItemStack(dirt, 1);
@@ -595,7 +597,7 @@ public final class GameplayChecks {
         }
 
         Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                .getValue(new ResourceLocation("skysgrassslabs:dirt_slab"));
+                .getValue(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
 
         if (dirt != null && dirt != Items.AIR) {
             for (Direction occupied : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,

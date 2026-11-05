@@ -81,7 +81,7 @@ public final class MineralogyCompat {
             return null;
         }
 
-        Block target = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(replacement));
+        Block target = ForgeRegistries.BLOCKS.getValue(ResourceLocation.parse(replacement));
 
         if (target == null || target == Blocks.AIR) {
             throw new IllegalStateException("Cannot recover " + historicalId

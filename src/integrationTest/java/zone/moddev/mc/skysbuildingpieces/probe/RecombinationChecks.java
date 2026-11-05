@@ -71,7 +71,7 @@ public final class RecombinationChecks {
                 : material.equals("minecraft:dirt") ? "dirt_slab" : null;
         Item external = grassSlab == null ? null
                 : net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .getValue(new net.minecraft.resources.ResourceLocation("skysgrassslabs:" + grassSlab));
+                        .getValue(net.minecraft.resources.ResourceLocation.parse("skysgrassslabs:" + grassSlab));
 
         if (external != null && external != net.minecraft.world.item.Items.AIR) {
             return new ItemStack(external);
@@ -105,17 +105,17 @@ public final class RecombinationChecks {
 
                         String label = material + " " + shape + " orientation=" + orientation;
                         var matching = world.getRecipeManager()
-                                .getRecipesFor(RecipeType.CRAFTING, grid, world);
+                                .getRecipesFor(RecipeType.CRAFTING, grid.asCraftInput(), world);
                         require(!matching.isEmpty(), "two vertically stacked pieces: " + label);
                         for (var holder : matching) {
                             var recipe = holder.value();
-                            ItemStack actual = recipe.assemble(grid, world.registryAccess());
+                            ItemStack actual = recipe.assemble(grid.asCraftInput(), world.registryAccess());
                             require(ItemStack.matches(expected, actual), "no conflicting recipe for " + label);
-                            for (ItemStack remainder : recipe.getRemainingItems(grid)) {
+                            for (ItemStack remainder : recipe.getRemainingItems(grid.asCraftInput())) {
                                 require(remainder.isEmpty(), "both piece units are consumed");
                             }
                             actual.setCount(9);
-                            require(ItemStack.matches(expected, recipe.assemble(grid, world.registryAccess())),
+                            require(ItemStack.matches(expected, recipe.assemble(grid.asCraftInput(), world.registryAccess())),
                                     "each crafting result is an independent one-item copy");
                         }
                         if (cases == 0) {
@@ -181,8 +181,8 @@ public final class RecombinationChecks {
     }
 
     private static ItemStack result(CraftingContainer grid, ServerLevel world) {
-        return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.value().assemble(grid, world.registryAccess())).orElse(ItemStack.EMPTY);
+        return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
+                .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
     }
 
     private static void require(boolean condition, String message) {

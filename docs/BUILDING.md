@@ -1,6 +1,6 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.20.6 and Forge 50.2.0. Run the included Gradle
+This branch targets Minecraft 1.21.1 and Forge 52.1.0. Run the included Gradle
 wrapper with Java 21. Compilation and Minecraft use Java 21; the pinned production
 toolchain is Temurin 21.0.7+6. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
@@ -27,7 +27,7 @@ and exclude test classes.
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
 The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs1206/SkysGrassSlabs` checkout,
+Build that exact commit in the sibling `SkysGrassSlabs1211/SkysGrassSlabs` checkout,
 or pass `-PgrassSlabsMainJar=<jar>`. The jar must match its pinned hash. CI builds the pinned commit before testing the optional
 integration; it can run after that commit is available in the upstream repository.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.

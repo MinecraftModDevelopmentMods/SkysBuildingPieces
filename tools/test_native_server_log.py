@@ -84,6 +84,16 @@ class NativeRegistryNoticeTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.check(compact + "[time] [main/ERROR]: An unrelated failure", self.profile)
 
+    def test_numeric_resource_names_still_require_an_exact_saved_id(self):
+        profile = {"mappings": {"minecraft:painting_variant": {"minecraft:aztec2": 3}}}
+        log = ("[time] [main/ERROR]: Unidentified mapping from registry minecraft:painting_variant\n"
+               "\tminecraft:aztec2: 3\n\n"
+               "[time] [main/ERROR]: There are unidentified mappings in this world - "
+               "we are going to attempt to process anyway\n")
+        self.assertEqual(len(self.check(log, profile)), 2)
+        with self.assertRaises(ValueError):
+            self.check(log.replace("minecraft:aztec2: 3", "minecraft:aztec2: 4"), profile)
+
     def test_every_notice_boundary_is_enforced(self):
         candidates = [
             (self.valid, None),

@@ -84,6 +84,19 @@ def profile_for(directory):
                 or profile["saved_uses"] != proof["renamed_cells"]):
             raise ValueError("The native biome contract does not match this source fixture")
     validate_registry_proofs(root, profile)
+    receipt = profile.get("forge52_registry_contract")
+    if receipt is not None:
+        path = root / receipt["path"]
+        raw = path.read_bytes()
+        proof = json.loads(raw)
+        if (hashlib.sha256(raw).hexdigest().upper() != receipt["sha256"]
+                or proof["source_world_sha256"] != profile["sha256"]
+                or proof["inspected_nbt_records"] <= 0
+                or not proof["snapshot_entries"]):
+            raise ValueError("The Forge 52 registry proof does not match this fixture")
+        # Forge 52 drops a different set of static snapshot entries. Its
+        # exact set has its own proof; older proofs still cover native data fixes.
+        profile = {**profile, "mappings": proof["snapshot_entries"]}
     return profile
 
 
@@ -113,7 +126,7 @@ def audit_text(text, profile=None):
         for row in body.splitlines():
             if not row.strip():
                 continue
-            entry = re.fullmatch(r"\s*(minecraft:[a-z_.]+): (\d+)", row)
+            entry = re.fullmatch(r"\s*(minecraft:[a-z0-9_./-]+): (\d+)", row)
             if not entry or entry[1] in entries:
                 raise ValueError("Malformed or repeated registry entry: " + row)
             entries[entry[1]] = int(entry[2])

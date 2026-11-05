@@ -36,11 +36,14 @@ class NativeRegistryNoticeProofTest {
         JsonObject profiles = new JsonParser().parse(new String(
                 Files.readAllBytes(Paths.get("tools/native-log-profiles.json")), StandardCharsets.UTF_8))
                 .getAsJsonObject().getAsJsonObject("profiles");
-        assertEquals(7, profiles.size());
+        assertEquals(8, profiles.size());
         Set<String> versions = new HashSet<>();
 
         for (java.util.Map.Entry<String, com.google.gson.JsonElement> entry : profiles.entrySet()) {
             JsonObject profile = entry.getValue().getAsJsonObject();
+            JsonObject forge52 = verifyForge52Snapshot(profile);
+            boolean adjacent = profile.getAsJsonObject("native_biome_contract").get("source").getAsString()
+                    .equals("1.20.6");
             Set<String> names = new HashSet<>();
             for (java.util.Map.Entry<String, com.google.gson.JsonElement> registry
                     : profile.getAsJsonObject("mappings").entrySet()) {
@@ -65,8 +68,15 @@ class NativeRegistryNoticeProofTest {
             verifyUnusedRegistryProof(profile, names);
             GrassRenameProof grass = new GrassRenameProof(profile);
             assertFalse(names.isEmpty());
-            assertEquals(0, profile.get("non_biome_saved_uses").getAsInt());
+            if (!adjacent) {
+                assertEquals(0, profile.get("non_biome_saved_uses").getAsInt());
+            }
             BiomeProof biomes = new BiomeProof(profile);
+            Map<String, Integer> typedUses = new HashMap<>();
+            if (adjacent) {
+                assertEquals(profile.get("mappings"), forge52.get("snapshot_entries"));
+                names.addAll(names.stream().map(name -> name.substring(name.indexOf(':') + 1)).toList());
+            }
             assertTrue(versions.add(biomes.version));
             assertEquals(entry.getKey(), checksum(Files.readAllBytes(Paths.get(profile.get("fixture").getAsString()))));
             int records = 0;
@@ -77,25 +87,74 @@ class NativeRegistryNoticeProofTest {
                     ZipEntry member = members.nextElement();
                     String label = member.getName();
                     try (InputStream input = archive.getInputStream(member)) {
-                        if (label.endsWith(".dat") || label.endsWith(".dat_old")) {
+                        if (label.endsWith(".dat") || (!adjacent && label.endsWith(".dat_old"))) {
                             CompoundTag root = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
                             // Registry availability is not a saved block, entity or inventory use.
                             root.remove("FML");
                             root.remove("fml");
-                            inspect(root, names, label);
+                            inspect(root, names, label, adjacent ? typedUses : null);
                             biomes.inspect(root);
                             records++;
                         } else if (label.endsWith(".mca")) {
-                            records += region(readAll(input), names, label, biomes, grass);
+                            records += region(readAll(input), names, label, biomes, grass,
+                                    adjacent ? typedUses : null);
                         }
                     }
                 }
             }
-            assertEquals(profile.get("inspected_nbt_records").getAsInt(), records);
+            if (adjacent) {
+                Map<String, Integer> expected = new HashMap<>();
+                forge52.getAsJsonObject("typed_uses").entrySet().forEach(use ->
+                        expected.put(use.getKey(), use.getValue().getAsJsonObject().get("before").getAsInt()));
+                assertEquals(expected, typedUses);
+                assertTrue(records > 0 && records < forge52.get("inspected_nbt_records").getAsInt());
+            } else {
+                assertEquals(profile.get("inspected_nbt_records").getAsInt(), records);
+            }
             biomes.complete(profile);
             grass.complete();
         }
-        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1"), versions);
+        assertEquals(Set.of("1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.1", "1.20.6"),
+                versions);
+    }
+
+    private static JsonObject verifyForge52Snapshot(JsonObject profile) throws Exception {
+        JsonObject binding = profile.getAsJsonObject("forge52_registry_contract");
+        byte[] bytes = Files.readAllBytes(Paths.get(binding.get("path").getAsString()));
+        assertEquals(binding.get("sha256").getAsString(), checksum(bytes));
+        JsonObject proof = JsonParser.parseString(new String(bytes, StandardCharsets.UTF_8)).getAsJsonObject();
+        assertEquals(profile.get("sha256"), proof.get("source_world_sha256"));
+        assertTrue(proof.get("inspected_nbt_records").getAsInt() > 0);
+
+        try (ZipFile archive = new ZipFile(profile.get("fixture").getAsString());
+                InputStream input = archive.getInputStream(archive.getEntry("level.dat"))) {
+            CompoundTag root = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+            // The current Forge snapshot can coexist with an older migration snapshot.
+            CompoundTag registries = root.getCompound(root.contains("fml", Tag.TAG_COMPOUND) ? "fml" : "FML")
+                    .getCompound("Registries");
+            JsonObject missing = proof.getAsJsonObject("snapshot_entries");
+            assertFalse(missing.isEmpty());
+            Map<String, String> oldNames = Map.of("minecraft:block", "minecraft:blocks",
+                    "minecraft:item", "minecraft:items", "minecraft:entity_type", "minecraft:entities",
+                    "minecraft:sound_event", "minecraft:soundevents", "minecraft:potion", "minecraft:potiontypes",
+                    "minecraft:point_of_interest_type", "minecraft:villagerprofessions",
+                    "minecraft:worldgen/biome", "minecraft:biomes");
+            for (var registry : missing.entrySet()) {
+                String name = registry.getKey();
+                String sourceName = registries.contains(name) ? name : oldNames.get(name);
+                assertNotNull(sourceName, name);
+                Map<String, Integer> sourceIds = new HashMap<>();
+                for (Tag value : registries.getCompound(sourceName).getList("ids", Tag.TAG_COMPOUND)) {
+                    CompoundTag saved = (CompoundTag) value;
+                    assertNull(sourceIds.put(saved.getString("K"), saved.getInt("V")), name);
+                }
+                for (var mapping : registry.getValue().getAsJsonObject().entrySet()) {
+                    assertEquals(mapping.getValue().getAsInt(), sourceIds.get(mapping.getKey()),
+                            sourceName + "/" + mapping.getKey());
+                }
+            }
+        }
+        return proof;
     }
 
     private static void verifyUnusedRegistryProof(JsonObject profile, Set<String> names) throws Exception {
@@ -125,7 +184,7 @@ class NativeRegistryNoticeProofTest {
     }
 
     private static int region(byte[] bytes, Set<String> names, String label, BiomeProof biomes,
-            GrassRenameProof grass) throws Exception {
+            GrassRenameProof grass, Map<String, Integer> typedUses) throws Exception {
         if (bytes.length == 0) {
             return 0;
         }
@@ -151,7 +210,7 @@ class NativeRegistryNoticeProofTest {
             try (DataInputStream input = new DataInputStream(payload)) {
                 CompoundTag root = NbtIo.read(input);
                 grass.inspect(root);
-                inspect(root, names, label + ":" + slot);
+                inspect(root, names, label + ":" + slot, typedUses);
                 biomes.inspect(root);
             }
             records++;
@@ -414,20 +473,33 @@ class NativeRegistryNoticeProofTest {
         }
     }
 
-    private static void inspect(Tag value, Set<String> names, String label) {
+    private static void inspect(Tag value, Set<String> names, String label, Map<String, Integer> typedUses) {
         if (value instanceof CompoundTag) {
             CompoundTag compound = (CompoundTag) value;
             for (String key : compound.getAllKeys()) {
                 assertFalse(names.contains(key), "Saved registry-name key in " + label + ": " + key);
-                inspect(compound.get(key), names, label + "/" + key);
+                inspect(compound.get(key), names, label + "/" + key, typedUses);
             }
         } else if (value instanceof ListTag) {
             for (Tag entry : (ListTag) value) {
-                inspect(entry, names, label);
+                inspect(entry, names, label, typedUses);
             }
         } else if (value instanceof StringTag) {
-            assertFalse(names.contains(value.getAsString()), "Saved registry-name value in " + label);
+            String name = value.getAsString();
+            if (names.contains(name) && typedUses != null && nonPaintingUse(name, label)) {
+                typedUses.merge(name, 1, Integer::sum);
+                return;
+            }
+            assertFalse(names.contains(name), "Saved registry-name value in " + label + ": " + name);
         }
+    }
+
+    private static boolean nonPaintingUse(String name, String label) {
+        if (name.equals("minecraft:water")) {
+            return label.endsWith("/sections/block_states/palette/Name") || label.endsWith("/fluid_ticks/i");
+        }
+        return name.equals("minecraft:skeleton") && (label.endsWith("/block_entities/SpawnData/entity/id")
+                || label.endsWith("/block_entities/SpawnPotentials/data/entity/id"));
     }
 
     private static byte[] readAll(InputStream input) throws Exception {

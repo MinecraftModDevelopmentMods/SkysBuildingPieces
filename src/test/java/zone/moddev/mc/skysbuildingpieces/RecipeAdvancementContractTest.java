@@ -17,7 +17,7 @@ class RecipeAdvancementContractTest {
         Path root = Paths.get("src/main/resources/data/skysbuildingpieces");
         int checked = 0;
 
-        try (java.util.stream.Stream<Path> files = Files.walk(root.resolve("recipes"))) {
+        try (java.util.stream.Stream<Path> files = Files.walk(root.resolve("recipe"))) {
             for (Path path : (Iterable<Path>) files.filter(file -> file.toString().endsWith(".json"))::iterator) {
                 JsonObject recipe = read(path);
 
@@ -25,9 +25,9 @@ class RecipeAdvancementContractTest {
                     continue;
                 }
 
-                String relative = root.resolve("recipes").relativize(path).toString().replace('\\', '/');
+                String relative = root.resolve("recipe").relativize(path).toString().replace('\\', '/');
                 String id = "skysbuildingpieces:" + relative.substring(0, relative.length() - 5);
-                JsonObject advancement = read(root.resolve("advancements/recipes").resolve(relative));
+                JsonObject advancement = read(root.resolve("advancement/recipes").resolve(relative));
 
                 assertFalse(advancement.has("parent"), "Large recipe catalogues have independent hidden unlocks");
                 assertEquals(id, advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString());

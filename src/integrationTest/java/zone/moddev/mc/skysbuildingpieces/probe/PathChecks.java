@@ -42,7 +42,7 @@ public final class PathChecks {
                     return action == net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN;
                 }
             };
-            net.minecraftforge.registries.ForgeRegistries.ITEMS.register(new ResourceLocation(namespace, "flattening_tool"), compatibleShovel);
+            net.minecraftforge.registries.ForgeRegistries.ITEMS.register(ResourceLocation.fromNamespaceAndPath(namespace, "flattening_tool"), compatibleShovel);
         });
     }
 
@@ -131,7 +131,9 @@ public final class PathChecks {
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
-                    silkTool.enchant(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, 1);
+                    silkTool.enchant(world.registryAccess()
+                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
                     require(ItemStack.matches(
                             Block.getDrops(expected, world, position, null, player, silkTool).get(0),
                             Pieces.stack(Pieces.state("minecraft:dirt", shape, orientation), 1)),
@@ -333,17 +335,17 @@ public final class PathChecks {
 
     private static int slabs(ServerLevel world, ServerPlayer player, BlockPos position) {
         if (!net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                .containsKey(new ResourceLocation("skysgrassslabs", "grass_slab"))) {
+                .containsKey(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", "grass_slab"))) {
             return 0;
         }
 
         Block path = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                .getValue(new ResourceLocation("skysgrassslabs", "path_slab"));
+                .getValue(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", "path_slab"));
         int checks = 0;
 
         for (String name : new String[] { "dirt_slab", "grass_slab" }) {
             Block slab = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                    .getValue(new ResourceLocation("skysgrassslabs", name));
+                    .getValue(ResourceLocation.fromNamespaceAndPath("skysgrassslabs", name));
 
             for (net.minecraft.world.level.block.state.properties.SlabType half : new net.minecraft.world.level.block.state.properties.SlabType[] {
                     net.minecraft.world.level.block.state.properties.SlabType.BOTTOM, net.minecraft.world.level.block.state.properties.SlabType.TOP }) {

@@ -35,9 +35,9 @@ public final class RegistryEvents {
             items();
         } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.RECIPE_SERIALIZERS)) {
             ForgeRegistries.RECIPE_SERIALIZERS.register(
-                    new ResourceLocation(SkysBuildingPieces.ID, "cutting"), CuttingRecipe.SERIALIZER);
+                    ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "cutting"), CuttingRecipe.SERIALIZER);
             ForgeRegistries.RECIPE_SERIALIZERS.register(
-                    new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece"), LegacyPieceRecipe.SERIALIZER);
+                    ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece"), LegacyPieceRecipe.SERIALIZER);
         }
     }
 
@@ -45,7 +45,7 @@ public final class RegistryEvents {
         SkysBuildingPieces.HOLDER = new Block(Block.Properties.of().mapColor(MapColor.STONE)
                 .strength(-1.0F, 3_600_000.0F));
         Pieces.registerBlocks(ForgeRegistries.BLOCKS);
-        ForgeRegistries.BLOCKS.register(new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece_holder"),
+        ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece_holder"),
                 SkysBuildingPieces.HOLDER);
     }
 
@@ -54,7 +54,7 @@ public final class RegistryEvents {
 
         BlockItem holder = new BlockItem(SkysBuildingPieces.HOLDER, new Item.Properties());
 
-        ForgeRegistries.ITEMS.register(new ResourceLocation(SkysBuildingPieces.ID, "legacy_piece_holder"), holder);
+        ForgeRegistries.ITEMS.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece_holder"), holder);
     }
 
     public static void missingBlocks(MissingMappingsEvent event) {

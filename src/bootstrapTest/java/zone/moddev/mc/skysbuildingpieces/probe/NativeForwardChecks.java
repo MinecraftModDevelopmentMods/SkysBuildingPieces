@@ -195,7 +195,7 @@ final class NativeForwardChecks {
             String id = saved.get("id").getAsString();
             BlockState actual = world.getBlockState(position);
             net.minecraft.world.level.block.Block registered = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                    .getValue(new net.minecraft.resources.ResourceLocation(id));
+                    .getValue(net.minecraft.resources.ResourceLocation.parse(id));
 
             require(registered instanceof PieceBlock, "Permanent palette registration is missing: " + id);
 

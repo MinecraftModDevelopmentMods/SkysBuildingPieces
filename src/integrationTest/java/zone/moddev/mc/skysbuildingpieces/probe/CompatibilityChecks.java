@@ -45,7 +45,7 @@ public final class CompatibilityChecks {
 
     public static ItemStack legacy(int count) {
         ItemStack stack = new ItemStack(
-                ForgeRegistries.ITEMS.getValue(new ResourceLocation("buildingbricks:rock_step")), count);
+                ForgeRegistries.ITEMS.getValue(ResourceLocation.parse("buildingbricks:rock_step")), count);
 
         zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, NativeLegacyChecks.stack("minecraft:stone", count).getCompound("tag").copy());
         return stack;
@@ -175,9 +175,9 @@ public final class CompatibilityChecks {
 
         LegacyPieceRecipe recipe = new LegacyPieceRecipe(net.minecraft.world.item.crafting.CraftingBookCategory.BUILDING);
 
-        NativeLegacyChecks.require(recipe.matches(grid, world),
+        NativeLegacyChecks.require(recipe.matches(grid.asCraftInput(), world),
                 "Explicit bridge recipe works independently of replacement");
-        identity(recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY), 1, true);
+        identity(recipe.assemble(grid.asCraftInput(), net.minecraft.core.RegistryAccess.EMPTY), 1, true);
         drop.discard();
         frame.discard();
         world.removeBlock(position.north(), false);
@@ -187,7 +187,7 @@ public final class CompatibilityChecks {
 
     private static void newlyPlaced(ServerLevel world, boolean convert) {
         BlockPos position = new BlockPos(934, 70, 932);
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("buildingbricks:rock_step"));
+        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.parse("buildingbricks:rock_step"));
         BlockState old = block.defaultBlockState().setValue((IntegerProperty) block.getStateDefinition().getProperty("meta"),
                 11);
 

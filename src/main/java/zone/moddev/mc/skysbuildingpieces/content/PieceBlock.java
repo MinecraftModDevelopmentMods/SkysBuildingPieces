@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluids;
@@ -551,7 +552,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         ItemStack tool = context.getOptionalParameter(LootContextParams.TOOL);
 
         if (!palette.group.equals("path") && tool != null
-                && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+                && EnchantmentHelper.getItemEnchantmentLevel(context.getLevel().registryAccess()
+                        .registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), tool) > 0) {
             return Collections.singletonList(getSilkTouchDrop(state));
         }
 

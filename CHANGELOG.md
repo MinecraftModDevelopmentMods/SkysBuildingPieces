@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8.121011
+
+- Bring Building Pieces to Minecraft 1.21.1 on Forge.
+- Keep existing pieces, recipes and supported world upgrades.
+- Grass Slabs and Mineralogy are still optional.
+
 ## 0.3.8.120061
 
 - Bring the building pieces and recipes to Minecraft 1.20.6.

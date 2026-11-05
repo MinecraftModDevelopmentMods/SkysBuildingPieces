@@ -13,9 +13,9 @@ if (!providers.gradleProperty('enableMineralogyFixtures').getOrElse('false').toB
     return
 }
 
-def smoother = file('../../SkysTerrainSmoother1206/SkysTerrainSmoother')
+def smoother = file('../../SkysTerrainSmoother1211/SkysTerrainSmoother')
 def smootherJar = new File(smoother,
-        'build/libs/SkysTerrainSmoother-0.1.0.120061.jar')
+        'build/libs/SkysTerrainSmoother-0.1.0.121011.jar')
 def fixtureClasses = layout.buildDirectory.dir('mineralogy-fixture/classes')
 def compileFixture = tasks.register('compileMineralogyFixture', JavaCompile) {
     group = 'verification'

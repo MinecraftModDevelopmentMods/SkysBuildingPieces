@@ -1,4 +1,4 @@
-"""Generate Forge 50 recipes from permanent material and shape catalogues.
+"""Generate Forge 52 recipes from permanent material and shape catalogues.
 
 The catalogue keeps source-world identities; recipes use the flattened item IDs.
 Optional inputs and matching advancements share the same Forge conditions.
@@ -267,11 +267,11 @@ def main():
     for path in args.native_jar:
         with ZipFile(path) as archive:
             for name in archive.namelist():
-                if name.startswith('data/') and '/recipes/' in name and name.endswith('.json'):
+                if name.startswith('data/') and '/recipe/' in name and name.endswith('.json'):
                     native.append(json.loads(archive.read(name)))
-                if name.startswith('data/') and '/tags/items/' in name and name.endswith('.json'):
+                if name.startswith('data/') and '/tags/item/' in name and name.endswith('.json'):
                     namespace = name.split('/')[1]
-                    identifier = namespace + ':' + name.split('/tags/items/', 1)[1][:-5]
+                    identifier = namespace + ':' + name.split('/tags/item/', 1)[1][:-5]
                     data = json.loads(archive.read(name))
                     values = data['values']
                     if data.get('replace', False):
@@ -282,7 +282,7 @@ def main():
     changed = 0
     manifest = args.resources.parent / 'recipe-book/native-1.14-generated.json'
     expected = sorted(folder + '/' + identifier + '.json'
-                      for folder, values in [('recipes', recipes), ('advancements', advancements)]
+                      for folder, values in [('recipe', recipes), ('advancement', advancements)]
                       for identifier in values)
     prior = json.loads(manifest.read_text(encoding='utf-8')) if manifest.is_file() else []
     # Only remove paths owned by this generator's previous manifest.
@@ -292,7 +292,7 @@ def main():
             changed += 1
             if args.write:
                 path.unlink()
-    for folder, values in [('recipes', recipes), ('advancements', advancements)]:
+    for folder, values in [('recipe', recipes), ('advancement', advancements)]:
         for identifier, data in values.items():
             path = args.resources / 'data/skysbuildingpieces' / folder / (identifier + '.json')
             text = format_json(data) + '\n'

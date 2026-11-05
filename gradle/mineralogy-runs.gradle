@@ -18,7 +18,7 @@ def gameDirectory = layout.projectDirectory.dir(
 
 def configureVerification = project.ext.configureMineralogyVerificationRun
 
-// Forge 50 uses the same official names in development and in the game.
+// Forge 52 uses the same official names in development and in the game.
 ext.nativeOptionalDevelopmentJars = runtimeSources
 ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
     group = 'verification'
@@ -164,13 +164,18 @@ tasks.register('verifyMineralogyDevelopmentProfile') {
 
 // Verification uses another directory. Probes never enter the manual Eclipse profile.
 def probeId = project.ext.mineralogyProfileProbeId
-def verificationDirectory = layout.buildDirectory.dir('mineralogy-integration-run')
+def verificationRunName = providers.gradleProperty('mineralogyIntegrationRunName')
+        .getOrElse('mineralogy-integration-run')
+if (!(verificationRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable Mineralogy directory name')
+}
+def verificationDirectory = layout.buildDirectory.dir(verificationRunName)
 def prepareMineralogyIntegrationTest = tasks.register('prepareMineralogyIntegrationTest') {
     group = 'verification'
     dependsOn prepareMineralogyDevelopmentRun, tasks.named('integrationTestModJar')
     doLast {
         File directory = verificationDirectory.get().asFile
-        File expected = new File(layout.buildDirectory.get().asFile, 'mineralogy-integration-run')
+        File expected = new File(layout.buildDirectory.get().asFile, verificationRunName)
         if (directory.canonicalFile != expected.canonicalFile) {
             throw new GradleException('Refusing to clear a Mineralogy verification directory outside the build output')
         }

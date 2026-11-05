@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -26,10 +26,10 @@ public final class LegacyPieceRecipe extends CustomRecipe {
         super(category);
     }
 
-    private ItemStack result(CraftingContainer inventory) {
+    private ItemStack result(CraftingInput inventory) {
         ItemStack source = ItemStack.EMPTY;
 
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+        for (int slot = 0; slot < inventory.size(); slot++) {
             ItemStack stack = inventory.getItem(slot);
 
             if (!stack.isEmpty()) {
@@ -79,12 +79,12 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inventory, Level world) {
+    public boolean matches(CraftingInput inventory, Level world) {
         return !result(inventory).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inventory, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries) {
         return result(inventory);
     }
 
@@ -99,7 +99,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inventory) {
-        return NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inventory) {
+        return NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
     }
 }

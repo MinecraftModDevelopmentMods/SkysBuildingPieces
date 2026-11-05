@@ -58,7 +58,7 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            registry.register(new ResourceLocation(palette.registryId()), block);
+            registry.register(ResourceLocation.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
         }
     }
@@ -70,7 +70,7 @@ public final class Pieces {
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
             Item item = new Item(new Item.Properties().stacksTo(1));
             RETIRED_TEMPLATES.put(name, item);
-            registry.register(new ResourceLocation(SkysBuildingPieces.ID, "template_" + name), item);
+            registry.register(ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name), item);
         }
     }
 
@@ -84,7 +84,7 @@ public final class Pieces {
             // entries use the flat items below.
             BlockItem carrier = new BlockItem(block, new Item.Properties());
 
-            registry.register(new ResourceLocation(block.palette.registryId()), carrier);
+            registry.register(ResourceLocation.parse(block.palette.registryId()), carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -95,7 +95,7 @@ public final class Pieces {
 
                 PieceItem item = new PieceItem(block, material);
 
-                registry.register(new ResourceLocation(identifier), item);
+                registry.register(ResourceLocation.parse(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -131,7 +131,7 @@ public final class Pieces {
     private static BlockState nativeState(JsonElement value) {
         JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
         String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(identifier));
+        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.parse(identifier));
 
         if (block == null || block == Blocks.AIR) {
             if (definition != null && definition.has("fallback")) {

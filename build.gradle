@@ -35,15 +35,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                '4B14145595E900F178A082F2253A756F63897E6F61C2B8B5E7C819B82CD79E8C',
+                '019032A4A26ECB473D403EF017054D5892CE59A9904E8831B452287CD756397E',
         (mavenizerRuleManifest.asFile):
-                '931DAB31C238D8C9C38239671A61DA0942ADADF80149D6359197EE80A16380A8',
+                '7F669F225520D0382E76991A8A3E5E4020840F0FA975F7DCB86681D7E7C3F766',
         (mavenizerSourcePatch.asFile):
-                'A140C21312C2A5A8AFC56DC0B037B94D222CA68A7B868512B91684CD3754B650',
+                '84FEA234619CC2D1931E609B22B6E5D96F59366F7D6C2783C3BEE0F726F3E876',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                '25121D3DF400E3C76D87E39985FEDC43BCDAE82E52B75A53A30DA490FF268F71'
+                'C052261D6B7B4E238D32A5E7F4CBA4D44D48311CE0FA1E673D26806EDCD41E70'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -180,7 +180,7 @@ minecraft {
                     "${mod_id}%%${buildDir}/forge-run-mod-classes/main"
             if (name.toLowerCase(Locale.ROOT).contains('client') &&
                     providers.gradleProperty('forgeClientAssets').isPresent()) {
-                environment 'assetIndex', '16'
+                environment 'assetIndex', '17'
                 environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
                 if (providers.gradleProperty('forgeClientNatives').isPresent()) {
                     environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
@@ -235,7 +235,8 @@ def configureFromForgeRun = { JavaExec process, String runTaskName, boolean incl
         List<String> originalJvmArgs = new ArrayList<>(run.jvmArgs)
         Map<String, Object> originalSystemProperties = new LinkedHashMap<>(run.systemProperties)
         Map<String, Object> originalEnvironment = new LinkedHashMap<>(run.environment)
-        Map<String, String> originalConfiguredEnvironment = new LinkedHashMap<>(runOptions.environment.get())
+        Map<String, String> originalConfiguredEnvironment = includeMain ? null :
+                new LinkedHashMap<>(runOptions.environment.get())
         FileCollection originalClasspath = files(run.classpath.files)
         String originalMinHeap = run.minHeapSize
         String originalMaxHeap = run.maxHeapSize
@@ -248,13 +249,15 @@ def configureFromForgeRun = { JavaExec process, String runTaskName, boolean incl
             run.systemProperties(process.systemProperties)
             run.environment(process.environment)
             String modClasses = includeMain ? "${mod_id}%%${forgeRunModClassesDirectory}" : ''
-            runOptions.environment.put('MOD_CLASSES', modClasses)
+            // Ordinary runs already use the merged production output. Eclipse
+            // generation locks this map, so leave it alone for those runs.
+            if (!includeMain) runOptions.environment.put('MOD_CLASSES', modClasses)
             run.setClasspath(isolatedForgeClasspath(originalClasspath, includeMain))
             run.environment('MOD_CLASSES', modClasses)
             run.exec()
         } finally {
             runOptions.workingDir.set(originalConfiguredWorkingDir)
-            runOptions.environment.set(originalConfiguredEnvironment)
+            if (!includeMain) runOptions.environment.set(originalConfiguredEnvironment)
             run.workingDir(originalWorkingDir)
             run.setArgs(originalArgs)
             run.setJvmArgs(originalJvmArgs)
@@ -515,12 +518,12 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.20.6' || project.forge_version != '50.2.0' ||
-                project.mapping_channel != 'official' || project.mapping_version != '1.20.6' ||
+        if (project.minecraft_version != '1.21.1' || project.forge_version != '52.1.0' ||
+                project.mapping_channel != 'official' || project.mapping_version != '1.21.1' ||
                 project.loader_name != 'forge' || project.loader_code != '1' ||
                 project.java_version != '21' || project.java_toolchain_version != '21.0.7+6' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 1.20.6 release metadata')
+            throw new GradleException('Unexpected 1.21.1 release metadata')
         }
     }
 }

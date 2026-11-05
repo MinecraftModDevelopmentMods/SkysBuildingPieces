@@ -34,7 +34,7 @@ public final class HistoricalBiomes {
                 throw new IllegalArgumentException("Invalid historical biome alias: " + source);
             }
 
-            checked.put(new ResourceLocation(source).toString(), new ResourceLocation(target).toString());
+            checked.put(ResourceLocation.parse(source).toString(), ResourceLocation.parse(target).toString());
         });
         MODULES.put(namespace, Collections.unmodifiableMap(checked));
     }
@@ -60,7 +60,7 @@ public final class HistoricalBiomes {
             ResourceLocation identity;
 
             try {
-                identity = new ResourceLocation(name);
+                identity = ResourceLocation.parse(name);
             } catch (RuntimeException malformed) {
                 throw blocked("invalid source biome name: " + name);
             }
@@ -86,7 +86,7 @@ public final class HistoricalBiomes {
             // Numeric IDs belong to the world's biome instances, which can differ from Forge's registration objects.
             Registry<Biome> current = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer()
                     .registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME);
-            Biome biome = current.get(new ResourceLocation(name));
+            Biome biome = current.get(ResourceLocation.parse(name));
 
             return biome == null ? -1 : current.getId(biome);
         });
@@ -131,7 +131,7 @@ public final class HistoricalBiomes {
         ListTag names = new ListTag();
         for (int number : source) {
             String replacement = replacements.get(number);
-            names.add(StringTag.valueOf(replacement == null ? "" : new ResourceLocation(replacement).toString()));
+            names.add(StringTag.valueOf(replacement == null ? "" : ResourceLocation.parse(replacement).toString()));
         }
         if (level.contains(PENDING) || level.contains(PENDING_NAMES)) {
             if (!level.contains(PENDING, 11) || !level.contains(PENDING_NAMES, 9)

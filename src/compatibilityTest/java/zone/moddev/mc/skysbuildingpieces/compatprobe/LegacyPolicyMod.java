@@ -35,7 +35,7 @@ public final class LegacyPolicyMod {
         if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCKS)) {
             for (int index = 0; index < NAMES.length; index++) {
                 BLOCKS[index] = new LegacyBlock();
-                ForgeRegistries.BLOCKS.register(new ResourceLocation("buildingbricks", NAMES[index]), BLOCKS[index]);
+                ForgeRegistries.BLOCKS.register(ResourceLocation.fromNamespaceAndPath("buildingbricks", NAMES[index]), BLOCKS[index]);
             }
         } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
             for (Block block : BLOCKS) {
@@ -44,7 +44,7 @@ public final class LegacyPolicyMod {
             }
         } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES)) {
             materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
-            ForgeRegistries.BLOCK_ENTITY_TYPES.register(new ResourceLocation("buildingbricks", "material"), materialType);
+            ForgeRegistries.BLOCK_ENTITY_TYPES.register(ResourceLocation.fromNamespaceAndPath("buildingbricks", "material"), materialType);
         }
     }
 
