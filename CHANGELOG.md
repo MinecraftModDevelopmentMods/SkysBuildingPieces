@@ -4,6 +4,7 @@
 
 - Updated Building Pieces for Minecraft 26.2 on Forge.
 - Existing pieces, recipes and migration totals carry forward.
+- Larger modded saves can upgrade without losing their saved registry data.
 
 ## 0.3.8.2601021
 

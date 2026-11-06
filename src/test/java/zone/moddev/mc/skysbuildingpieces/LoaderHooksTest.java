@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderHooksTest {
@@ -43,7 +45,30 @@ class LoaderHooksTest {
         assertFalse(Files.exists(resources.resolve("META-INF/coremods.json")));
     }
 
+    @Test
+    void theFileUpgradeHasOneLocalLevelDataRead() throws Exception {
+        MethodNode writer = nativeMethod("net.minecraft.util.filefix.FileFixerUpper",
+                "writeUpdatedLevelData", "(Ljava/nio/file/Path;I)V");
+        long reads = java.util.Arrays.stream(writer.instructions.toArray())
+                .filter(instruction -> instruction instanceof MethodInsnNode call
+                        && call.owner.equals("net/minecraft/nbt/NbtIo")
+                        && call.name.equals("readCompressed")
+                        && call.desc.equals("(Ljava/nio/file/Path;Lnet/minecraft/nbt/NbtAccounter;)"
+                                + "Lnet/minecraft/nbt/CompoundTag;"))
+                .count();
+        assertEquals(1, reads);
+    }
+
     static void assertNativeReturn(String type, String method, String descriptor, int opcode) throws Exception {
+        MethodNode target = nativeMethod(type, method, descriptor);
+        boolean returns = false;
+        for (var instruction : target.instructions) {
+            returns |= instruction.getOpcode() == opcode;
+        }
+        assertTrue(returns, type + "." + method);
+    }
+
+    private static MethodNode nativeMethod(String type, String method, String descriptor) throws Exception {
         String resource = "/" + type.replace('.', '/') + ".class";
         try (var stream = LoaderHooksTest.class.getResourceAsStream(resource)) {
             assertNotNull(stream, type);
@@ -53,11 +78,7 @@ class LoaderHooksTest {
                     .filter(candidate -> candidate.name.equals(method) && candidate.desc.equals(descriptor))
                     .toList();
             assertEquals(1, methods.size(), type + "." + method);
-            boolean returns = false;
-            for (var instruction : methods.getFirst().instructions) {
-                returns |= instruction.getOpcode() == opcode;
-            }
-            assertTrue(returns, type + "." + method);
+            return methods.getFirst();
         }
     }
 }
