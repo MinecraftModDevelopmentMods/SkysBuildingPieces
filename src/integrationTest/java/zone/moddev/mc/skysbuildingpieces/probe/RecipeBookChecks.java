@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import net.minecraft.advancements.*;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
@@ -282,7 +283,7 @@ public final class RecipeBookChecks {
                     "Advancement reload lost " + id);
         }
 
-        player.getAdvancements().stopListening();
+        player.getAdvancements().clearTriggers();
         network.channel().close();
         org.apache.logging.log4j.LogManager.getLogger().info("SKY_RECIPE_BOOK_PASS recipes=" + checks + " inventory=true crafting=true reload=true");
     }

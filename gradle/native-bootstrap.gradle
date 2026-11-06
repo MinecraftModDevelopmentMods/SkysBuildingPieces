@@ -116,7 +116,7 @@ def phases = [:]
             }
             File log = new File(directory.get().asFile, 'logs/latest.log')
             if (!log.isFile()) throw new GradleException('Native bootstrap log is missing')
-            String text = log.getText('UTF-8')
+            String text = readForgeRuntimeLog(log)
             if (!text.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS ' + phase) ||
                     !text.contains('Done (') || text =~ /(?m)\[[^\r\n]*\/(?:ERROR|FATAL)\]/ ||
                     text.contains('[STDERR/') || text.contains('Encountered an unexpected exception')) {
@@ -137,7 +137,7 @@ tasks.register('nativeWaterloggingTest', JavaExec) {
     project.ext.configureNativeBootstrapRun(delegate, 'runServer')
     doLast {
         auditServerLogs(directory.get().asFile, systemProperties['skysbuildingpieces.bootstrapPhase'].toString())
-        String log = new File(directory.get().asFile, 'logs/latest.log').getText('UTF-8')
+        String log = readForgeRuntimeLog(new File(directory.get().asFile, 'logs/latest.log'))
         if (!log.contains('BUILDING_PIECES_WATERLOGGING_PASS') ||
                 !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS water') ||
                 log =~ /\/(?:ERROR|FATAL)\]/ || log.contains('[STDERR/')) {
@@ -153,7 +153,7 @@ tasks.register('nativeStagingTest', JavaExec) {
     project.ext.configureNativeBootstrapRun(delegate, 'runServer')
     doLast {
         auditServerLogs(directory.get().asFile, systemProperties['skysbuildingpieces.bootstrapPhase'].toString())
-        String log = new File(directory.get().asFile, 'logs/latest.log').getText('UTF-8')
+        String log = readForgeRuntimeLog(new File(directory.get().asFile, 'logs/latest.log'))
         if (!log.contains('BUILDING_PIECES_NATIVE_STAGING_PASS') ||
                 !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS staging') ||
                 log =~ /\/(?:ERROR|FATAL)\]/ || log.contains('[STDERR/')) {
@@ -200,7 +200,7 @@ def forwardPhases = [:]
         doLast {
             auditServerLogs(forwardDirectory.get().asFile, phase)
             File log = new File(forwardDirectory.get().asFile, 'logs/latest.log')
-            String text = log.isFile() ? log.getText('UTF-8') : ''
+            String text = log.isFile() ? readForgeRuntimeLog(log) : ''
             if (!text.contains('BUILDING_PIECES_NATIVE_FORWARD_PASS') ||
                     !text.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS ' + phase) ||
                     !text.contains('Done (') || text =~ /(?m)\[[^\r\n]*\/(?:ERROR|FATAL)\]/ ||

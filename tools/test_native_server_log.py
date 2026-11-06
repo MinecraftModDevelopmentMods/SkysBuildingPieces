@@ -230,5 +230,44 @@ class NativeServerFilesTest(unittest.TestCase):
             audit_server(self.directory, 'test')
 
 
+class ForgeWindowsReportTests(unittest.TestCase):
+    def setUp(self):
+        self.report = "\n".join((
+            "[05:22:40] [main/ERROR] [oshi.driver.windows.registry.HkeyPerformanceDataUtil/]: "
+            "Unable to locate English counter names in registry Perflib 009. Counters may need to be rebuilt: ",
+            "com.sun.jna.platform.win32.Win32Exception: The parameter is incorrect.",
+            "\tat com.sun.jna.platform@5.17.0/com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray",
+            "\tat com.github.oshi@6.9.0/oshi.driver.windows.registry.HkeyPerformanceDataUtil.mapCounterIndicesFromRegistry",
+            "\tat TRANSFORMER/minecraft@26.2/net.minecraft.SystemReport.putSoftware",
+            "\tat SECURE-BOOTSTRAP/net.minecraftforge.fmlloader@26.2-65.1.0/Forge",
+            "[05:22:46] [Server thread/INFO]: Done (1.5s)!",
+            "",
+        ))
+
+    def test_the_controlled_report_is_scoped_to_windows(self):
+        from native_windows_log import forge_windows_log
+
+        self.assertEqual(forge_windows_log(self.report, enabled=False), self.report)
+        result = forge_windows_log(self.report, enabled=True)
+        self.assertNotIn("/ERROR]", result)
+        self.assertIn("Done (1.5s)!", result)
+
+    def test_a_different_exception_or_loader_is_still_an_error(self):
+        from native_windows_log import forge_windows_log
+
+        for changed in (
+            self.report.replace("The parameter is incorrect.", "Access is denied."),
+            self.report.replace("26.2-65.1.0/Forge", "26.2-65.1.1/Forge"),
+            self.report + self.report,
+        ):
+            self.assertEqual(forge_windows_log(changed, enabled=True), changed)
+
+    def test_an_unrelated_error_is_never_removed(self):
+        from native_windows_log import forge_windows_log
+
+        failure = "[05:22:47] [Server thread/ERROR]: Failed to save a chunk"
+        self.assertIn(failure, forge_windows_log(self.report + failure, enabled=True))
+
+
 if __name__ == '__main__':
     unittest.main()

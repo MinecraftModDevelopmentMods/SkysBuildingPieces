@@ -50,7 +50,7 @@ public final class ClientProbe extends ProbeProxy {
                 confirmDisposableWorld(minecraft);
                 if (System.nanoTime() - worldStarted > java.util.concurrent.TimeUnit.SECONDS.toNanos(180)) {
                     ClientStatus.failure = new AssertionError("Disposable client world did not start; screen="
-                            + (minecraft.screen == null ? "none" : minecraft.screen.getClass().getName()));
+                            + (minecraft.gui.screen() == null ? "none" : minecraft.gui.screen().getClass().getName()));
                     org.apache.logging.log4j.LogManager.getLogger().error("Client runtime check failed", ClientStatus.failure);
                     minecraft.stop();
                     return;
@@ -88,8 +88,8 @@ public final class ClientProbe extends ProbeProxy {
             return;
         }
 
-        if (minecraft.getOverlay() != null
-                || !(minecraft.screen instanceof net.minecraft.client.gui.screens.TitleScreen)) {
+        if (minecraft.gui.overlay() != null
+                || !(minecraft.gui.screen() instanceof net.minecraft.client.gui.screens.TitleScreen)) {
             return;
         }
         ran = true;
@@ -188,7 +188,7 @@ public final class ClientProbe extends ProbeProxy {
                 startedWorld = true;
                 worldStarted = System.nanoTime();
                 if (new File(minecraft.gameDirectory, "saves/building-pieces-world/level.dat").isFile()) {
-                    minecraft.createWorldOpenFlows().openWorld("building-pieces-world", () -> minecraft.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
+                    minecraft.createWorldOpenFlows().openWorld("building-pieces-world", () -> minecraft.gui.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
                 } else {
                     net.minecraft.world.level.LevelSettings settings = new net.minecraft.world.level.LevelSettings(
                             "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE,
@@ -196,7 +196,7 @@ public final class ClientProbe extends ProbeProxy {
                             net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
                     minecraft.createWorldOpenFlows().createFreshLevel("building-pieces-world", settings,
                             new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, minecraft.screen);
+                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, minecraft.gui.screen());
                 }
             }
         } catch (Throwable failure) {
@@ -272,9 +272,9 @@ public final class ClientProbe extends ProbeProxy {
 
     private void confirmDisposableWorld(Minecraft minecraft) {
         if (confirmedWorld) return;
-        boolean backup = minecraft.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
-        boolean confirmation = minecraft.screen != null
-                && minecraft.screen.getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
+        boolean backup = minecraft.gui.screen() instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
+        boolean confirmation = minecraft.gui.screen() != null
+                && minecraft.gui.screen().getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
         if (!backup && !confirmation) {
             return;
         }
@@ -285,14 +285,14 @@ public final class ClientProbe extends ProbeProxy {
         }
         String experimentalTitle = net.minecraft.network.chat.Component
                 .translatable("selectWorld.backupQuestion.experimental").getString();
-        if (confirmation && !experimentalTitle.equals(minecraft.screen.getTitle().getString())) {
+        if (confirmation && !experimentalTitle.equals(minecraft.gui.screen().getTitle().getString())) {
             throw new IllegalStateException("Unexpected world-load confirmation: "
-                    + minecraft.screen.getTitle().getString());
+                    + minecraft.gui.screen().getTitle().getString());
         }
         String proceed = backup
                 ? net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString()
                 : net.minecraft.network.chat.CommonComponents.GUI_PROCEED.getString();
-        for (var child : minecraft.screen.children()) {
+        for (var child : minecraft.gui.screen().children()) {
             if (child instanceof net.minecraft.client.gui.components.Button button
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {

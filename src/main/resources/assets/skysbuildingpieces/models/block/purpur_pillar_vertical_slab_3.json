@@ -2,9 +2,9 @@
   "parent": "block/block",
   "textures": {
     "top": "minecraft:block/purpur_pillar_top",
-    "side": "minecraft:block/purpur_pillar",
+    "side": "minecraft:block/purpur_pillar_side",
     "bottom": "minecraft:block/purpur_pillar_top",
-    "particle": "minecraft:block/purpur_pillar"
+    "particle": "minecraft:block/purpur_pillar_side"
   },
   "elements": [
     {

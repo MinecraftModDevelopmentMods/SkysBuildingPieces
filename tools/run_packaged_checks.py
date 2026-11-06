@@ -85,15 +85,15 @@ def argument_file(java, directory, phase, arguments):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/26.1.2/26.1.2.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/26.2/26.2.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("26.1.2-forge-64.0.9", "forge-64.0.9")]
+                for name in ("26.2-forge-65.1.0", "forge-65.1.0")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 64.0.9 profile")
+        raise ValueError("The installed client has no Forge 65.1.0 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "26.1.2" or forge["inheritsFrom"] != "26.1.2":
-        raise ValueError("This launcher requires the verified Forge 64 client metadata")
+    if base["id"] != "26.2" or forge["inheritsFrom"] != "26.2":
+        raise ValueError("This launcher requires the verified Forge 65 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -115,7 +115,7 @@ def client_command(options, directory):
         classpath.append(path)
         if classifier == "natives-windows":
             native_artifacts.append(path)
-    client = runtime / "versions/26.1.2/26.1.2.jar"
+    client = runtime / "versions/26.2/26.2.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -152,12 +152,12 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/minecraftforge/forge/26.1.2-64.0.9" / filename
+    source = libraries / "net/minecraftforge/forge/26.2-65.1.0" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    shim = runtime / "forge-26.1.2-64.0.9-shim.jar"
+    shim = runtime / "forge-26.2-65.1.0-shim.jar"
     expected_options = ["-Djava.net.preferIPv6Addresses=system", "-XX:+UseCompactObjectHeaders"]
     if launch != [*expected_options, "-jar", shim.name] or not shim.is_file():
-        raise ValueError("Expected the official Forge 64 server shim")
+        raise ValueError("Expected the official Forge 65 server shim")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":

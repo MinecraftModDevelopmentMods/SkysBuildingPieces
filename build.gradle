@@ -35,15 +35,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                'BB0DACB3DEB2A711CA67DD402D5FDAB5A9847C37C7B9B596DEC7CF37378FA085',
+                '5ABAB52A3F1BE115381C3CE80D5FD38DBE6C9F4C0B9ECF70A957700EC90FB88B',
         (mavenizerRuleManifest.asFile):
-                '21D1F5984E735BCEA1B1EFB9F965655796B39538FC91AAED1C3474004710423D',
+                '9437E03FC5E1CB5D605D72F0538C4DF4417B64DB0A57D0AABDC5184781517AC1',
         (mavenizerSourcePatch.asFile):
-                '7C8EC895E79DF31AFD2CA3B505B43573C7052718A24050832189AAA2D3CC6137',
+                '2DA8DD0FD5F112F5B7591113AED06D9A58C584A25F8705E26445A6D2E9D5C78E',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                '7686880D2B0F6BD6ACAFA4F0AB7585189767813174BC36DB675FEC0142440A77'
+                'EAD1477F393897C491A10FB86178213A99C360571A8063D551DA0579DF65BA6F'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -85,10 +85,14 @@ def versionParts = project.mod_version.toString().tokenize('.')
 if (versionParts.size() != 4 || !versionParts.every { it ==~ /\d+/ }) {
     throw new GradleException("mod_version must use Major.Minor.Bug.Target numeric form: ${project.mod_version}")
 }
-def minecraftVersionParts = project.minecraft_version.toString().tokenize('.')
+def minecraftVersionParts = project.minecraft_version.toString().split('\\.', -1)
+if (!(minecraftVersionParts.length in 2..3) || !minecraftVersionParts.every { it ==~ /\d+/ }) {
+    throw new GradleException("minecraft_version must have two or three numeric parts: ${project.minecraft_version}")
+}
+def minecraftPatch = minecraftVersionParts.length == 3 ? minecraftVersionParts[2] : '0'
 def expectedTargetVersion = "${minecraftVersionParts[0]}" +
         "${minecraftVersionParts[1].padLeft(2, '0')}" +
-        "${minecraftVersionParts[2].padLeft(2, '0')}" + project.loader_code
+        "${minecraftPatch.padLeft(2, '0')}" + project.loader_code
 if (versionParts[3] != expectedTargetVersion) {
     throw new GradleException("mod_version target ${versionParts[3]} does not match ${expectedTargetVersion}")
 }
@@ -188,7 +192,7 @@ minecraft {
                     "${mod_id}%%${buildDir}/forge-run-mod-classes/main"
             if (name.toLowerCase(Locale.ROOT).contains('client') &&
                     providers.gradleProperty('forgeClientAssets').isPresent()) {
-                environment 'assetIndex', '30'
+                environment 'assetIndex', '32'
                 environment 'assetDirectory', providers.gradleProperty('forgeClientAssets').get()
                 if (providers.gradleProperty('forgeClientNatives').isPresent()) {
                     environment 'nativesDirectory', providers.gradleProperty('forgeClientNatives').get()
@@ -541,12 +545,12 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '26.1.2' || project.forge_version != '64.0.9' ||
-                project.mapping_channel != 'official' || project.mapping_version != '26.1.2' ||
+        if (project.minecraft_version != '26.2' || project.forge_version != '65.1.0' ||
+                project.mapping_channel != 'official' || project.mapping_version != '26.2' ||
                 project.loader_name != 'forge' || project.loader_code != '1' ||
                 project.java_version != '25' || project.java_toolchain_version != '25.0.3+9' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 26.1.2 release metadata')
+            throw new GradleException('Unexpected 26.2 release metadata')
         }
     }
 }
@@ -842,6 +846,7 @@ ext.mineralogyProfileProbeId = 'skysbuildingpieces'
 ext.mineralogyProfileAdditionalMods = files()
 apply from: 'gradle/mineralogy-runs.gradle'
 apply from: 'gradle/mineralogy-fixtures.gradle'
+apply from: 'gradle/native-runtime-log.gradle'
 apply from: 'gradle/grass-slabs-release.gradle'
 
 // Recipe and advancement JSON is checked in under the native data/ tree.

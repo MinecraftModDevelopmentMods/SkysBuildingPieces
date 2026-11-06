@@ -16,7 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
@@ -236,7 +236,7 @@ public final class CompatibilityChecks {
         private final LazyOptional<ItemStackHandler> optional = LazyOptional.of(() -> handler);
 
         HandlerTile(BlockPos position) {
-            super(BlockEntityType.CHEST, position, Blocks.CHEST.defaultBlockState());
+            super(BlockEntityTypes.CHEST, position, Blocks.CHEST.defaultBlockState());
         }
 
         @Override

@@ -982,7 +982,7 @@
     "resistance": 10,
     "textures": {
       "top": "minecraft:block/purpur_pillar_top",
-      "side": "minecraft:block/purpur_pillar"
+      "side": "minecraft:block/purpur_pillar_side"
     },
     "blocks": {
       "full": {

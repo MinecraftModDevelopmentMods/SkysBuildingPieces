@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8.2602001
+
+- Updated Building Pieces for Minecraft 26.2 on Forge.
+- Existing pieces, recipes and migration totals carry forward.
+
 ## 0.3.8.2601021
 
 - Bring Building Pieces to Minecraft 26.1.2 on Forge.

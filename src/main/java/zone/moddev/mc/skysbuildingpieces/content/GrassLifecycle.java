@@ -166,7 +166,7 @@ public final class GrassLifecycle {
     }
 
     private static int lightBlocked(BlockState cover) {
-        return LightEngine.getLightBlockInto(Blocks.AIR.defaultBlockState(), cover,
+        return LightEngine.getLightDampeningInto(Blocks.AIR.defaultBlockState(), cover,
                 Direction.UP, cover.getLightDampening());
     }
 

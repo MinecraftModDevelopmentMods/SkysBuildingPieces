@@ -56,7 +56,7 @@ tasks.register('nativeInstalledPolicyTest', JavaExec) {
         File directory = policyDirectory.get().asFile
         project.ext.auditNativeServerLogs(directory, 'compat')
         File log = new File(directory, 'logs/latest.log')
-        String text = log.isFile() ? log.getText('UTF-8') : ''
+        String text = log.isFile() ? readForgeRuntimeLog(log) : ''
         if (!text.contains('BUILDING_PIECES_COMPATIBILITY_PASS installed_fixture=true') ||
                 !text.contains('BUILDING_PIECES_PROBE_PASS compat') || !text.contains('Done (') ||
                 text =~ /\/(?:ERROR|FATAL)\]/ || text.contains('[STDERR/') ||
