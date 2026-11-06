@@ -54,14 +54,14 @@ when Grass Slabs isn't installed.
 
 ## Installation and other Sky mods
 
-For **Minecraft 1.21.11**, use **NeoForge 21.11.45** and **Java 21**.
+For **Minecraft 26.1.2**, use **NeoForge 26.1.2.94** and **Java 25**.
 No other mod is required. Put the main jar in `mods` on both the client and
 server.
 
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.2.0.121112 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.0.2601022 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

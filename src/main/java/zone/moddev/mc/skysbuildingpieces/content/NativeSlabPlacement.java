@@ -37,13 +37,13 @@ public final class NativeSlabPlacement {
                 continue;
             }
 
-            ItemStack stack = Pieces.stack(slab, 1);
+            Item item = Pieces.item(slab);
 
-            if (stack == null) {
+            if (item == null) {
                 continue;
             }
 
-            String previous = materials.put(stack.getItem(), definition.id);
+            String previous = materials.put(item, definition.id);
 
             if (previous != null && !previous.equals(definition.id)) {
                 throw new IllegalStateException(

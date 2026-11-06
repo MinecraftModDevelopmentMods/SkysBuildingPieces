@@ -79,8 +79,13 @@ public final class LegacyBridge {
                 || normalized.getFileName().toString().equals("level.dat_old")) {
             normalized = normalized.getParent();
         }
+        CompoundTag snapshot = root.getCompoundOrEmpty("FML");
+        // The file upgrader reads the original snapshot before Forge opens the
+        // relocated save. A later read without FML must not replace it.
+        if (!normalized.equals(capturedDirectory) || !snapshot.isEmpty()) {
+            capturedRegistry = snapshot.copy();
+        }
         capturedDirectory = normalized;
-        capturedRegistry = root.getCompoundOrEmpty("FML").copy();
         SourceLevelData.capture(normalized);
     }
 

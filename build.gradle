@@ -32,7 +32,7 @@ base {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
         vendor = JvmVendorSpec.ADOPTIUM
     }
     withSourcesJar()
@@ -41,11 +41,11 @@ java {
 
 tasks.withType(JavaCompile).configureEach {
     javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
         vendor = JvmVendorSpec.ADOPTIUM
     }
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
     options.encoding = 'UTF-8'
 }
 
@@ -56,20 +56,20 @@ tasks.withType(Javadoc).configureEach {
     options.addBooleanOption('notimestamp', true)
 }
 
-def java21Launcher = javaToolchains.launcherFor {
-    languageVersion = JavaLanguageVersion.of(21)
+def java25Launcher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(25)
     vendor = JvmVendorSpec.ADOPTIUM
 }
 
-tasks.register('verifyJava21Toolchain') {
+tasks.register('verifyJava25Toolchain') {
     group = 'verification'
-    description = 'Verifies the pinned Temurin Java 21 production toolchain.'
+    description = 'Verifies the pinned Temurin Java 25 production toolchain.'
     doLast {
-        def metadata = java21Launcher.get().metadata
+        def metadata = java25Launcher.get().metadata
         String runtimeVersion = metadata.javaRuntimeVersion
-        if (project.java_toolchain_version != '21.0.7+6'
+        if (project.java_toolchain_version != '25.0.3+9'
                 || metadata.vendor.toString() != 'Eclipse Temurin'
-                || !(runtimeVersion == '21.0.7+6' || runtimeVersion == '21.0.7+6-LTS')) {
+                || !(runtimeVersion == '25.0.3+9' || runtimeVersion == '25.0.3+9-LTS')) {
             throw new GradleException("Expected Temurin ${project.java_toolchain_version}, found " +
                     "${metadata.vendor} ${runtimeVersion} at ${metadata.installationPath}")
         }
@@ -77,7 +77,7 @@ tasks.register('verifyJava21Toolchain') {
 }
 
 tasks.named('check') {
-    dependsOn tasks.named('verifyJava21Toolchain')
+    dependsOn tasks.named('verifyJava25Toolchain')
 }
 
 tasks.named('compileTestJava', JavaCompile) {
@@ -90,7 +90,7 @@ tasks.withType(Test).configureEach {
     // These saved-world audits read files outside the compiled test resources.
     inputs.file('tools/native-log-profiles.json')
     inputs.dir('src/testFixtures')
-    javaLauncher = java21Launcher
+    javaLauncher = java25Launcher
 }
 tasks.withType(AbstractArchiveTask).configureEach {
     includeEmptyDirs = false
@@ -169,7 +169,7 @@ dependencies {
 }
 
 tasks.withType(JavaExec).configureEach {
-    javaLauncher = java21Launcher
+    javaLauncher = java25Launcher
     if (name == 'runServer') standardInput = System.in
 }
 
@@ -251,11 +251,11 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.21.11' || project.neo_version != '21.11.45' ||
+        if (project.minecraft_version != '26.1.2' || project.neo_version != '26.1.2.94' ||
                 project.loader_name != 'neoforge' || project.loader_code != '2' ||
-                project.java_version != '21' || project.java_toolchain_version != '21.0.7+6' ||
+                project.java_version != '25' || project.java_toolchain_version != '25.0.3+9' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 1.21.11 release metadata')
+            throw new GradleException('Unexpected 26.1.2 release metadata')
         }
     }
 }
@@ -304,8 +304,8 @@ tasks.register('verifyReleaseArtifacts') {
                 if (!entry.directory) {
                     byte[] auditBytes = zip.getInputStream(entry).bytes
                     if (entry.name.endsWith('.class') &&
-                            (((auditBytes[6] & 255) << 8) | (auditBytes[7] & 255)) != 65) {
-                        throw new GradleException("Non-Java-21 production class: ${entry.name}")
+                            (((auditBytes[6] & 255) << 8) | (auditBytes[7] & 255)) != 69) {
+                        throw new GradleException("Non-Java-25 production class: ${entry.name}")
                     }
                     String content = new String(zip.getInputStream(entry).bytes,
                             StandardCharsets.ISO_8859_1).toLowerCase(Locale.ROOT)
@@ -510,8 +510,8 @@ def verifyEclipseConfiguration = tasks.register('verifyEclipseConfiguration') {
         if (entries.find { it.@kind == 'output' }.@path != 'bin/default' ||
                 entries.find { it.@path == 'src/main/java' }.@output != 'bin/main' ||
                 entries.find { it.@path == 'src/test/java' }.@output != 'bin/test' ||
-                !classpathText.contains('/JavaSE-21/')) {
-            throw new GradleException('Eclipse production, test and default output must be separate on Java 21')
+                !classpathText.contains('/JavaSE-25/')) {
+            throw new GradleException('Eclipse production, test and default output must be separate on Java 25')
         }
         List<String> libraries = entries.findAll { it.@kind == 'lib' }
                 .collect { file(it.@path).canonicalPath }

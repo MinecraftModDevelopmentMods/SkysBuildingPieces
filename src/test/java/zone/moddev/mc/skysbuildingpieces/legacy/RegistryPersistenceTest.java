@@ -54,6 +54,20 @@ class RegistryPersistenceTest {
         assertTrue(fresh.getCompoundOrEmpty("FML").isEmpty());
     }
 
+    @Test
+    void relocatedLevelReadDoesNotEraseTheOriginalRegistry() throws Exception {
+        Path directory = java.nio.file.Files.createDirectories(temporary.resolve("relocated"));
+        CompoundTag expected = snapshot();
+        CompoundTag original = new CompoundTag();
+        original.put("FML", expected);
+        LegacyBridge.captureLegacyLevelData(original, directory);
+        LegacyBridge.captureLegacyLevelData(new CompoundTag(), directory);
+
+        CompoundTag output = new CompoundTag();
+        LegacyBridge.writeLegacyLevelData(output);
+        assertEquals(expected, output.getCompoundOrEmpty("FML"));
+    }
+
     private CompoundTag snapshot() {
         CompoundTag data = new CompoundTag();
         CompoundTag registries = new CompoundTag();

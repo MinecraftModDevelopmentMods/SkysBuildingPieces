@@ -75,12 +75,12 @@ final class NativeForwardChecks {
                 if (!active(saved)) {
                     continue;
                 }
-                net.minecraft.world.level.ChunkPos owner = new net.minecraft.world.level.ChunkPos(position(saved));
+                net.minecraft.world.level.ChunkPos owner = net.minecraft.world.level.ChunkPos.containing(position(saved));
                 if (!WARMUP_CHUNKS.add(owner)) {
                     continue;
                 }
-                world.setChunkForced(owner.x, owner.z, true);
-                world.getChunk(owner.x, owner.z);
+                world.setChunkForced(owner.x(), owner.z(), true);
+                world.getChunk(owner.x(), owner.z());
             }
         } catch (Exception failure) {
             throw new IllegalStateException("Cannot prepare the disposable forward fixture", failure);
@@ -89,7 +89,7 @@ final class NativeForwardChecks {
 
     static boolean ready(ServerLevel world) {
         for (net.minecraft.world.level.ChunkPos chunk : WARMUP_CHUNKS) {
-            if (!world.areEntitiesLoaded(chunk.toLong()) || !world.getChunkSource().isPositionTicking(chunk.toLong())) {
+            if (!world.areEntitiesLoaded(chunk.pack()) || !world.getChunkSource().isPositionTicking(chunk.pack())) {
                 return false;
             }
         }
@@ -103,7 +103,7 @@ final class NativeForwardChecks {
 
     static void release(ServerLevel world) {
         for (net.minecraft.world.level.ChunkPos chunk : WARMUP_CHUNKS) {
-            world.setChunkForced(chunk.x, chunk.z, false);
+            world.setChunkForced(chunk.x(), chunk.z(), false);
         }
         WARMUP_CHUNKS.clear();
         WARMUP_ENTITIES.clear();
@@ -173,7 +173,7 @@ final class NativeForwardChecks {
         require(!pending(tracked), "Native chunk post-processing did not finish");
 
         for (net.minecraft.world.level.chunk.LevelChunk chunk : tracked) {
-            world.setChunkForced(chunk.getPos().x, chunk.getPos().z, false);
+            world.setChunkForced(chunk.getPos().x(), chunk.getPos().z(), false);
         }
         if (fixture.has("kind") && fixture.get("kind").getAsString().equals("named")) {
             checkNativeBlockRenames(world);
@@ -576,8 +576,12 @@ final class NativeForwardChecks {
     }
 
     private static net.minecraft.nbt.CompoundTag rawChunk(ServerLevel world, int chunkX, int chunkZ) throws Exception {
-        File region = new File(world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile(),
-                "region/r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
+        var root = world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT);
+        String name = "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca";
+        File region = root.resolve("dimensions/minecraft/overworld/region").resolve(name).toFile();
+        if (!region.isFile()) {
+            region = root.resolve("region").resolve(name).toFile();
+        }
 
         try (java.io.RandomAccessFile input = new java.io.RandomAccessFile(region, "r")) {
             input.seek(((chunkX & 31) + (chunkZ & 31) * 32) * 4L);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8.2601022 - Minecraft 26.1.2 (NeoForge)
+
+- Updated the pieces for Minecraft 26.1.2.
+- Kept saved pieces and migration totals when opening older worlds.
+
 ## 0.3.8.121112
 
 - Bring Building Pieces to Minecraft 1.21.11 on NeoForge.

@@ -85,15 +85,15 @@ def probe_property(options):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.21.11/1.21.11.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/26.1.2/26.1.2.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("neoforge-21.11.45",)]
+                for name in ("neoforge-26.1.2.94",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 21.11.45 profile")
+        raise ValueError("The installed client has no NeoForge 26.1.2.94 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.21.11" or forge["inheritsFrom"] != "1.21.11":
-        raise ValueError("This launcher requires the verified NeoForge 21.11 client metadata")
+    if base["id"] != "26.1.2" or forge["inheritsFrom"] != "26.1.2":
+        raise ValueError("This launcher requires the verified NeoForge 26.1.2 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -117,16 +117,16 @@ def client_command(options, directory):
             native_artifacts.append(path)
     # NeoForge locates the patched game and universal jar through the library directory.
     installed_libraries = {
-        "net/neoforged/minecraft-client-patched/21.11.45/minecraft-client-patched-21.11.45.jar":
-            "55F9848BFD0EC0562B1DE17CDBBA519D8B6895F232469684128A51C3D87437AA",
-        "net/neoforged/neoforge/21.11.45/neoforge-21.11.45-universal.jar":
-            "0D9AB82C37319ED6514E8E28E5AB357BA5E9B8043EE4621333CF45B743039CBA",
+        "net/neoforged/minecraft-client-patched/26.1.2.94/minecraft-client-patched-26.1.2.94.jar":
+            "C3042E9E1F01CE8F5A2619904E48BA8520332A64B49408B48C5D47FF4F32BA74",
+        "net/neoforged/neoforge/26.1.2.94/neoforge-26.1.2.94-universal.jar":
+            "D331399276FE1042C88A475F10A3B7CCF19F262F462CF13F13147F108727E4B3",
     }
     for name, expected in installed_libraries.items():
         path = runtime / "libraries" / name
         if digest(path) != expected:
             raise ValueError("NeoForge installer output checksum changed: " + name)
-    client = runtime / "versions/1.21.11/1.21.11.jar"
+    client = runtime / "versions/26.1.2/26.1.2.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -176,10 +176,10 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/neoforged/neoforge/21.11.45" / filename
+    source = libraries / "net/neoforged/neoforge/26.1.2.94" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    if "net.neoforged.fml.startup.Server" not in launch or "21.11.45" not in launch:
-        raise ValueError("Expected the official NeoForge 21.11.45 server arguments")
+    if "net.neoforged.fml.startup.Server" not in launch or "26.1.2.94" not in launch:
+        raise ValueError("Expected the official NeoForge 26.1.2.94 server arguments")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":
@@ -189,8 +189,11 @@ def server_command(options, directory):
             local_libraries.symlink_to(libraries, target_is_directory=True)
     if local_libraries.resolve() != libraries.resolve():
         raise ValueError("The disposable server is not using the selected NeoForge installation")
+    # The plain layout keeps diagnostics without loading unsupported native Netty classes
+    # just to attach code-source names to Windows platform-probe stack frames.
+    log_config = Path(__file__).resolve().parents[1] / "src/bootstrapTest/log4j2-server.xml"
     arguments = ["-Xmx3g", probe_property(options),
-                 *launch, "nogui"]
+                 "-Dlog4j.configurationFile=" + log_config.as_uri(), *launch, "nogui"]
     return argument_file(options.java, directory, options.phase, arguments)
 
 

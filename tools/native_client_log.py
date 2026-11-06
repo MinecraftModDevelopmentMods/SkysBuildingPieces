@@ -11,7 +11,7 @@ from native_registry_notices import audit_text, profile_for, audit_biome_proof
 
 
 def offline_client_notices(text):
-    """Recognise the exact token-zero errors seen on the bare 21.11 client."""
+    """Recognise the exact token-zero errors seen on the bare 26.1.2 client."""
     realms_error = ("com.mojang.realmsclient.exception.RealmsServiceException: "
                     "Realms authentication error with message "
                     "'java.lang.RuntimeException: Failed to parse into SignedJWT: 0'")
@@ -70,7 +70,7 @@ def classify(log, unchanged_defaults, packaged_offline=False):
     lines = log.splitlines()
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = next((index for index, line in enumerate(lines)
-                    if "Starting integrated minecraft server version 1.21.11" in line), -1)
+                    if "Starting integrated minecraft server version 26.1.2" in line), -1)
     login = next((index for index, line in enumerate(lines) if " logged in with entity id " in line), -1)
     joined = next((index for index, line in enumerate(lines) if line.endswith(" joined the game")), -1)
     if not 0 <= startup < login <= joined:

@@ -20,10 +20,10 @@ abstract class SimpleRegionStorageMixin {
     private DataFixTypes dataFixType;
 
     @Inject(
-            method = "upgradeChunkTag(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;",
+            method = "upgradeChunkTag(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/nbt/CompoundTag;",
             at = @At("HEAD"))
     private void skysbuildingpieces$prepareLegacyChunk(CompoundTag chunk,
-            int fallbackDataVersion, @Nullable CompoundTag context,
+            int fallbackDataVersion, @Nullable CompoundTag context, int targetDataVersion,
             CallbackInfoReturnable<CompoundTag> callback) {
         if (dataFixType == DataFixTypes.CHUNK) {
             LegacyBridge.prepareLegacyChunk(chunk);
@@ -31,11 +31,11 @@ abstract class SimpleRegionStorageMixin {
     }
 
     @Inject(
-            method = "upgradeChunkTag(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;",
+            method = "upgradeChunkTag(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/nbt/CompoundTag;",
             // Finish before older compatibility mixins that cancel the remaining return callbacks.
             at = @At("RETURN"), order = 900)
     private void skysbuildingpieces$finalizeLegacyChunk(CompoundTag chunk,
-            int fallbackDataVersion, @Nullable CompoundTag context,
+            int fallbackDataVersion, @Nullable CompoundTag context, int targetDataVersion,
             CallbackInfoReturnable<CompoundTag> callback) {
         if (dataFixType == DataFixTypes.CHUNK) {
             LegacyBridge.finalizeLegacyChunk(callback.getReturnValue());

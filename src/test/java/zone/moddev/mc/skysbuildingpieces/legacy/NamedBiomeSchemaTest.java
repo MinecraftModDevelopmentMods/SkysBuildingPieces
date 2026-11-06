@@ -66,13 +66,13 @@ class NamedBiomeSchemaTest {
         CompoundTag original = source.copy();
         try (SimpleRegionStorage storage = new SimpleRegionStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
                 temporary, DataFixers.getDataFixer(), false, net.minecraft.util.datafix.DataFixTypes.CHUNK)) {
-            CompoundTag control = storage.upgradeChunkTag(source.copy(), 0, MinecraftTestBootstrap.overworldUpgradeContext());
+            CompoundTag control = storage.upgradeChunkTag(source.copy(), 0, MinecraftTestBootstrap.overworldUpgradeContext(), net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
             CompoundTag prepared = source.copy();
             HistoricalBiomes.preserveNamed(prepared, cells, Map.of(52, "minecraft:stony_shore"));
             CompoundTag once = prepared.copy();
             HistoricalBiomes.preserveNamed(prepared, cells, Map.of(52, "minecraft:stony_shore"));
             assertEquals(once, prepared, "Two early wrappers must stage the same recovery safely");
-            CompoundTag fixed = storage.upgradeChunkTag(prepared, 0, MinecraftTestBootstrap.overworldUpgradeContext());
+            CompoundTag fixed = storage.upgradeChunkTag(prepared, 0, MinecraftTestBootstrap.overworldUpgradeContext(), net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
             HistoricalBiomes.finish(fixed);
             assertFalse(fixed.contains("skysbuildingpieces_biomes"));
             assertFalse(fixed.contains("skysbuildingpieces_biome_names"));

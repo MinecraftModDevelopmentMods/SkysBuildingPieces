@@ -1,6 +1,6 @@
 # Configuration
 
-Forge creates `config/skysbuildingpieces-common.toml`. Stop the game or server before
+NeoForge creates `config/skysbuildingpieces-common.toml`. Stop the game or server before
 editing it, then restart. An existing CFG setting is copied on the first run;
 the original file is kept.
 

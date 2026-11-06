@@ -255,7 +255,7 @@ public final class PresentationChecks {
                     }
 
                     BlockState actual = block.getActualState(wall, world, pos);
-                    int joined = joins(world, pos, actual);
+                    int joined = GlassModelProbe.joins(world, pos, actual);
 
                     require(joined == matching, "only identical glass materials lose their border");
                     require(actual.getValue(PieceBlock.CONNECTIONS) == connections,
@@ -282,7 +282,7 @@ public final class PresentationChecks {
                     PieceBlock block = (PieceBlock) wall.getBlock();
                     PieceBlock other = (PieceBlock) neighbour.getBlock();
 
-                    int joined = joins(world, pos, block.getActualState(wall, world, pos));
+                    int joined = GlassModelProbe.joins(world, pos, block.getActualState(wall, world, pos));
                     int expected = block.definition(wall).id.equals(other.definition(neighbour).id) ? 1 << side : 0;
 
                     require(joined == expected, "all clear/stained colour pairs keep the correct boundary");
@@ -392,20 +392,6 @@ public final class PresentationChecks {
         return block.getActualState(state, world, position).getShape(world, position).clip(start, end, position);
     }
 
-    private static int joins(ServerLevel world, BlockPos position, BlockState state) {
-        try {
-            Class<?> type = zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel.class;
-            var matchingNeighbours = type.getDeclaredMethod("matchingNeighbours",
-                    net.minecraft.world.level.BlockAndTintGetter.class, BlockPos.class, BlockState.class);
-            matchingNeighbours.setAccessible(true);
-            var model = net.minecraft.client.Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-            require(type.isInstance(model), "The baked glass wall uses the continuous model");
-            return (int) matchingNeighbours.invoke(model, world, position, state);
-        } catch (ReflectiveOperationException failure) {
-            throw new AssertionError("Cannot inspect joins in the native glass model", failure);
-        }
-    }
-
     private static void require(boolean value, String message) {
         if (!value) {
             throw new AssertionError(message);
@@ -413,7 +399,8 @@ public final class PresentationChecks {
     }
 
     public static void gallery(ServerLevel world) {
-        world.setDayTime(6000);
+        world.getServer().clockManager().setTotalTicks(
+                world.dimensionTypeRegistration().value().defaultClock().orElseThrow(), 6000);
         world.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.ADVANCE_TIME, false, world.getServer());
 
         for (int blockX = 0; blockX <= 12; blockX++) {

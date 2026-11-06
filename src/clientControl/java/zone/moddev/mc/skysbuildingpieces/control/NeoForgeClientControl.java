@@ -43,9 +43,8 @@ public final class NeoForgeClientControl {
         if (!started) {
             started = true;
             worldStarted = System.nanoTime();
-            LevelSettings settings = new LevelSettings("NeoForge Login Control", GameType.CREATIVE, false,
-                    net.minecraft.world.Difficulty.NORMAL, true,
-                    new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS),
+            LevelSettings settings = new LevelSettings("NeoForge Login Control", GameType.CREATIVE,
+                    LevelSettings.DifficultySettings.DEFAULT, true,
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),

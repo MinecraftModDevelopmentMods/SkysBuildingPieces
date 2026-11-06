@@ -40,7 +40,7 @@ public final class PathChecks {
             compatibleShovel = new Item(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(
                     net.minecraft.core.registries.Registries.ITEM, toolId)).durability(50)) {
                 @Override
-                public boolean canPerformAction(ItemStack stack, net.neoforged.neoforge.common.ItemAbility action) {
+                public boolean canPerformAction(net.minecraft.world.item.ItemInstance stack, net.neoforged.neoforge.common.ItemAbility action) {
                     return action == net.neoforged.neoforge.common.ItemAbilities.SHOVEL_FLATTEN;
                 }
             };

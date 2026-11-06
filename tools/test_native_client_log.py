@@ -1,4 +1,4 @@
-"""Controls for the NeoForge 1.21.11 client log checks."""
+"""Controls for the NeoForge 26.1.2 client log checks."""
 
 import unittest
 import json
@@ -13,7 +13,7 @@ import run_packaged_checks
 
 LOGIN = ("[Server thread/INFO]: PiecesChecks logged in with entity id 21 at (0, 64, 0)\n"
          "[Server thread/INFO]: PiecesChecks joined the game")
-START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 1.21.11"
+START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 26.1.2"
 NOTICE = "[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: Forge config just got changed on the file system!"
 PAYLOAD = "[Client thread/ERROR] [net.minecraftforge.fml.network.simple.IndexedMessageCodec/SIMPLENET]: Received empty payload on channel fml:handshake"
 

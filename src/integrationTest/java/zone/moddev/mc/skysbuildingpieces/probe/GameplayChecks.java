@@ -38,7 +38,7 @@ public final class GameplayChecks {
     }
 
     public static boolean ready(ServerLevel world) {
-        long chunk = new net.minecraft.world.level.ChunkPos(FIXTURE_POSITION).toLong();
+        long chunk = net.minecraft.world.level.ChunkPos.pack(FIXTURE_POSITION);
         return world.areEntitiesLoaded(chunk) && world.getChunkSource().isPositionTicking(chunk);
     }
 
@@ -66,7 +66,7 @@ public final class GameplayChecks {
 
         long trackingDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
-        long chunkPosition = new net.minecraft.world.level.ChunkPos(position).toLong();
+        long chunkPosition = net.minecraft.world.level.ChunkPos.pack(position);
         while (!world.getChunkSource().isPositionTicking(chunkPosition) && System.nanoTime() < trackingDeadline) {
             if (!world.getChunkSource().pollTask()) {
                 Thread.yield();

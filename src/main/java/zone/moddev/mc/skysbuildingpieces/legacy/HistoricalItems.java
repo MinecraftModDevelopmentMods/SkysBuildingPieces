@@ -103,7 +103,7 @@ public final class HistoricalItems {
                 // our recovery selected, leaving ordinary old vanilla items to their normal fixers.
                 String target = compound.getStringOr(NATIVE_ITEM_ID, "");
                 if (!compound.getString(NATIVE_ITEM_ID).isPresent()
-                        || !(target.equals("minecraft:grass") || target.equals("minecraft:stone_slab")
+                        || !(target.equals("minecraft:short_grass") || target.equals("minecraft:stone_slab")
                                 || target.equals("minecraft:stone_stairs"))
                         || !compound.getString("id").isPresent()) {
                     throw new LegacyBridge.RecoveryAbort("Invalid pending native item recovery", null);

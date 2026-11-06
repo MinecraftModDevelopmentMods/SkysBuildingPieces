@@ -8,7 +8,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -114,18 +113,8 @@ record PlantSoilView(LevelReader world, BlockPos soilPosition, BlockState soil) 
     }
 
     @Override
-    public float getShade(Direction direction, boolean shade) {
-        return world.getShade(direction, shade);
-    }
-
-    @Override
     public LevelLightEngine getLightEngine() {
         return world.getLightEngine();
-    }
-
-    @Override
-    public int getBlockTint(BlockPos position, ColorResolver resolver) {
-        return world.getBlockTint(position, resolver);
     }
 
     @Override
