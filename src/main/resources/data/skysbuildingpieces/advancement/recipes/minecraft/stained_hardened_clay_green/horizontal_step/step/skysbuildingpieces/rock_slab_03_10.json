@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_green/horizontal_step/step/skysbuildingpieces/rock_slab_03_10"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_green/horizontal_step/step/skysbuildingpieces/rock_slab_03_10"
       }
     }
   },

@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/chiseled_sandstone/corner/corner/skysbuildingpieces/rock_vertical_step_00_8"
+        "recipes": "skysbuildingpieces:minecraft/chiseled_sandstone/corner/corner/skysbuildingpieces/rock_vertical_step_00_8"
       }
     }
   },

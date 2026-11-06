@@ -38,7 +38,7 @@ public final class ClientProbe extends ProbeProxy {
     public void tick(TickEvent.ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().handle());
+        org.lwjgl.sdl.SDLVideo.SDL_HideWindow(minecraft.getWindow().handle());
 
         if (ClientStatus.failure != null) {
             minecraft.stop();
@@ -95,7 +95,7 @@ public final class ClientProbe extends ProbeProxy {
         ran = true;
 
         try {
-            org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().handle());
+            org.lwjgl.sdl.SDLVideo.SDL_HideWindow(minecraft.getWindow().handle());
 
             int checked = 0;
 
@@ -298,7 +298,7 @@ public final class ClientProbe extends ProbeProxy {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
                     confirmedWorld = true;
-                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
+                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.sdl.SDLKeycode.SDLK_RETURN, 0, 0));
                     System.out.println("BUILDING_PIECES_CLIENT_LOAD_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;

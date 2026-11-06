@@ -35,15 +35,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                '5ABAB52A3F1BE115381C3CE80D5FD38DBE6C9F4C0B9ECF70A957700EC90FB88B',
+                '9DA1F44821D89B16B3E181CA89057F44CD3FC3F3383EA5A16442872E67E30F35',
         (mavenizerRuleManifest.asFile):
-                '9437E03FC5E1CB5D605D72F0538C4DF4417B64DB0A57D0AABDC5184781517AC1',
+                'C765A5F65FB9CD176F3CE08CB0CFCA814D06E649940E2BF169CD8943AFC30B26',
         (mavenizerSourcePatch.asFile):
-                '2DA8DD0FD5F112F5B7591113AED06D9A58C584A25F8705E26445A6D2E9D5C78E',
+                'BBD82C6BD96206DEA2FE2673F4D7E76FBA92884032455BBFD5CCD59045C5E271',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                'EAD1477F393897C491A10FB86178213A99C360571A8063D551DA0579DF65BA6F'
+                'A611E2BF14E29761B99BF7D3F0FD44AF151DD09A69968C0CFAEC384BD0E7A666'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -545,12 +545,12 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '26.2' || project.forge_version != '65.1.0' ||
-                project.mapping_channel != 'official' || project.mapping_version != '26.2' ||
+        if (project.minecraft_version != '26.3' || project.forge_version != '66.0.2' ||
+                project.mapping_channel != 'official' || project.mapping_version != '26.3' ||
                 project.loader_name != 'forge' || project.loader_code != '1' ||
                 project.java_version != '25' || project.java_toolchain_version != '25.0.3+9' ||
                 project.mod_id != 'skysbuildingpieces') {
-            throw new GradleException('Unexpected 26.2 release metadata')
+            throw new GradleException('Unexpected 26.3 release metadata')
         }
     }
 }

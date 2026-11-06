@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/emerald_block/slab/slab/minecraft/emerald_block_0"
+        "recipes": "skysbuildingpieces:minecraft/emerald_block/slab/slab/minecraft/emerald_block_0"
       }
     }
   },

@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/gabbro/horizontal_step/rock_step/mineralogy/gabbro_0"
+        "recipes": "skysbuildingpieces:mineralogy/gabbro/horizontal_step/rock_step/mineralogy/gabbro_0"
       }
     }
   },

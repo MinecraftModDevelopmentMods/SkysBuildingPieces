@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.8.2603001
+
+- Updated Building Pieces for Minecraft 26.3 on Forge.
+- Existing pieces, recipes and migration totals carry forward.
+- The Building Pieces tab now uses Minecraft's wool slabs and stairs. Older
+  Sky wool slabs and stairs still load and can be exchanged in the crafting grid.
+
 ## 0.3.8.2602001
 
 - Updated Building Pieces for Minecraft 26.2 on Forge.

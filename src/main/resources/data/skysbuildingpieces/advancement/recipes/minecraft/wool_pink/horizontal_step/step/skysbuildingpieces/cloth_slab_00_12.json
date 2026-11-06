@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_pink_slab"]
+            "items": ["minecraft:pink_wool_slab"]
           }
         ]
       }
@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_pink/horizontal_step/step/skysbuildingpieces/cloth_slab_00_12"
+        "recipes": "skysbuildingpieces:minecraft/wool_pink/horizontal_step/step/skysbuildingpieces/cloth_slab_00_12"
       }
     }
   },
@@ -24,16 +24,7 @@
     "recipes": ["skysbuildingpieces:minecraft/wool_pink/horizontal_step/step/skysbuildingpieces/cloth_slab_00_12"]
   },
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_pink_horizontal_step"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_pink_slab"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_pink_horizontal_step"
   }
 }

@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/andesite_smooth/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_10_8"
+        "recipes": "skysbuildingpieces:minecraft/andesite_smooth/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_10_8"
       }
     }
   },

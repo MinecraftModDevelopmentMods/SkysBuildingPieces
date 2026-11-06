@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_brown_slab"]
+            "items": ["minecraft:brown_wool_slab"]
           }
         ]
       }
@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_brown/horizontal_step/step/skysbuildingpieces/cloth_slab_01_8"
+        "recipes": "skysbuildingpieces:minecraft/wool_brown/horizontal_step/step/skysbuildingpieces/cloth_slab_01_8"
       }
     }
   },
@@ -24,16 +24,7 @@
     "recipes": ["skysbuildingpieces:minecraft/wool_brown/horizontal_step/step/skysbuildingpieces/cloth_slab_01_8"]
   },
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_brown_horizontal_step"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_brown_slab"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_brown_horizontal_step"
   }
 }

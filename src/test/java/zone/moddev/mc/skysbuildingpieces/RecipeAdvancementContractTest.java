@@ -35,7 +35,7 @@ class RecipeAdvancementContractTest {
 
                 JsonObject criteria = advancement.getAsJsonObject("criteria");
 
-                assertEquals(id, criteria.getAsJsonObject("has_the_recipe").getAsJsonObject("conditions").get("recipe")
+                assertEquals(id, criteria.getAsJsonObject("has_the_recipe").getAsJsonObject("conditions").get("recipes")
                         .getAsString());
 
                 String input = recipe.getAsJsonObject("key").get("X").getAsString();

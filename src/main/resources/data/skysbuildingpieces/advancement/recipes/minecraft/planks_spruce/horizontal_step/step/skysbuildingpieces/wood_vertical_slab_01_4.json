@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/planks_spruce/horizontal_step/step/skysbuildingpieces/wood_vertical_slab_01_4"
+        "recipes": "skysbuildingpieces:minecraft/planks_spruce/horizontal_step/step/skysbuildingpieces/wood_vertical_slab_01_4"
       }
     }
   },

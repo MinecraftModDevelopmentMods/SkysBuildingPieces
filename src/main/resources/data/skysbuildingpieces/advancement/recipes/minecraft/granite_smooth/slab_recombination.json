@@ -15,7 +15,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/granite_smooth/slab_recombination"
+        "recipes": "skysbuildingpieces:minecraft/granite_smooth/slab_recombination"
       }
     }
   },

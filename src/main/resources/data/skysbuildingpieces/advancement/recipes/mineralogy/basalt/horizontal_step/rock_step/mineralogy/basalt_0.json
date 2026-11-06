@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/basalt/horizontal_step/rock_step/mineralogy/basalt_0"
+        "recipes": "skysbuildingpieces:mineralogy/basalt/horizontal_step/rock_step/mineralogy/basalt_0"
       }
     }
   },

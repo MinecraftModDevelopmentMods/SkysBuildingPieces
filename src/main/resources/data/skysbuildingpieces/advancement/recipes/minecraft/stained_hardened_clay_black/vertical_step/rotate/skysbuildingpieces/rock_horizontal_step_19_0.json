@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_black/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_19_0"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_black/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_19_0"
       }
     }
   },

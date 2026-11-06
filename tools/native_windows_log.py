@@ -1,4 +1,4 @@
-"""Keep the known Forge 65 Windows system report out of test failure checks."""
+"""Keep the known Forge 66 Windows system report out of test failure checks."""
 
 import hashlib
 import os
@@ -19,8 +19,8 @@ COMPACT_PERFLIB = re.compile(
 # The packaged logger omits both the logger name and the frame suffixes.
 # Require the entire call stack from the Forge-only control in that format.
 COMPACT_TRACES = {
-    "ab48bd0c66c3aa7dc4e71a1890d783570ee5a9f5938804fff5a34ca94d7ce805",  # Dedicated server
-    "b1e31669532ac1e55ed5df225babc6ec239c6968508a9e1ce8053b98ff8ae81a",  # Client
+    "9bb8e40d2b5de478652e405d006e58f3c62f50653e7c4a279ec8bb454eb90bdc",  # Dedicated server
+    "7f3aaf1aff8842b81b11164979b6de11140d3558d999d579d59c267aa15a92b7",  # Client
 }
 
 JNA_EXCEPTION = "com.sun.jna.platform.win32.Win32Exception: The parameter is incorrect."
@@ -53,8 +53,8 @@ def forge_windows_log(text, *, enabled):
     if not all(frame in stack for frame in (
         "com.sun.jna.platform@5.17.0/com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray",
         "com.github.oshi@6.9.0/oshi.driver.windows.registry.HkeyPerformanceDataUtil.mapCounterIndicesFromRegistry",
-        "minecraft@26.2/net.minecraft.SystemReport.",
-        "net.minecraftforge.fmlloader@26.2-65.1.0/",
+        "minecraft@26.3/net.minecraft.SystemReport.",
+        "net.minecraftforge.fmlloader@26.3-66.0.2/",
     )):
         return text
 

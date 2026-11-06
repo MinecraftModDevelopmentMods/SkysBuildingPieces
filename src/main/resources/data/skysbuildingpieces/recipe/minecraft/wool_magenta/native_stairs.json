@@ -1,0 +1,18 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skysbuildingpieces/wool_magenta",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_magenta_stairs"
+  },
+  "result": {
+    "id": "minecraft:magenta_wool_stairs",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_magenta_stairs"
+  }
+}

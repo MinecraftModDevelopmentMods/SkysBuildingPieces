@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/hardened_clay/corner/corner/skysbuildingpieces/rock_horizontal_step_03_8"
+        "recipes": "skysbuildingpieces:minecraft/hardened_clay/corner/corner/skysbuildingpieces/rock_horizontal_step_03_8"
       }
     }
   },

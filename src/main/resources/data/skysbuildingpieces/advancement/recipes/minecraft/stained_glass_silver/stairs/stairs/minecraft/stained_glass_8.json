@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_glass_silver/stairs/stairs/minecraft/stained_glass_8"
+        "recipes": "skysbuildingpieces:minecraft/stained_glass_silver/stairs/stairs/minecraft/stained_glass_8"
       }
     }
   },

@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/emerald_block/corner/corner/skysbuildingpieces/metal_horizontal_step_00_8"
+        "recipes": "skysbuildingpieces:minecraft/emerald_block/corner/corner/skysbuildingpieces/metal_horizontal_step_00_8"
       }
     }
   },

@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/gold_block/horizontal_step/rotate/skysbuildingpieces/metal_vertical_step_00_8"
+        "recipes": "skysbuildingpieces:minecraft/gold_block/horizontal_step/rotate/skysbuildingpieces/metal_vertical_step_00_8"
       }
     }
   },

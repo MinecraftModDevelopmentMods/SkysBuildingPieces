@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_orange_slab"]
+            "items": ["minecraft:orange_wool_slab"]
           }
         ]
       }
@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_slab_00_2"
+        "recipes": "skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_slab_00_2"
       }
     }
   },
@@ -24,16 +24,7 @@
     "recipes": ["skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_slab_00_2"]
   },
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_orange_horizontal_step"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_orange_slab"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_orange_horizontal_step"
   }
 }

@@ -72,7 +72,7 @@ def classify(log, unchanged_defaults, packaged_offline=False):
     lines = log.splitlines()
     severe = [line for line in lines if re.search(r"/(?:ERROR|FATAL)\]", line)]
     startup = next((index for index, line in enumerate(lines)
-                    if "Starting integrated minecraft server version 26.2" in line), -1)
+                    if "Starting integrated minecraft server version 26.3" in line), -1)
     server_info = r"\[[^\r\n]+\] \[Server thread/INFO\](?: \[[^\r\n]+\])?: "
     player = None
     joined = False
@@ -82,7 +82,7 @@ def classify(log, unchanged_defaults, packaged_offline=False):
                              line)
         if login:
             player = login[1]
-        elif player and re.fullmatch(server_info + re.escape(player) + " joined the game", line):
+        elif player and re.fullmatch(server_info + "System chat: " + re.escape(player) + " joined the game", line):
             joined = True
             break
     if not joined:

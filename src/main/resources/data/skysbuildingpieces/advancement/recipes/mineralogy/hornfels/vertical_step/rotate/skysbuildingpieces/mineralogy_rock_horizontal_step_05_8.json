@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/hornfels/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_05_8"
+        "recipes": "skysbuildingpieces:mineralogy/hornfels/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_05_8"
       }
     }
   },

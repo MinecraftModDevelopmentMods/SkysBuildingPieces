@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_glass_purple/slab/slab/minecraft/stained_glass_10"
+        "recipes": "skysbuildingpieces:minecraft/stained_glass_purple/slab/slab/minecraft/stained_glass_10"
       }
     }
   },

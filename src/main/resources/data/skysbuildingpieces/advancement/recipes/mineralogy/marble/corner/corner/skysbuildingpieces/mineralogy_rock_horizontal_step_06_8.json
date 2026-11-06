@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/marble/corner/corner/skysbuildingpieces/mineralogy_rock_horizontal_step_06_8"
+        "recipes": "skysbuildingpieces:mineralogy/marble/corner/corner/skysbuildingpieces/mineralogy_rock_horizontal_step_06_8"
       }
     }
   },

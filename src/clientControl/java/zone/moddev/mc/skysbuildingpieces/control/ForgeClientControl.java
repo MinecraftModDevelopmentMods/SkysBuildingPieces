@@ -22,7 +22,7 @@ public final class ForgeClientControl {
 
         Minecraft client = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getWindow().handle());
+        org.lwjgl.sdl.SDLVideo.SDL_HideWindow(client.getWindow().handle());
 
         if (started && client.level == null) {
             confirmDisposableWorld(client);
@@ -78,7 +78,7 @@ public final class ForgeClientControl {
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
-                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
+                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.sdl.SDLKeycode.SDLK_RETURN, 0, 0));
                     System.out.println("FORGE47_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;

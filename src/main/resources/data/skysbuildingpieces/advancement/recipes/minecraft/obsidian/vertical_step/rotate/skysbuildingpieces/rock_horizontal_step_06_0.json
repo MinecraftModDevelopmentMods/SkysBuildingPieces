@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/obsidian/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_06_0"
+        "recipes": "skysbuildingpieces:minecraft/obsidian/vertical_step/rotate/skysbuildingpieces/rock_horizontal_step_06_0"
       }
     }
   },

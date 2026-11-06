@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/mossy_cobblestone/recombine_corner"
+        "recipes": "skysbuildingpieces:minecraft/mossy_cobblestone/recombine_corner"
       }
     }
   },

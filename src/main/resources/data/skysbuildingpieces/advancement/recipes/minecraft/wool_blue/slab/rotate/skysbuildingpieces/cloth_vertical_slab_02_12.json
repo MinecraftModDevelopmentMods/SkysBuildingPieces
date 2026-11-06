@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_blue/slab/rotate/skysbuildingpieces/cloth_vertical_slab_02_12"
+        "recipes": "skysbuildingpieces:minecraft/wool_blue/slab/rotate/skysbuildingpieces/cloth_vertical_slab_02_12"
       }
     }
   },
@@ -24,16 +24,7 @@
     "recipes": ["skysbuildingpieces:minecraft/wool_blue/slab/rotate/skysbuildingpieces/cloth_vertical_slab_02_12"]
   },
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_blue_slab"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_blue_vertical_slab"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_blue_vertical_slab"
   }
 }

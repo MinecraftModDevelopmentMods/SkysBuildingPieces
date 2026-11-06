@@ -329,7 +329,8 @@ class NativeRegistryNoticeProofTest {
             var source = new com.mojang.serialization.Dynamic<net.minecraft.nbt.Tag>(net.minecraft.nbt.NbtOps.INSTANCE, entry);
             var fixed = net.minecraft.util.datafix.DataFixers.getDataFixer().update(
                     net.minecraft.util.datafix.fixes.References.BLOCK_STATE, source, version, current);
-            assertEquals("minecraft:short_grass", fixed.get("Name").asString(""));
+            assertEquals("minecraft:short_grass",
+                    fixed.asString(fixed.get("id").asString("")));
         }
 
         private static long paletteIndex(long[] packed, int bits, int perWord, int cell) {

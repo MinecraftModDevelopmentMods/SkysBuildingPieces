@@ -104,7 +104,8 @@ class ContinuousGlassTest {
         }
         BakedQuad source = new BakedQuad(positions[0], positions[1], positions[2], positions[3],
                 uv[0], uv[1], uv[2], uv[3], Direction.WEST,
-                new BakedQuad.MaterialInfo(null, ChunkSectionLayer.TRANSLUCENT, null, 3, false, 4));
+                new BakedQuad.MaterialInfo(null, ChunkSectionLayer.TRANSLUCENT,
+                        null, null, null, 3, null, 4));
         List<BakedQuad> original = List.of(source);
         BlockStateModelPart basePart = new BlockStateModelPart() {
             @Override

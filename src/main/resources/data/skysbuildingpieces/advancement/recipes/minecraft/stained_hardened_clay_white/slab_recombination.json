@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_white/slab_recombination"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_white/slab_recombination"
       }
     }
   },

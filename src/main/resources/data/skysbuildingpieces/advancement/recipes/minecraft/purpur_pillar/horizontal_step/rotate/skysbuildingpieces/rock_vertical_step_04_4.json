@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/purpur_pillar/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_04_4"
+        "recipes": "skysbuildingpieces:minecraft/purpur_pillar/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_04_4"
       }
     }
   },

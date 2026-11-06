@@ -1,16 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
   "group": "skysbuildingpieces/wool_cyan",
   "pattern": ["XX"],
   "key": {
-    "X": "skysbuildingpieces:wool_cyan_slab"
+    "X": "minecraft:cyan_wool_slab"
   },
   "result": {
     "id": "minecraft:cyan_wool",
     "count": 1
-  },
-  "forge:condition": {
-    "type": "forge:item_exists",
-    "item": "skysbuildingpieces:wool_cyan_slab"
   }
 }

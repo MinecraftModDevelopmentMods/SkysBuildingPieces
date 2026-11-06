@@ -82,7 +82,7 @@ public final class NativeStagingChecks {
                         // the complete material and state to match the staged block.
                         BlockState decoded = NbtUtils.readBlockState(world.registryAccess()
                                 .lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK),
-                                palette.getCompoundOrEmpty(entry));
+                                LegacyTestScope.nativeStateTag(palette.getCompoundOrEmpty(entry)));
                         retained |= decoded.equals(expected);
                     }
                     if (!retained) {

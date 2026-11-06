@@ -85,7 +85,8 @@ public final class HistoricalItems {
             stack.remove(NATIVE_ITEM_ID);
         }
         for (CompoundTag state : states) {
-            state.putString("Name", state.getStringOr(NumericStateBridge.NATIVE_STATE_ID, ""));
+            String nameKey = state.contains("Name") ? "Name" : "id";
+            state.putString(nameKey, state.getStringOr(NumericStateBridge.NATIVE_STATE_ID, ""));
             state.remove(NumericStateBridge.NATIVE_STATE_ID);
         }
     }
@@ -112,13 +113,15 @@ public final class HistoricalItems {
                 stacks.add(compound);
             }
             if (compound.contains(NumericStateBridge.NATIVE_STATE_ID)) {
-                CompoundTag properties = compound.getCompoundOrEmpty("Properties");
+                String nameKey = compound.contains("Name") ? "Name" : "id";
+                String propertiesKey = nameKey.equals("Name") ? "Properties" : "properties";
+                CompoundTag properties = compound.getCompoundOrEmpty(propertiesKey);
                 String half = properties.getStringOr("type", "");
                 String water = properties.getStringOr("waterlogged", "");
 
                 if (!compound.getString(NumericStateBridge.NATIVE_STATE_ID).isPresent()
                         || !compound.getStringOr(NumericStateBridge.NATIVE_STATE_ID, "").equals("minecraft:stone_slab")
-                        || !compound.getString("Name").isPresent() || !(half.equals("top") || half.equals("bottom"))
+                        || !compound.getString(nameKey).isPresent() || !(half.equals("top") || half.equals("bottom"))
                         || !(water.equals("true") || water.equals("false"))) {
                     throw new LegacyBridge.RecoveryAbort("Invalid pending native stone slab recovery", null);
                 }

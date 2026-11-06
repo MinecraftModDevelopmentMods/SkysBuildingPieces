@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/dirt/stairs/stairs/minecraft/dirt_0"
+        "recipes": "skysbuildingpieces:minecraft/dirt/stairs/stairs/minecraft/dirt_0"
       }
     }
   },

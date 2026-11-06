@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/smooth_red_sandstone/horizontal_step/step/skysbuildingpieces/rock_slab_01_12"
+        "recipes": "skysbuildingpieces:minecraft/smooth_red_sandstone/horizontal_step/step/skysbuildingpieces/rock_slab_01_12"
       }
     }
   },

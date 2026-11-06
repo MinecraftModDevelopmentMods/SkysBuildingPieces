@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/phyllite/horizontal_step/rock_step/mineralogy/phyllite_0"
+        "recipes": "skysbuildingpieces:mineralogy/phyllite/horizontal_step/rock_step/mineralogy/phyllite_0"
       }
     }
   },

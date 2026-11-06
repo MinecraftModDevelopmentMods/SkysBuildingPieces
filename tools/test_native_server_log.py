@@ -238,8 +238,8 @@ class ForgeWindowsReportTests(unittest.TestCase):
             "com.sun.jna.platform.win32.Win32Exception: The parameter is incorrect.",
             "\tat com.sun.jna.platform@5.17.0/com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray",
             "\tat com.github.oshi@6.9.0/oshi.driver.windows.registry.HkeyPerformanceDataUtil.mapCounterIndicesFromRegistry",
-            "\tat TRANSFORMER/minecraft@26.2/net.minecraft.SystemReport.putSoftware",
-            "\tat SECURE-BOOTSTRAP/net.minecraftforge.fmlloader@26.2-65.1.0/Forge",
+            "\tat TRANSFORMER/minecraft@26.3/net.minecraft.SystemReport.putSoftware",
+            "\tat SECURE-BOOTSTRAP/net.minecraftforge.fmlloader@26.3-66.0.2/Forge",
             "[05:22:46] [Server thread/INFO]: Done (1.5s)!",
             "",
         ))
@@ -257,7 +257,7 @@ class ForgeWindowsReportTests(unittest.TestCase):
 
         for changed in (
             self.report.replace("The parameter is incorrect.", "Access is denied."),
-            self.report.replace("26.2-65.1.0/Forge", "26.2-65.1.1/Forge"),
+            self.report.replace("26.3-66.0.2/Forge", "26.3-66.0.3/Forge"),
             self.report + self.report,
         ):
             self.assertEqual(forge_windows_log(changed, enabled=True), changed)

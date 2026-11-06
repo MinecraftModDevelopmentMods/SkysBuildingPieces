@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/quartz_block/corner/corner/skysbuildingpieces/rock_horizontal_step_09_0"
+        "recipes": "skysbuildingpieces:minecraft/quartz_block/corner/corner/skysbuildingpieces/rock_horizontal_step_09_0"
       }
     }
   },

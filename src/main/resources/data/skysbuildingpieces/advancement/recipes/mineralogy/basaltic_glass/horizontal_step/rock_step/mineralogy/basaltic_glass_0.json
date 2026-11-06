@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/basaltic_glass/horizontal_step/rock_step/mineralogy/basaltic_glass_0"
+        "recipes": "skysbuildingpieces:mineralogy/basaltic_glass/horizontal_step/rock_step/mineralogy/basaltic_glass_0"
       }
     }
   },

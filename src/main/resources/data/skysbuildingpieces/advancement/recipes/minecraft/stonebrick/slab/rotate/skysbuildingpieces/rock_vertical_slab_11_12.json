@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stonebrick/slab/rotate/skysbuildingpieces/rock_vertical_slab_11_12"
+        "recipes": "skysbuildingpieces:minecraft/stonebrick/slab/rotate/skysbuildingpieces/rock_vertical_slab_11_12"
       }
     }
   },

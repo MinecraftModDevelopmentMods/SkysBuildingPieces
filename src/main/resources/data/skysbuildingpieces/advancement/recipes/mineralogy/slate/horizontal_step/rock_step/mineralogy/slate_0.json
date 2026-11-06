@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/slate/horizontal_step/rock_step/mineralogy/slate_0"
+        "recipes": "skysbuildingpieces:mineralogy/slate/horizontal_step/rock_step/mineralogy/slate_0"
       }
     }
   },

@@ -1,7 +1,7 @@
-// The empty Forge 65 server reproduces this Windows report without any mods.
+// The empty Forge 66 server reproduces this Windows report without any mods.
 // Keep it out of the build-only audit, and leave the raw logs in place.
 ext.readForgeRuntimeLog = { File log ->
-    if (project.forge_version != '65.1.0' ||
+    if (project.forge_version != '66.0.2' ||
             !System.getProperty('os.name').startsWith('Windows')) {
         return log.getText('UTF-8')
     }

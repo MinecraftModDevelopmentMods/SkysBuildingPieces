@@ -1,26 +1,18 @@
 {
   "type": "skysbuildingpieces:cutting",
+  "category": "building",
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:wool_orange_vertical_slab"
   },
   "result": {
-    "id": "skysbuildingpieces:wool_orange_slab",
+    "id": "minecraft:orange_wool_slab",
     "count": 1
   },
   "preserve_tag": true,
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_orange_slab"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_orange_vertical_slab"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_orange_vertical_slab"
   }
 }

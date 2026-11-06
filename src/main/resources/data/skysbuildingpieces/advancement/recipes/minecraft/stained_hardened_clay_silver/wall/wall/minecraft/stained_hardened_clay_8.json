@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_silver/wall/wall/minecraft/stained_hardened_clay_8"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_silver/wall/wall/minecraft/stained_hardened_clay_8"
       }
     }
   },

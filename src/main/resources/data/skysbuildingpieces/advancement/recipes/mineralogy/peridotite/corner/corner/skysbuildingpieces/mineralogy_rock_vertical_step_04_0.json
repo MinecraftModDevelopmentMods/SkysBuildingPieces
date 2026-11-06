@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/peridotite/corner/corner/skysbuildingpieces/mineralogy_rock_vertical_step_04_0"
+        "recipes": "skysbuildingpieces:mineralogy/peridotite/corner/corner/skysbuildingpieces/mineralogy_rock_vertical_step_04_0"
       }
     }
   },

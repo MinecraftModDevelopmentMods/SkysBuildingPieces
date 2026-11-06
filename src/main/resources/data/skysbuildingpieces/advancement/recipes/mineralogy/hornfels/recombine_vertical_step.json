@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/hornfels/recombine_vertical_step"
+        "recipes": "skysbuildingpieces:mineralogy/hornfels/recombine_vertical_step"
       }
     }
   },

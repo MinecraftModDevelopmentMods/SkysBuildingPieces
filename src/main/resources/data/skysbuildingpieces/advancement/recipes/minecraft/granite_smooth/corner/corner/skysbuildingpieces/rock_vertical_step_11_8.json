@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/granite_smooth/corner/corner/skysbuildingpieces/rock_vertical_step_11_8"
+        "recipes": "skysbuildingpieces:minecraft/granite_smooth/corner/corner/skysbuildingpieces/rock_vertical_step_11_8"
       }
     }
   },

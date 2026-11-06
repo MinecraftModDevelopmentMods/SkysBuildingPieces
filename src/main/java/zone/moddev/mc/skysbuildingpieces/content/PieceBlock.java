@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
@@ -657,19 +658,23 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public boolean isValidBonemealTarget(net.minecraft.world.level.LevelReader world, BlockPos position, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader world, BlockPos position, BlockState state,
+            BonemealSource source) {
         return GrassLifecycle.grass(state) && completeTop(state) && !state.getValue(SlabBlock.WATERLOGGED);
     }
 
     @Override
-    public boolean isBonemealSuccess(Level world, RandomSource random, BlockPos position, BlockState state) {
-        return isValidBonemealTarget(world, position, state);
+    public boolean isBonemealSuccess(Level world, RandomSource random, BlockPos position,
+            BlockState state, BonemealSource source) {
+        return isValidBonemealTarget(world, position, state, source);
     }
 
     @Override
-    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos position, BlockState state) {
-        if (isValidBonemealTarget(world, position, state)) {
-            ((BonemealableBlock) Blocks.GRASS_BLOCK).performBonemeal(world, random, position, Blocks.GRASS_BLOCK.defaultBlockState());
+    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos position,
+            BlockState state, BonemealSource source) {
+        if (isValidBonemealTarget(world, position, state, source)) {
+            ((BonemealableBlock) Blocks.GRASS_BLOCK).performBonemeal(
+                    world, random, position, Blocks.GRASS_BLOCK.defaultBlockState(), source);
         }
     }
 }

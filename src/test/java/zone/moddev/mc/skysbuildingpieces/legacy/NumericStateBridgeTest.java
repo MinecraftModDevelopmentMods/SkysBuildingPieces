@@ -163,7 +163,12 @@ class NumericStateBridgeTest {
 
         assertEquals(Blocks.STONE_SLAB.defaultBlockState(), NumericStateBridge.stagedState(2000 << 4));
         assertNotEquals(Blocks.SMOOTH_STONE_SLAB.defaultBlockState(), NumericStateBridge.stagedState(2000 << 4));
-        assertEquals(saved, NumericStateBridge.saveStaging());
+        ListTag restored = NumericStateBridge.saveStaging();
+        CompoundTag restoredEntry = restored.getCompoundOrEmpty(0);
+        assertEquals(2000 << 4, restoredEntry.getIntOr("encoded", 0));
+        assertEquals("minecraft:stone_slab", restoredEntry.getCompoundOrEmpty("state").getStringOr("Name", ""));
+        NumericStateBridge.begin(new LinkedHashMap<>(), restored);
+        assertEquals(restored, NumericStateBridge.saveStaging());
     }
 
     @Test

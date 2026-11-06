@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/planks_dark_oak/horizontal_step/step/minecraft/wooden_slab_5"
+        "recipes": "skysbuildingpieces:minecraft/planks_dark_oak/horizontal_step/step/minecraft/wooden_slab_5"
       }
     }
   },

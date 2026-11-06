@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_lime/horizontal_step/rotate/skysbuildingpieces/cloth_vertical_step_01_4"
+        "recipes": "skysbuildingpieces:minecraft/wool_lime/horizontal_step/rotate/skysbuildingpieces/cloth_vertical_step_01_4"
       }
     }
   },

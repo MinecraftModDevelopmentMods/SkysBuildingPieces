@@ -1,5 +1,6 @@
 {
   "type": "skysbuildingpieces:cutting",
+  "category": "building",
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X"],
   "key": {

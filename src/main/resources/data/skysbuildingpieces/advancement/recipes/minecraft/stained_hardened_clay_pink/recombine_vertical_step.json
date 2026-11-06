@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_pink/recombine_vertical_step"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_pink/recombine_vertical_step"
       }
     }
   },

@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/conglomerate/horizontal_step/rock_step/mineralogy/conglomerate_0"
+        "recipes": "skysbuildingpieces:mineralogy/conglomerate/horizontal_step/rock_step/mineralogy/conglomerate_0"
       }
     }
   },

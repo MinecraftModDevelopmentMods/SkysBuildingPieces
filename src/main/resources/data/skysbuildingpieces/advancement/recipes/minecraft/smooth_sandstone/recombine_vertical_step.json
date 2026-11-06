@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/smooth_sandstone/recombine_vertical_step"
+        "recipes": "skysbuildingpieces:minecraft/smooth_sandstone/recombine_vertical_step"
       }
     }
   },

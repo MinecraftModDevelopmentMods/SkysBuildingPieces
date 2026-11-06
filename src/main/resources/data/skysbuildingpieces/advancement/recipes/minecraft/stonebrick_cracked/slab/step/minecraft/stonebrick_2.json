@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stonebrick_cracked/slab/step/minecraft/stonebrick_2"
+        "recipes": "skysbuildingpieces:minecraft/stonebrick_cracked/slab/step/minecraft/stonebrick_2"
       }
     }
   },

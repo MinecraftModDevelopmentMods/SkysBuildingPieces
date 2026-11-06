@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/netherrack/wall/wall/minecraft/netherrack_0"
+        "recipes": "skysbuildingpieces:minecraft/netherrack/wall/wall/minecraft/netherrack_0"
       }
     }
   },

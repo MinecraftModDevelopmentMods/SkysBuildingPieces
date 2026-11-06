@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/planks_acacia/corner/corner/skysbuildingpieces/wood_horizontal_step_00_0"
+        "recipes": "skysbuildingpieces:minecraft/planks_acacia/corner/corner/skysbuildingpieces/wood_horizontal_step_00_0"
       }
     }
   },

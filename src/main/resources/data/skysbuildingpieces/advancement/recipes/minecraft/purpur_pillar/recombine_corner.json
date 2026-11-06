@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/purpur_pillar/recombine_corner"
+        "recipes": "skysbuildingpieces:minecraft/purpur_pillar/recombine_corner"
       }
     }
   },

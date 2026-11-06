@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/emerald_block/slab/rotate/skysbuildingpieces/metal_vertical_slab_00_4"
+        "recipes": "skysbuildingpieces:minecraft/emerald_block/slab/rotate/skysbuildingpieces/metal_vertical_slab_00_4"
       }
     }
   },

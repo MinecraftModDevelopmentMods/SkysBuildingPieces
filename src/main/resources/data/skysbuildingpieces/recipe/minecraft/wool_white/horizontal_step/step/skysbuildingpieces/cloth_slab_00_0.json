@@ -1,25 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": ["X ", " X"],
   "key": {
-    "X": "skysbuildingpieces:wool_white_slab"
+    "X": "minecraft:white_wool_slab"
   },
   "result": {
     "id": "skysbuildingpieces:wool_white_horizontal_step",
     "count": 4
   },
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_white_horizontal_step"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_white_slab"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_white_horizontal_step"
   }
 }

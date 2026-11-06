@@ -157,7 +157,7 @@ def prepare(resources, native_recipes=(), tags=None):
                     'has_ingredient': {'trigger': 'minecraft:inventory_changed',
                                        'conditions': {'items': [{'items': [ingredient]}]}},
                     'has_the_recipe': {'trigger': 'minecraft:recipe_unlocked',
-                                       'conditions': {'recipe': 'skysbuildingpieces:' + path}}},
+                                       'conditions': {'recipes': 'skysbuildingpieces:' + path}}},
                 'requirements': [['has_ingredient', 'has_the_recipe']],
                 'rewards': {'recipes': ['skysbuildingpieces:' + path]}}
             if conditions:
@@ -240,6 +240,12 @@ def prepare(resources, native_recipes=(), tags=None):
             for shape in ('stairs', 'wall', 'pane'):
                 if shape not in material['blocks']:
                     cut(shape, shape, full)
+            if identity.startswith('minecraft:wool_'):
+                # Exchange older Sky wool pieces without placing them first.
+                for shape in ('slab', 'stairs'):
+                    if shape in material['blocks'] and (identity, shape) in legacy_palettes:
+                        old_item = 'skysbuildingpieces:' + identity.split(':', 1)[1] + '_' + shape
+                        add(base + '/native_' + shape, ['X'], old_item, piece(material, shape), 1, preserve=True)
             if slab is not None and vertical is not None:
                 cut('slab', 'rotate', vertical)
             if slab is not None and not half_input:

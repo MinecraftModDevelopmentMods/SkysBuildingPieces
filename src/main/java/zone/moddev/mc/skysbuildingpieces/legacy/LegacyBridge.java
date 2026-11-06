@@ -3,7 +3,6 @@ package zone.moddev.mc.skysbuildingpieces.legacy;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.ShortTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.storage.LevelResource;
@@ -429,10 +428,10 @@ public final class LegacyBridge {
                         continue;
                     }
 
-                    BlockState original = NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK, saved);
+                    BlockState original = NumericStateBridge.readSavedState(saved);
                     BlockState target = Pieces.canonicalState(original);
                     CompoundTag converted = saved.copy();
-                    CompoundTag nativeState = NbtUtils.writeBlockState(target);
+                    CompoundTag nativeState = NumericStateBridge.writeSavedState(target);
 
                     converted.putString("Name", nativeState.getStringOr("Name", ""));
 

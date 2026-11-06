@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stone_slab/stairs/stairs/minecraft/double_stone_slab_0"
+        "recipes": "skysbuildingpieces:minecraft/stone_slab/stairs/stairs/minecraft/double_stone_slab_0"
       }
     }
   },

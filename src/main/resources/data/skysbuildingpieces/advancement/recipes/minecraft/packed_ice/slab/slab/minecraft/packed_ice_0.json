@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/packed_ice/slab/slab/minecraft/packed_ice_0"
+        "recipes": "skysbuildingpieces:minecraft/packed_ice/slab/slab/minecraft/packed_ice_0"
       }
     }
   },

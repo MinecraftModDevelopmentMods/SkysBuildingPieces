@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/quartzite/slab_recombination"
+        "recipes": "skysbuildingpieces:mineralogy/quartzite/slab_recombination"
       }
     }
   },

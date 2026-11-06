@@ -164,7 +164,7 @@ public final class NativeLegacyChecks {
             ListTag palette = sections.getCompoundOrEmpty(section).getListOrEmpty("Palette");
 
             for (int index = 0; index < palette.size(); index++) {
-                if (palette.getCompoundOrEmpty(index).equals(expected)) {
+                if (LegacyTestScope.nativeStateTag(palette.getCompoundOrEmpty(index)).equals(expected)) {
                     return true;
                 }
             }

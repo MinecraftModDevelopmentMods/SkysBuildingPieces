@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/glass/recombine_horizontal_step"
+        "recipes": "skysbuildingpieces:minecraft/glass/recombine_horizontal_step"
       }
     }
   },

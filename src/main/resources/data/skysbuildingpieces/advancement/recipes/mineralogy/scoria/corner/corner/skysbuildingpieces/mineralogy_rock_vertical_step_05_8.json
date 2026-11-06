@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/scoria/corner/corner/skysbuildingpieces/mineralogy_rock_vertical_step_05_8"
+        "recipes": "skysbuildingpieces:mineralogy/scoria/corner/corner/skysbuildingpieces/mineralogy_rock_vertical_step_05_8"
       }
     }
   },

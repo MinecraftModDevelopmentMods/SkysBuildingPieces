@@ -1,19 +1,19 @@
-name: Sky's Building Pieces 26.2 CI
+name: Sky's Building Pieces 26.3 CI
 
 on:
   push:
     branches:
-      - master-26.2
+      - master-26.3
       - 'feature/**'
   pull_request:
     branches:
-      - master-26.2
+      - master-26.3
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-26.2-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-26.3-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -154,13 +154,13 @@ jobs:
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-26.2-${{ github.sha }}
+          name: SkysBuildingPieces-26.3-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.8.2602001.jar
-            build/libs/SkysBuildingPieces-0.3.8.2602001-sources.jar
-            build/libs/SkysBuildingPieces-0.3.8.2602001-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.8.2603001.jar
+            build/libs/SkysBuildingPieces-0.3.8.2603001-sources.jar
+            build/libs/SkysBuildingPieces-0.3.8.2603001-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -168,7 +168,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-26.2-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-26.3-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

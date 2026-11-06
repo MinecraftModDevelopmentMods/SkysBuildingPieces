@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/dolomite/horizontal_step/rock_step/mineralogy/dolomite_0"
+        "recipes": "skysbuildingpieces:mineralogy/dolomite/horizontal_step/rock_step/mineralogy/dolomite_0"
       }
     }
   },

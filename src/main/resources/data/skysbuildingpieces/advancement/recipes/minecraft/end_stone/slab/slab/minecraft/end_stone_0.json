@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"
+        "recipes": "skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"
       }
     }
   },

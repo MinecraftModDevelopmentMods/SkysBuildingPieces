@@ -1,25 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
   "group": "skysbuildingpieces/wool_brown",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:wool_brown_vertical_step"
   },
   "result": {
-    "id": "skysbuildingpieces:wool_brown_slab",
+    "id": "minecraft:brown_wool_slab",
     "count": 1
   },
   "forge:condition": {
-    "type": "forge:and",
-    "values": [
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_brown_slab"
-      },
-      {
-        "type": "forge:item_exists",
-        "item": "skysbuildingpieces:wool_brown_vertical_step"
-      }
-    ]
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_brown_vertical_step"
   }
 }

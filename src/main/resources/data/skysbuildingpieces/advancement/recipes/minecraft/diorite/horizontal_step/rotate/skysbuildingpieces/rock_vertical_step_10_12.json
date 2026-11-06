@@ -13,7 +13,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/diorite/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_10_12"
+        "recipes": "skysbuildingpieces:minecraft/diorite/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_10_12"
       }
     }
   },
