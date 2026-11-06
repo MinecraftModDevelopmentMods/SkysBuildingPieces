@@ -4,6 +4,7 @@
 
 - Updated Building Pieces for Minecraft 26.2 on NeoForge.
 - Existing pieces, recipes and migration totals carry forward.
+- Fixed an upgrade crash when opening older Forge worlds with large registry snapshots.
 
 ## 0.3.8.2601022 - Minecraft 26.1.2 (NeoForge)
 
