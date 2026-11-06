@@ -12,6 +12,7 @@ import subprocess
 import zipfile
 from native_client_log import audit as audit_client, audit_server
 from native_registry_notices import audit_text, profile_for
+from native_runtime_notices import windows_counter_notice
 
 
 def digest(path, algorithm="sha256"):
@@ -85,15 +86,15 @@ def probe_property(options):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/26.1.2/26.1.2.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/26.2/26.2.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("neoforge-26.1.2.94",)]
+                for name in ("neoforge-26.2.0.45-beta",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 26.1.2.94 profile")
+        raise ValueError("The installed client has no NeoForge 26.2.0.45-beta profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "26.1.2" or forge["inheritsFrom"] != "26.1.2":
-        raise ValueError("This launcher requires the verified NeoForge 26.1.2 client metadata")
+    if base["id"] != "26.2" or forge["inheritsFrom"] != "26.2":
+        raise ValueError("This launcher requires the verified NeoForge 26.2 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -117,16 +118,16 @@ def client_command(options, directory):
             native_artifacts.append(path)
     # NeoForge locates the patched game and universal jar through the library directory.
     installed_libraries = {
-        "net/neoforged/minecraft-client-patched/26.1.2.94/minecraft-client-patched-26.1.2.94.jar":
-            "C3042E9E1F01CE8F5A2619904E48BA8520332A64B49408B48C5D47FF4F32BA74",
-        "net/neoforged/neoforge/26.1.2.94/neoforge-26.1.2.94-universal.jar":
-            "D331399276FE1042C88A475F10A3B7CCF19F262F462CF13F13147F108727E4B3",
+        "net/neoforged/minecraft-client-patched/26.2.0.45-beta/minecraft-client-patched-26.2.0.45-beta.jar":
+            "FEC38E3CDCB99792EBDF920315F246C7E4CBC65068D78446550F166111DD717E",
+        "net/neoforged/neoforge/26.2.0.45-beta/neoforge-26.2.0.45-beta-universal.jar":
+            "FD500FB526DDF9B2182C3D78548BAD35C8B5F79AF45CFA3F4A61D44E2F1FD97E",
     }
     for name, expected in installed_libraries.items():
         path = runtime / "libraries" / name
         if digest(path) != expected:
             raise ValueError("NeoForge installer output checksum changed: " + name)
-    client = runtime / "versions/26.1.2/26.1.2.jar"
+    client = runtime / "versions/26.2/26.2.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -176,10 +177,10 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/neoforged/neoforge/26.1.2.94" / filename
+    source = libraries / "net/neoforged/neoforge/26.2.0.45-beta" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    if "net.neoforged.fml.startup.Server" not in launch or "26.1.2.94" not in launch:
-        raise ValueError("Expected the official NeoForge 26.1.2.94 server arguments")
+    if "net.neoforged.fml.startup.Server" not in launch or "26.2.0.45-beta" not in launch:
+        raise ValueError("Expected the official NeoForge 26.2.0.45-beta server arguments")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":
@@ -223,12 +224,21 @@ def prepare(options, directory):
         "max-tick-time=120000\n", encoding="utf-8")
     (directory / "options.txt").write_text("lang:en_us\nfullscreen:false\nrenderDistance:2\npauseOnLostFocus:false\n", encoding="utf-8")
     shutil.copytree("src/bootstrapTest/defaultconfigs", directory, dirs_exist_ok=True)
+    no_early_display = getattr(options, "no_early_display", False)
+    if no_early_display:
+        fml = directory / "config/fml.toml"
+        original = fml.read_text(encoding="utf-8")
+        setting = "earlyWindowControl = true"
+        if original.count(setting) != 1:
+            raise ValueError("Cannot identify the NeoForge early display setting")
+        fml.write_text(original.replace(setting, "earlyWindowControl = false"), encoding="utf-8")
     if options.mineralogy_slabs_disabled:
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
     profile = {"probe_kind": getattr(options, "probe_kind", "bootstrap"),
                "persistence_order": options.persistence_order,
+               "no_early_display": no_early_display,
                "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
     (directory / "qualification-options.json").write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
     if options.fixture:
@@ -255,16 +265,17 @@ def audit_console(directory, phase, packaged_offline=False):
     status_error = re.search(r"(?m)^(?:ERROR|FATAL) Status(?:Console)?Listener\b.*", console)
     if status_error:
         raise ValueError("Unexpected loader logging failure: " + status_error[0])
+    console = windows_counter_notice(console)
     if packaged_offline:
         from native_client_log import offline_client_notices
         console, _ = offline_client_notices(console)
     audit_text(console, profile_for(directory))
 
 
-def audit(directory, phase, mode, probe_kind="bootstrap", packaged_offline=False):
+def audit(directory, phase, mode, probe_kind="bootstrap", packaged_offline=False, no_early_display=False):
     audit_console(directory, phase, packaged_offline)
     if mode == "client":
-        audit_client(directory, phase, packaged_offline=packaged_offline)
+        audit_client(directory, phase, packaged_offline=packaged_offline, no_early_display=no_early_display)
     else:
         log = (directory / "logs/latest.log").read_text(encoding="utf-8")
         audit_server(directory, phase)
@@ -291,9 +302,13 @@ def main():
     parser.add_argument("--fixture", type=Path)
     parser.add_argument("--extra-mod", type=Path, action="append", default=[])
     parser.add_argument("--fresh", action="store_true")
+    parser.add_argument("--no-early-display", action="store_true",
+                        help="Disable the NeoForge splash in this disposable client only")
     parser.add_argument("--persistence-order", choices=("forward", "reverse"))
     parser.add_argument("--mineralogy-slabs-disabled", action="store_true")
     options = parser.parse_args()
+    if options.no_early_display and options.mode != "client":
+        parser.error("--no-early-display requires a client launch")
     directory = options.directory.resolve()
     if not directory.is_relative_to(Path("build").resolve()) or directory == Path("build").resolve():
         raise ValueError("Packaged checks must stay inside this checkout's build directory")
@@ -302,9 +317,11 @@ def main():
     else:
         profile = {"probe_kind": options.probe_kind,
                    "persistence_order": options.persistence_order,
+                   "no_early_display": options.no_early_display,
                    "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
         saved_profile = json.loads((directory / "qualification-options.json").read_text(encoding="utf-8"))
         saved_profile.setdefault("probe_kind", "bootstrap")
+        saved_profile.setdefault("no_early_display", False)
         if saved_profile != profile:
             raise ValueError("Qualification options changed between loads")
         expected = json.loads((directory / "artifact-inputs.json").read_text(encoding="utf-8"))
@@ -331,7 +348,7 @@ def main():
         subprocess.run(command, cwd=directory, env=environment, stdout=output,
                        stderr=subprocess.STDOUT, check=True, timeout=600)
     audit(directory, options.phase, options.mode, options.probe_kind,
-          packaged_offline=options.mode == "client")
+          packaged_offline=options.mode == "client", no_early_display=options.no_early_display)
     print("PACKAGED_CHECK_PASS", options.mode, options.phase, directory.name)
 
 

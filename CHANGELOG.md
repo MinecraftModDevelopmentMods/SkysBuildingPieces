@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8.2602002
+
+- Updated Building Pieces for Minecraft 26.2 on NeoForge.
+- Existing pieces, recipes and migration totals carry forward.
+
 ## 0.3.8.2601022 - Minecraft 26.1.2 (NeoForge)
 
 - Updated the pieces for Minecraft 26.1.2.

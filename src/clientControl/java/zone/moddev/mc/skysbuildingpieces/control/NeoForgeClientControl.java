@@ -48,7 +48,7 @@ public final class NeoForgeClientControl {
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.screen);
+                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.gui.screen());
         } else if (client.player != null && client.level != null && ++joinedTicks >= 40) {
             if (net.neoforged.fml.ModList.get().isLoaded("skysbuildingpieces")
                     || net.neoforged.fml.ModList.get().isLoaded("skysgrassslabs")) {
@@ -61,9 +61,9 @@ public final class NeoForgeClientControl {
         }
     }
     private static void confirmDisposableWorld(Minecraft minecraft) {
-        boolean backup = minecraft.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
-        boolean confirmation = minecraft.screen != null
-                && minecraft.screen.getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
+        boolean backup = minecraft.gui.screen() instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
+        boolean confirmation = minecraft.gui.screen() != null
+                && minecraft.gui.screen().getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
         if (!backup && !confirmation) {
             return;
         }
@@ -74,14 +74,14 @@ public final class NeoForgeClientControl {
         }
         String experimentalTitle = net.minecraft.network.chat.Component
                 .translatable("selectWorld.backupQuestion.experimental").getString();
-        if (confirmation && !experimentalTitle.equals(minecraft.screen.getTitle().getString())) {
+        if (confirmation && !experimentalTitle.equals(minecraft.gui.screen().getTitle().getString())) {
             throw new IllegalStateException("Unexpected world-load confirmation: "
-                    + minecraft.screen.getTitle().getString());
+                    + minecraft.gui.screen().getTitle().getString());
         }
         String proceed = backup
                 ? net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString()
                 : net.minecraft.network.chat.CommonComponents.GUI_PROCEED.getString();
-        for (var child : minecraft.screen.children()) {
+        for (var child : minecraft.gui.screen().children()) {
             if (child instanceof net.minecraft.client.gui.components.Button button
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {

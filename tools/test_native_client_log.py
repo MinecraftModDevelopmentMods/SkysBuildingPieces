@@ -1,4 +1,4 @@
-"""Controls for the NeoForge 26.1.2 client log checks."""
+"""Controls for the NeoForge 26.2 client log checks."""
 
 import unittest
 import json
@@ -13,7 +13,7 @@ import run_packaged_checks
 
 LOGIN = ("[Server thread/INFO]: PiecesChecks logged in with entity id 21 at (0, 64, 0)\n"
          "[Server thread/INFO]: PiecesChecks joined the game")
-START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 26.1.2"
+START = "[Server thread/INFO] [IntegratedServer/]: Starting integrated minecraft server version 26.2"
 NOTICE = "[Thread-1/FATAL] [net.minecraftforge.common.ForgeConfig/CORE]: Forge config just got changed on the file system!"
 PAYLOAD = "[Client thread/ERROR] [net.minecraftforge.fml.network.simple.IndexedMessageCodec/SIMPLENET]: Received empty payload on channel fml:handshake"
 
@@ -62,8 +62,24 @@ class NativeClientLogTest(unittest.TestCase):
             classify("\n".join((START, LOGIN, "[STDERR/]: java.lang.IllegalStateException")), True)
 
     def test_only_the_packaged_offline_authentication_notice_is_accepted(self):
-        auth = ("[00:00:00] [Download-2/ERROR] [minecraft/Minecraft]: Failed to fetch user properties\n"
-                "com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401")
+        auth = "\n".join((
+            '[00:00:00] [Download-2/ERROR]: Failed to fetch user properties',
+            'com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401',
+            'at com.mojang.authlib.exceptions.MinecraftClientHttpException.toAuthenticationException(MinecraftClientHttpException.java:70)',
+            'at com.mojang.authlib.yggdrasil.YggdrasilUserApiService.fetchProperties(YggdrasilUserApiService.java:173)',
+            'at TRANSFORMER/minecraft@26.2/net.minecraft.client.Minecraft.lambda$new$1(Minecraft.java:409)',
+            'at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1789)',
+            'at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)',
+            'at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)',
+            'at java.base/java.lang.Thread.run(Thread.java:1474)',
+            'Caused by: MinecraftClientHttpException[type=HTTP_ERROR, status=401, response=ErrorResponse[path=/player/attributes, error=null, errorMessage=null, details=null]]',
+            'at com.mojang.authlib.minecraft.client.MinecraftClient.buildHttpException(MinecraftClient.java:170)',
+            'at com.mojang.authlib.minecraft.client.MinecraftClient.readServiceResponse(MinecraftClient.java:147)',
+            'at com.mojang.authlib.minecraft.client.MinecraftClient.getWithEtag(MinecraftClient.java:81)',
+            'at com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:65)',
+            'at com.mojang.authlib.yggdrasil.YggdrasilUserApiService.fetchProperties(YggdrasilUserApiService.java:123)',
+            '... 5 more',
+        ))
         log = "\n".join((auth, START, LOGIN))
         self.assertEqual(classify(log, True, packaged_offline=True)["notices"],
                          ["Failed to fetch user properties"])
@@ -71,6 +87,8 @@ class NativeClientLogTest(unittest.TestCase):
             classify(log, True)
         with self.assertRaises(ValueError):
             classify(log.replace("Status: 401", "Status: 503"), True, packaged_offline=True)
+        with self.assertRaises(ValueError):
+            classify(log.replace("CompletableFuture", "AnotherWorker"), True, packaged_offline=True)
 
 
 class NativeClientFilesTest(unittest.TestCase):
@@ -104,6 +122,22 @@ class NativeClientFilesTest(unittest.TestCase):
                                            "showLoadWarnings = false"), encoding="utf-8")
         with self.assertRaises(ValueError):
             audit(self.directory, "control", True)
+
+    def test_early_window_override_requires_a_matching_profile_and_log(self):
+        config = self.directory / "config/fml.toml"
+        original = config.read_text(encoding="utf-8")
+        config.write_text(original.replace("earlyWindowControl = true", "earlyWindowControl = false"),
+                          encoding="utf-8")
+        debug = self.directory / "logs/debug.log"
+        debug.write_text("[main/INFO]: Loader started", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "early loading window"):
+            audit(self.directory, "control", True, no_early_display=True)
+        debug.write_text("[main/INFO]: ImmediateWindowProvider not loading because splash screen is disabled",
+                         encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "settings differ"):
+            audit(self.directory, "control", True)
+        receipt = audit(self.directory, "control", True, no_early_display=True)
+        self.assertFalse(receipt["early_display"])
 
     def test_missing_server_config_stops_the_check(self):
         (self.server / "neoforge-server.toml").unlink()

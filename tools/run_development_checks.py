@@ -17,7 +17,11 @@ def main():
     parser.add_argument("--phase", required=True)
     parser.add_argument("--extra-mod", type=Path, action="append", default=[])
     parser.add_argument("--fresh", action="store_true")
+    parser.add_argument("--no-early-display", action="store_true",
+                        help="Disable the NeoForge splash in this disposable client only")
     options = parser.parse_args()
+    if options.no_early_display and options.mode != "client":
+        parser.error("--no-early-display requires a client launch")
     if not all(part.isalnum() for part in options.phase.split("-")):
         raise ValueError("Use a simple probe phase name")
     directory = options.directory.resolve()
@@ -43,7 +47,7 @@ def main():
     console = directory / (options.phase + "-console.log")
     with console.open("x", encoding="utf-8") as output:
         subprocess.run(command, check=True, stdout=output, stderr=subprocess.STDOUT, timeout=600)
-    audit(directory, options.phase, options.mode)
+    audit(directory, options.phase, options.mode, no_early_display=options.no_early_display)
     print("NEOFORGE_BUILDING_PIECES_DEVELOPMENT_PASS", options.mode, options.phase)
 
 

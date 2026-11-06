@@ -403,7 +403,7 @@ public final class GameplayChecks {
         }
 
         net.minecraft.world.entity.decoration.ArmorStand stand = new net.minecraft.world.entity.decoration.ArmorStand(
-                net.minecraft.world.entity.EntityType.ARMOR_STAND, world);
+                net.minecraft.world.entity.EntityTypes.ARMOR_STAND, world);
 
         stand.setPos(position.getX() + .25, position.getY(), position.getZ() + .5);
         require(world.addFreshEntity(stand), "collision fixture joins world");
