@@ -7,16 +7,18 @@ import org.junit.jupiter.api.Test;
 
 class NativeItemTargetsTest {
     @Test
-    void finalIdentitySurvivesVanillaRenamingWithoutChangingTheStack() {
+    void recoveredShortGrassKeepsItsCountSlotAndComponents() {
         CompoundTag item = item();
         CompoundTag custom = new CompoundTag();
+        CompoundTag components = new CompoundTag();
 
         custom.putString("unrelated", "Keep the saved item data");
-        item.put("tag", custom);
+        components.put("minecraft:custom_data", custom);
+        item.put("components", components);
 
         CompoundTag expected = item.copy();
 
-        expected.putString("id", "minecraft:grass");
+        expected.putString("id", "minecraft:short_grass");
         expected.remove(HistoricalItems.NATIVE_ITEM_ID);
         HistoricalItems.restoreNativeTargets(item);
         assertEquals(expected, item);
@@ -141,9 +143,9 @@ class NativeItemTargetsTest {
         CompoundTag item = new CompoundTag();
 
         item.putString("id", "minecraft:grass_block");
-        item.putByte("Count", (byte) 37);
+        item.putInt("count", 37);
         item.putByte("Slot", (byte) 17);
-        item.putString(HistoricalItems.NATIVE_ITEM_ID, "minecraft:grass");
+        item.putString(HistoricalItems.NATIVE_ITEM_ID, "minecraft:short_grass");
         return item;
     }
 }
