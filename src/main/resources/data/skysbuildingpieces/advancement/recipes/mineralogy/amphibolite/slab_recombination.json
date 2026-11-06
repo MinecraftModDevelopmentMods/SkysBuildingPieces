@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:amphibolite_slab"]
+            "items": [
+              "mineralogy:amphibolite_slab"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/amphibolite/slab_recombination"
+        "recipes": "skysbuildingpieces:mineralogy/amphibolite/slab_recombination"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/amphibolite/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/amphibolite/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {

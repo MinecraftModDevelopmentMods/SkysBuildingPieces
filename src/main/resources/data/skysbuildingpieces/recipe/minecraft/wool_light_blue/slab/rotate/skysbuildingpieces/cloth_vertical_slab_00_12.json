@@ -1,5 +1,6 @@
 {
   "type": "skysbuildingpieces:cutting",
+  "category": "building",
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": [
     "X"
@@ -8,15 +9,11 @@
     "X": "skysbuildingpieces:wool_light_blue_vertical_slab"
   },
   "result": {
-    "id": "skysbuildingpieces:wool_light_blue_slab",
+    "id": "minecraft:light_blue_wool_slab",
     "count": 1
   },
   "preserve_tag": true,
   "neoforge:conditions": [
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_light_blue_slab"
-    },
     {
       "type": "neoforge:registered",
       "value": "skysbuildingpieces:wool_light_blue_vertical_slab"

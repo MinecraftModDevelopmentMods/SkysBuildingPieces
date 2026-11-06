@@ -72,12 +72,12 @@ final class NumericStateBridge {
 
             // Sidecars can retain a target chosen before vanilla renamed grass paths.
             // The staging number stays fixed for chunks which have not been opened yet.
-            if (target.getStringOr("Name", "").equals("minecraft:grass_path")) {
-                target.putString("Name", "minecraft:dirt_path");
+            String nameKey = target.contains("Name") ? "Name" : "id";
+            if (target.getStringOr(nameKey, "").equals("minecraft:grass_path")) {
+                target.putString(nameKey, "minecraft:dirt_path");
             }
 
-            BlockState state = NbtUtils.readBlockState(
-                    net.minecraft.core.registries.BuiltInRegistries.BLOCK, target);
+            BlockState state = readSavedState(target);
 
             if (state.isAir() || state.hasBlockEntity()) {
                 throw new LegacyBridge.RecoveryAbort("A saved migration target is no longer available: " + entry, null);
@@ -144,7 +144,7 @@ final class NumericStateBridge {
             CompoundTag saved = new CompoundTag();
 
             saved.putInt("encoded", entry.getKey());
-            saved.put("state", NbtUtils.writeBlockState(entry.getValue()));
+            saved.put("state", writeSavedState(entry.getValue()));
             result.add(saved);
         }
 
@@ -166,7 +166,7 @@ final class NumericStateBridge {
             previous.put(encoded, table[encoded]);
         }
 
-        CompoundTag flattened = NbtUtils.writeBlockState(state);
+        CompoundTag flattened = writeSavedState(state);
         preserveNativeName(flattened);
         String name = flattened.getStringOr("Name", "");
 
@@ -200,6 +200,26 @@ final class NumericStateBridge {
 
     static synchronized boolean needsNativeNames() {
         return nativeNames;
+    }
+
+    static BlockState readSavedState(CompoundTag saved) {
+        CompoundTag state = saved;
+        if (saved.contains("Name")) {
+            CompoundTag current = new CompoundTag();
+            current.putString("id", saved.getStringOr("Name", ""));
+            saved.getCompound("Properties").ifPresent(properties -> current.put("properties", properties));
+            state = current;
+        }
+        return NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK, state);
+    }
+
+    static CompoundTag writeSavedState(BlockState state) {
+        // Keep the sidecar and numeric flattening table in their original format.
+        CompoundTag current = NbtUtils.writeBlockState(state);
+        CompoundTag saved = new CompoundTag();
+        saved.putString("Name", current.getString("id").orElseThrow());
+        current.getCompound("properties").ifPresent(properties -> saved.put("Properties", properties));
+        return saved;
     }
 
     static synchronized void reset() {

@@ -86,15 +86,15 @@ def probe_property(options):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/26.2/26.2.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/26.3/26.3.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("neoforge-26.2.0.45-beta",)]
+                for name in ("neoforge-26.3.0.99",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 26.2.0.45-beta profile")
+        raise ValueError("The installed client has no NeoForge 26.3.0.99 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "26.2" or forge["inheritsFrom"] != "26.2":
-        raise ValueError("This launcher requires the verified NeoForge 26.2 client metadata")
+    if base["id"] != "26.3" or forge["inheritsFrom"] != "26.3":
+        raise ValueError("This launcher requires the verified NeoForge 26.3 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -118,16 +118,16 @@ def client_command(options, directory):
             native_artifacts.append(path)
     # NeoForge locates the patched game and universal jar through the library directory.
     installed_libraries = {
-        "net/neoforged/minecraft-client-patched/26.2.0.45-beta/minecraft-client-patched-26.2.0.45-beta.jar":
-            "FEC38E3CDCB99792EBDF920315F246C7E4CBC65068D78446550F166111DD717E",
-        "net/neoforged/neoforge/26.2.0.45-beta/neoforge-26.2.0.45-beta-universal.jar":
-            "FD500FB526DDF9B2182C3D78548BAD35C8B5F79AF45CFA3F4A61D44E2F1FD97E",
+        "net/neoforged/minecraft-client-patched/26.3.0.99/minecraft-client-patched-26.3.0.99.jar":
+            "59724A91C97404F45FE517BED6EFBF744731D182E03583131EB283AA9D6488DC",
+        "net/neoforged/neoforge/26.3.0.99/neoforge-26.3.0.99-universal.jar":
+            "1C41DC00C92E87CD874788EE51720E3217E238423B853AC13B8242CF1973A13E",
     }
     for name, expected in installed_libraries.items():
         path = runtime / "libraries" / name
         if digest(path) != expected:
             raise ValueError("NeoForge installer output checksum changed: " + name)
-    client = runtime / "versions/26.2/26.2.jar"
+    client = runtime / "versions/26.3/26.3.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -158,6 +158,12 @@ def client_command(options, directory):
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Djava.library.path=" + str(natives),
                  probe_property(options)]
+    # The loader profile inherits these Java 25 options from Mojang's profile.
+    inherited_options = ["-XX:StackShadowPages=32", "--enable-native-access=ALL-UNNAMED",
+                         "--add-exports", "java.base/jdk.internal.misc=ALL-UNNAMED"]
+    if not all(option in base["arguments"]["jvm"] for option in inherited_options):
+        raise ValueError("The Minecraft Java 25 startup flags changed")
+    arguments.extend(inherited_options)
     for argument in forge["arguments"]["jvm"]:
         for key, value in substitutions.items():
             argument = argument.replace("${" + key + "}", value)
@@ -177,10 +183,10 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/neoforged/neoforge/26.2.0.45-beta" / filename
+    source = libraries / "net/neoforged/neoforge/26.3.0.99" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    if "net.neoforged.fml.startup.Server" not in launch or "26.2.0.45-beta" not in launch:
-        raise ValueError("Expected the official NeoForge 26.2.0.45-beta server arguments")
+    if "net.neoforged.fml.startup.Server" not in launch or "26.3.0.99" not in launch:
+        raise ValueError("Expected the official NeoForge 26.3.0.99 server arguments")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":

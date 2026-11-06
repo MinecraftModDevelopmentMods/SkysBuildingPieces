@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:dirt_vertical_step"]
+            "items": [
+              "skysbuildingpieces:dirt_vertical_step"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/dirt/corner/corner/skysbuildingpieces/dirt_vertical_step_00_0"
+        "recipes": "skysbuildingpieces:minecraft/dirt/corner/corner/skysbuildingpieces/dirt_vertical_step_00_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/dirt/corner/corner/skysbuildingpieces/dirt_vertical_step_00_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/dirt/corner/corner/skysbuildingpieces/dirt_vertical_step_00_0"
+    ]
   },
   "neoforge:conditions": [
     {

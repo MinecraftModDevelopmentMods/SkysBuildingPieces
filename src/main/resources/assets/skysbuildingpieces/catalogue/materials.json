@@ -2451,7 +2451,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:white_wool"
-      }
+      },
+      "slab": "minecraft:white_wool_slab",
+      "stairs": "minecraft:white_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2471,7 +2473,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:orange_wool"
-      }
+      },
+      "slab": "minecraft:orange_wool_slab",
+      "stairs": "minecraft:orange_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2491,7 +2495,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:magenta_wool"
-      }
+      },
+      "slab": "minecraft:magenta_wool_slab",
+      "stairs": "minecraft:magenta_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2511,7 +2517,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:light_blue_wool"
-      }
+      },
+      "slab": "minecraft:light_blue_wool_slab",
+      "stairs": "minecraft:light_blue_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2531,7 +2539,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:yellow_wool"
-      }
+      },
+      "slab": "minecraft:yellow_wool_slab",
+      "stairs": "minecraft:yellow_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2551,7 +2561,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:lime_wool"
-      }
+      },
+      "slab": "minecraft:lime_wool_slab",
+      "stairs": "minecraft:lime_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2571,7 +2583,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:pink_wool"
-      }
+      },
+      "slab": "minecraft:pink_wool_slab",
+      "stairs": "minecraft:pink_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2591,7 +2605,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:gray_wool"
-      }
+      },
+      "slab": "minecraft:gray_wool_slab",
+      "stairs": "minecraft:gray_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2611,7 +2627,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:light_gray_wool"
-      }
+      },
+      "slab": "minecraft:light_gray_wool_slab",
+      "stairs": "minecraft:light_gray_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2631,7 +2649,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:cyan_wool"
-      }
+      },
+      "slab": "minecraft:cyan_wool_slab",
+      "stairs": "minecraft:cyan_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2651,7 +2671,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:purple_wool"
-      }
+      },
+      "slab": "minecraft:purple_wool_slab",
+      "stairs": "minecraft:purple_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2671,7 +2693,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:blue_wool"
-      }
+      },
+      "slab": "minecraft:blue_wool_slab",
+      "stairs": "minecraft:blue_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2691,7 +2715,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:brown_wool"
-      }
+      },
+      "slab": "minecraft:brown_wool_slab",
+      "stairs": "minecraft:brown_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2711,7 +2737,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:green_wool"
-      }
+      },
+      "slab": "minecraft:green_wool_slab",
+      "stairs": "minecraft:green_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2731,7 +2759,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:red_wool"
-      }
+      },
+      "slab": "minecraft:red_wool_slab",
+      "stairs": "minecraft:red_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {
@@ -2751,7 +2781,9 @@
     "blocks": {
       "full": {
         "id": "minecraft:black_wool"
-      }
+      },
+      "slab": "minecraft:black_wool_slab",
+      "stairs": "minecraft:black_wool_stairs"
     },
     "group": "cloth",
     "legacy_blocks": {

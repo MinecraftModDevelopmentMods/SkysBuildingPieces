@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:diorite"]
+            "items": [
+              "mineralogy:diorite"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"
+        "recipes": "skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/diorite/horizontal_step/rock_step/mineralogy/diorite_0"
+    ]
   },
   "neoforge:conditions": [
     {

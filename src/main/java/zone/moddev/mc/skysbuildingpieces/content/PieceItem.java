@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -38,7 +39,11 @@ public final class PieceItem extends Item {
 
     private static Item.Properties properties(PieceBlock block, String material) {
         Identifier id = Identifier.parse(PaletteItemIds.itemId(block.palette, material));
-        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+        Item.Properties properties = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+        if (Catalogue.INSTANCE.materials.get(material).type.equals("wood")) {
+            properties.cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_BLOCKS);
+        }
+        return properties;
     }
 
     boolean visibleInCreativeTab() {
@@ -61,12 +66,6 @@ public final class PieceItem extends Item {
 
         return PieceNames.displayName(namespace, material,
                 piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), full.getHoverName());
-    }
-
-    @Override
-    public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType,
-            net.minecraft.world.level.block.entity.FuelValues fuels) {
-        return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
     }
 
     @Override

@@ -14,6 +14,7 @@ import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 
 /** Recovery choices are read at startup; old Forge CFG files are kept intact. */
 public final class BuildingPiecesConfig {
+    private static final String FILE_NAME = SkysBuildingPieces.ID + "-common.toml";
     private static final ModConfigSpec SPEC;
     private static final ModConfigSpec.BooleanValue FORCE_REPLACEMENT;
 
@@ -35,7 +36,7 @@ public final class BuildingPiecesConfig {
 
     public static void register(ModContainer container) {
         migrateLegacyConfig();
-        container.registerConfig(ModConfig.Type.COMMON, SPEC);
+        container.registerConfig(ModConfig.Type.LOCAL, SPEC, FILE_NAME);
     }
 
     public static boolean forceReplacement() {
@@ -44,7 +45,7 @@ public final class BuildingPiecesConfig {
 
     private static void migrateLegacyConfig() {
         Path directory = FMLPaths.CONFIGDIR.get();
-        Path current = directory.resolve(SkysBuildingPieces.ID + "-common.toml");
+        Path current = directory.resolve(FILE_NAME);
         Path legacy = directory.resolve(SkysBuildingPieces.ID + ".cfg");
 
         if (Files.exists(current) || !Files.isRegularFile(legacy)) {

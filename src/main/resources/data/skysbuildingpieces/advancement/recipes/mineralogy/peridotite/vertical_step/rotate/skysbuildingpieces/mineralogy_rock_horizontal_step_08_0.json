@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:mineralogy_peridotite_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:mineralogy_peridotite_horizontal_step"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/peridotite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_08_0"
+        "recipes": "skysbuildingpieces:mineralogy/peridotite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_08_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/peridotite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_08_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/peridotite/vertical_step/rotate/skysbuildingpieces/mineralogy_rock_horizontal_step_08_0"
+    ]
   },
   "neoforge:conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:chiseled_sandstone_vertical_step"]
+            "items": [
+              "skysbuildingpieces:chiseled_sandstone_vertical_step"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/chiseled_sandstone/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_00_8"
+        "recipes": "skysbuildingpieces:minecraft/chiseled_sandstone/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_00_8"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/chiseled_sandstone/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_00_8"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/chiseled_sandstone/horizontal_step/rotate/skysbuildingpieces/rock_vertical_step_00_8"
+    ]
   },
   "neoforge:conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_orange_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:wool_orange_vertical_slab"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_vertical_slab_00_4"
+        "recipes": "skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_vertical_slab_00_4"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_vertical_slab_00_4"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_orange/horizontal_step/step/skysbuildingpieces/cloth_vertical_slab_00_4"
+    ]
   },
   "neoforge:conditions": [
     {

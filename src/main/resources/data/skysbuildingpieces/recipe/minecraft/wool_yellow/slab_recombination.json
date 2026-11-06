@@ -1,20 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
   "group": "skysbuildingpieces/wool_yellow",
   "pattern": [
     "XX"
   ],
   "key": {
-    "X": "skysbuildingpieces:wool_yellow_slab"
+    "X": "minecraft:yellow_wool_slab"
   },
   "result": {
     "id": "minecraft:yellow_wool",
     "count": 1
-  },
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_yellow_slab"
-    }
-  ]
+  }
 }

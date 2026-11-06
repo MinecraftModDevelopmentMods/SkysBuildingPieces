@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:white_terracotta"]
+            "items": [
+              "minecraft:white_terracotta"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_white/wall/wall/minecraft/stained_hardened_clay_0"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_white/wall/wall/minecraft/stained_hardened_clay_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_white/wall/wall/minecraft/stained_hardened_clay_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_white/wall/wall/minecraft/stained_hardened_clay_0"
+    ]
   },
   "neoforge:conditions": [
     {

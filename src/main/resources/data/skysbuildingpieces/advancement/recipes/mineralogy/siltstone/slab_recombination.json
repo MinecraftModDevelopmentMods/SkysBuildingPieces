@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:siltstone_slab"]
+            "items": [
+              "mineralogy:siltstone_slab"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/siltstone/slab_recombination"
+        "recipes": "skysbuildingpieces:mineralogy/siltstone/slab_recombination"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/siltstone/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/siltstone/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {

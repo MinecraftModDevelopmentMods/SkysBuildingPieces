@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:iron_block"]
+            "items": [
+              "minecraft:iron_block"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/iron_block/wall/wall/minecraft/iron_block_0"
+        "recipes": "skysbuildingpieces:minecraft/iron_block/wall/wall/minecraft/iron_block_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/iron_block/wall/wall/minecraft/iron_block_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/iron_block/wall/wall/minecraft/iron_block_0"
+    ]
   },
   "neoforge:conditions": [
     {

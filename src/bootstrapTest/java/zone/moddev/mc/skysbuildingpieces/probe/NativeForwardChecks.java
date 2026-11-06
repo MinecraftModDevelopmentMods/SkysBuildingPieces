@@ -16,8 +16,9 @@ import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 import zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState;
+import zone.moddev.mc.skysbuildingpieces.probe.legacy.LegacyTestScope;
 
-/** Loads saved source chunks through the normal Forge chunk upgrader. */
+/** Loads saved source chunks through the normal chunk upgrader. */
 final class NativeForwardChecks {
     private static final java.util.Set<net.minecraft.world.level.ChunkPos> WARMUP_CHUNKS = new java.util.LinkedHashSet<>();
     private static final java.util.Set<java.util.UUID> WARMUP_ENTITIES = new java.util.LinkedHashSet<>();
@@ -319,11 +320,11 @@ final class NativeForwardChecks {
         for (JsonElement value : fixture.getAsJsonArray("states")) {
             JsonObject saved = value.getAsJsonObject();
             BlockPos position = position(saved);
-            net.minecraft.nbt.CompoundTag expected = net.minecraft.nbt.TagParser
-                    .parseCompoundFully(saved.get("state").getAsString());
+            net.minecraft.nbt.CompoundTag expected = LegacyTestScope.nativeStateTag(net.minecraft.nbt.TagParser
+                    .parseCompoundFully(saved.get("state").getAsString()));
 
-            if (expected.getStringOr("Name", "").equals("minecraft:grass_path")) {
-                expected.putString("Name", "minecraft:dirt_path");
+            if (expected.getStringOr("id", "").equals("minecraft:grass_path")) {
+                expected.putString("id", "minecraft:dirt_path");
             }
 
             require(net.minecraft.nbt.NbtUtils.writeBlockState(world.getBlockState(position)).equals(expected),

@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
   "group": "skysbuildingpieces/wool_silver",
   "pattern": [
     "X",
@@ -9,17 +10,13 @@
     "X": "skysbuildingpieces:wool_silver_horizontal_step"
   },
   "result": {
-    "id": "skysbuildingpieces:wool_silver_slab",
+    "id": "minecraft:light_gray_wool_slab",
     "count": 1
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
       "value": "skysbuildingpieces:wool_silver_horizontal_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_silver_slab"
     }
   ]
 }

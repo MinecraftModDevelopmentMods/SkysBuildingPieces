@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:mineralogy_scoria_vertical_step"]
+            "items": [
+              "skysbuildingpieces:mineralogy_scoria_vertical_step"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/scoria/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_05_8"
+        "recipes": "skysbuildingpieces:mineralogy/scoria/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_05_8"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/scoria/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_05_8"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/scoria/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_05_8"
+    ]
   },
   "neoforge:conditions": [
     {

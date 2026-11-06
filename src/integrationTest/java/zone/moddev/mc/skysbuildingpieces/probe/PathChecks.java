@@ -12,6 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.resources.Identifier;
@@ -38,12 +39,7 @@ public final class PathChecks {
             if (!event.getRegistryKey().equals(net.minecraft.core.registries.Registries.ITEM)) return;
             Identifier toolId = Identifier.fromNamespaceAndPath(namespace, "flattening_tool");
             compatibleShovel = new Item(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(
-                    net.minecraft.core.registries.Registries.ITEM, toolId)).durability(50)) {
-                @Override
-                public boolean canPerformAction(net.minecraft.world.item.ItemInstance stack, net.neoforged.neoforge.common.ItemAbility action) {
-                    return action == net.neoforged.neoforge.common.ItemAbilities.SHOVEL_FLATTEN;
-                }
-            };
+                    net.minecraft.core.registries.Registries.ITEM, toolId)).durability(50));
             net.minecraft.core.Registry.register(net.minecraft.core.registries.BuiltInRegistries.ITEM, toolId, compatibleShovel);
         });
     }
@@ -181,6 +177,8 @@ public final class PathChecks {
         world.setBlock(position, corner, 2);
 
         ItemStack custom = new ItemStack(compatibleShovel);
+        custom.set(DataComponents.BLOCK_TRANSFORMER,
+                new ItemStack(Items.IRON_SHOVEL).get(DataComponents.BLOCK_TRANSFORMER));
 
         click(world, player, position, custom, InteractionHand.MAIN_HAND, Direction.UP);
         require(custom.getDamageValue() == 1 && !world.getBlockState(position).equals(corner), "registered shovel support");

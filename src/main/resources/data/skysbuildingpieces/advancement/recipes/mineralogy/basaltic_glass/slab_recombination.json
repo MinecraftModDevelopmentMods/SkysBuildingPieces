@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:basaltic_glass_slab"]
+            "items": [
+              "mineralogy:basaltic_glass_slab"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/basaltic_glass/slab_recombination"
+        "recipes": "skysbuildingpieces:mineralogy/basaltic_glass/slab_recombination"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/basaltic_glass/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/basaltic_glass/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {

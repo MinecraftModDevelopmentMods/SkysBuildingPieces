@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:hornfels_slab"]
+            "items": [
+              "mineralogy:hornfels_slab"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:mineralogy/hornfels/slab_recombination"
+        "recipes": "skysbuildingpieces:mineralogy/hornfels/slab_recombination"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/hornfels/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/hornfels/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:dark_prismarine_slab"]
+            "items": [
+              "minecraft:dark_prismarine_slab"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/prismarine_dark/horizontal_step/step/skysbuildingpieces/rock_slab_01_6"
+        "recipes": "skysbuildingpieces:minecraft/prismarine_dark/horizontal_step/step/skysbuildingpieces/rock_slab_01_6"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_dark/horizontal_step/step/skysbuildingpieces/rock_slab_01_6"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_dark/horizontal_step/step/skysbuildingpieces/rock_slab_01_6"
+    ]
   },
   "neoforge:conditions": [
     {

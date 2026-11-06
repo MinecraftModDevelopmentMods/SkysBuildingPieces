@@ -1,12 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
   "group": "skysbuildingpieces/skysbuildingpieces",
   "pattern": [
     "X ",
     " X"
   ],
   "key": {
-    "X": "skysbuildingpieces:wool_light_blue_slab"
+    "X": "minecraft:light_blue_wool_slab"
   },
   "result": {
     "id": "skysbuildingpieces:wool_light_blue_horizontal_step",
@@ -16,10 +17,6 @@
     {
       "type": "neoforge:registered",
       "value": "skysbuildingpieces:wool_light_blue_horizontal_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_light_blue_slab"
     }
   ]
 }

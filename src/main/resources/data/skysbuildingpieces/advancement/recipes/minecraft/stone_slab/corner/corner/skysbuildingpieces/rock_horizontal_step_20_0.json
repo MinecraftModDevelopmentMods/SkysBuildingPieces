@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:stone_slab_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:stone_slab_horizontal_step"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stone_slab/corner/corner/skysbuildingpieces/rock_horizontal_step_20_0"
+        "recipes": "skysbuildingpieces:minecraft/stone_slab/corner/corner/skysbuildingpieces/rock_horizontal_step_20_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stone_slab/corner/corner/skysbuildingpieces/rock_horizontal_step_20_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stone_slab/corner/corner/skysbuildingpieces/rock_horizontal_step_20_0"
+    ]
   },
   "neoforge:conditions": [
     {

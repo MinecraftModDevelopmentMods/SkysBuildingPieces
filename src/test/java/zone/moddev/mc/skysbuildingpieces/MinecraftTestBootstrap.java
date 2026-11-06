@@ -43,7 +43,7 @@ public final class MinecraftTestBootstrap {
             loadingMods.set(loader, LoadingModList.of(List.of(), List.of(), List.of(),
                     List.of(), List.of(), Map.of()));
             SharedConstants.tryDetectVersion();
-            if (!SharedConstants.getCurrentVersion().name().equals("26.2")) {
+            if (!SharedConstants.getCurrentVersion().name().equals("26.3")) {
                 throw new IllegalStateException("Wrong Minecraft version for the focused tests");
             }
             set(Bootstrap.class, "isBootstrapped", true);
@@ -57,7 +57,7 @@ public final class MinecraftTestBootstrap {
                     net.minecraft.core.registries.BuiltInRegistries.ITEM).unfreeze(false);
             initialized = true;
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to initialize the NeoForge 26.2 test runtime",
+            throw new IllegalStateException("Unable to initialize the NeoForge 26.3 test runtime",
                     exception);
         }
     }

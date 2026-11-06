@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
@@ -99,9 +100,8 @@ final class RecipePreviewModels {
         }
         try {
             for (var layer : layers(state)) {
-                @SuppressWarnings("unchecked")
-                List<BakedQuad> quads = (List<BakedQuad>) field(layer.getClass(), "quads").get(layer);
-                for (BakedQuad quad : quads) {
+                var quads = (ItemQuads) field(layer.getClass(), "quads").get(layer);
+                for (BakedQuad quad : quads.all()) {
                     if (quad.materialInfo().sprite().contents().name().toString().contains("missingno")) {
                         throw new AssertionError("Missing recipe face texture: " + stack);
                     }
@@ -116,7 +116,7 @@ final class RecipePreviewModels {
         var state = model(minecraft, stack);
         try {
             var layer = layers(state).getFirst();
-            var tints = (it.unimi.dsi.fastutil.ints.IntList) field(layer.getClass(), "tintLayers").get(layer);
+            var tints = layer.tintLayers();
             if (tints.isEmpty() || (tints.getInt(0) & 0xFFFFFF) != (expected & 0xFFFFFF)
                     || tints.size() > 1 && tints.getInt(1) != -1) {
                 throw new AssertionError("Grass-piece inventory tint: " + stack);

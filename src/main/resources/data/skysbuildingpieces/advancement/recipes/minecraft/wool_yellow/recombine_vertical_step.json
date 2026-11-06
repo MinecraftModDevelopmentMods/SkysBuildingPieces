@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_yellow_vertical_step"]
+            "items": [
+              "skysbuildingpieces:wool_yellow_vertical_step"
+            ]
           }
         ]
       }
@@ -13,21 +15,22 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_yellow/recombine_vertical_step"
+        "recipes": "skysbuildingpieces:minecraft/wool_yellow/recombine_vertical_step"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_yellow/recombine_vertical_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_yellow/recombine_vertical_step"
+    ]
   },
   "neoforge:conditions": [
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_yellow_slab"
-    },
     {
       "type": "neoforge:registered",
       "value": "skysbuildingpieces:wool_yellow_vertical_step"

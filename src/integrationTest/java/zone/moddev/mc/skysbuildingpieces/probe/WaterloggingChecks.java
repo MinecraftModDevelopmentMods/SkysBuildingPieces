@@ -3,6 +3,7 @@ package zone.moddev.mc.skysbuildingpieces.probe;
 import java.util.Random;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.material.Fluids;
@@ -93,7 +94,8 @@ public final class WaterloggingChecks {
                                     .mask(expected),
                             "Wet grass and paths decay to matching waterlogged dirt: " + dry + " became " + actual
                                     + ", expected " + expected);
-                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(world, position, actual),
+                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(
+                            world, position, actual, BonemealSource.INTERACTION),
                             "Wet dirt cannot grow grass through bonemeal");
                     decays++;
                 }

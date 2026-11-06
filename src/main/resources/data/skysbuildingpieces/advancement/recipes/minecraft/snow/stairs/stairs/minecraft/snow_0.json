@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:snow_block"]
+            "items": [
+              "minecraft:snow_block"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/snow/stairs/stairs/minecraft/snow_0"
+        "recipes": "skysbuildingpieces:minecraft/snow/stairs/stairs/minecraft/snow_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/snow/stairs/stairs/minecraft/snow_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/snow/stairs/stairs/minecraft/snow_0"
+    ]
   },
   "neoforge:conditions": [
     {

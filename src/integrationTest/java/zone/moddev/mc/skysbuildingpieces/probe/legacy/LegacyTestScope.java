@@ -50,6 +50,17 @@ public final class LegacyTestScope implements AutoCloseable {
         return NumericStateBridge.stagedState(encoded);
     }
 
+    /** Compare the saved identity and properties using the current NBT keys. */
+    public static CompoundTag nativeStateTag(CompoundTag saved) {
+        if (!saved.contains("Name")) {
+            return saved;
+        }
+        CompoundTag current = new CompoundTag();
+        current.putString("id", saved.getString("Name").orElseThrow());
+        saved.getCompound("Properties").ifPresent(properties -> current.put("properties", properties));
+        return current;
+    }
+
     private static Field field(String name) throws Exception {
         Field field = LegacyBridge.class.getDeclaredField(name);
 

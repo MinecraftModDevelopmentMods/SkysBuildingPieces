@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:cut_red_sandstone"]
+            "items": [
+              "minecraft:cut_red_sandstone"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/smooth_red_sandstone/wall/wall/minecraft/red_sandstone_2"
+        "recipes": "skysbuildingpieces:minecraft/smooth_red_sandstone/wall/wall/minecraft/red_sandstone_2"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/smooth_red_sandstone/wall/wall/minecraft/red_sandstone_2"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/smooth_red_sandstone/wall/wall/minecraft/red_sandstone_2"
+    ]
   },
   "neoforge:conditions": [
     {

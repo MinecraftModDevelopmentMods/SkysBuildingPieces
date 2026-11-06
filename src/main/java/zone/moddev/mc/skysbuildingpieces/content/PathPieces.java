@@ -9,8 +9,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.BlockTransformers;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.minecraft.util.TriState;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -63,7 +64,7 @@ public final class PathPieces {
             world.setBlock(support, Blocks.DIRT_PATH.defaultBlockState(), 3);
         }
 
-        world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1, 1);
+        world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN.value(), SoundSource.BLOCKS, 1, 1);
 
         if (!player.getAbilities().instabuild) {
             shovel.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
@@ -78,7 +79,8 @@ public final class PathPieces {
             return null;
         }
 
-        if (!shovel.canPerformAction(ItemAbilities.SHOVEL_FLATTEN) || !world.isEmptyBlock(position.above())
+        var transformer = shovel.get(DataComponents.BLOCK_TRANSFORMER);
+        if (transformer == null || !transformer.is(BlockTransformers.SHOVEL) || !world.isEmptyBlock(position.above())
                 || !player.mayUseItemAt(position, face, shovel)) {
             return null;
         }

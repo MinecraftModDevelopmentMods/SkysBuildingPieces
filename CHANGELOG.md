@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8.2603002
+
+- Updated for Minecraft 26.3 on NeoForge. Wool uses the new vanilla slabs and stairs for new builds.
+- Saved Building Pieces wool pieces and inventory items are still supported.
+
 ## 0.3.8.2602002
 
 - Updated Building Pieces for Minecraft 26.2 on NeoForge.

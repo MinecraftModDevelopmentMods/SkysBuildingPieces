@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_brown_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:wool_brown_vertical_slab"
+            ]
           }
         ]
       }
@@ -13,21 +15,22 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_brown/slab/rotate/skysbuildingpieces/cloth_vertical_slab_03_0"
+        "recipes": "skysbuildingpieces:minecraft/wool_brown/slab/rotate/skysbuildingpieces/cloth_vertical_slab_03_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_brown/slab/rotate/skysbuildingpieces/cloth_vertical_slab_03_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_brown/slab/rotate/skysbuildingpieces/cloth_vertical_slab_03_0"
+    ]
   },
   "neoforge:conditions": [
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_brown_slab"
-    },
     {
       "type": "neoforge:registered",
       "value": "skysbuildingpieces:wool_brown_vertical_slab"

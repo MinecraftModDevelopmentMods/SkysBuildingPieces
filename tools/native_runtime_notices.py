@@ -1,4 +1,4 @@
-"""Keep known NeoForge 26.2 platform and offline messages separate from test failures."""
+"""Keep known NeoForge 26.3 platform and offline messages separate from test failures."""
 
 import os
 import re
@@ -9,25 +9,21 @@ COUNTER_MESSAGE = "Unable to locate English counter names in registry Perflib 00
 COUNTER_LOGGER = r"(?:oshi\.driver\.windows\.registry|os\.dr\.wi\.re)\.HkeyPerformanceDataUtil/"
 # The same OSHI exception is present when the Windows client or server runs on its own.
 COUNTER_TRACES = frozenset((
-    "7C017CF1ECFC9A32F3B2EB1C9243BD425F856CC01AA022A09BAB4A2013705265",
-    "3751F62B5119A5D2A05C098407BE85DAF4DB65E1B734B01F035E804EFF004C67",
+    "765AD01973F5FE5829DE0B78DC2714CB85A8B26AD4506BD9F8984DADC19DC8A3",
+    "196392CF9E83653E4434DDA811736464785DF5211DF0E1294A9E29E1DE5D2745",
 ))
 
 OFFLINE_TRACES = {
     "Failed to fetch user properties": (
         r"(?:net\.minecraft\.client\.Minecraft/|minecraft/Minecraft)",
-        {"46420CF918D068D5DA9A7D668BC9F81277183E11922AED6D1E0AD3B37424E7DB",
-         "64B6AD5D1469F8C7D33DA73A4F0AF1B2DDE1C14BEAF85BE224E8CAB2B895BE3C"}),
+        {"ADAF5E4F2459F568946216356024CEB73F0D195D0DD4FBD9B741BF42A17EABEF",
+         "7091256E4532D2A71B94BAA58E684B64906E9FF815CE678BA9D51E5EB71C57CC"}),
     "Failed to fetch Realms feature flags": (
         r"(?:com\.mojang\.realmsclient\.client\.RealmsClient/|mojang/RealmsClient)",
-        {"BDD75617F92748C2F3325FD97CCDB8034E32ACF210FA6B5E2F00BF81B760B5D1"}),
+        {"7C8D23CDB61777F30D6F67A0C5EB51A1F298AF61971161B0DD32459F40E726E9"}),
     "Couldn't connect to realms": (
         r"(?:com\.mojang\.realmsclient\.RealmsAvailability/|mojang/RealmsAvailability)",
-        {"5E8D3F81BDF000068A7EB95C48C9CC06A8722559174A37F0C364B2075A998322"}),
-    "Failed to retrieve profile key pair": (
-        r"(?:net\.minecraft\.client\.multiplayer\.AccountProfileKeyPairManager/|minecraft/AccountProfileKeyPairManager)",
-        {"8B41056B8D7FF45325AB5BD6137A2B9D29BDB33E8F4F946901F03897DE791903",
-         "B3CEABE5455CEF1BD5EBEE1C1D1E571749B81C5E474FEDFBDDA77CAEDC6ABD7C"}),
+        {"188E2A54FEE04A3B8E6E3D4EBD3614FB5BFE1B7F3746D551A4255F49B3F9E5FC"}),
 }
 
 

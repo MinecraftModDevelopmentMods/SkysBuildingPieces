@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:end_stone"]
+            "items": [
+              "minecraft:end_stone"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"
+        "recipes": "skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/end_stone/slab/slab/minecraft/end_stone_0"
+    ]
   },
   "neoforge:conditions": [
     {

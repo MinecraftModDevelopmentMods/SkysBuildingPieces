@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:stained_hardened_clay_pink_vertical_step"]
+            "items": [
+              "skysbuildingpieces:stained_hardened_clay_pink_vertical_step"
+            ]
           }
         ]
       }
@@ -13,15 +15,20 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_pink/recombine_vertical_step"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_pink/recombine_vertical_step"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_pink/recombine_vertical_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_pink/recombine_vertical_step"
+    ]
   },
   "neoforge:conditions": [
     {
