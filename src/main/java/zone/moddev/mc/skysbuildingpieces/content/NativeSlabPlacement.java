@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 
 /** Exact catalogue slab items use the same face-local placement as our own items. */
 public final class NativeSlabPlacement {
@@ -82,7 +83,7 @@ public final class NativeSlabPlacement {
 
     public static InteractionResult place(ItemStack stack, Player player, Level world, BlockPos position,
             InteractionHand hand, Direction face, float hitX, float hitY, float hitZ) {
-        if (instance == null || ModList.get().isLoaded("buildingbricks")) {
+        if (instance == null || !BuildingPiecesConfig.directionalSlabPlacement() || ModList.get().isLoaded("buildingbricks")) {
             return null;
         }
 

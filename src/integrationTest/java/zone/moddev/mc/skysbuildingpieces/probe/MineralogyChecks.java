@@ -68,8 +68,9 @@ final class MineralogyChecks {
                     BlockState state = Pieces.state(material, palette.shape, orientation);
 
                     require(state != null && !state.hasBlockEntity(), "invalid rock piece");
-                    require(((zone.moddev.mc.skysbuildingpieces.content.PieceBlock) state.getBlock())
-                            .getMetaFromState(state) == palette.meta(material, orientation),
+                    var block = (zone.moddev.mc.skysbuildingpieces.content.PieceBlock) state.getBlock();
+                    require(!block.isLegacyPalette() && block.definition(state).id.equals(material)
+                            && block.orientation(state) == orientation,
                             "saved material or orientation changed");
                     states++;
                 }

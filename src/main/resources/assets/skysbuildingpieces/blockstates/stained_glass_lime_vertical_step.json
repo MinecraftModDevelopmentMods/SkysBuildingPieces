@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "orientation=north_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_0"
+    },
+    "orientation=north_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_0"
+    },
+    "orientation=north_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_1"
+    },
+    "orientation=north_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_1"
+    },
+    "orientation=south_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_2"
+    },
+    "orientation=south_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_2"
+    },
+    "orientation=south_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_3"
+    },
+    "orientation=south_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_lime_vertical_step_3"
+    }
+  }
+}

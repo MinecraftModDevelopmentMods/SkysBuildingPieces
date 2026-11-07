@@ -183,7 +183,7 @@ public final class ContinuousGlassModel implements BakedModel {
         public void bake(ModelEvent.ModifyBakingResult event) {
             Set<String> walls = new HashSet<String>();
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.registeredBlocks()) {
                 if (block.palette.shape == Shape.WALL && block.palette.group.contains("glass")) {
                     walls.add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString());
                 }

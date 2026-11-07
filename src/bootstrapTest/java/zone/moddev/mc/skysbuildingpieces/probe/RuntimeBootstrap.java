@@ -134,6 +134,9 @@ public final class RuntimeBootstrap {
                 zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
+            } else if (!zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig.directionalSlabPlacement()
+                    && (phase.equals("fresh") || phase.equals("reload"))) {
+                GameplayChecks.horizontalSlabsOnly(world);
             } else if (phase.startsWith("client")) {
                 // The dedicated server exercises crafting and migration exhaustively.
                 // Here a real client must load, render and reopen the native piece states.
@@ -232,7 +235,7 @@ public final class RuntimeBootstrap {
     }
 
     private static java.util.Set<ChunkPos> clientGridChunks() {
-        int states = Pieces.BLOCKS.values().stream()
+        int states = Pieces.playableBlocks().stream()
                 .mapToInt(block -> block.palette.materials.size() * block.palette.shape.states).sum();
         java.util.Set<ChunkPos> chunks = new java.util.LinkedHashSet<>();
         for (int index = 0; index < states; index++) {
@@ -272,7 +275,7 @@ public final class RuntimeBootstrap {
 
         int number = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             int values = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < values; metadata++) {

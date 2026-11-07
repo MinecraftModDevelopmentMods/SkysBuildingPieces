@@ -26,7 +26,7 @@ public final class ClientProxy {
     }
 
     private static void renderLayers(FMLClientSetupEvent event) {
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             RenderType layer = RenderType.solid();
             if (block.palette.group.equals("grass")) {
                 layer = RenderType.cutoutMipped();
@@ -40,7 +40,7 @@ public final class ClientProxy {
     }
 
     private static void blockColors(RegisterColorHandlersEvent.Block event) {
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             if (block.palette.group.equals("grass")) {
                 event.getBlockColors().register(
                         (state, world, position,
@@ -55,12 +55,6 @@ public final class ClientProxy {
         for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
             if (item instanceof PieceItem && ((PieceItem) item).piece.palette.group.equals("grass")) {
                 event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1, item);
-            }
-        }
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
-            if (block.palette.group.equals("grass")) {
-                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1,
-                        block.asItem());
             }
         }
     }

@@ -2,6 +2,8 @@ package zone.moddev.mc.skysbuildingpieces.content;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -9,7 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -24,15 +25,29 @@ import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Fixed placed palettes and separate material items for the native recipe book. */
+/** Registers individual pieces and keeps the old palette identities for recovery. */
 public final class Pieces {
     public static final Map<String, PieceBlock> BLOCKS = new LinkedHashMap<>();
+    private static final Map<PieceKey, PieceBlock> PLAYABLE_BLOCKS = new LinkedHashMap<>();
     public static final Map<String, Item> RETIRED_TEMPLATES = new LinkedHashMap<>();
     private static final Map<String, PieceItem> ITEMS = new LinkedHashMap<>();
     private static final Map<Block, java.util.function.Function<BlockState, Item>> STATE_ITEMS = new java.util.concurrent.ConcurrentHashMap<>();
     public static boolean initialized;
 
     private Pieces() {
+    }
+
+    private record PieceKey(String material, Shape shape) {
+    }
+
+    public static Collection<PieceBlock> playableBlocks() {
+        return java.util.Collections.unmodifiableCollection(PLAYABLE_BLOCKS.values());
+    }
+
+    public static Collection<PieceBlock> registeredBlocks() {
+        var blocks = new ArrayList<>(BLOCKS.values());
+        blocks.addAll(PLAYABLE_BLOCKS.values());
+        return blocks;
     }
 
     public static PieceItem pieceItem(String identifier) {
@@ -60,6 +75,13 @@ public final class Pieces {
 
             Registry.register(registry, ResourceLocation.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
+
+            for (String material : palette.materials) {
+                ResourceLocation id = ResourceLocation.parse(PaletteItemIds.itemId(palette, material));
+                PieceBlock piece = new PieceBlock(palette.forMaterial(id.getPath(), material), false);
+                Registry.register(registry, id, piece);
+                PLAYABLE_BLOCKS.put(new PieceKey(material, palette.shape), piece);
+            }
         }
     }
 
@@ -82,7 +104,7 @@ public final class Pieces {
 
             // Keep the old item identity available for mixed and unopened saves. Normal drops, recipes and creative
             // entries use the flat items below.
-            BlockItem carrier = new BlockItem(block, new Item.Properties());
+            Item carrier = new Item(new Item.Properties());
 
             Registry.register(registry, ResourceLocation.parse(block.palette.registryId()), carrier);
 
@@ -93,7 +115,7 @@ public final class Pieces {
                     throw new IllegalStateException("Duplicate piece item: " + identifier);
                 }
 
-                PieceItem item = new PieceItem(block, material);
+                PieceItem item = new PieceItem(PLAYABLE_BLOCKS.get(new PieceKey(material, block.palette.shape)), material);
 
                 Registry.register(registry, ResourceLocation.parse(identifier), item);
                 ITEMS.put(identifier, item);
@@ -211,21 +233,15 @@ public final class Pieces {
         if (!Catalogue.supportsShape(definition, shape)) {
             return null;
         }
-        for (PieceBlock block : BLOCKS.values()) {
-            Shape stored = block.palette.shape;
-            int mapped = orientation;
-
-            if (stored == Shape.STEP && (shape == Shape.HORIZONTAL_STEP || shape == Shape.VERTICAL_STEP)) {
-                mapped = (shape == Shape.VERTICAL_STEP ? 8 : 0) + orientation;
-            } else if (stored != shape) {
-                continue;
-            }
-            if (block.palette.materials.contains(material)) {
-                return block.getStateFromMeta(block.palette.meta(material, mapped));
+        PieceBlock block = PLAYABLE_BLOCKS.get(new PieceKey(material, shape));
+        if (block == null && (shape == Shape.HORIZONTAL_STEP || shape == Shape.VERTICAL_STEP)) {
+            block = PLAYABLE_BLOCKS.get(new PieceKey(material, Shape.STEP));
+            if (shape == Shape.VERTICAL_STEP) {
+                orientation += 8;
             }
         }
 
-        return null;
+        return block == null ? null : block.getStateFromMeta(orientation);
     }
 
     /** Recover retired materials and newly native equivalents without changing the saved geometry. */
@@ -237,19 +253,19 @@ public final class Pieces {
         PieceBlock source = (PieceBlock) state.getBlock();
         Catalogue.MaterialDef material = source.definition(state);
 
-        if (material.replacement() == null
+        if (!source.isLegacyPalette() && material.replacement() == null
                 && material.block(source.palette.shape.name().toLowerCase(Locale.ROOT)) == null) {
             return state;
         }
 
-        int orientation = source.getMetaFromState(state) % source.palette.shape.states;
+        int orientation = source.orientation(state);
         BlockState result = state(material.id, source.palette.shape, orientation);
 
         if (result == null || result.hasBlockEntity()) {
             throw new IllegalStateException("No safe replacement geometry for " + material.id);
         }
         for (Map.Entry<Property<?>, Comparable<?>> property : state.getValues().entrySet()) {
-            if (property.getKey().getName().equals("meta")) {
+            if (property.getKey().getName().equals("meta") || property.getKey().getName().equals("orientation")) {
                 continue;
             }
 

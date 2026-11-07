@@ -26,6 +26,7 @@ public final class NativeLegacyChecks {
 
     public static void run(ServerLevel world) throws Exception {
         zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
+        flattenedPieces();
 
         boolean forced = SkysBuildingPieces.forceReplace;
         boolean installed = ModList.get().isLoaded("buildingbricks");
@@ -99,6 +100,41 @@ public final class NativeLegacyChecks {
 
         System.out
                 .println("BUILDING_PIECES_NATIVE_LEGACY_PASS step_codes=16 native_datafix=true installed=" + installed);
+    }
+
+    private static void flattenedPieces() {
+        int checked = 0;
+        for (PieceBlock carrier : Pieces.BLOCKS.values()) {
+            for (String material : carrier.palette.materials) {
+                for (int orientation = 0; orientation < carrier.palette.shape.states; orientation++) {
+                    BlockState old = carrier.getStateFromMeta(carrier.palette.meta(material, orientation))
+                            .setValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED, true);
+                    BlockState target = Pieces.canonicalState(old);
+                    if (!(target.getBlock() instanceof PieceBlock piece)) {
+                        continue;
+                    }
+                    require(!piece.isLegacyPalette() && piece.palette.materials.size() == 1
+                            && piece.getStateDefinition().getProperty("meta") == null,
+                            "A playable block still stores material metadata: " + target);
+                    require(piece.mask(target) == carrier.mask(old)
+                            && target.getValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED),
+                            "Flattening changed geometry or water: " + old + " -> " + target);
+                    CompoundTag sample = new CompoundTag();
+                    ListTag palette = new ListTag();
+                    palette.add(NbtUtils.writeBlockState(old));
+                    sample.put("palette", palette);
+                    LegacyBridge.finalizeNbt(sample);
+                    require(palette.getCompound(0).equals(NbtUtils.writeBlockState(target)),
+                            "Named palette recovery failed: " + old);
+                    CompoundTag first = sample.copy();
+                    LegacyBridge.finalizeNbt(sample);
+                    require(first.equals(sample), "Named palette recovery is not idempotent");
+                    checked++;
+                }
+            }
+        }
+        require(checked > 1000, "The placed block catalogue was not checked");
+        System.out.println("BUILDING_PIECES_FLAT_STATES_PASS states=" + checked);
     }
 
     static CompoundTag chunk(int number, int code, String material) {

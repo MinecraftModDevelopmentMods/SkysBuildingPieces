@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.9.121012
+
+- Give each material and shape its own block ID. Older worlds keep their pieces and their orientation.
+- Show Building Pieces items in the mod's creative tab. Vanilla pieces stay in their usual tabs.
+- Add an option to use ordinary slab placement.
+
 ## 0.3.8.121012
 
 - Bring Building Pieces to Minecraft 1.21.1 on NeoForge.
