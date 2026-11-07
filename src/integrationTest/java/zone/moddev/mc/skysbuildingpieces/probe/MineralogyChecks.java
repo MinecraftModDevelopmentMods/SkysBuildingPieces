@@ -34,7 +34,7 @@ final class MineralogyChecks {
             }
         }
 
-        require(registered == 35, "Mineralogy must use exactly 35 core block IDs");
+        require(registered == 35 + 81, "Mineralogy must register its 35 recovery palettes and 81 individual pieces: " + registered);
 
         int states = 0;
         if (disabled) {
