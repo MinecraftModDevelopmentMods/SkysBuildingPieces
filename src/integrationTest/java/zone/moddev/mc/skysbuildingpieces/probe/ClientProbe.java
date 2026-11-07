@@ -96,6 +96,7 @@ public final class ClientProbe extends ProbeProxy {
         try {
             org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().getWindow());
 
+            ConfigScreenChecks.run(minecraft);
             var availableCreative = PiecesTab.entries();
 
             for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {

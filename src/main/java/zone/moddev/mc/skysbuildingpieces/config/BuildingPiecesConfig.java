@@ -26,7 +26,7 @@ public final class BuildingPiecesConfig {
                 .comment("Replace supported historical pieces when their original mod is installed.",
                         "Back up the world before enabling this. Requires restart.",
                         "Recovery is automatic when the original mod is absent.")
-                .worldRestart().define("forceReplaceBuildingBricksPieces", false);
+                .gameRestart().define("forceReplaceBuildingBricksPieces", false);
         builder.pop();
         builder.push("gameplay");
         DIRECTIONAL_SLAB_PLACEMENT = builder

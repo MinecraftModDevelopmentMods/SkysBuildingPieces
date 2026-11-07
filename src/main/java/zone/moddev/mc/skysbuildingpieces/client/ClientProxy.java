@@ -7,7 +7,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GrassColor;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -17,8 +20,8 @@ public final class ClientProxy {
     private ClientProxy() {
     }
 
-    public static void register(IEventBus modBus) {
-
+    public static void register(IEventBus modBus, ModContainer container) {
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modBus.addListener(ClientProxy::blockColors);
         modBus.addListener(ClientProxy::itemColors);
         modBus.addListener(ClientProxy::renderLayers);

@@ -1,4 +1,13 @@
 {
+  "skysbuildingpieces.configuration.title": "%s Settings",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Common Settings",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Common Settings",
+  "skysbuildingpieces.configuration.gameplay": "Gameplay",
+  "skysbuildingpieces.configuration.gameplay.button": "Gameplay",
+  "skysbuildingpieces.configuration.compat": "Compatibility",
+  "skysbuildingpieces.configuration.compat.button": "Compatibility",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Directional slab placement",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Replace legacy pieces",
   "pieces.skysbuildingpieces.slab": "%s Slab",
   "pieces.skysbuildingpieces.vertical_slab": "%s Vertical Slab",
   "pieces.skysbuildingpieces.horizontal_step": "%s Step",

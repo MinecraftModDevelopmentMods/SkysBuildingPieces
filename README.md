@@ -13,8 +13,9 @@ Pieces doesn't generate terrain.
 
 - Use the same slab item for horizontal and vertical placement. Click the centre
   of a face to place against it, or near an edge to place along that edge.
-  Breaking a vertical slab returns the regular slab. Turn off
-  `gameplay.directionalSlabPlacement` if you prefer ordinary slab placement.
+  Breaking a vertical slab returns the regular slab. To use ordinary slab
+  placement, open **Mods → Sky's Building Pieces → Config → Gameplay** and
+  turn off **Directional slab placement**.
 - Sneak while placing a step to turn it vertically. Steps are quarter-block
   pieces; corners are eighth-block pieces.
 - Matching pieces can join into supported larger shapes or a full block.

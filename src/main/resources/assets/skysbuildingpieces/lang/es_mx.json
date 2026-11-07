@@ -1,4 +1,13 @@
 {
+  "skysbuildingpieces.configuration.title": "Ajustes de %s",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Ajustes comunes",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Ajustes comunes",
+  "skysbuildingpieces.configuration.gameplay": "Jugabilidad",
+  "skysbuildingpieces.configuration.gameplay.button": "Jugabilidad",
+  "skysbuildingpieces.configuration.compat": "Compatibilidad",
+  "skysbuildingpieces.configuration.compat.button": "Compatibilidad",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Colocación direccional de losas",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Reemplazar piezas antiguas",
   "pieces.skysbuildingpieces.slab": "Losa de %s",
   "pieces.skysbuildingpieces.vertical_slab": "Losa vertical de %s",
   "pieces.skysbuildingpieces.horizontal_step": "Cuarto de bloque de %s",

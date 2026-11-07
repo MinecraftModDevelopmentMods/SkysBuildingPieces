@@ -1,4 +1,13 @@
 {
+  "skysbuildingpieces.configuration.title": "Paramètres de %s",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Paramètres communs",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Paramètres communs",
+  "skysbuildingpieces.configuration.gameplay": "Jouabilité",
+  "skysbuildingpieces.configuration.gameplay.button": "Jouabilité",
+  "skysbuildingpieces.configuration.compat": "Compatibilité",
+  "skysbuildingpieces.configuration.compat.button": "Compatibilité",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Placement directionnel des dalles",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Remplacer les anciennes pièces",
   "pieces.skysbuildingpieces.slab": "Dalle en %s",
   "pieces.skysbuildingpieces.vertical_slab": "Dalle verticale en %s",
   "pieces.skysbuildingpieces.horizontal_step": "Quart de bloc en %s",

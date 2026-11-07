@@ -38,7 +38,7 @@ public final class SkysBuildingPieces {
         NeoForge.EVENT_BUS.register(new PathPieces());
         NeoForge.EVENT_BUS.addListener(this::afterServer);
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(modBus);
+            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(modBus, container);
         }
     }
 

@@ -4,7 +4,7 @@
 
 - Give each material and shape its own block ID. Older worlds keep their pieces and their orientation.
 - Show Building Pieces items in the mod's creative tab. Vanilla pieces stay in their usual tabs.
-- Add an option to use ordinary slab placement.
+- Let players switch to ordinary slab placement from the Mods menu.
 
 ## 0.3.8.121012
 
