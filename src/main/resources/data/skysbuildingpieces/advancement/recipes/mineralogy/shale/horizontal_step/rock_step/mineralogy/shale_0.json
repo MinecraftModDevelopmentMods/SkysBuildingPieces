@@ -1,0 +1,40 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["mineralogy:shale"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:mineralogy/shale/horizontal_step/rock_step/mineralogy/shale_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:mineralogy/shale/horizontal_step/rock_step/mineralogy/shale_0"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:shale"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_shale_horizontal_step"
+    }
+  ]
+}

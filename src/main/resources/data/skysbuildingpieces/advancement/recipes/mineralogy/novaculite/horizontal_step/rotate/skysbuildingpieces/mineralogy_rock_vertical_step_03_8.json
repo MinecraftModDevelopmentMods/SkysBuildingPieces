@@ -1,0 +1,40 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:mineralogy_novaculite_vertical_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:mineralogy/novaculite/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_03_8"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:mineralogy/novaculite/horizontal_step/rotate/skysbuildingpieces/mineralogy_rock_vertical_step_03_8"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_novaculite_vertical_step"
+    }
+  ]
+}

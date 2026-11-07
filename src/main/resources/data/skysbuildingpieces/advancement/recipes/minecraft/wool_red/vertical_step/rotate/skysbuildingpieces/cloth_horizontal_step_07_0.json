@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:wool_red_horizontal_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/wool_red/vertical_step/rotate/skysbuildingpieces/cloth_horizontal_step_07_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/wool_red/vertical_step/rotate/skysbuildingpieces/cloth_horizontal_step_07_0"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:wool_red_horizontal_step"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:wool_red_vertical_step"
+    }
+  ]
+}

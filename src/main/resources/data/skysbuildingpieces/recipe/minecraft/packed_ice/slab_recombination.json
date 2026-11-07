@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/packed_ice",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:packed_ice_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:packed_ice",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:packed_ice_slab"
+    }
+  ]
+}

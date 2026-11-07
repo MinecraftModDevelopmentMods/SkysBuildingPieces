@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:end_bricks_horizontal_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/end_bricks/corner/corner/skysbuildingpieces/rock_horizontal_step_02_8"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/end_bricks/corner/corner/skysbuildingpieces/rock_horizontal_step_02_8"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:end_bricks_corner"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:end_bricks_horizontal_step"
+    }
+  ]
+}

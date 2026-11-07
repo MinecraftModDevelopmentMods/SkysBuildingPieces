@@ -1,0 +1,21 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:planks_dark_oak_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:dark_oak_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:planks_dark_oak_vertical_slab"
+    }
+  ]
+}

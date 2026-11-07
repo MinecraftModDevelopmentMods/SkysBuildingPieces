@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:purple_terracotta"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_hardened_clay_purple_slab",
+    "count": 6
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_purple_slab"
+    }
+  ]
+}

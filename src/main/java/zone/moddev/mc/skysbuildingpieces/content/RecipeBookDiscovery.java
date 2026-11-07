@@ -4,74 +4,86 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.ICriterionInstance;
+import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 
-/** Unlock the next cut while its ingredient is still on the crafting-table cursor. */
-@Mod.EventBusSubscriber(modid = "skysbuildingpieces")
+/** Unlock the next cut even when a crafted piece is still on the table cursor. */
+@EventBusSubscriber(
+        modid = SkysBuildingPieces.ID)
 public final class RecipeBookDiscovery {
-    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList(
-            "skysbuildingpieces", "skysbuildingpiecesbop",
+    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
             "skysterrainsmoother", "skysterrainsmootherbop"));
+
+    private RecipeBookDiscovery() {
+    }
 
     @SubscribeEvent
     public static void crafted(PlayerEvent.ItemCraftedEvent event) {
-        if (!(event.player instanceof EntityPlayerMP) || event.crafting.isEmpty()) {
+        if (!(event.getEntity() instanceof ServerPlayer) || event.getCrafting().isEmpty()) {
             return;
         }
 
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
-        InventoryPlayer ingredient = new InventoryPlayer(player);
-        ingredient.setInventorySlotContents(0, event.crafting.copy());
+        ServerPlayer player = (ServerPlayer) event.getEntity();
+        Inventory ingredient = new Inventory(player);
 
-        for (IRecipe recipe : CraftingManager.REGISTRY) {
-            ResourceLocation id = recipe.getRegistryName();
-            if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isDynamic()) {
+        ingredient.setItem(0, event.getCrafting().copy());
+
+        for (RecipeHolder<?> holder : player.getServer().getRecipeManager().getRecipes()) {
+            ResourceLocation id = holder.id();
+            Recipe<?> recipe = holder.value();
+
+            if (!OWNERS.contains(id.getNamespace()) || recipe.isSpecial()
+                    || recipe.getIngredients().stream().noneMatch(input -> input.test(event.getCrafting()))) {
                 continue;
             }
-            if (recipe.getIngredients().stream().noneMatch(input -> input.apply(event.crafting))) {
+
+            String owner = id.getNamespace();
+
+            if (owner.equals(SkysBuildingPieces.ID)) {
+                Catalogue.Module module = Catalogue.INSTANCE.modules.get(id.getPath().split("/", 2)[0]);
+
+                if (module != null) {
+                    owner = module.namespace;
+                }
+            }
+
+            AdvancementHolder advancement = player.getServer().getAdvancements()
+                    .get(ResourceLocation.fromNamespaceAndPath(owner, "recipes/" + id.getPath()));
+
+            if (advancement == null) {
                 continue;
             }
 
-            for (String owner : OWNERS) {
-                Advancement advancement = player.getServer().getAdvancementManager()
-                        .getAdvancement(new ResourceLocation(owner, "recipes/" + id.getPath()));
-                if (advancement == null) {
-                    continue;
-                }
+            Criterion<?> recipeCriterion = advancement.value().criteria().get("has_the_recipe");
 
-                Criterion recipeCriterion = advancement.getCriteria().get("has_the_recipe");
-                if (recipeCriterion == null || !(recipeCriterion.getCriterionInstance()
-                        instanceof RecipeUnlockedTrigger.Instance)) {
-                    continue;
-                }
-                if (!((RecipeUnlockedTrigger.Instance) recipeCriterion.getCriterionInstance()).test(recipe)) {
-                    continue;
-                }
+            if (recipeCriterion == null
+                    || !(recipeCriterion.triggerInstance() instanceof RecipeUnlockedTrigger.TriggerInstance trigger)
+                    || !trigger.matches(holder)) {
+                continue;
+            }
+            for (Map.Entry<String, Criterion<?>> criterion : advancement.value().criteria().entrySet()) {
+                CriterionTriggerInstance predicate = criterion.getValue().triggerInstance();
 
-                // Evaluate the actual criterion, including metadata, rather than guessing its material.
-                for (Map.Entry<String, Criterion> criterion : advancement.getCriteria().entrySet()) {
-                    ICriterionInstance instance = criterion.getValue().getCriterionInstance();
-                    if (instance instanceof InventoryChangeTrigger.Instance
-                            && ((InventoryChangeTrigger.Instance) instance).test(ingredient)) {
-                        player.getAdvancements().grantCriterion(advancement, criterion.getKey());
-                    }
+                if (predicate instanceof InventoryChangeTrigger.TriggerInstance
+                        && ((InventoryChangeTrigger.TriggerInstance) predicate).matches(ingredient, event.getCrafting(),
+                                event.getCrafting().getCount() >= event.getCrafting().getMaxStackSize() ? 1 : 0,
+                                ingredient.getContainerSize() - 1, 1)) {
+                    player.getAdvancements().award(advancement, criterion.getKey());
                 }
             }
         }
-    }
-
-    private RecipeBookDiscovery() {
     }
 }

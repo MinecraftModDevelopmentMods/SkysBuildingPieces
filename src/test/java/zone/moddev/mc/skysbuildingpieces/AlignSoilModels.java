@@ -13,17 +13,21 @@ public final class AlignSoilModels {
 
         try (java.util.stream.Stream<Path> files = Files.list(root)) {
             for (Path file : (Iterable<Path>) files::iterator) {
-                JsonObject model = new JsonParser().parse(new String(Files.readAllBytes(file),
-                        StandardCharsets.UTF_8)).getAsJsonObject();
+                JsonObject model = new JsonParser().parse(new String(Files.readAllBytes(file), StandardCharsets.UTF_8))
+                        .getAsJsonObject();
+
                 if (!model.getAsJsonObject("textures").has("side")) {
                     continue;
                 }
+
                 String side = model.getAsJsonObject("textures").get("side").getAsString();
+
                 if (!side.endsWith("/grass_side") && !side.endsWith("/grass_side_snowed")) {
                     continue;
                 }
 
                 boolean updated = false;
+
                 for (JsonElement value : model.getAsJsonArray("elements")) {
                     JsonObject element = value.getAsJsonObject();
                     JsonArray from = element.getAsJsonArray("from");
@@ -35,6 +39,7 @@ public final class AlignSoilModels {
                         JsonObject other = otherValue.getAsJsonObject();
                         JsonArray otherFrom = other.getAsJsonArray("from");
                         JsonArray otherTo = other.getAsJsonArray("to");
+
                         if (otherFrom.get(0).equals(from.get(0)) && otherTo.get(0).equals(to.get(0))
                                 && otherFrom.get(2).equals(from.get(2)) && otherTo.get(2).equals(to.get(2))) {
                             columnTop = Math.max(columnTop, otherTo.get(1).getAsInt());
@@ -42,15 +47,19 @@ public final class AlignSoilModels {
                     }
 
                     JsonObject faces = element.getAsJsonObject("faces");
+
                     for (String direction : Arrays.asList("north", "south", "west", "east")) {
                         if (!faces.has(direction)) {
                             continue;
                         }
+
                         JsonArray uv = faces.getAsJsonObject(direction).getAsJsonArray("uv");
                         int firstRow = columnTop - to.get(1).getAsInt();
                         int lastRow = columnTop - from.get(1).getAsInt();
+
                         if (uv.get(1).getAsInt() != firstRow || uv.get(3).getAsInt() != lastRow) {
                             JsonArray aligned = new JsonArray();
+
                             aligned.add(uv.get(0));
                             aligned.add(new JsonPrimitive(firstRow));
                             aligned.add(uv.get(2));
@@ -66,6 +75,7 @@ public final class AlignSoilModels {
                 }
             }
         }
+
         System.out.println("SOIL_EDGE_MODELS_ALIGNED files=" + changed);
     }
 

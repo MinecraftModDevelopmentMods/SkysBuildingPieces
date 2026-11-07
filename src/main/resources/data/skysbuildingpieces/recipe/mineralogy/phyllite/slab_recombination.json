@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/phyllite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:phyllite_slab"
+    }
+  },
+  "result": {
+    "id": "mineralogy:phyllite",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:phyllite"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:phyllite_slab"
+    }
+  ]
+}

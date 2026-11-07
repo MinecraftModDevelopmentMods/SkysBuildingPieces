@@ -1,0 +1,97 @@
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+
+// Optional mods live in their own run directories. The ordinary run stays standalone.
+def grass = new Properties()
+file('gradle/grass-slabs-release.properties').withInputStream { grass.load(it) }
+def rocks = new Properties()
+file('gradle/mineralogy-runtime.properties').withInputStream { rocks.load(it) }
+
+def grassJar = providers.gradleProperty('grassSlabsMainJar').orElse(
+        "../../SkysGrassSlabs1211NEO/SkysGrassSlabs/build/libs/SkysGrassSlabs-${grass.version}.jar")
+def oreJar = providers.gradleProperty('oreSpawnMainJar').orElse(rocks.getProperty('orespawn.path'))
+def rockJar = providers.gradleProperty('mineralogyMainJar').orElse(rocks.getProperty('mineralogy.path'))
+
+def inputsFor = [
+        grassSlabs: [[grassJar, grass.sha256, 'skysgrassslabs', grass.version]],
+        mineralogy: [[oreJar, rocks.getProperty('orespawn.sha256'), 'orespawn', rocks.getProperty('orespawn.version')],
+                     [rockJar, rocks.getProperty('mineralogy.sha256'), 'mineralogy', rocks.getProperty('mineralogy.version')]]
+]
+
+def verifyCompanion = { row ->
+    File source = file(row[0].get())
+    if (!source.isFile()) {
+        throw new GradleException("Build the pinned ${row[2]} jar before starting this profile")
+    }
+    MessageDigest digest = MessageDigest.getInstance('SHA-256')
+    source.withInputStream { input ->
+        byte[] buffer = new byte[8192]
+        for (int read = input.read(buffer); read >= 0; read = input.read(buffer)) {
+            if (read > 0) digest.update(buffer, 0, read)
+        }
+    }
+    if (digest.digest().encodeHex().toString().toUpperCase(Locale.ROOT) != row[1]) {
+        throw new GradleException("Unexpected companion checksum: ${source.name}")
+    }
+    new ZipFile(source).withCloseable { jar ->
+        def descriptor = jar.getEntry('META-INF/neoforge.mods.toml')
+        if (descriptor == null) throw new GradleException("Not a NeoForge companion: ${source.name}")
+        String metadata = jar.getInputStream(descriptor).getText('UTF-8')
+        if (!(metadata =~ /(?m)^\s*modId\s*=\s*["']${java.util.regex.Pattern.quote(row[2])}["']\s*$/) ||
+                !(metadata =~ /(?m)^\s*version\s*=\s*["']${java.util.regex.Pattern.quote(row[3])}["']\s*$/)) {
+            throw new GradleException("Unexpected companion metadata: ${source.name}")
+        }
+    }
+    source
+}
+
+inputsFor.each { profile, companionSet ->
+    def label = profile.capitalize()
+    def profileDirectory = layout.projectDirectory.dir(profile == 'grassSlabs'
+            ? 'run-grass-slabs' : 'run-mineralogy')
+    def prepare = tasks.register("prepare${label}DevelopmentRun") {
+        group = 'ide'
+        doLast {
+            def companionJars = companionSet.collect(verifyCompanion)
+            File mods = profileDirectory.dir('mods').asFile
+            Set<String> allowed = companionJars*.name as Set<String>
+            Set<String> unexpected = (fileTree(mods).matching { include '*.jar' }.files*.name as Set<String>) - allowed
+            if (!unexpected.isEmpty()) {
+                throw new GradleException("Unexpected jars in ${profileDirectory.asFile.name}/mods: ${unexpected}")
+            }
+            copy { from companionJars; into mods }
+        }
+    }
+    ['Client', 'Server'].each { side ->
+        String runName = "${profile}${side}"
+        runs.create(runName) {
+            runType side.toLowerCase(Locale.ROOT)
+            modSource sourceSets.main
+            workingDirectory profileDirectory
+            if (side == 'Server') argument '--nogui'
+        }
+        tasks.matching { it.name in ["run${runName.capitalize()}", "prepareRun${runName.capitalize()}"] }
+                .configureEach { dependsOn prepare }
+    }
+}
+
+def compileOrderChecks = tasks.register('compileCoremodOrderChecks', JavaCompile) {
+    group = 'verification'
+    dependsOn tasks.named('classes')
+    source fileTree('src/coremodTest/java')
+    classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
+    destinationDirectory = layout.buildDirectory.dir('coremod-order-checks/classes')
+}
+
+tasks.register('verifyCoexistingCoremods', JavaExec) {
+    group = 'verification'
+    description = 'Checks all orders of the three pinned legacy transformers.'
+    dependsOn compileOrderChecks
+    classpath = files(compileOrderChecks.flatMap { it.destinationDirectory }, sourceSets.main.runtimeClasspath)
+    mainClass = 'zone.moddev.mc.skysbuildingpieces.probe.CoremodOrderChecks'
+    doFirst {
+        File mineralogy = verifyCompanion(inputsFor.mineralogy.find { it[2] == 'mineralogy' })
+        File grassSlabs = verifyCompanion(inputsFor.grassSlabs.first())
+        setArgs([file('src/main/resources/coremods/skysbuildingpieces.js'), mineralogy, grassSlabs])
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:snow_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:snow_corner",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:snow_corner"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:snow_step"
+    }
+  ]
+}

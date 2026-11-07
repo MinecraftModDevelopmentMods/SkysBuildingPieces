@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:chiseled_sandstone_horizontal_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/chiseled_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_01_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/chiseled_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_01_0"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_corner"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_horizontal_step"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/marble",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mineralogy_marble_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "mineralogy:marble_slab",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:marble_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_marble_horizontal_step"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_carved_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_carved_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_carved_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_carved_vertical_slab"
+    }
+  ]
+}

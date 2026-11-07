@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mineralogy_basaltic_glass_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:mineralogy_basaltic_glass_corner",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_basaltic_glass_corner"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:mineralogy_basaltic_glass_horizontal_step"
+    }
+  ]
+}

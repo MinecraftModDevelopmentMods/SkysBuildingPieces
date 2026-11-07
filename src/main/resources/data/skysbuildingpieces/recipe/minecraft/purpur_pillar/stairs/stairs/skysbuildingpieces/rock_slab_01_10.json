@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:purpur_pillar_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:purpur_pillar_stairs",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:purpur_pillar_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:purpur_pillar_stairs"
+    }
+  ]
+}

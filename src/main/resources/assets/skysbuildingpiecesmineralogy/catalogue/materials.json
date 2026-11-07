@@ -13,6 +13,18 @@
     "textures": "mineralogy:blocks/amphibolite",
     "blocks": {
       "full": {
+        "id": "mineralogy:amphibolite"
+      },
+      "slab": {
+        "id": "mineralogy:amphibolite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:amphibolite",
         "meta": 0
       },
@@ -20,7 +32,8 @@
         "id": "mineralogy:amphibolite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/amphibolite"
   },
   {
     "id": "mineralogy:andesite",
@@ -36,6 +49,18 @@
     "textures": "mineralogy:blocks/andesite",
     "blocks": {
       "full": {
+        "id": "mineralogy:andesite"
+      },
+      "slab": {
+        "id": "mineralogy:andesite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:andesite",
         "meta": 0
       },
@@ -43,7 +68,8 @@
         "id": "mineralogy:andesite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/andesite"
   },
   {
     "id": "mineralogy:basalt",
@@ -59,6 +85,18 @@
     "textures": "mineralogy:blocks/basalt",
     "blocks": {
       "full": {
+        "id": "mineralogy:basalt"
+      },
+      "slab": {
+        "id": "mineralogy:basalt_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:basalt",
         "meta": 0
       },
@@ -66,7 +104,8 @@
         "id": "mineralogy:basalt_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/basalt"
   },
   {
     "id": "mineralogy:basaltic_glass",
@@ -82,6 +121,18 @@
     "textures": "mineralogy:blocks/basaltic_glass",
     "blocks": {
       "full": {
+        "id": "mineralogy:basaltic_glass"
+      },
+      "slab": {
+        "id": "mineralogy:basaltic_glass_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:basaltic_glass",
         "meta": 0
       },
@@ -89,7 +140,8 @@
         "id": "mineralogy:basaltic_glass_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/basaltic_glass"
   },
   {
     "id": "mineralogy:conglomerate",
@@ -105,6 +157,18 @@
     "textures": "mineralogy:blocks/conglomerate",
     "blocks": {
       "full": {
+        "id": "mineralogy:conglomerate"
+      },
+      "slab": {
+        "id": "mineralogy:conglomerate_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:conglomerate",
         "meta": 0
       },
@@ -112,7 +176,8 @@
         "id": "mineralogy:conglomerate_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/conglomerate"
   },
   {
     "id": "mineralogy:diabase",
@@ -128,6 +193,18 @@
     "textures": "mineralogy:blocks/diabase",
     "blocks": {
       "full": {
+        "id": "mineralogy:diabase"
+      },
+      "slab": {
+        "id": "mineralogy:diabase_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:diabase",
         "meta": 0
       },
@@ -135,7 +212,8 @@
         "id": "mineralogy:diabase_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/diabase"
   },
   {
     "id": "mineralogy:diorite",
@@ -151,6 +229,18 @@
     "textures": "mineralogy:blocks/diorite",
     "blocks": {
       "full": {
+        "id": "mineralogy:diorite"
+      },
+      "slab": {
+        "id": "mineralogy:diorite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:diorite",
         "meta": 0
       },
@@ -158,7 +248,8 @@
         "id": "mineralogy:diorite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/diorite"
   },
   {
     "id": "mineralogy:dolomite",
@@ -174,6 +265,18 @@
     "textures": "mineralogy:blocks/dolomite",
     "blocks": {
       "full": {
+        "id": "mineralogy:dolomite"
+      },
+      "slab": {
+        "id": "mineralogy:dolomite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:dolomite",
         "meta": 0
       },
@@ -181,7 +284,8 @@
         "id": "mineralogy:dolomite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/dolomite"
   },
   {
     "id": "mineralogy:gabbro",
@@ -197,6 +301,18 @@
     "textures": "mineralogy:blocks/gabbro",
     "blocks": {
       "full": {
+        "id": "mineralogy:gabbro"
+      },
+      "slab": {
+        "id": "mineralogy:gabbro_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:gabbro",
         "meta": 0
       },
@@ -204,7 +320,8 @@
         "id": "mineralogy:gabbro_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/gabbro"
   },
   {
     "id": "mineralogy:gneiss",
@@ -220,6 +337,18 @@
     "textures": "mineralogy:blocks/gneiss",
     "blocks": {
       "full": {
+        "id": "mineralogy:gneiss"
+      },
+      "slab": {
+        "id": "mineralogy:gneiss_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:gneiss",
         "meta": 0
       },
@@ -227,7 +356,8 @@
         "id": "mineralogy:gneiss_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/gneiss"
   },
   {
     "id": "mineralogy:granite",
@@ -243,6 +373,18 @@
     "textures": "mineralogy:blocks/granite",
     "blocks": {
       "full": {
+        "id": "mineralogy:granite"
+      },
+      "slab": {
+        "id": "mineralogy:granite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:granite",
         "meta": 0
       },
@@ -250,7 +392,8 @@
         "id": "mineralogy:granite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/granite"
   },
   {
     "id": "mineralogy:hornfels",
@@ -266,6 +409,18 @@
     "textures": "mineralogy:blocks/hornfels",
     "blocks": {
       "full": {
+        "id": "mineralogy:hornfels"
+      },
+      "slab": {
+        "id": "mineralogy:hornfels_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:hornfels",
         "meta": 0
       },
@@ -273,7 +428,8 @@
         "id": "mineralogy:hornfels_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/hornfels"
   },
   {
     "id": "mineralogy:limestone",
@@ -289,6 +445,18 @@
     "textures": "mineralogy:blocks/limestone",
     "blocks": {
       "full": {
+        "id": "mineralogy:limestone"
+      },
+      "slab": {
+        "id": "mineralogy:limestone_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:limestone",
         "meta": 0
       },
@@ -296,7 +464,8 @@
         "id": "mineralogy:limestone_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/limestone"
   },
   {
     "id": "mineralogy:marble",
@@ -312,6 +481,18 @@
     "textures": "mineralogy:blocks/marble",
     "blocks": {
       "full": {
+        "id": "mineralogy:marble"
+      },
+      "slab": {
+        "id": "mineralogy:marble_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:marble",
         "meta": 0
       },
@@ -319,7 +500,8 @@
         "id": "mineralogy:marble_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/marble"
   },
   {
     "id": "mineralogy:novaculite",
@@ -335,6 +517,18 @@
     "textures": "mineralogy:blocks/novaculite",
     "blocks": {
       "full": {
+        "id": "mineralogy:novaculite"
+      },
+      "slab": {
+        "id": "mineralogy:novaculite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:novaculite",
         "meta": 0
       },
@@ -342,7 +536,8 @@
         "id": "mineralogy:novaculite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/novaculite"
   },
   {
     "id": "mineralogy:pegmatite",
@@ -358,6 +553,18 @@
     "textures": "mineralogy:blocks/pegmatite",
     "blocks": {
       "full": {
+        "id": "mineralogy:pegmatite"
+      },
+      "slab": {
+        "id": "mineralogy:pegmatite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:pegmatite",
         "meta": 0
       },
@@ -365,7 +572,8 @@
         "id": "mineralogy:pegmatite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/pegmatite"
   },
   {
     "id": "mineralogy:peridotite",
@@ -381,6 +589,18 @@
     "textures": "mineralogy:blocks/peridotite",
     "blocks": {
       "full": {
+        "id": "mineralogy:peridotite"
+      },
+      "slab": {
+        "id": "mineralogy:peridotite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:peridotite",
         "meta": 0
       },
@@ -388,7 +608,8 @@
         "id": "mineralogy:peridotite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/peridotite"
   },
   {
     "id": "mineralogy:phyllite",
@@ -404,6 +625,18 @@
     "textures": "mineralogy:blocks/phyllite",
     "blocks": {
       "full": {
+        "id": "mineralogy:phyllite"
+      },
+      "slab": {
+        "id": "mineralogy:phyllite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:phyllite",
         "meta": 0
       },
@@ -411,7 +644,8 @@
         "id": "mineralogy:phyllite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/phyllite"
   },
   {
     "id": "mineralogy:quartzite",
@@ -427,6 +661,18 @@
     "textures": "mineralogy:blocks/quartzite",
     "blocks": {
       "full": {
+        "id": "mineralogy:quartzite"
+      },
+      "slab": {
+        "id": "mineralogy:quartzite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:quartzite",
         "meta": 0
       },
@@ -434,7 +680,8 @@
         "id": "mineralogy:quartzite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/quartzite"
   },
   {
     "id": "mineralogy:rhyolite",
@@ -450,6 +697,18 @@
     "textures": "mineralogy:blocks/rhyolite",
     "blocks": {
       "full": {
+        "id": "mineralogy:rhyolite"
+      },
+      "slab": {
+        "id": "mineralogy:rhyolite_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:rhyolite",
         "meta": 0
       },
@@ -457,7 +716,8 @@
         "id": "mineralogy:rhyolite_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/rhyolite"
   },
   {
     "id": "mineralogy:rock_salt",
@@ -473,6 +733,18 @@
     "textures": "mineralogy:blocks/rock_salt",
     "blocks": {
       "full": {
+        "id": "mineralogy:rock_salt"
+      },
+      "slab": {
+        "id": "mineralogy:rock_salt_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:rock_salt",
         "meta": 0
       },
@@ -480,7 +752,8 @@
         "id": "mineralogy:rock_salt_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/rock_salt"
   },
   {
     "id": "mineralogy:schist",
@@ -496,6 +769,18 @@
     "textures": "mineralogy:blocks/schist",
     "blocks": {
       "full": {
+        "id": "mineralogy:schist"
+      },
+      "slab": {
+        "id": "mineralogy:schist_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:schist",
         "meta": 0
       },
@@ -503,7 +788,8 @@
         "id": "mineralogy:schist_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/schist"
   },
   {
     "id": "mineralogy:scoria",
@@ -519,6 +805,18 @@
     "textures": "mineralogy:blocks/scoria",
     "blocks": {
       "full": {
+        "id": "mineralogy:scoria"
+      },
+      "slab": {
+        "id": "mineralogy:scoria_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:scoria",
         "meta": 0
       },
@@ -526,7 +824,8 @@
         "id": "mineralogy:scoria_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/scoria"
   },
   {
     "id": "mineralogy:shale",
@@ -542,6 +841,18 @@
     "textures": "mineralogy:blocks/shale",
     "blocks": {
       "full": {
+        "id": "mineralogy:shale"
+      },
+      "slab": {
+        "id": "mineralogy:shale_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:shale",
         "meta": 0
       },
@@ -549,7 +860,8 @@
         "id": "mineralogy:shale_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/shale"
   },
   {
     "id": "mineralogy:siltstone",
@@ -565,6 +877,18 @@
     "textures": "mineralogy:blocks/siltstone",
     "blocks": {
       "full": {
+        "id": "mineralogy:siltstone"
+      },
+      "slab": {
+        "id": "mineralogy:siltstone_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:siltstone",
         "meta": 0
       },
@@ -572,7 +896,8 @@
         "id": "mineralogy:siltstone_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/siltstone"
   },
   {
     "id": "mineralogy:slate",
@@ -588,6 +913,18 @@
     "textures": "mineralogy:blocks/slate",
     "blocks": {
       "full": {
+        "id": "mineralogy:slate"
+      },
+      "slab": {
+        "id": "mineralogy:slate_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:slate",
         "meta": 0
       },
@@ -595,7 +932,8 @@
         "id": "mineralogy:slate_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/slate"
   },
   {
     "id": "mineralogy:tuff",
@@ -611,6 +949,18 @@
     "textures": "mineralogy:blocks/tuff",
     "blocks": {
       "full": {
+        "id": "mineralogy:tuff"
+      },
+      "slab": {
+        "id": "mineralogy:tuff_slab",
+        "properties": {
+          "facing": "up"
+        },
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": {
         "id": "mineralogy:tuff",
         "meta": 0
       },
@@ -618,6 +968,7 @@
         "id": "mineralogy:tuff_slab",
         "meta": 1
       }
-    }
+    },
+    "legacy_textures": "mineralogy:blocks/tuff"
   }
 ]

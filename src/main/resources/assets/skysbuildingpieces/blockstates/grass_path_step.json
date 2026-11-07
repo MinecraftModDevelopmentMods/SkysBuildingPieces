@@ -1,0 +1,148 @@
+{
+  "variants": {
+    "lowered_support=false,orientation=top_north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_0"
+    },
+    "lowered_support=false,orientation=top_north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_0"
+    },
+    "lowered_support=false,orientation=top_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_1"
+    },
+    "lowered_support=false,orientation=top_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_1"
+    },
+    "lowered_support=false,orientation=top_south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_2"
+    },
+    "lowered_support=false,orientation=top_south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_2"
+    },
+    "lowered_support=false,orientation=top_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_3"
+    },
+    "lowered_support=false,orientation=top_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_3"
+    },
+    "lowered_support=false,orientation=bottom_north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_4"
+    },
+    "lowered_support=false,orientation=bottom_north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_4"
+    },
+    "lowered_support=false,orientation=bottom_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_5"
+    },
+    "lowered_support=false,orientation=bottom_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_5"
+    },
+    "lowered_support=false,orientation=bottom_south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_6"
+    },
+    "lowered_support=false,orientation=bottom_south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_6"
+    },
+    "lowered_support=false,orientation=bottom_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_7"
+    },
+    "lowered_support=false,orientation=bottom_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_7"
+    },
+    "lowered_support=false,orientation=north_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_8"
+    },
+    "lowered_support=false,orientation=north_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_8"
+    },
+    "lowered_support=false,orientation=north_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_9"
+    },
+    "lowered_support=false,orientation=north_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_9"
+    },
+    "lowered_support=false,orientation=south_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_10"
+    },
+    "lowered_support=false,orientation=south_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_10"
+    },
+    "lowered_support=false,orientation=south_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_11"
+    },
+    "lowered_support=false,orientation=south_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_11"
+    },
+    "lowered_support=true,orientation=top_north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_0_lowered"
+    },
+    "lowered_support=true,orientation=top_north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_0_lowered"
+    },
+    "lowered_support=true,orientation=top_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_1_lowered"
+    },
+    "lowered_support=true,orientation=top_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_1_lowered"
+    },
+    "lowered_support=true,orientation=top_south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_2_lowered"
+    },
+    "lowered_support=true,orientation=top_south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_2_lowered"
+    },
+    "lowered_support=true,orientation=top_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_3_lowered"
+    },
+    "lowered_support=true,orientation=top_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_3_lowered"
+    },
+    "lowered_support=true,orientation=bottom_north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_4_lowered"
+    },
+    "lowered_support=true,orientation=bottom_north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_4_lowered"
+    },
+    "lowered_support=true,orientation=bottom_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_5_lowered"
+    },
+    "lowered_support=true,orientation=bottom_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_5_lowered"
+    },
+    "lowered_support=true,orientation=bottom_south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_6_lowered"
+    },
+    "lowered_support=true,orientation=bottom_south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_6_lowered"
+    },
+    "lowered_support=true,orientation=bottom_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_7_lowered"
+    },
+    "lowered_support=true,orientation=bottom_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_7_lowered"
+    },
+    "lowered_support=true,orientation=north_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_8_lowered"
+    },
+    "lowered_support=true,orientation=north_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_8_lowered"
+    },
+    "lowered_support=true,orientation=north_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_9_lowered"
+    },
+    "lowered_support=true,orientation=north_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_9_lowered"
+    },
+    "lowered_support=true,orientation=south_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_10_lowered"
+    },
+    "lowered_support=true,orientation=south_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_10_lowered"
+    },
+    "lowered_support=true,orientation=south_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/grass_path_step_11_lowered"
+    },
+    "lowered_support=true,orientation=south_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/grass_path_step_11_lowered"
+    }
+  }
+}

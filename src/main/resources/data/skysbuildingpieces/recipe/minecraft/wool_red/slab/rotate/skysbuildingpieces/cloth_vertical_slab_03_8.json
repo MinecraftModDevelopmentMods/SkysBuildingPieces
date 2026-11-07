@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_red_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_red_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:wool_red_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:wool_red_vertical_slab"
+    }
+  ]
+}

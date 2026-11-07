@@ -4,57 +4,67 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 
 /** Checks every ingredient picture the recipe book can cycle through. */
 final class RecipePreviewModels {
-    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList(
-            "skysbuildingpieces", "skysbuildingpiecesbop", "skysgrassslabs",
-            "skysterrainsmoother", "skysterrainsmootherbop"));
+    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
+            "skysgrassslabs", "skysterrainsmoother", "skysterrainsmootherbop"));
 
     static void check(Minecraft minecraft) {
         int recipes = 0;
         int previews = 0;
-        for (IRecipe recipe : CraftingManager.REGISTRY) {
-            ResourceLocation id = recipe.getRegistryName();
-            if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isDynamic()) {
+
+        for (RecipeHolder<?> holder : minecraft.getConnection().getRecipeManager().getRecipes()) {
+            ResourceLocation id = holder.id();
+            Recipe<?> recipe = holder.value();
+
+            if (id == null || !OWNERS.contains(id.getNamespace()) || recipe.isSpecial()) {
                 continue;
             }
             for (Ingredient ingredient : recipe.getIngredients()) {
-                for (ItemStack preview : ingredient.getMatchingStacks()) {
+                for (ItemStack preview : ingredient.getItems()) {
                     checkModel(minecraft, preview, id);
                     previews++;
                 }
             }
-            checkModel(minecraft, recipe.getRecipeOutput(), id);
+
+            checkModel(minecraft, recipe.getResultItem(net.minecraft.core.RegistryAccess.EMPTY), id);
             previews++;
             recipes++;
         }
-        System.out.println("SKY_RECIPE_PREVIEW_MODELS_PASS recipes=" + recipes + " previews=" + previews);
+        if (recipes < 1000) {
+            throw new AssertionError("Client did not receive the complete native recipe catalogue: " + recipes);
+        }
+
+        org.apache.logging.log4j.LogManager.getLogger().info("SKY_RECIPE_PREVIEW_MODELS_PASS recipes=" + recipes + " previews=" + previews);
     }
 
     private static void checkModel(Minecraft minecraft, ItemStack stack, ResourceLocation recipe) {
         if (stack.isEmpty()) {
             throw new AssertionError("Empty recipe preview: " + recipe);
         }
-        String label = recipe + " -> " + stack.getItem().getRegistryName() + ":" + stack.getMetadata();
-        IBakedModel model = minecraft.getRenderItem().getItemModelWithOverrides(stack, null, null);
-        IBakedModel missing = minecraft.getBlockRendererDispatcher().getBlockModelShapes()
-                .getModelManager().getMissingModel();
-        if (model == missing || model.getParticleTexture().getIconName().contains("missingno")) {
+
+        String label = recipe + " -> " + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+        BakedModel model = minecraft.getItemRenderer().getModel(stack, null, null, 0);
+        BakedModel missing = minecraft.getBlockRenderer().getBlockModelShaper().getModelManager()
+                .getMissingModel();
+
+        if (model == missing || model.getParticleIcon().contents().name().toString().contains("missingno")) {
             throw new AssertionError("Missing recipe preview model: " + label);
         }
-        for (EnumFacing face : new EnumFacing[] {null, EnumFacing.DOWN, EnumFacing.UP,
-                EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST}) {
-            for (BakedQuad quad : model.getQuads(null, face, 0)) {
-                if (quad.getSprite().getIconName().contains("missingno")) {
+        for (Direction face : new Direction[] { null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
+                Direction.WEST, Direction.EAST }) {
+            for (BakedQuad quad : model.getQuads(null, face, net.minecraft.util.RandomSource.create(0))) {
+                if (quad.getSprite().contents().name().toString().contains("missingno")) {
                     throw new AssertionError("Missing recipe preview texture: " + label);
                 }
             }

@@ -1,0 +1,8 @@
+modLoader="javafml"
+loaderVersion="[3,)"
+license="LGPL-2.1-only"
+[[mods]]
+modId="optionalmodcontrol"
+version="1.0"
+displayName="Optional Mod Startup Control"
+description="Build-only dependency diagnosis without Sky content."

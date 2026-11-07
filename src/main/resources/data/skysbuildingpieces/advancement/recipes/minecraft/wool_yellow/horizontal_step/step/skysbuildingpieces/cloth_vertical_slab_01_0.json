@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:wool_yellow_vertical_slab"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/wool_yellow/horizontal_step/step/skysbuildingpieces/cloth_vertical_slab_01_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/wool_yellow/horizontal_step/step/skysbuildingpieces/cloth_vertical_slab_01_0"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:wool_yellow_horizontal_step"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:wool_yellow_vertical_slab"
+    }
+  ]
+}

@@ -1,1 +1,52 @@
-{"variants":{"meta=0":{"model":"skysbuildingpieces:diamond_block_slab_0"},"meta=1":{"model":"skysbuildingpieces:diamond_block_slab_1"},"meta=2":{"model":"skysbuildingpieces:emerald_block_slab_0"},"meta=3":{"model":"skysbuildingpieces:emerald_block_slab_1"},"meta=4":{"model":"skysbuildingpieces:gold_block_slab_0"},"meta=5":{"model":"skysbuildingpieces:gold_block_slab_1"},"meta=6":{"model":"skysbuildingpieces:iron_block_slab_0"},"meta=7":{"model":"skysbuildingpieces:iron_block_slab_1"},"meta=8":{"model":"skysbuildingpieces:diamond_block_slab_0"},"meta=9":{"model":"skysbuildingpieces:diamond_block_slab_1"},"meta=10":{"model":"skysbuildingpieces:diamond_block_slab_0"},"meta=11":{"model":"skysbuildingpieces:diamond_block_slab_1"},"meta=12":{"model":"skysbuildingpieces:diamond_block_slab_0"},"meta=13":{"model":"skysbuildingpieces:diamond_block_slab_1"},"meta=14":{"model":"skysbuildingpieces:diamond_block_slab_0"},"meta=15":{"model":"skysbuildingpieces:diamond_block_slab_1"}}}
+{
+  "variants": {
+    "meta=0,waterlogged=false": {
+      "model": "skysbuildingpieces:block/diamond_block_slab_0"
+    },
+    "meta=0,waterlogged=true": {
+      "model": "skysbuildingpieces:block/diamond_block_slab_0"
+    },
+    "meta=1,waterlogged=false": {
+      "model": "skysbuildingpieces:block/diamond_block_slab_1"
+    },
+    "meta=1,waterlogged=true": {
+      "model": "skysbuildingpieces:block/diamond_block_slab_1"
+    },
+    "meta=2,waterlogged=false": {
+      "model": "skysbuildingpieces:block/emerald_block_slab_0"
+    },
+    "meta=2,waterlogged=true": {
+      "model": "skysbuildingpieces:block/emerald_block_slab_0"
+    },
+    "meta=3,waterlogged=false": {
+      "model": "skysbuildingpieces:block/emerald_block_slab_1"
+    },
+    "meta=3,waterlogged=true": {
+      "model": "skysbuildingpieces:block/emerald_block_slab_1"
+    },
+    "meta=4,waterlogged=false": {
+      "model": "skysbuildingpieces:block/gold_block_slab_0"
+    },
+    "meta=4,waterlogged=true": {
+      "model": "skysbuildingpieces:block/gold_block_slab_0"
+    },
+    "meta=5,waterlogged=false": {
+      "model": "skysbuildingpieces:block/gold_block_slab_1"
+    },
+    "meta=5,waterlogged=true": {
+      "model": "skysbuildingpieces:block/gold_block_slab_1"
+    },
+    "meta=6,waterlogged=false": {
+      "model": "skysbuildingpieces:block/iron_block_slab_0"
+    },
+    "meta=6,waterlogged=true": {
+      "model": "skysbuildingpieces:block/iron_block_slab_0"
+    },
+    "meta=7,waterlogged=false": {
+      "model": "skysbuildingpieces:block/iron_block_slab_1"
+    },
+    "meta=7,waterlogged=true": {
+      "model": "skysbuildingpieces:block/iron_block_slab_1"
+    }
+  }
+}

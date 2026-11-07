@@ -1,7 +1,10 @@
 # Configuration
 
-Forge creates `config/skysbuildingpieces.cfg`. Stop the game or server before
-editing it, then restart.
+Open **Mods → Sky's Building Pieces → Config** to edit settings in the game.
+NeoForge also saves them in `config/skysbuildingpieces-common.toml`. On a
+dedicated server, stop the server before editing the file and restart when
+you are done. An existing CFG setting is copied on the first run and the
+original file is kept.
 
 `compat.forceReplaceBuildingBricksPieces=false`
 
@@ -14,18 +17,16 @@ Turning the option off stops further replacements, not previous conversions.
 This mod has no world generation setting. It does not change Sky's Grass Slabs
 configuration, generation or migration progress.
 
-## Block-ID budget for modpacks
+## Slab placement
 
-Without Mineralogy, Building Pieces uses 238 block IDs: 237 building blocks and one hidden recovery
-holder. Materials share fixed metadata palettes so they don't each need a
-separate block ID for every shape and orientation. Saved palette assignments
-do not change between installations.
+**Gameplay → Directional slab placement** is on by default
+(`gameplay.directionalSlabPlacement=true`).
 
-The matching Biomes O Plenty add-on uses another 74 IDs, for 312 combined.
-Mineralogy support adds 35 IDs only when Mineralogy is installed, for 273 core
-IDs in that setup. The vanilla catalogue still uses 238 IDs. The optional rock
-catalogue has its own fixed 35-ID budget; it does not change existing palettes.
-These totals exclude blocks already registered by Minecraft, Biomes O Plenty
-and Mineralogy.
-With both Mineralogy and the BOP add-on installed, the combined Sky pieces use
-347 IDs (238+35+74).
+Click near a face edge to place a slab vertically. Turn the setting off to
+place supported regular slabs using Minecraft's horizontal slab
+rules. Dedicated vertical pieces still place vertically. The setting changes
+hand placement only. Existing blocks and Terrain Smoother generation keep
+their shapes.
+
+Close and reopen the world after changing slab placement. In multiplayer,
+match the server's setting on each client.

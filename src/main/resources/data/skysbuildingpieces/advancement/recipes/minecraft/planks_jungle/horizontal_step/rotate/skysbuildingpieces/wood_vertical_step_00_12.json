@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:planks_jungle_vertical_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/planks_jungle/horizontal_step/rotate/skysbuildingpieces/wood_vertical_step_00_12"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/planks_jungle/horizontal_step/rotate/skysbuildingpieces/wood_vertical_step_00_12"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:planks_jungle_horizontal_step"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:planks_jungle_vertical_step"
+    }
+  ]
+}

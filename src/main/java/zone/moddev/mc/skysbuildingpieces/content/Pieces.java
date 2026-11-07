@@ -1,214 +1,334 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import com.google.gson.*;
-import java.util.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
-import zone.moddev.mc.skysbuildingpieces.catalogue.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
+/** Registers individual pieces and keeps the old palette identities for recovery. */
 public final class Pieces {
-    public static final Map<String, PieceBlock> BLOCKS = new LinkedHashMap<String, PieceBlock>();
-    // Earlier betas may have saved these IDs. They are hidden, cannot be made, and have no cutting behaviour; a
-    // one-item recipe recycles them to paper.
-    public static final Map<String, Item> RETIRED_TEMPLATES = new LinkedHashMap<String, Item>();
-    // The compact catalogue is used only by the migration test fixture.
-    public static final boolean COMPACT = false;
+    public static final Map<String, PieceBlock> BLOCKS = new LinkedHashMap<>();
+    private static final Map<PieceKey, PieceBlock> PLAYABLE_BLOCKS = new LinkedHashMap<>();
+    public static final Map<String, Item> RETIRED_TEMPLATES = new LinkedHashMap<>();
+    private static final Map<String, PieceItem> ITEMS = new LinkedHashMap<>();
+    private static final Map<Block, java.util.function.Function<BlockState, Item>> STATE_ITEMS = new java.util.concurrent.ConcurrentHashMap<>();
     public static boolean initialized;
 
-    public static void register() {
-        Catalogue.INSTANCE.modules.get("vanilla");
-        initialized = true;
-
-        for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
-            Item item = new Item().setMaxStackSize(1).setTranslationKey("skysbuildingpieces.template_" + name)
-                    .setRegistryName("skysbuildingpieces", "template_" + name);
-
-            RETIRED_TEMPLATES.put(name, item);
-        }
+    private Pieces() {
     }
 
-    public static void registerBlocks(IForgeRegistry<Block> registry) {
+    private record PieceKey(String material, Shape shape) {
+    }
+
+    public static Collection<PieceBlock> playableBlocks() {
+        return java.util.Collections.unmodifiableCollection(PLAYABLE_BLOCKS.values());
+    }
+
+    public static Collection<PieceBlock> registeredBlocks() {
+        var blocks = new ArrayList<>(BLOCKS.values());
+        blocks.addAll(PLAYABLE_BLOCKS.values());
+        return blocks;
+    }
+
+    public static PieceItem pieceItem(String identifier) {
+        return ITEMS.get(identifier);
+    }
+
+    public static void register() {
+        initialized = true;
+    }
+
+    public static void registerBlocks(Registry<Block> registry) {
+        registerNamespaceBlocks(SkysBuildingPieces.ID, registry);
+    }
+
+    /** Called on the contributor's own mod bus, keeping registry ownership correct. */
+    public static void registerNamespaceBlocks(String namespace, Registry<Block> registry) {
         Catalogue.INSTANCE.freeze();
 
-        for (Catalogue.Module module : Catalogue.INSTANCE.modules.values()) {
-            registerForOwner(module.namespace, () -> registerModule(module, registry));
-        }
-    }
-
-    public static void registerItems(IForgeRegistry<Item> registry) {
-        for (PieceBlock block : BLOCKS.values()) {
-            registerForOwner(block.getRegistryName().getNamespace(),
-                    () -> registry.register(new PieceItem(block).setRegistryName(block.getRegistryName())));
-        }
-        for (Item item : RETIRED_TEMPLATES.values()) {
-            registry.register(item);
-        }
-    }
-
-    /**
-     * Registry events reach the core, but the contributor owns its palette IDs.
-     * Restore the previous context even if registration fails.
-     */
-    private static void registerForOwner(String namespace, Runnable registration) {
-        net.minecraftforge.fml.common.Loader loader = net.minecraftforge.fml.common.Loader.instance();
-        net.minecraftforge.fml.common.ModContainer previous = loader.activeModContainer();
-        net.minecraftforge.fml.common.ModContainer owner = loader.getIndexedModList().get(namespace);
-        if (owner == null) {
-            throw new IllegalStateException("No loaded mod owns the piece namespace " + namespace);
-        }
-        try {
-            loader.setActiveModContainer(owner);
-            registration.run();
-        } finally {
-            loader.setActiveModContainer(previous);
-        }
-    }
-
-    private static void registerModule(Catalogue.Module module, IForgeRegistry<Block> registry) {
-        for (Catalogue.MaterialDef definition : module.materials.values()) {
-            nativeState(definition, "full");
-        }
-        for (Catalogue.Palette palette : module.palettes) {
-            if (COMPACT && !(palette.materials.contains("minecraft:grass")
-                    || palette.materials.contains("minecraft:dirt") || palette.materials.contains("minecraft:glass")
-                    || palette.materials.contains("minecraft:stone"))) {
+        for (Catalogue.Palette palette : Catalogue.INSTANCE.palettes) {
+            if (!palette.namespace.equals(namespace)) {
                 continue;
             }
 
             PieceBlock block = new PieceBlock(palette);
 
-            registry.register(block);
+            Registry.register(registry, ResourceLocation.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
 
-            if (palette.group.equals("wood")) {
-                net.minecraft.init.Blocks.FIRE.setFireInfo(block, 5, 20);
-            }
-            if (palette.group.equals("cloth")) {
-                net.minecraft.init.Blocks.FIRE.setFireInfo(block, 30, 60);
+            for (String material : palette.materials) {
+                ResourceLocation id = ResourceLocation.parse(PaletteItemIds.itemId(palette, material));
+                PieceBlock piece = new PieceBlock(palette.forMaterial(id.getPath(), material), false);
+                Registry.register(registry, id, piece);
+                PLAYABLE_BLOCKS.put(new PieceKey(material, palette.shape), piece);
             }
         }
     }
 
-    public static IBlockState nativeState(Catalogue.MaterialDef material, String shape) {
-        if (material.id.equals("minecraft:grass_path") && shape.equals("slab")) {
-            // Path slabs remain owned by Grass Slabs, which is optional here.
-            Block pathSlab = Block.REGISTRY.getObject(new ResourceLocation("skysgrassslabs", "path_slab"));
-            return pathSlab == null || pathSlab == net.minecraft.init.Blocks.AIR ? null : pathSlab.getDefaultState();
+    public static void registerItems(Registry<Item> registry) {
+        registerNamespaceItems(SkysBuildingPieces.ID, registry);
+        // Retain old item identities, creating their intrusive holders only
+        // while Forge has opened the item registry.
+        for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
+            Item item = new Item(new Item.Properties().stacksTo(1));
+            RETIRED_TEMPLATES.put(name, item);
+            Registry.register(registry, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name), item);
         }
+    }
+
+    public static void registerNamespaceItems(String namespace, Registry<Item> registry) {
+        for (PieceBlock block : BLOCKS.values()) {
+            if (!block.palette.namespace.equals(namespace)) {
+                continue;
+            }
+
+            // Keep the old item identity available for mixed and unopened saves. Normal drops, recipes and creative
+            // entries use the flat items below.
+            Item carrier = new Item(new Item.Properties());
+
+            Registry.register(registry, ResourceLocation.parse(block.palette.registryId()), carrier);
+
+            for (String material : block.palette.materials) {
+                String identifier = PaletteItemIds.itemId(block.palette, material);
+
+                if (ITEMS.containsKey(identifier)) {
+                    throw new IllegalStateException("Duplicate piece item: " + identifier);
+                }
+
+                PieceItem item = new PieceItem(PLAYABLE_BLOCKS.get(new PieceKey(material, block.palette.shape)), material);
+
+                Registry.register(registry, ResourceLocation.parse(identifier), item);
+                ITEMS.put(identifier, item);
+            }
+        }
+    }
+
+    public static void validateMaterials() {
+        for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
+            nativeState(material, "full");
+        }
+    }
+
+    /** Flat inventory identities for native full blocks that retain a saved palette. */
+    public static synchronized void registerStateItems(Block block,
+            java.util.function.Function<BlockState, Item> items) {
+        if (zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge.ready || block == null || items == null
+                || STATE_ITEMS.containsKey(block)) {
+            throw new IllegalStateException("Invalid, duplicate or late state-item lookup");
+        }
+
+        STATE_ITEMS.put(block, items);
+    }
+
+    public static BlockState nativeState(Catalogue.MaterialDef material, String shape) {
+        if (material.replacement() != null) {
+            material = Catalogue.INSTANCE.materials.get(Catalogue.INSTANCE.resolveReplacement(material.id));
+        }
+
         JsonElement value = material.block(shape);
 
-        if (value == null) {
-            return null;
-        }
-
-        return nativeState(value);
+        return value == null ? null : nativeState(value);
     }
 
-    private static IBlockState nativeState(JsonElement value) {
-        String registryId = value.isJsonPrimitive() ? value.getAsString()
-                : value.getAsJsonObject().get("id").getAsString();
-        int meta = value.isJsonObject() && value.getAsJsonObject().has("meta")
-                ? value.getAsJsonObject().get("meta").getAsInt()
-                : 0;
-        Block block = Block.REGISTRY.getObject(new ResourceLocation(registryId));
+    private static BlockState nativeState(JsonElement value) {
+        JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
+        String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
+        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(identifier));
 
-        if (block == null || block instanceof net.minecraft.block.BlockAir) {
-            // An add-on may name a specific replacement for a retired material. Missing materials without an explicit
-            // fallback still stop loading.
-            if (value.isJsonObject() && value.getAsJsonObject().has("fallback")) {
-                return nativeState(value.getAsJsonObject().get("fallback"));
+        if (block == null || block == Blocks.AIR) {
+            if (definition != null && definition.has("fallback")) {
+                return nativeState(definition.get("fallback"));
+            }
+            if (definition != null && definition.has("optional") && definition.get("optional").getAsBoolean()) {
+                return null;
             }
 
-            throw new IllegalStateException("Missing native material " + registryId);
+            throw new IllegalStateException("Missing native building material: " + identifier);
         }
 
-        return block.getStateFromMeta(meta);
+        BlockState result = block.defaultBlockState();
+
+        if (definition != null && definition.has("properties")) {
+            for (Map.Entry<String, JsonElement> entry : definition.getAsJsonObject("properties").entrySet()) {
+                Property<?> property = block.getStateDefinition().getProperty(entry.getKey());
+
+                if (property == null) {
+                    throw new IllegalStateException("Unknown property " + entry.getKey() + " on " + identifier);
+                }
+
+                result = withProperty(result, property, entry.getValue().getAsString());
+            }
+        }
+
+        return result;
     }
 
-    public static IBlockState state(String material, Shape shape, int orientation) {
+    private static <T extends Comparable<T>> BlockState withProperty(BlockState state, Property<T> property,
+            String value) {
+        T parsed = property.getValue(value).orElseThrow(
+                () -> new IllegalStateException("Invalid " + property.getName() + "=" + value + " on " + state));
+
+        return state.setValue(property, parsed);
+    }
+
+    public static BlockState state(String material, Shape shape, int orientation) {
+        material = Catalogue.INSTANCE.resolveReplacement(material);
+
         if (shape == Shape.STEP) {
             shape = orientation >= 8 ? Shape.VERTICAL_STEP : Shape.HORIZONTAL_STEP;
             orientation = orientation >= 8 ? orientation & 3 : orientation;
         }
 
-        Catalogue.MaterialDef materialDefinition = Catalogue.INSTANCE.materials.get(material);
+        Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
 
-        if (materialDefinition == null || !Catalogue.supportsShape(materialDefinition, shape)) {
+        if (definition == null) {
             return null;
         }
+        if (shape == Shape.VERTICAL_SLAB) {
+            BlockState horizontal = nativeState(definition, "slab");
+            BlockState vertical = horizontal == null ? null : NativeSlabState.vertical(horizontal, orientation);
 
-        IBlockState nativeState = nativeState(materialDefinition, shape.name().toLowerCase(Locale.ROOT));
+            if (vertical != null) {
+                return vertical;
+            }
+        }
 
-        if (nativeState != null) {
+        BlockState nativePiece = nativeState(definition, shape.name().toLowerCase(Locale.ROOT));
+
+        if (nativePiece != null) {
             if (shape == Shape.SLAB) {
-                return NativeSlabState.orient(nativeState, orientation);
+                return NativeSlabState.orient(nativePiece, orientation);
             }
             if (shape == Shape.STAIRS) {
-                return nativeState.getBlock().getStateFromMeta(orientation & 7);
+                Direction facing = new Direction[] { Direction.EAST, Direction.WEST, Direction.SOUTH,
+                        Direction.NORTH }[orientation & 3];
+
+                return nativePiece.setValue(StairBlock.FACING, facing)
+                        .setValue(StairBlock.HALF, orientation < 4 ? Half.BOTTOM : Half.TOP)
+                        .setValue(StairBlock.SHAPE, StairsShape.STRAIGHT);
             }
 
-            return nativeState;
+            return nativePiece;
         }
-        for (PieceBlock block : BLOCKS.values()) {
-            Shape stored = block.palette.shape;
-            int mapped = orientation;
+        if (!Catalogue.supportsShape(definition, shape)) {
+            return null;
+        }
+        PieceBlock block = PLAYABLE_BLOCKS.get(new PieceKey(material, shape));
+        if (block == null && (shape == Shape.HORIZONTAL_STEP || shape == Shape.VERTICAL_STEP)) {
+            block = PLAYABLE_BLOCKS.get(new PieceKey(material, Shape.STEP));
+            if (shape == Shape.VERTICAL_STEP) {
+                orientation += 8;
+            }
+        }
 
-            if (stored == Shape.STEP && (shape == Shape.HORIZONTAL_STEP || shape == Shape.VERTICAL_STEP)) {
-                mapped = (shape == Shape.VERTICAL_STEP ? 8 : 0) + orientation;
-            } else if (stored != shape) {
+        return block == null ? null : block.getStateFromMeta(orientation);
+    }
+
+    /** Recover retired materials and newly native equivalents without changing the saved geometry. */
+    public static BlockState canonicalState(BlockState state) {
+        if (!(state.getBlock() instanceof PieceBlock)) {
+            return state;
+        }
+
+        PieceBlock source = (PieceBlock) state.getBlock();
+        Catalogue.MaterialDef material = source.definition(state);
+
+        if (!source.isLegacyPalette() && material.replacement() == null
+                && material.block(source.palette.shape.name().toLowerCase(Locale.ROOT)) == null) {
+            return state;
+        }
+
+        int orientation = source.orientation(state);
+        BlockState result = state(material.id, source.palette.shape, orientation);
+
+        if (result == null || result.hasBlockEntity()) {
+            throw new IllegalStateException("No safe replacement geometry for " + material.id);
+        }
+        for (Map.Entry<Property<?>, Comparable<?>> property : state.getValues().entrySet()) {
+            if (property.getKey().getName().equals("meta") || property.getKey().getName().equals("orientation")) {
                 continue;
             }
-            if (block.palette.materials.contains(material)) {
-                return block.getStateFromMeta(block.palette.meta(material, mapped));
+
+            Property<?> target = result.getBlock().getStateDefinition().getProperty(property.getKey().getName());
+
+            if (target != null) {
+                result = withProperty(result, target, property.getValue().toString().toLowerCase(Locale.ROOT));
+            } else if (property.getKey().getName().equals("waterlogged") && Boolean.TRUE.equals(property.getValue())) {
+                throw new IllegalStateException("Material replacement would lose water: " + material.id);
             }
         }
 
-        return null;
+        return result;
     }
 
-    static ItemStack slabDrop(String material, IBlockState fallback) {
-        IBlockState horizontal = state(material, Shape.SLAB, 1);
+    static ItemStack slabDrop(String material, BlockState fallback) {
+        BlockState horizontal = state(material, Shape.SLAB, 1);
 
-        if (horizontal != null) {
-            return stack(horizontal, 1);
-        }
-        if (material.equals("minecraft:dirt")) {
-            Item dirt = Item.getByNameOrId("skysgrassslabs:dirt_slab");
-
-            if (dirt != null) {
-                return new ItemStack(dirt, 1, 0);
-            }
-        }
-
-        return stack(fallback, 1);
+        return stack(horizontal == null ? fallback : horizontal, 1);
     }
 
-    public static ItemStack stack(IBlockState state, int count) {
+    public static ItemStack stack(BlockState state, int count) {
         if (state == null) {
             return null;
         }
 
-        Block block = state.getBlock();
-        // A material identity is not its ordinary breaking drop: vanilla podzol, for example, drops dirt but its
-        // crafting input is podzol.
-        int meta = block instanceof PieceBlock ? ((PieceBlock) block).canonicalMeta(state)
-                : block instanceof net.minecraft.block.BlockStairs ? 0
-                        : block instanceof net.minecraft.block.BlockSlab ? block.damageDropped(state)
-                                : block.getMetaFromState(state);
-        Item item = Item.getItemFromBlock(block);
+        state = canonicalState(state);
 
-        // Facing is a placed state, not an item variant. Mineralogy's six-way
-        // slabs, for example, use one ordinary item regardless of orientation.
-        if (item != null && !item.getHasSubtypes()) {
-            meta = 0;
+        if (state.hasProperty(net.minecraft.world.level.block.SlabBlock.TYPE)
+                && state.getValue(net.minecraft.world.level.block.SlabBlock.TYPE) == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE) {
+            return null; // A native double slab has no distinct full-block inventory item.
         }
 
-        return item == null || item == net.minecraft.init.Items.AIR ? null : new ItemStack(item, count, meta);
+        Item item;
+
+        if (state.getBlock() instanceof PieceBlock) {
+            PieceBlock block = (PieceBlock) state.getBlock();
+
+            item = ITEMS.get(PaletteItemIds.itemId(block.palette, block.definition(state).id));
+        } else {
+            java.util.function.Function<BlockState, Item> lookup = STATE_ITEMS.get(state.getBlock());
+
+            item = lookup == null ? state.getBlock().asItem() : lookup.apply(state);
+        }
+
+        return item == null || item == Items.AIR ? null : new ItemStack(item, count);
     }
 
-    private Pieces() {
+    /** Resolve the old palette item while retaining unrelated stack NBT elsewhere. */
+    public static ItemStack legacyItem(String registryId, int metadata, int count) {
+        if (metadata < 0 || metadata > 15) {
+            throw new IllegalArgumentException("Invalid saved piece metadata: " + registryId + ":" + metadata);
+        }
+        for (PieceBlock block : BLOCKS.values()) {
+            if (BuiltInRegistries.BLOCK.getKey(block).toString().equals(registryId)) {
+                String material = block.palette.material(metadata);
+                Shape shape = block.palette.shape;
+                BlockState canonical = state(material, shape, shape == Shape.SLAB ? 1 : 0);
+
+                return stack(canonical, count);
+            }
+        }
+
+        return null;
     }
 }

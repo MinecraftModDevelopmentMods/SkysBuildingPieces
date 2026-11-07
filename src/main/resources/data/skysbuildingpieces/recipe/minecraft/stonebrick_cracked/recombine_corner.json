@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stonebrick_cracked",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_cracked_corner"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_cracked_horizontal_step",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_cracked_corner"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_cracked_horizontal_step"
+    }
+  ]
+}

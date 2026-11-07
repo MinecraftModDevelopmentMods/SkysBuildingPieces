@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:stained_hardened_clay_silver_vertical_slab"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_silver/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_07_12"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_silver/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_07_12"]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_silver_horizontal_step"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_silver_vertical_slab"
+    }
+  ]
+}

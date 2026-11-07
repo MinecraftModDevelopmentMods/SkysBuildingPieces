@@ -1,54 +1,55 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import java.util.*;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Loader;
-import zone.moddev.mc.skysbuildingpieces.catalogue.*;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.neoforged.fml.ModList;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 
-/** Exact catalogue slab items only; unknown items and legacy-mod placement remain untouched. */
+/** Exact catalogue slab items use the same face-local placement as our own items. */
 public final class NativeSlabPlacement {
     private static NativeSlabPlacement instance;
-    private final Map<Item, Map<Integer, String>> materials = new HashMap<>();
+    private final Map<Item, String> materials = new HashMap<>();
 
     private NativeSlabPlacement() {
         for (Catalogue.MaterialDef definition : Catalogue.INSTANCE.materials.values()) {
+            if (definition.replacement() != null) {
+                continue;
+            }
             if (Pieces.state(definition.id, Shape.VERTICAL_SLAB, 0) == null) {
                 continue;
             }
 
-            IBlockState slab = Pieces.nativeState(definition, "slab");
+            BlockState slab = Pieces.nativeState(definition, "slab");
 
-            if (slab == null) {
+            if (slab == null || NativeSlabState.mask(slab) < 0) {
                 continue;
             }
 
-            ItemStack item = Pieces.stack(slab, 1);
+            ItemStack stack = Pieces.stack(slab, 1);
 
-            if (item == null) {
+            if (stack == null) {
                 continue;
             }
 
-            Map<Integer, String> variants = materials.computeIfAbsent(item.getItem(), key -> new HashMap<>());
-            String previous = variants.put(item.getMetadata(), definition.id);
+            String previous = materials.put(stack.getItem(), definition.id);
 
             if (previous != null && !previous.equals(definition.id)) {
-                throw new IllegalStateException("Conflicting native slab material");
+                throw new IllegalStateException(
+                        "Conflicting native slab materials: " + previous + " and " + definition.id);
             }
-        }
-
-        Item dirt = Item.getByNameOrId("skysgrassslabs:dirt_slab");
-
-        if (dirt != null) {
-            Map<Integer, String> variants = new HashMap<>();
-
-            variants.put(0, "minecraft:dirt");
-            variants.put(1, "minecraft:dirt");
-            materials.put(dirt, variants);
         }
     }
 
@@ -57,32 +58,43 @@ public final class NativeSlabPlacement {
     }
 
     public String material(ItemStack stack) {
-        Map<Integer, String> variants = stack == null ? null : materials.get(stack.getItem());
-
-        return variants == null ? null : variants.get(stack.getMetadata());
+        return stack == null || stack.isEmpty() ? null : materials.get(stack.getItem());
     }
 
-    /** Null leaves the original item-use path intact; otherwise return its exact result. */
-    public static EnumActionResult place(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing face,
+    /** The BlockItem hook supplies the exact hit position from the item-use packet. */
+    public static InteractionResult place(UseOnContext context) {
+        if (context.getPlayer() == null) {
+            return null;
+        }
+
+        BlockPos position = context.getClickedPos();
+        Vec3 hit = context.getClickLocation();
+
+        return place(context.getItemInHand(), context.getPlayer(), context.getLevel(), position, context.getHand(),
+                context.getClickedFace(), (float) (hit.x - position.getX()), (float) (hit.y - position.getY()),
+                (float) (hit.z - position.getZ()));
+    }
+
+    /** Null leaves the original item-use path intact. */
+    public static InteractionResult place(Player player, Level world, BlockPos position, InteractionHand hand, Direction face,
             float hitX, float hitY, float hitZ) {
-        return place(player.getHeldItem(hand), player, world, pos, hand, face, hitX, hitY, hitZ);
+        return place(player.getItemInHand(hand), player, world, position, hand, face, hitX, hitY, hitZ);
     }
 
-    public static EnumActionResult place(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand,
-            EnumFacing face, float hitX, float hitY, float hitZ) {
-        if (instance == null || Loader.isModLoaded("buildingbricks")) {
+    public static InteractionResult place(ItemStack stack, Player player, Level world, BlockPos position,
+            InteractionHand hand, Direction face, float hitX, float hitY, float hitZ) {
+        if (instance == null || !BuildingPiecesConfig.directionalSlabPlacement() || ModList.get().isLoaded("buildingbricks")) {
             return null;
         }
 
         String material = instance.material(stack);
 
-        // Grass Slabs still owns horizontal dirt placement and its lifecycle.
         if ("minecraft:dirt".equals(material)
-                && SlabPlacement.side(face, hitX, hitY, hitZ).getAxis() == EnumFacing.Axis.Y) {
+                && SlabPlacement.side(face, hitX, hitY, hitZ).getAxis() == Direction.Axis.Y) {
             return null;
         }
 
         return material == null ? null
-                : PieceItem.place(stack, player, world, pos, hand, face, hitX, hitY, hitZ, material, Shape.SLAB);
+                : PieceItem.place(stack, player, world, position, hand, face, hitX, hitY, hitZ, material, Shape.SLAB);
     }
 }

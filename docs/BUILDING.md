@@ -1,56 +1,47 @@
 # Building and running the mod
 
-Run Gradle with Java 17. Production code and Minecraft use Java 8; the tested
-toolchain is Temurin 8.0.502+7. Use the included Gradle wrapper.
+This branch uses Minecraft 1.21.1, NeoForge 21.1.247 and Temurin Java 21.0.7+6.
+Use the Gradle 9.2.1 wrapper included in the checkout.
 
 ```text
 gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
-gradlew genEclipseRuns eclipse verifyEclipseProductionClasspath
+gradlew eclipse verifyEclipseConfiguration -Declipse.application=org.eclipse.ui.ide.workbench
 ```
 
-The main jar is in `build/libs`. Sources and Javadocs are separate jars, and
-`build/release/SHA256SUMS` records their checksums. Only the main jar goes into
-a game's mods folder.
+The main jar goes in the game's mods folder. The sources and Javadoc jars in
+`build/libs` are for developers. Check `build/release/SHA256SUMS` to verify any
+of those three jars.
 
-## Eclipse
+## Eclipse and development runs
 
-Import the project through Buildship, using the Gradle wrapper. Regenerate
-the launches after changing dependencies. The generated configuration uses
-processed resources and keeps test code out of ordinary game runs.
+Import the checkout as a Gradle project with Buildship and use the wrapper.
+Keep Buildship and the command line on the same Gradle home so the launcher
+doesn't pick up duplicate copies of its libraries. Gradle generates the
+launches and processes the resources; ordinary game launches exclude test code.
 
-- `runClient` and `runServer` run Building Pieces on its own.
-- `runGrassSlabsClient` and `runGrassSlabsServer` also load the released Grass
-  Slabs jar recorded in `gradle/grass-slabs-release.properties`.
-- `runMineralogyClient` and `runMineralogyServer` use the optional Mineralogy
-  and OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
+- `runClient` and `runServer` start Building Pieces on its own.
+- `runGrassSlabsClient` and `runGrassSlabsServer` add the Grass Slabs build
+  listed in `gradle/grass-slabs-release.properties`.
+- `runMineralogyClient` and `runMineralogyServer` add the NeoForge Mineralogy
+  and OreSpawn builds listed in `gradle/mineralogy-runtime.properties`.
 
-Each profile has its own game folder. Grass Slabs is downloaded from its public
-release, checked against its SHA-256 and mapped to development names. There is
-no sibling source build to prepare. The published Grass Slabs jar remains
-unchanged, and none of its classes are bundled into Building Pieces.
-
-For the Mineralogy profile, supply the jars named in its lock file, or use
-`-PmineralogyRuntimeJar=<jar>` and `-PorespawnRuntimeJar=<jar>` to select matching
-copies. They must pass the recorded checksums.
+Build the matching companion jars before starting an optional profile. You can
+point the profiles at exact jars with `-PgrassSlabsMainJar=<jar>`,
+`-PmineralogyMainJar=<jar>` and `-PoreSpawnMainJar=<jar>`. Each profile checks
+the version and checksum before copying the jars into its own run directory.
+The normal game does not need any of these mods.
 
 ## Runtime checks
 
-`check` runs the unit suite and disposable server checks, both standalone and
-with the released Grass Slabs jar. `integrationGrassSlabsClientProcess` checks
-the combined client models. `integrationMineralogyTest` and
-`integrationMineralogyClientProcess` cover the optional rock pieces when the
-locked native jars are available.
+`preparePackagedRuntimeProbes` builds separate test mods for the client and
+server checks. They cover placement, rendering, the recipe book, saved pieces
+and inventory migration. The probes do not go in a player installation.
 
-Verification worlds live under `build/`. Keep player worlds in the separate
-ordinary game folders or another instance.
+`tools/run_packaged_checks.py` runs the probes with an installed NeoForge
+runtime and exact jar inputs. Use Python 3.11 or later. The harness keeps
+disposable worlds and the logs for both fresh starts and reloads under
+`build`. Never point it at a world you play in.
 
-## Recipe-book resources
-
-The build generates unlock advancements from `src/main/recipe-book/recipes.json`.
-The runtime checks compare those entries with the registered recipes and exercise
-inventory discovery, crafting-table discovery and recipe-book persistence.
-Optional catalogue entries load only when their recipe exists.
-
-Recipe unlocks have no shared advancement parent. Minecraft 1.12 walks that
-visibility tree recursively when loading completed progress, which can overflow
-with a large catalogue. The inventory and crafting unlock criteria are unchanged.
+The test fixture for installed-mod replacement checks the replacement policy.
+It isn't a BuildingBricks port. Historical world fixtures test recovery of
+actual saved pieces before Minecraft loads their chunks and inventories.

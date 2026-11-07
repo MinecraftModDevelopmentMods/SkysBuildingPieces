@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/conglomerate",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:conglomerate_slab"
+    }
+  },
+  "result": {
+    "id": "mineralogy:conglomerate",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:conglomerate"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:conglomerate_slab"
+    }
+  ]
+}

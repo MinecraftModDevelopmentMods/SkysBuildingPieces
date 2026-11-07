@@ -1,101 +1,121 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import java.util.Set;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.bus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Shovel paths use the original footprint, with the exposed top lowered by one pixel. */
+/** Flatten a piece and its exposed grass support in one shovel action. */
 public final class PathPieces {
     @SubscribeEvent
     public void allowShovelUse(PlayerInteractEvent.RightClickBlock event) {
-        if (target(event.getWorld(), event.getPos(), event.getEntityPlayer(), event.getItemStack(), event.getFace()) == null) {
+        if (target(event.getLevel(), event.getPos(), event.getEntity(), event.getItemStack(),
+                event.getFace()) == null) {
+            return;
+        }
+        // Sneaking bypasses block activation. Finish this valid use here so the
+        // shovel acts once, including when a step sits above grass.
+        if (event.getEntity().isShiftKeyDown() && activate(event.getLevel(), event.getPos(), event.getEntity(),
+                event.getItemStack(), event.getFace(), event.getHand())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
             return;
         }
 
-        // Let block activation report SUCCESS, including while sneaking. Cancelling
-        // this event reports PASS in Forge 1.10 and can also try the other hand.
-        event.setUseBlock(Event.Result.ALLOW);
-        event.setUseItem(Event.Result.DENY);
+        event.setUseBlock(TriState.TRUE);
+        event.setUseItem(TriState.FALSE);
     }
 
-    public static boolean activate(World world, BlockPos position, EntityPlayer player,
-            ItemStack shovel, EnumFacing face) {
-        IBlockState path = target(world, position, player, shovel, face);
+    public static boolean activate(Level world, BlockPos position, Player player, ItemStack shovel,
+            Direction face, net.minecraft.world.InteractionHand hand) {
+        BlockState path = target(world, position, player, shovel, face);
+
         if (path == null) {
             return false;
         }
-        if (world.isRemote) {
+        if (world.isClientSide) {
             return true;
         }
+
         boolean grassPiece = GrassLifecycle.grass(world.getBlockState(position));
-        if (!world.setBlockState(position, path, 11)) {
+
+        if (!world.setBlock(position, path, 11)) {
             return false;
         }
-        BlockPos support = position.down();
-        if (grassPiece && world.isBlockLoaded(support)
-                && world.getBlockState(support).getBlock() == Blocks.GRASS
-                && player.canPlayerEdit(support, EnumFacing.UP, shovel)) {
-            // Flatten the exposed grass around the piece in the same shovel action.
-            world.setBlockState(support, Blocks.GRASS_PATH.getDefaultState(), 3);
+
+        BlockPos support = position.below();
+
+        if (grassPiece && world.isLoaded(support) && world.getBlockState(support).getBlock() == Blocks.GRASS_BLOCK
+                && player.mayUseItemAt(support, Direction.UP, shovel)) {
+            world.setBlock(support, Blocks.DIRT_PATH.defaultBlockState(), 3);
         }
-        world.playSound(null, position, SoundEvents.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1, 1);
-        if (!player.capabilities.isCreativeMode) {
-            shovel.damageItem(1, player);
+
+        world.playSound(null, position, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1, 1);
+
+        if (!player.getAbilities().instabuild) {
+            shovel.hurtAndBreak(1, player, net.minecraft.world.entity.LivingEntity.getSlotForHand(hand));
         }
+
         return true;
     }
 
-    private static IBlockState target(World world, BlockPos position, EntityPlayer player,
-            ItemStack shovel, EnumFacing face) {
-        if (shovel == null || shovel.isEmpty() || face == null || face == EnumFacing.DOWN) {
+    private static BlockState target(Level world, BlockPos position, Player player, ItemStack shovel,
+            Direction face) {
+        if (player == null || shovel == null || shovel.isEmpty() || face == null || face == Direction.DOWN) {
             return null;
         }
-        Set<String> tools = shovel.getItem().getToolClasses(shovel);
-        if (tools == null || !tools.contains("shovel")) {
-            return null;
-        }
-        if (!world.isAirBlock(position.up()) || !player.canPlayerEdit(position, face, shovel)) {
-            return null;
-        }
-        return path(world.getBlockState(position));
-    }
 
-    private static IBlockState path(IBlockState source) {
-        if (!(source.getBlock() instanceof PieceBlock)) {
+        if (!shovel.canPerformAction(ItemAbilities.SHOVEL_FLATTEN) || !world.isEmptyBlock(position.above())
+                || !player.mayUseItemAt(position, face, shovel)) {
             return null;
         }
+
+        BlockState source = world.getBlockState(position);
+
+        if (!(source.getBlock() instanceof PieceBlock) || source.getValue(SlabBlock.WATERLOGGED)) {
+            return null;
+        }
+
         PieceBlock piece = (PieceBlock) source.getBlock();
         String material = piece.definition(source).id;
         Shape shape = piece.palette.shape;
-        if ((!material.equals("minecraft:grass") && !material.equals("minecraft:dirt"))
-                || (shape != Shape.STEP && shape != Shape.HORIZONTAL_STEP
-                        && shape != Shape.VERTICAL_STEP && shape != Shape.CORNER)) {
+
+        if ((!material.equals("minecraft:grass") && !material.equals("minecraft:dirt")) || (shape != Shape.STEP
+                && shape != Shape.HORIZONTAL_STEP && shape != Shape.VERTICAL_STEP && shape != Shape.CORNER)) {
             return null;
         }
+
         return Pieces.state("minecraft:grass_path", shape, piece.orientation(source));
     }
 
-    static IBlockState dirt(IBlockState path) {
+    static BlockState dirt(BlockState path) {
         PieceBlock piece = (PieceBlock) path.getBlock();
-        return Pieces.state("minecraft:dirt", piece.palette.shape, piece.orientation(path));
+        BlockState dirt = Pieces.state("minecraft:dirt", piece.palette.shape, piece.orientation(path));
+
+        return dirt.setValue(SlabBlock.WATERLOGGED, path.getValue(SlabBlock.WATERLOGGED));
     }
 
-    static void checkCover(World world, BlockPos position, IBlockState state) {
+    static void checkCover(Level world, BlockPos position, BlockState state) {
+        if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
+            return;
+        }
+
         PieceBlock piece = (PieceBlock) state.getBlock();
-        if (!world.isRemote && piece.palette.group.equals("path")
-                && world.getBlockState(position.up()).getMaterial().isSolid()) {
-            world.setBlockState(position, dirt(state), 3);
+
+        if (piece.palette.group.equals("path")
+                && (state.getValue(SlabBlock.WATERLOGGED) || world.getBlockState(position.above()).isSolid())) {
+            world.setBlock(position, dirt(state), 3);
         }
     }
 }

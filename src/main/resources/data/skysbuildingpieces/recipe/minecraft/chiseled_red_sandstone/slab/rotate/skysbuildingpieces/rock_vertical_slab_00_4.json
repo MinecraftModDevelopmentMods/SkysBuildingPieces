@@ -1,0 +1,25 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:chiseled_red_sandstone_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+    }
+  ]
+}

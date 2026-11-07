@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stained_hardened_clay_magenta",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stained_hardened_clay_magenta_corner"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_hardened_clay_magenta_horizontal_step",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_magenta_corner"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_magenta_horizontal_step"
+    }
+  ]
+}

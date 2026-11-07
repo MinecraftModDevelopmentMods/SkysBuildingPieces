@@ -1,11 +1,11 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
 
 /** Keeps migration totals and preserves saved fields this version does not interpret. */
-public final class PiecesWorldState extends WorldSavedData {
+public final class PiecesWorldState extends SavedData {
     public static final String NAME = "skysbuildingpieces_world_state";
     public long blocks, items, chunks;
     public final java.util.Map<String, Long> unresolved = new java.util.TreeMap<String, Long>();
@@ -48,18 +48,18 @@ public final class PiecesWorldState extends WorldSavedData {
         }
     }
 
-    private NBTTagCompound retained = new NBTTagCompound();
+    private CompoundTag retained = new CompoundTag();
 
     public PiecesWorldState() {
-        super(NAME);
+        super();
     }
 
     public PiecesWorldState(String name) {
-        super(name);
+        super();
     }
 
-    public void readFromNBT(NBTTagCompound compoundTag) {
-        int schema = compoundTag.getInteger("schema_version");
+    public void load(CompoundTag compoundTag) {
+        int schema = compoundTag.getInt("schema_version");
 
         if (schema != 1) {
             throw new IllegalStateException("Unsupported building-pieces state schema " + schema);
@@ -72,18 +72,18 @@ public final class PiecesWorldState extends WorldSavedData {
         retained = compoundTag.copy();
         unresolved.clear();
 
-        NBTTagCompound issues = compoundTag.getCompoundTag("unresolved");
+        CompoundTag issues = compoundTag.getCompound("unresolved");
 
-        for (String key : issues.getKeySet()) {
+        for (String key : issues.getAllKeys()) {
             unresolved.put(key, issues.getLong(key));
         }
 
         modules.clear();
 
-        NBTTagCompound savedModules = compoundTag.getCompoundTag("modules");
+        CompoundTag savedModules = compoundTag.getCompound("modules");
 
-        for (String key : savedModules.getKeySet()) {
-            NBTTagCompound saved = savedModules.getCompoundTag(key);
+        for (String key : savedModules.getAllKeys()) {
+            CompoundTag saved = savedModules.getCompound(key);
             Totals moduleTotals = totals(key);
 
             moduleTotals.blocks = saved.getLong("blocks");
@@ -92,52 +92,56 @@ public final class PiecesWorldState extends WorldSavedData {
         }
     }
 
-    public NBTTagCompound writeToNBT(NBTTagCompound compoundTag) {
+    @Override
+    public CompoundTag save(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
         compoundTag.merge(retained);
-        compoundTag.setInteger("schema_version", 1);
-        compoundTag.setLong("vanilla_blocks", blocks);
-        compoundTag.setLong("vanilla_items", items);
-        compoundTag.setLong("vanilla_chunks", chunks);
+        compoundTag.putInt("schema_version", 1);
+        compoundTag.putLong("vanilla_blocks", blocks);
+        compoundTag.putLong("vanilla_items", items);
+        compoundTag.putLong("vanilla_chunks", chunks);
 
-        NBTTagCompound issues = new NBTTagCompound();
+        CompoundTag issues = new CompoundTag();
 
         for (java.util.Map.Entry<String, Long> entry : unresolved.entrySet()) {
-            issues.setLong(entry.getKey(), entry.getValue());
+            issues.putLong(entry.getKey(), entry.getValue());
         }
 
-        compoundTag.setTag("unresolved", issues);
+        compoundTag.put("unresolved", issues);
 
-        NBTTagCompound savedModules = compoundTag.getCompoundTag("modules");
+        CompoundTag savedModules = compoundTag.getCompound("modules");
 
         for (java.util.Map.Entry<String, Totals> entry : modules.entrySet()) {
-            NBTTagCompound saved = savedModules.getCompoundTag(entry.getKey());
+            CompoundTag saved = savedModules.getCompound(entry.getKey());
 
-            saved.setLong("blocks", entry.getValue().blocks);
-            saved.setLong("items", entry.getValue().items);
-            saved.setLong("chunks", entry.getValue().chunks);
-            savedModules.setTag(entry.getKey(), saved);
+            saved.putLong("blocks", entry.getValue().blocks);
+            saved.putLong("items", entry.getValue().items);
+            saved.putLong("chunks", entry.getValue().chunks);
+            savedModules.put(entry.getKey(), saved);
         }
         if (!savedModules.isEmpty()) {
-            compoundTag.setTag("modules", savedModules);
+            compoundTag.put("modules", savedModules);
         }
 
         return compoundTag;
     }
 
-    public static PiecesWorldState get(World world) {
-        if (world.getMinecraftServer() != null) {
-            world = world.getMinecraftServer().getWorld(0);
+    public static PiecesWorldState get(Level world) {
+        if (world.getServer() != null) {
+            world = world.getServer().getLevel(Level.OVERWORLD);
+        }
+        if (!(world instanceof net.minecraft.server.level.ServerLevel)) {
+            throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
-        PiecesWorldState worldState = (PiecesWorldState) world.getMapStorage().getOrLoadData(PiecesWorldState.class,
-                NAME);
+        // This is our own schema. The vanilla map fixer rewrites old saved-data envelopes.
+        return ((net.minecraft.server.level.ServerLevel) world).getDataStorage()
+                .computeIfAbsent(new SavedData.Factory<>(PiecesWorldState::new,
+                        (tag, registries) -> fromTag(tag), null), NAME);
+    }
 
-        if (worldState == null) {
-            worldState = new PiecesWorldState();
-            world.getMapStorage().setData(NAME, worldState);
-            worldState.markDirty();
-        }
-
-        return worldState;
+    private static PiecesWorldState fromTag(CompoundTag tag) {
+        PiecesWorldState state = new PiecesWorldState();
+        state.load(tag);
+        return state;
     }
 }

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/sandstone",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:sandstone_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:sandstone",
+    "count": 1
+  }
+}

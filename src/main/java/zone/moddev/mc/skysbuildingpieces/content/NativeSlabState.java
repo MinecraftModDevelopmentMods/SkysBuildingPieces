@@ -1,32 +1,73 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.core.Direction;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Native slabs may use either vanilla's half bit or a six-direction facing property. */
+/** Vanilla halves and Mineralogy's six-way facing describe the same occupied space. */
 final class NativeSlabState {
     private NativeSlabState() {
     }
 
-    static EnumFacing facingFor(int orientation) {
-        return orientation == 0 ? EnumFacing.DOWN : EnumFacing.UP;
+    static Direction facingFor(int orientation) {
+        return orientation == 0 ? Direction.DOWN : Direction.UP;
     }
 
-    static int vanillaMetadata(int metadata, int orientation) {
-        return (metadata & ~8) | (orientation == 0 ? 8 : 0);
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    static IBlockState orient(IBlockState nativeState, int orientation) {
-        for (IProperty property : nativeState.getPropertyKeys()) {
-            if (property.getName().equals("facing")
-                    && property.getAllowedValues().contains(EnumFacing.UP)
-                    && property.getAllowedValues().contains(EnumFacing.DOWN)) {
-                return nativeState.withProperty(property, facingFor(orientation));
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    static BlockState orient(BlockState nativeState, int orientation) {
+        if (nativeState.hasProperty(SlabBlock.TYPE)) {
+            return nativeState.setValue(SlabBlock.TYPE, orientation == 0 ? SlabType.TOP : SlabType.BOTTOM);
+        }
+        for (Property property : nativeState.getProperties()) {
+            if (directional(property)) {
+                return nativeState.setValue(property, facingFor(orientation));
             }
         }
-        return nativeState.getBlock().getStateFromMeta(vanillaMetadata(
-                nativeState.getBlock().getMetaFromState(nativeState), orientation));
+
+        throw new IllegalArgumentException("No supported slab orientation on " + nativeState);
+    }
+
+    static int mask(BlockState state) {
+        if (state.hasProperty(SlabBlock.TYPE)) {
+            SlabType half = state.getValue(SlabBlock.TYPE);
+
+            return half == SlabType.DOUBLE ? 255 : Geometry.mask(Shape.SLAB, half == SlabType.TOP ? 0 : 1);
+        }
+        for (Property<?> property : state.getProperties()) {
+            if (directional(property)) {
+                Direction outward = (Direction) state.getValue(property);
+
+                if (outward.getAxis() == Direction.Axis.Y) {
+                    return Geometry.mask(Shape.SLAB, outward == Direction.DOWN ? 0 : 1);
+                }
+
+                return Geometry.mask(Shape.VERTICAL_SLAB, outward.getOpposite().get2DDataValue());
+            }
+        }
+
+        return -1;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    static BlockState vertical(BlockState state, int orientation) {
+        Direction occupied = new Direction[] { Direction.SOUTH, Direction.WEST, Direction.NORTH,
+                Direction.EAST }[orientation & 3];
+
+        for (Property property : state.getProperties()) {
+            if (directional(property) && property.getPossibleValues().contains(occupied.getOpposite())) {
+                return state.setValue(property, occupied.getOpposite());
+            }
+        }
+
+        return null;
+    }
+
+    private static boolean directional(Property<?> property) {
+        return property.getName().equals("facing") && property.getPossibleValues().contains(Direction.UP)
+                && property.getPossibleValues().contains(Direction.DOWN);
     }
 }

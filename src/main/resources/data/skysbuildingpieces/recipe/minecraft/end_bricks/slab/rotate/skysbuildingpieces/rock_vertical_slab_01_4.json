@@ -1,0 +1,21 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:end_bricks_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:end_stone_brick_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:end_bricks_vertical_slab"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:chiseled_sandstone_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:chiseled_sandstone_stairs",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_stairs"
+    }
+  ]
+}

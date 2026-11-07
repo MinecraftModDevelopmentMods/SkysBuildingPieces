@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:sandstone_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:sandstone_horizontal_step",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:sandstone_horizontal_step"
+    }
+  ]
+}

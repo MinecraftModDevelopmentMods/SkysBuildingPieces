@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/diabase",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:diabase_slab"
+    }
+  },
+  "result": {
+    "id": "mineralogy:diabase",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:diabase"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:diabase_slab"
+    }
+  ]
+}

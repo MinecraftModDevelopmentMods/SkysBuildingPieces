@@ -1,22 +1,83 @@
-name: Sky's Building Pieces CI
+name: Sky's Building Pieces 1.21.1 NeoForge CI
 
 on:
   push:
     branches:
-      - 'master-*'
-      - 'feature/**'
+      - master-1.21.1-neo
   pull_request:
     branches:
-      - 'master-*'
+      - master-1.21.1-neo
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-1.21.1-neo-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  cold-bootstrap:
+    name: Cold NeoForge bootstrap
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Read target build metadata
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "java_setup_version=$(sed -n 's/^java_setup_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
+          echo "gradle_java_version=$(sed -n 's/^gradle_java_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
+
+      - name: Install pinned Java 21 runtime and toolchain
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: ${{ steps.target.outputs.java_setup_version }}
+
+      - name: Check the Gradle JVM
+        env:
+          GRADLE_JAVA_MAJOR: ${{ steps.target.outputs.gradle_java_version }}
+        run: java -version 2>&1 | grep -F "version \"$GRADLE_JAVA_MAJOR."
+
+      - name: Bootstrap NeoForge from an empty cache
+        shell: bash
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skysbuildingpieces-cold-gradle
+        run: |
+          set -euo pipefail
+          test ! -e .gradle
+          test ! -e "$GRADLE_USER_HOME"
+          mkdir -p "$GRADLE_USER_HOME"
+          chmod +x ./gradlew
+          gradle_args=(
+            classes test
+            --no-daemon --no-build-cache --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+
+      - name: Verify same-cache bootstrap offline
+        shell: bash
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skysbuildingpieces-cold-gradle
+        run: |
+          set -euo pipefail
+          gradle_args=(
+            classes test
+            --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+
   build:
     name: Build, test, and audit
     runs-on: ubuntu-latest
@@ -31,60 +92,54 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          value() { sed -n "s/^$1=//p" gradle.properties; }
-          toolchain="$(value java_toolchain_version)"
-          selector="$(value java_setup_version)"
-          echo "java_setup_version=${selector:-$toolchain}" >> "$GITHUB_OUTPUT"
-          echo "java_version=$(value java_version)" >> "$GITHUB_OUTPUT"
-          echo "minecraft_version=$(value minecraft_version)" >> "$GITHUB_OUTPUT"
-          echo "gradle_java_version=$(value gradle_java_version)" >> "$GITHUB_OUTPUT"
-          echo "artifact_prefix=SkysBuildingPieces-$(value mod_version)" >> "$GITHUB_OUTPUT"
+          echo "java_setup_version=$(sed -n 's/^java_setup_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
+          echo "gradle_java_version=$(sed -n 's/^gradle_java_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
 
-      - name: Install target Java toolchain
+      - name: Install pinned Java 21 runtime and toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: ${{ steps.target.outputs.java_setup_version }}
 
-      - name: Pin production Java
-        if: steps.target.outputs.java_version == '8'
-        run: |
-          echo "SGS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-          echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-          echo "STS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-
-      - name: Install Java for Gradle
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: microsoft
-          java-version: ${{ steps.target.outputs.gradle_java_version }}
+      - name: Check the Gradle JVM
+        env:
+          GRADLE_JAVA_MAJOR: ${{ steps.target.outputs.gradle_java_version }}
+        run: java -version 2>&1 | grep -F "version \"$GRADLE_JAVA_MAJOR."
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
-
 
       - name: Make the wrapper executable
         run: chmod +x ./gradlew
 
       - name: Build, test, and audit release artifacts
         run: >-
-          ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
-          verifyEclipseProductionClasspath  --no-daemon --stacktrace
+          ./gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
+          preparePackagedRuntimeProbes eclipse verifyEclipseConfiguration --no-daemon --stacktrace
+          -Declipse.application=org.eclipse.ui.ide.workbench
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+          -Dorg.gradle.java.installations.auto-detect=false
+          -Dorg.gradle.java.installations.auto-download=false
 
-      - name: Replay artifact checks offline
-        run: >-
-          ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
+      - name: Test native fresh and reload servers
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools -p 'test_*.py'
+          args=(--directory build/ci-native-probe --mode server
+                --probe build/native-bootstrap-probe/building-pieces-native-checks.jar)
+          python3 tools/run_development_checks.py "${args[@]}" --phase fresh --fresh
+          python3 tools/run_development_checks.py "${args[@]}" --phase reload
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-${{ steps.target.outputs.minecraft_version }}-${{ github.sha }}
+          name: SkysBuildingPieces-1.21.1-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/${{ steps.target.outputs.artifact_prefix }}.jar
-            build/libs/${{ steps.target.outputs.artifact_prefix }}-sources.jar
-            build/libs/${{ steps.target.outputs.artifact_prefix }}-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.9.121012.jar
+            build/libs/SkysBuildingPieces-0.3.9.121012-sources.jar
+            build/libs/SkysBuildingPieces-0.3.9.121012-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -92,12 +147,13 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-${{ steps.target.outputs.minecraft_version }}-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-1.21.1-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |
             build/test-results/**
             build/reports/**
             build/*-run/logs/**
-            build/*-run/**/*.properties
+            build/ci-native-probe/*-console.log
+            build/ci-native-probe/logs/**
             build/problems/**

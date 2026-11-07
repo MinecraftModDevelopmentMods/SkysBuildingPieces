@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/gneiss",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:gneiss_slab"
+    }
+  },
+  "result": {
+    "id": "mineralogy:gneiss",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:gneiss"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "mineralogy:gneiss_slab"
+    }
+  ]
+}

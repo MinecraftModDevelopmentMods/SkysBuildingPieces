@@ -1,0 +1,634 @@
+{
+  "profiles": {
+    "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.14.4.zip",
+      "sha256": "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209",
+      "source_jar_sha256": "8A0A1DEA2A4A6C069519C7B1BCF28331186FF2DF6284DB72C2FFDB8178FC84D4",
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 94
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 17
+        },
+        "minecraft:entity_type": {
+          "minecraft:zombie_pigman": 56
+        },
+        "minecraft:item": {
+          "minecraft:grass": 76,
+          "minecraft:scute": 519,
+          "minecraft:zombie_pigman_spawn_egg": 753
+        },
+        "minecraft:memory_module_type": {
+          "minecraft:golem_last_seen_time": 24,
+          "minecraft:opened_doors": 16
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
+        "minecraft:sound_event": {
+          "minecraft:entity.parrot.imitate.enderman": 446,
+          "minecraft:entity.parrot.imitate.panda": 454,
+          "minecraft:entity.parrot.imitate.polar_bear": 457,
+          "minecraft:entity.parrot.imitate.wolf": 470,
+          "minecraft:entity.parrot.imitate.zombie_pigman": 472,
+          "minecraft:entity.zombie_pigman.ambient": 784,
+          "minecraft:entity.zombie_pigman.angry": 785,
+          "minecraft:entity.zombie_pigman.death": 786,
+          "minecraft:entity.zombie_pigman.hurt": 787,
+          "minecraft:music.nether": 400
+        }
+      },
+      "saved_uses": 0,
+      "inspected_nbt_records": 785,
+      "non_biome_saved_uses": 0,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.biomes.json",
+        "sha256": "B2DCB2A7D49F46821E14C06766495417FED924DC04C08870E529F86CD2630EBD",
+        "source": "1.14.4",
+        "checked_cells": 795648,
+        "renamed_cells": 0
+      },
+      "legacy_biome_registry": "minecraft:biome",
+      "retired_poi_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.retired-poi.json",
+        "sha256": "DD2BC04B3FA5264A66B8974EA31C3B48A6F48C37DE67BF6DC70305E6CF1EE4C2"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 0,
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.forge50-grass-rename.json",
+        "sha256": "C1987F5A36074B8EB99B4FA442B04808EAAAA283710513F8640B83877F5FDA30"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.14.4.forge50-unused-registry.json",
+        "sha256": "925ED46BDD7EAE19D4C090E87A962B647E53F7BEBB288976722BC1C1556323E1"
+      }
+    },
+    "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.15.2.zip",
+      "sha256": "03A1DD5E363661D3D71194AC18CB1B53484841BC98A57A93E9056EC5048C5525",
+      "source_jar_sha256": "94A5BAA4B3DC025A338A60BAC27B3E5BBAD4AE0CE494BA5EC1F852E401A704F7",
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 94
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 17
+        },
+        "minecraft:entity_type": {
+          "minecraft:zombie_pigman": 57
+        },
+        "minecraft:item": {
+          "minecraft:grass": 76,
+          "minecraft:scute": 519,
+          "minecraft:zombie_pigman_spawn_egg": 754
+        },
+        "minecraft:memory_module_type": {
+          "minecraft:golem_last_seen_time": 24,
+          "minecraft:opened_doors": 16
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
+        "minecraft:sound_event": {
+          "minecraft:entity.zombie_pigman.ambient": 799,
+          "minecraft:entity.zombie_pigman.angry": 800,
+          "minecraft:entity.zombie_pigman.death": 801,
+          "minecraft:entity.zombie_pigman.hurt": 802,
+          "minecraft:music.nether": 420
+        }
+      },
+      "saved_uses": 14400,
+      "inspected_nbt_records": 787,
+      "non_biome_saved_uses": 0,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.biomes.json",
+        "sha256": "716A1CFF7B790B499B32AEDD2B7B20469C79F6161BF55C84F9FC14860F9B27AF",
+        "source": "1.15.2",
+        "checked_cells": 795648,
+        "renamed_cells": 14400
+      },
+      "legacy_biome_registry": "minecraft:biome",
+      "retired_poi_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.retired-poi.json",
+        "sha256": "89E156C6208A59AEE60CEA1182B339A0D2B4EC2928373FD3C33952199E1008FF"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 20363,
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.forge50-grass-rename.json",
+        "sha256": "1125ADF48F137CB2B00434905294A18785FFBA1CD81338F48F461702ED61ECB3"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.15.2.forge50-unused-registry.json",
+        "sha256": "DEFF6E8BE4347F344C9EFF49E8D71C6BAF25241464201760DF4CADFBA8928072"
+      }
+    },
+    "B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F": {
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
+        "minecraft:worldgen/biome": {
+          "minecraft:badlands": 37,
+          "minecraft:badlands_plateau": 39,
+          "minecraft:bamboo_jungle": 168,
+          "minecraft:bamboo_jungle_hills": 169,
+          "minecraft:basalt_deltas": 173,
+          "minecraft:beach": 16,
+          "minecraft:birch_forest": 27,
+          "minecraft:birch_forest_hills": 28,
+          "minecraft:cold_ocean": 46,
+          "minecraft:crimson_forest": 171,
+          "minecraft:dark_forest": 29,
+          "minecraft:dark_forest_hills": 157,
+          "minecraft:deep_cold_ocean": 49,
+          "minecraft:deep_frozen_ocean": 50,
+          "minecraft:deep_lukewarm_ocean": 48,
+          "minecraft:deep_ocean": 24,
+          "minecraft:deep_warm_ocean": 47,
+          "minecraft:desert": 2,
+          "minecraft:desert_hills": 17,
+          "minecraft:desert_lakes": 130,
+          "minecraft:end_barrens": 43,
+          "minecraft:end_highlands": 42,
+          "minecraft:end_midlands": 41,
+          "minecraft:eroded_badlands": 165,
+          "minecraft:flower_forest": 132,
+          "minecraft:forest": 4,
+          "minecraft:frozen_ocean": 10,
+          "minecraft:frozen_river": 11,
+          "minecraft:giant_spruce_taiga": 160,
+          "minecraft:giant_spruce_taiga_hills": 161,
+          "minecraft:giant_tree_taiga": 32,
+          "minecraft:giant_tree_taiga_hills": 33,
+          "minecraft:gravelly_mountains": 131,
+          "minecraft:ice_spikes": 140,
+          "minecraft:jungle": 21,
+          "minecraft:jungle_edge": 23,
+          "minecraft:jungle_hills": 22,
+          "minecraft:lukewarm_ocean": 45,
+          "minecraft:modified_badlands_plateau": 167,
+          "minecraft:modified_gravelly_mountains": 162,
+          "minecraft:modified_jungle": 149,
+          "minecraft:modified_jungle_edge": 151,
+          "minecraft:modified_wooded_badlands_plateau": 166,
+          "minecraft:mountain_edge": 20,
+          "minecraft:mountains": 3,
+          "minecraft:mushroom_field_shore": 15,
+          "minecraft:mushroom_fields": 14,
+          "minecraft:nether_wastes": 8,
+          "minecraft:ocean": 0,
+          "minecraft:plains": 1,
+          "minecraft:river": 7,
+          "minecraft:savanna": 35,
+          "minecraft:savanna_plateau": 36,
+          "minecraft:shattered_savanna": 163,
+          "minecraft:shattered_savanna_plateau": 164,
+          "minecraft:small_end_islands": 40,
+          "minecraft:snowy_beach": 26,
+          "minecraft:snowy_mountains": 13,
+          "minecraft:snowy_taiga": 30,
+          "minecraft:snowy_taiga_hills": 31,
+          "minecraft:snowy_taiga_mountains": 158,
+          "minecraft:snowy_tundra": 12,
+          "minecraft:soul_sand_valley": 170,
+          "minecraft:stone_shore": 25,
+          "minecraft:sunflower_plains": 129,
+          "minecraft:swamp": 6,
+          "minecraft:swamp_hills": 134,
+          "minecraft:taiga": 5,
+          "minecraft:taiga_hills": 19,
+          "minecraft:taiga_mountains": 133,
+          "minecraft:tall_birch_forest": 155,
+          "minecraft:tall_birch_hills": 156,
+          "minecraft:the_end": 9,
+          "minecraft:the_void": 127,
+          "minecraft:warm_ocean": 44,
+          "minecraft:warped_forest": 172,
+          "minecraft:wooded_badlands_plateau": 38,
+          "minecraft:wooded_hills": 18,
+          "minecraft:wooded_mountains": 34
+        }
+      },
+      "fixture": "src/testFixtures/worlds/building-pieces-1.16.5.zip",
+      "sha256": "B712B235C72BCB3D09B41DAE7A79F6B18FF0A8E08E08F774BD050E341E526C9F",
+      "source_jar_sha256": "B4DC9F16E5CF42902B93667B9E95EC846B66E2A3C488CC7CF48D9FBA3B477C41",
+      "saved_uses": 14400,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 792,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.biomes.json",
+        "sha256": "93CDCB3346343BFEBBDD86C2BA173A00181450145928E37FBDA6D2BAB8B42C37",
+        "source": "1.16.5",
+        "checked_cells": 796672,
+        "renamed_cells": 14400
+      },
+      "static_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.static-biomes.json",
+        "sha256": "2166295927DF0A362E9974320053909C6D4B199C14D5B8DB12AB43890C7EA6B8"
+      },
+      "retired_poi_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.retired-poi.json",
+        "sha256": "506DA915D5C20AE71C18FB317BA9A7321BFAED507EB15BB7E5DE8B59F8528A35"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 20365,
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.forge50-grass-rename.json",
+        "sha256": "98212D1CDB2068D0CF6A55C65B0C8D4958B07349CBF7865A6869C17140F54921"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.16.5.forge50-unused-registry.json",
+        "sha256": "65570D6B02F06AC808F79D60B88FB0481BFEFF0327E1BFF03C25BF7B378BBFA9"
+      }
+    },
+    "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67": {
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
+        "minecraft:worldgen/biome": {
+          "minecraft:badlands": 37,
+          "minecraft:badlands_plateau": 39,
+          "minecraft:bamboo_jungle": 168,
+          "minecraft:bamboo_jungle_hills": 169,
+          "minecraft:basalt_deltas": 173,
+          "minecraft:beach": 16,
+          "minecraft:birch_forest": 27,
+          "minecraft:birch_forest_hills": 28,
+          "minecraft:cold_ocean": 46,
+          "minecraft:crimson_forest": 171,
+          "minecraft:dark_forest": 29,
+          "minecraft:dark_forest_hills": 157,
+          "minecraft:deep_cold_ocean": 49,
+          "minecraft:deep_frozen_ocean": 50,
+          "minecraft:deep_lukewarm_ocean": 48,
+          "minecraft:deep_ocean": 24,
+          "minecraft:deep_warm_ocean": 47,
+          "minecraft:desert": 2,
+          "minecraft:desert_hills": 17,
+          "minecraft:desert_lakes": 130,
+          "minecraft:dripstone_caves": 174,
+          "minecraft:end_barrens": 43,
+          "minecraft:end_highlands": 42,
+          "minecraft:end_midlands": 41,
+          "minecraft:eroded_badlands": 165,
+          "minecraft:flower_forest": 132,
+          "minecraft:forest": 4,
+          "minecraft:frozen_ocean": 10,
+          "minecraft:frozen_river": 11,
+          "minecraft:giant_spruce_taiga": 160,
+          "minecraft:giant_spruce_taiga_hills": 161,
+          "minecraft:giant_tree_taiga": 32,
+          "minecraft:giant_tree_taiga_hills": 33,
+          "minecraft:gravelly_mountains": 131,
+          "minecraft:ice_spikes": 140,
+          "minecraft:jungle": 21,
+          "minecraft:jungle_edge": 23,
+          "minecraft:jungle_hills": 22,
+          "minecraft:lukewarm_ocean": 45,
+          "minecraft:lush_caves": 175,
+          "minecraft:modified_badlands_plateau": 167,
+          "minecraft:modified_gravelly_mountains": 162,
+          "minecraft:modified_jungle": 149,
+          "minecraft:modified_jungle_edge": 151,
+          "minecraft:modified_wooded_badlands_plateau": 166,
+          "minecraft:mountain_edge": 20,
+          "minecraft:mountains": 3,
+          "minecraft:mushroom_field_shore": 15,
+          "minecraft:mushroom_fields": 14,
+          "minecraft:nether_wastes": 8,
+          "minecraft:ocean": 0,
+          "minecraft:plains": 1,
+          "minecraft:river": 7,
+          "minecraft:savanna": 35,
+          "minecraft:savanna_plateau": 36,
+          "minecraft:shattered_savanna": 163,
+          "minecraft:shattered_savanna_plateau": 164,
+          "minecraft:small_end_islands": 40,
+          "minecraft:snowy_beach": 26,
+          "minecraft:snowy_mountains": 13,
+          "minecraft:snowy_taiga": 30,
+          "minecraft:snowy_taiga_hills": 31,
+          "minecraft:snowy_taiga_mountains": 158,
+          "minecraft:snowy_tundra": 12,
+          "minecraft:soul_sand_valley": 170,
+          "minecraft:stone_shore": 25,
+          "minecraft:sunflower_plains": 129,
+          "minecraft:swamp": 6,
+          "minecraft:swamp_hills": 134,
+          "minecraft:taiga": 5,
+          "minecraft:taiga_hills": 19,
+          "minecraft:taiga_mountains": 133,
+          "minecraft:tall_birch_forest": 155,
+          "minecraft:tall_birch_hills": 156,
+          "minecraft:the_end": 9,
+          "minecraft:the_void": 127,
+          "minecraft:warm_ocean": 44,
+          "minecraft:warped_forest": 172,
+          "minecraft:wooded_badlands_plateau": 38,
+          "minecraft:wooded_hills": 18,
+          "minecraft:wooded_mountains": 34
+        }
+      },
+      "fixture": "src/testFixtures/worlds/building-pieces-1.17.1.zip",
+      "sha256": "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67",
+      "source_jar_sha256": "40ACD56C59F50C9C5DC484781B7FEA180E1C45FAB5470735CA27983E14258240",
+      "saved_uses": 18240,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 996,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.biomes.json",
+        "sha256": "1FDD5E6FEC9097501649D47B98982030EC96E11C202241007059FF122DEF53C7",
+        "source": "1.17.1",
+        "checked_cells": 982016,
+        "renamed_cells": 18240
+      },
+      "static_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.static-biomes.json",
+        "sha256": "A6FE5A72B4AEE97DEB0CB035085C0D46DCD32C9CC207AA5FE299CFB0D8239EB1"
+      },
+      "retired_poi_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.retired-poi.json",
+        "sha256": "C5424560C9760C454AE85B82DC15AC2E4ECEE0353370FFEFC29B7087BE88F641"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 23326,
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.forge50-grass-rename.json",
+        "sha256": "50041BF669198B48297C54FE4FB7DC820199084AA0850057D07C40C67E20855F"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.17.1.forge50-unused-registry.json",
+        "sha256": "490719FDD17186B193AC50BC113C9FCFD82D66B6D768667DC704FFCDCE37825C"
+      }
+    },
+    "85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.18.2.zip",
+      "sha256": "85432F3E0FED85EF363ED17A9D803115EB3BABB5E81AE82EE5729E55F0D55D49",
+      "source_jar_sha256": "82709CF16A7282DB5562BE5FCC2F417D0F103620EAE86DBDE9E0CBD760B51B5A",
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:point_of_interest_type": {
+          "minecraft:nitwit": 11,
+          "minecraft:unemployed": 0
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
+        "minecraft:worldgen/biome": {
+          "minecraft:badlands": 37,
+          "minecraft:bamboo_jungle": 168,
+          "minecraft:basalt_deltas": 173,
+          "minecraft:beach": 16,
+          "minecraft:birch_forest": 27,
+          "minecraft:cold_ocean": 46,
+          "minecraft:crimson_forest": 171,
+          "minecraft:dark_forest": 29,
+          "minecraft:deep_cold_ocean": 49,
+          "minecraft:deep_frozen_ocean": 50,
+          "minecraft:deep_lukewarm_ocean": 48,
+          "minecraft:deep_ocean": 24,
+          "minecraft:desert": 2,
+          "minecraft:dripstone_caves": 174,
+          "minecraft:end_barrens": 43,
+          "minecraft:end_highlands": 42,
+          "minecraft:end_midlands": 41,
+          "minecraft:eroded_badlands": 165,
+          "minecraft:flower_forest": 132,
+          "minecraft:forest": 4,
+          "minecraft:frozen_ocean": 10,
+          "minecraft:frozen_peaks": 64,
+          "minecraft:frozen_river": 11,
+          "minecraft:grove": 62,
+          "minecraft:ice_spikes": 140,
+          "minecraft:jagged_peaks": 65,
+          "minecraft:jungle": 21,
+          "minecraft:lukewarm_ocean": 45,
+          "minecraft:lush_caves": 175,
+          "minecraft:meadow": 61,
+          "minecraft:mushroom_fields": 14,
+          "minecraft:nether_wastes": 8,
+          "minecraft:ocean": 0,
+          "minecraft:old_growth_birch_forest": 52,
+          "minecraft:old_growth_pine_taiga": 53,
+          "minecraft:old_growth_spruce_taiga": 54,
+          "minecraft:plains": 1,
+          "minecraft:river": 7,
+          "minecraft:savanna": 35,
+          "minecraft:savanna_plateau": 36,
+          "minecraft:small_end_islands": 40,
+          "minecraft:snowy_beach": 26,
+          "minecraft:snowy_plains": 51,
+          "minecraft:snowy_slopes": 63,
+          "minecraft:snowy_taiga": 30,
+          "minecraft:soul_sand_valley": 170,
+          "minecraft:sparse_jungle": 59,
+          "minecraft:stony_peaks": 66,
+          "minecraft:stony_shore": 67,
+          "minecraft:sunflower_plains": 129,
+          "minecraft:swamp": 6,
+          "minecraft:taiga": 5,
+          "minecraft:the_end": 9,
+          "minecraft:the_void": 127,
+          "minecraft:warm_ocean": 44,
+          "minecraft:warped_forest": 172,
+          "minecraft:windswept_forest": 57,
+          "minecraft:windswept_gravelly_hills": 56,
+          "minecraft:windswept_hills": 55,
+          "minecraft:windswept_savanna": 58,
+          "minecraft:wooded_badlands": 60
+        }
+      },
+      "saved_uses": 0,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 353,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.biomes.json",
+        "sha256": "947AB6DB5B9652149F1E7433B0DD141E9707B446067AD48B95B82EE3D99C1E35",
+        "source": "1.18.2",
+        "checked_cells": 528384,
+        "renamed_cells": 0
+      },
+      "static_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.static-biomes.json",
+        "sha256": "7B2B08C6BA9AF9281E7AC801A480522B7D17FA798D621733F15F9654A3B8B5D4"
+      },
+      "retired_poi_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.retired-poi.json",
+        "sha256": "8BA0EDD066627A2B5D014354000A7720FB4FF364F2544594AE0523D23AD50B45"
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 6182,
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.forge50-grass-rename.json",
+        "sha256": "676FCB6DDB78667A151B20811CAEDF8800A9706E3B7A53E2D14898FFB18C51B1"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.18.2.forge50-unused-registry.json",
+        "sha256": "B48D5E09DBCED2AE6407774C37478F76BEC9B5BFEB425BA577FAA9EA9365EBBE"
+      }
+    },
+    "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.19.4.zip",
+      "sha256": "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095",
+      "source_jar_sha256": "A1055C3DD776D24619635D1F30700D6E2A51CBA19ECF2AEE6894E2DBBC6C6DB7",
+      "saved_uses": 0,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 353,
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.biomes.json",
+        "sha256": "84D921F247B7F49D01D08C0E9673368363A721E8FDDA1FE4AE0F2163F9163BB0",
+        "source": "1.19.4",
+        "checked_cells": 528384,
+        "renamed_cells": 0
+      },
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:pottery_shard_archer": 2115,
+          "minecraft:pottery_shard_arms_up": 2117,
+          "minecraft:pottery_shard_prize": 2116,
+          "minecraft:pottery_shard_skull": 2118,
+          "minecraft:scute": 571
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        },
+        "minecraft:sound_event": {
+          "minecraft:item.brush.brush_sand_completed": 1226,
+          "minecraft:item.brush.brushing": 1225,
+          "minecraft:music.overworld.jungle_and_forest": 1363
+        }
+      },
+      "native_block_rename_contract": {
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass",
+        "checked_positions": 6182,
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge50-grass-rename.json",
+        "sha256": "D893D373C6E9726B489417BAAA26BECC4358DB67A384E2775B85B0FAC5249D76"
+      },
+      "forge50_unused_registry_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.19.4.forge50-unused-registry.json",
+        "sha256": "062BC86221557CB0BA675D4E823B6E6B1E6E98ED492A8FF4367954B528B07344"
+      }
+    },
+    "910789BEF774D2D2B20CDCBEEB08D6E0296D7C2B714267B8EA4CCB49F1DF6324": {
+      "fixture": "src/testFixtures/worlds/building-pieces-1.20.1.zip",
+      "sha256": "910789BEF774D2D2B20CDCBEEB08D6E0296D7C2B714267B8EA4CCB49F1DF6324",
+      "source_jar_sha256": "C4ABB48E52DE06508D3610E5463F55AF1ADB496E22BFE5EAFE4515BB52209F44",
+      "saved_uses": 0,
+      "non_biome_saved_uses": 0,
+      "inspected_nbt_records": 354,
+      "mappings": {
+        "minecraft:block": {
+          "minecraft:grass": 95
+        },
+        "minecraft:enchantment": {
+          "minecraft:sweeping": 18
+        },
+        "minecraft:item": {
+          "minecraft:grass": 89,
+          "minecraft:scute": 571
+        },
+        "minecraft:potion": {
+          "minecraft:empty": 0
+        }
+      },
+      "native_block_rename_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.20.1.forge50-grass-rename.json",
+        "sha256": "62917879AD1736B6887385977FF7CD79390CAB8C34786E9D4DE14E491ABA3211",
+        "checked_positions": 6182,
+        "source": "minecraft:grass",
+        "target": "minecraft:short_grass"
+      },
+      "native_biome_contract": {
+        "path": "src/testFixtures/worlds/building-pieces-1.20.1.biomes.json",
+        "sha256": "4217E21FF7089E158F23F63E81DDD8DE822745DD790D424E8950426A4B9380D8",
+        "source": "1.20.1",
+        "checked_cells": 528384,
+        "renamed_cells": 0
+      }
+    }
+  },
+  "native_control": {
+    "source": "Forge 31.2.57",
+    "target": "Forge 37.1.1",
+    "registered_game_content": false,
+    "normal_start_and_stop": true,
+    "reload_errors": 0,
+    "source_sha256": "026DB236B140825EB68B516B84BECDC5E3A41BCF91A89498609AA9214CA77B8C",
+    "helper_sha256": "B8E305F3B1DE1BB372DB72C8D0FB4A13DCD0E478F62EB858C95441BE359B2D18",
+    "first_log_sha256": "A22ACFC9417D2F8FA3D9CF8CFC7BF933A91733FDF3116DD35DA80B7FE08AE346"
+  },
+  "native_biome_control": {
+    "target": "Forge 40.3.0",
+    "sky_mods_loaded": false,
+    "native_sources_sha256": "610B11E71BC75F23D80607007E865A573ACA0AF5AFB6BB30F12EB06FAE19CD6C",
+    "probe_sha256": "7F72FAD7E1A7CF51A6DC02999EF3FA828A6FBBCFC1A016DFF409D00C4A2D5402",
+    "first_log_sha256": "EA5E9B6655318245BF5FFBD17B126110E3607BED3C9DC196EF667A9E9EDD00D6",
+    "reload_log_sha256": "F44550FA72952C0E3162AA27EDA928AAC1FDCAAC6F2E29815677D07B63D5DAE6",
+    "checked_cells": 541696,
+    "renamed_cells": 14400,
+    "matching_missing_biome_names_and_numbers": true,
+    "scope": "Independent native conversion control; each Sky fixture also requires its own complete cell audit."
+  }
+}

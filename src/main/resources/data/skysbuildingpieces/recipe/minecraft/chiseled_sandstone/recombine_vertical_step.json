@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/chiseled_sandstone",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:chiseled_sandstone_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:chiseled_sandstone_slab",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_slab"
+    },
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_vertical_step"
+    }
+  ]
+}

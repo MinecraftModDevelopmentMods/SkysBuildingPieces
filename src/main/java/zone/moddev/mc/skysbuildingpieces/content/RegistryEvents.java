@@ -1,70 +1,68 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.sounds.SoundEvents;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
-import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
+import zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat;
+import zone.moddev.mc.skysbuildingpieces.legacy.LegacyRegistryAliases;
 
-/** Catalogue contributions are complete before Forge opens the registries. */
-@Mod.EventBusSubscriber(
-        modid = SkysBuildingPieces.ID)
+/** Catalogue contributions are complete before NeoForge opens the registries. */
+@EventBusSubscriber(
+        modid = SkysBuildingPieces.ID,
+        bus = EventBusSubscriber.Bus.MOD)
 public final class RegistryEvents {
     private RegistryEvents() {
     }
 
-    @SubscribeEvent(
-            priority = EventPriority.LOWEST)
-    public static void blocks(RegistryEvent.Register<Block> event) {
-        Pieces.registerBlocks(event.getRegistry());
-        event.getRegistry().register(SkysBuildingPieces.HOLDER);
-    }
-
-    @SubscribeEvent
-    public static void items(RegistryEvent.Register<Item> event) {
-        Pieces.registerItems(event.getRegistry());
-        event.getRegistry().register(
-                new ItemBlock(SkysBuildingPieces.HOLDER).setRegistryName(SkysBuildingPieces.HOLDER.getRegistryName()));
-    }
-
-    @SubscribeEvent(
-            priority = EventPriority.LOWEST)
-    public static void recipes(RegistryEvent.Register<IRecipe> event) {
-        CuttingRecipe.register(event.getRegistry());
-    }
-
-    @SubscribeEvent
-    public static void missingBlocks(RegistryEvent.MissingMappings<Block> event) {
-        for (RegistryEvent.MissingMappings.Mapping<Block> mapping : event.getAllMappings()) {
-            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
-                    .formerBlock(mapping.key.toString());
-            if (formerPiece != null) {
-                mapping.remap(formerPiece);
-                continue;
-            }
-            if (LegacyMapping.owned(mapping.key.toString())) {
-                mapping.ignore();
-            }
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void register(RegisterEvent event) {
+        if (event.getRegistryKey().equals(Registries.BLOCK)) {
+            blocks();
+        } else if (event.getRegistryKey().equals(Registries.ITEM)) {
+            items();
+        } else if (event.getRegistryKey().equals(Registries.SOUND_EVENT)) {
+            LegacyRegistryAliases.register(BuiltInRegistries.SOUND_EVENT,
+                    ResourceLocation.parse("minecraft:item.sweet_berries.pick_from_bush"),
+                    BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES));
+        } else if (event.getRegistryKey().equals(Registries.RECIPE_SERIALIZER)) {
+            Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+                    ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "cutting"), CuttingRecipe.SERIALIZER);
+            Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+                    ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece"), LegacyPieceRecipe.SERIALIZER);
         }
     }
 
-    @SubscribeEvent
-    public static void missingItems(RegistryEvent.MissingMappings<Item> event) {
-        for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getAllMappings()) {
-            Block formerPiece = zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat
-                    .formerBlock(mapping.key.toString());
-            if (formerPiece != null) {
-                mapping.remap(Item.getItemFromBlock(formerPiece));
-                continue;
-            }
-            if (LegacyMapping.owned(mapping.key.toString())) {
-                mapping.ignore();
-            }
-        }
+    private static void blocks() {
+        SkysBuildingPieces.HOLDER = new Block(Block.Properties.of().mapColor(MapColor.STONE)
+                .strength(-1.0F, 3_600_000.0F));
+        Pieces.registerBlocks(BuiltInRegistries.BLOCK);
+        LegacyRegistryAliases.register(BuiltInRegistries.BLOCK, ResourceLocation.parse("minecraft:grass_path"),
+                ResourceLocation.parse("minecraft:dirt_path"));
+        MineralogyCompat.registerFormerAliases(BuiltInRegistries.BLOCK);
+        Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece_holder"),
+                SkysBuildingPieces.HOLDER);
     }
+
+    private static void items() {
+        Pieces.registerItems(BuiltInRegistries.ITEM);
+        LegacyRegistryAliases.register(BuiltInRegistries.ITEM, ResourceLocation.parse("minecraft:grass_path"),
+                ResourceLocation.parse("minecraft:dirt_path"));
+        MineralogyCompat.registerFormerAliases(BuiltInRegistries.ITEM);
+
+        BlockItem holder = new BlockItem(SkysBuildingPieces.HOLDER, new Item.Properties());
+
+        Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "legacy_piece_holder"), holder);
+    }
+
 }

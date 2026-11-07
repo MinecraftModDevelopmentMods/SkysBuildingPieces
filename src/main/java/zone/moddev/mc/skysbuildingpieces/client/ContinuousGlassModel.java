@@ -1,33 +1,78 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.BakedModel;
+
 import java.util.*;
 import java.util.concurrent.*;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.*;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import com.mojang.blaze3d.vertex.*;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.minecraft.util.RandomSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+
+import net.neoforged.neoforge.client.model.data.ModelData;
+
+import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.bus.api.SubscribeEvent;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
 /** Removes repeated glass borders at matching joins without changing the wall geometry. */
-public final class ContinuousGlassModel implements IBakedModel {
-    private final IBakedModel original;
+public final class ContinuousGlassModel implements BakedModel {
+    private static final ModelProperty<Integer> JOINS = new ModelProperty<>(
+            joins -> joins != null && joins >= 0 && joins < 16);
+    private final BakedModel original;
     private final ConcurrentMap<QuadKey, List<BakedQuad>> cache = new ConcurrentHashMap<QuadKey, List<BakedQuad>>();
 
-    public ContinuousGlassModel(IBakedModel original) {
+    public ContinuousGlassModel(BakedModel original) {
         this.original = original;
     }
 
-    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long random) {
-        Integer joins = state instanceof IExtendedBlockState
-                ? ((IExtendedBlockState) state).getValue(GlassWallTexture.JOINS)
-                : null;
-        IBlockState clean = state instanceof IExtendedBlockState ? ((IExtendedBlockState) state).getClean() : state;
-        List<BakedQuad> quads = original.getQuads(clean, side, random);
+    @Override
+    public ModelData getModelData(BlockAndTintGetter world, BlockPos position, BlockState state,
+            ModelData tileData) {
+        int joins = 0;
+        PieceBlock wall = (PieceBlock) state.getBlock();
+        int connectionBit = 1;
+
+        for (Direction direction : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
+                Direction.WEST }) {
+            BlockState neighbour = world.getBlockState(position.relative(direction));
+
+            if (neighbour.getBlock() instanceof PieceBlock) {
+                PieceBlock other = (PieceBlock) neighbour.getBlock();
+
+                if (other.palette.shape == Shape.WALL
+                        && other.definition(neighbour).id.equals(wall.definition(state).id)) {
+                    joins |= connectionBit;
+                }
+            }
+
+            connectionBit <<= 1;
+        }
+
+        return tileData.derive().with(JOINS, joins).build();
+    }
+
+    @Override
+    public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
+        return getQuads(state, side, random, ModelData.EMPTY, null);
+    }
+
+    @Override
+    public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random, ModelData modelData, RenderType renderType) {
+        Integer joins = modelData.get(JOINS);
+        List<BakedQuad> quads = original.getQuads(state, side, random, modelData, renderType);
 
         if (joins == null || joins == 0 || quads.isEmpty()) {
             return quads;
@@ -43,28 +88,21 @@ public final class ContinuousGlassModel implements IBakedModel {
         List<BakedQuad> result = new ArrayList<BakedQuad>(quads.size());
 
         for (BakedQuad quad : quads) {
-            VertexFormat format = quad.getFormat();
-            int position = -1;
-
-            for (int elementIndex = 0; elementIndex < format.getElementCount(); elementIndex++) {
-                VertexFormatElement element = format.getElement(elementIndex);
-
-                if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION
-                        && element.getType() == VertexFormatElement.EnumType.FLOAT) {
-                    position = format.getOffset(elementIndex) / 4;
-                }
-            }
-            if (position < 0 || !format.hasUvOffset(0)) {
+            // Baked block quads use the shared vertex layout.
+            VertexFormat format = DefaultVertexFormat.BLOCK;
+            int positionOffset = format.getOffset(VertexFormatElement.POSITION);
+            int textureOffset = format.getOffset(VertexFormatElement.UV0);
+            if (positionOffset < 0 || textureOffset < 0) {
                 result.add(quad);
                 continue;
             }
 
-            int[] data = GlassWallTexture.trim(quad.getVertexData(), format.getIntegerSize(), position,
-                    format.getUvOffsetById(0) / 4, joins);
+            int[] data = GlassWallTexture.trim(quad.getVertices(), format.getVertexSize() / Integer.BYTES,
+                    positionOffset / Integer.BYTES, textureOffset / Integer.BYTES, joins);
 
-            result.add(data == quad.getVertexData() ? quad
-                    : new BakedQuad(data, quad.getTintIndex(), quad.getFace(), quad.getSprite(),
-                            quad.shouldApplyDiffuseLighting(), format));
+            result.add(data == quad.getVertices() ? quad
+                    : new BakedQuad(data, quad.getTintIndex(), quad.getDirection(), quad.getSprite(),
+                            quad.isShade(), quad.hasAmbientOcclusion()));
         }
 
         List<BakedQuad> immutable = Collections.unmodifiableList(result);
@@ -81,27 +119,42 @@ public final class ContinuousGlassModel implements IBakedModel {
         return immutable;
     }
 
-    public boolean isAmbientOcclusion() {
-        return original.isAmbientOcclusion();
+    @Override
+    public net.neoforged.neoforge.client.ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource random, ModelData data) {
+        return original.getRenderTypes(state, random, data);
+    }
+
+    @Override
+    public List<RenderType> getRenderTypes(net.minecraft.world.item.ItemStack stack, boolean fabulous) {
+        return original.getRenderTypes(stack, fabulous);
+    }
+
+    public boolean useAmbientOcclusion() {
+        return original.useAmbientOcclusion();
     }
 
     public boolean isGui3d() {
         return original.isGui3d();
     }
 
-    public boolean isBuiltInRenderer() {
-        return original.isBuiltInRenderer();
+    @Override
+    public boolean usesBlockLight() {
+        return original.usesBlockLight();
     }
 
-    public TextureAtlasSprite getParticleTexture() {
-        return original.getParticleTexture();
+    public boolean isCustomRenderer() {
+        return original.isCustomRenderer();
     }
 
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return original.getItemCameraTransforms();
+    public TextureAtlasSprite getParticleIcon() {
+        return original.getParticleIcon();
     }
 
-    public ItemOverrideList getOverrides() {
+    public ItemTransforms getTransforms() {
+        return original.getTransforms();
+    }
+
+    public ItemOverrides getOverrides() {
         return original.getOverrides();
     }
 
@@ -127,30 +180,28 @@ public final class ContinuousGlassModel implements IBakedModel {
     }
 
     public static final class BakeHandler {
-        @SubscribeEvent
-        public void bake(ModelBakeEvent event) {
+        public void bake(ModelEvent.ModifyBakingResult event) {
             Set<String> walls = new HashSet<String>();
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.registeredBlocks()) {
                 if (block.palette.shape == Shape.WALL && block.palette.group.contains("glass")) {
-                    walls.add(block.getRegistryName().toString());
+                    walls.add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block).toString());
                 }
             }
 
-            install(event.getModelRegistry(), event.getModelManager().getMissingModel(), walls);
+            install(event.getModels(), event.getModels().get(ModelBakery.MISSING_MODEL_LOCATION), walls);
         }
     }
 
-    static void install(net.minecraft.util.registry.IRegistry<ModelResourceLocation, IBakedModel> registry,
-            IBakedModel missing, Set<String> walls) {
-        IdentityHashMap<IBakedModel, ContinuousGlassModel> wrapped = new IdentityHashMap<IBakedModel, ContinuousGlassModel>();
+    static void install(Map<ModelResourceLocation, BakedModel> registry, BakedModel missing, Set<String> walls) {
+        IdentityHashMap<BakedModel, ContinuousGlassModel> wrapped = new IdentityHashMap<BakedModel, ContinuousGlassModel>();
 
-        for (ModelResourceLocation key : new ArrayList<ModelResourceLocation>(registry.getKeys())) {
-            if (key.getVariant().equals("inventory") || !walls.contains(key.getNamespace() + ":" + key.getPath())) {
+        for (ModelResourceLocation key : new ArrayList<>(registry.keySet())) {
+            if (key.variant().equals("inventory") || !walls.contains(key.id().toString())) {
                 continue;
             }
 
-            IBakedModel model = registry.getObject(key);
+            BakedModel model = registry.get(key);
 
             if (model == null || model == missing || model instanceof ContinuousGlassModel) {
                 continue;
@@ -163,7 +214,7 @@ public final class ContinuousGlassModel implements IBakedModel {
                 wrapped.put(model, replacement);
             }
 
-            registry.putObject(key, replacement);
+            registry.put(key, replacement);
         }
     }
 }

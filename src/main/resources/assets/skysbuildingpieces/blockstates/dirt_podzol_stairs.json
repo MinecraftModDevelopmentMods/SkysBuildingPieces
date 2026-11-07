@@ -1,0 +1,484 @@
+{
+  "variants": {
+    "orientation=bottom_east,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_straight"
+    },
+    "orientation=bottom_east,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_straight"
+    },
+    "orientation=bottom_east,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_inner_left"
+    },
+    "orientation=bottom_east,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_inner_left"
+    },
+    "orientation=bottom_east,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_inner_right"
+    },
+    "orientation=bottom_east,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_inner_right"
+    },
+    "orientation=bottom_east,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_outer_left"
+    },
+    "orientation=bottom_east,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_outer_left"
+    },
+    "orientation=bottom_east,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_outer_right"
+    },
+    "orientation=bottom_east,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_dry_outer_right"
+    },
+    "orientation=bottom_east,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_straight"
+    },
+    "orientation=bottom_east,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_straight"
+    },
+    "orientation=bottom_east,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_inner_left"
+    },
+    "orientation=bottom_east,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_inner_left"
+    },
+    "orientation=bottom_east,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_inner_right"
+    },
+    "orientation=bottom_east,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_inner_right"
+    },
+    "orientation=bottom_east,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_outer_left"
+    },
+    "orientation=bottom_east,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_outer_left"
+    },
+    "orientation=bottom_east,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_outer_right"
+    },
+    "orientation=bottom_east,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_0_snow_outer_right"
+    },
+    "orientation=bottom_west,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_straight"
+    },
+    "orientation=bottom_west,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_straight"
+    },
+    "orientation=bottom_west,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_inner_left"
+    },
+    "orientation=bottom_west,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_inner_left"
+    },
+    "orientation=bottom_west,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_inner_right"
+    },
+    "orientation=bottom_west,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_inner_right"
+    },
+    "orientation=bottom_west,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_outer_left"
+    },
+    "orientation=bottom_west,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_outer_left"
+    },
+    "orientation=bottom_west,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_outer_right"
+    },
+    "orientation=bottom_west,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_dry_outer_right"
+    },
+    "orientation=bottom_west,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_straight"
+    },
+    "orientation=bottom_west,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_straight"
+    },
+    "orientation=bottom_west,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_inner_left"
+    },
+    "orientation=bottom_west,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_inner_left"
+    },
+    "orientation=bottom_west,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_inner_right"
+    },
+    "orientation=bottom_west,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_inner_right"
+    },
+    "orientation=bottom_west,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_outer_left"
+    },
+    "orientation=bottom_west,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_outer_left"
+    },
+    "orientation=bottom_west,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_outer_right"
+    },
+    "orientation=bottom_west,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_1_snow_outer_right"
+    },
+    "orientation=bottom_south,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_straight"
+    },
+    "orientation=bottom_south,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_straight"
+    },
+    "orientation=bottom_south,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_inner_left"
+    },
+    "orientation=bottom_south,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_inner_left"
+    },
+    "orientation=bottom_south,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_inner_right"
+    },
+    "orientation=bottom_south,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_inner_right"
+    },
+    "orientation=bottom_south,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_outer_left"
+    },
+    "orientation=bottom_south,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_outer_left"
+    },
+    "orientation=bottom_south,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_outer_right"
+    },
+    "orientation=bottom_south,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_dry_outer_right"
+    },
+    "orientation=bottom_south,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_straight"
+    },
+    "orientation=bottom_south,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_straight"
+    },
+    "orientation=bottom_south,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_inner_left"
+    },
+    "orientation=bottom_south,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_inner_left"
+    },
+    "orientation=bottom_south,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_inner_right"
+    },
+    "orientation=bottom_south,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_inner_right"
+    },
+    "orientation=bottom_south,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_outer_left"
+    },
+    "orientation=bottom_south,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_outer_left"
+    },
+    "orientation=bottom_south,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_outer_right"
+    },
+    "orientation=bottom_south,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_2_snow_outer_right"
+    },
+    "orientation=bottom_north,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_straight"
+    },
+    "orientation=bottom_north,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_straight"
+    },
+    "orientation=bottom_north,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_inner_left"
+    },
+    "orientation=bottom_north,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_inner_left"
+    },
+    "orientation=bottom_north,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_inner_right"
+    },
+    "orientation=bottom_north,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_inner_right"
+    },
+    "orientation=bottom_north,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_outer_left"
+    },
+    "orientation=bottom_north,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_outer_left"
+    },
+    "orientation=bottom_north,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_outer_right"
+    },
+    "orientation=bottom_north,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_dry_outer_right"
+    },
+    "orientation=bottom_north,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_straight"
+    },
+    "orientation=bottom_north,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_straight"
+    },
+    "orientation=bottom_north,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_inner_left"
+    },
+    "orientation=bottom_north,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_inner_left"
+    },
+    "orientation=bottom_north,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_inner_right"
+    },
+    "orientation=bottom_north,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_inner_right"
+    },
+    "orientation=bottom_north,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_outer_left"
+    },
+    "orientation=bottom_north,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_outer_left"
+    },
+    "orientation=bottom_north,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_outer_right"
+    },
+    "orientation=bottom_north,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_3_snow_outer_right"
+    },
+    "orientation=top_east,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_straight"
+    },
+    "orientation=top_east,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_straight"
+    },
+    "orientation=top_east,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_inner_left"
+    },
+    "orientation=top_east,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_inner_left"
+    },
+    "orientation=top_east,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_inner_right"
+    },
+    "orientation=top_east,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_inner_right"
+    },
+    "orientation=top_east,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_outer_left"
+    },
+    "orientation=top_east,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_outer_left"
+    },
+    "orientation=top_east,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_outer_right"
+    },
+    "orientation=top_east,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_dry_outer_right"
+    },
+    "orientation=top_east,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_straight"
+    },
+    "orientation=top_east,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_straight"
+    },
+    "orientation=top_east,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_inner_left"
+    },
+    "orientation=top_east,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_inner_left"
+    },
+    "orientation=top_east,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_inner_right"
+    },
+    "orientation=top_east,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_inner_right"
+    },
+    "orientation=top_east,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_outer_left"
+    },
+    "orientation=top_east,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_outer_left"
+    },
+    "orientation=top_east,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_outer_right"
+    },
+    "orientation=top_east,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_4_snow_outer_right"
+    },
+    "orientation=top_west,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_straight"
+    },
+    "orientation=top_west,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_straight"
+    },
+    "orientation=top_west,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_inner_left"
+    },
+    "orientation=top_west,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_inner_left"
+    },
+    "orientation=top_west,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_inner_right"
+    },
+    "orientation=top_west,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_inner_right"
+    },
+    "orientation=top_west,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_outer_left"
+    },
+    "orientation=top_west,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_outer_left"
+    },
+    "orientation=top_west,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_outer_right"
+    },
+    "orientation=top_west,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_dry_outer_right"
+    },
+    "orientation=top_west,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_straight"
+    },
+    "orientation=top_west,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_straight"
+    },
+    "orientation=top_west,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_inner_left"
+    },
+    "orientation=top_west,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_inner_left"
+    },
+    "orientation=top_west,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_inner_right"
+    },
+    "orientation=top_west,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_inner_right"
+    },
+    "orientation=top_west,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_outer_left"
+    },
+    "orientation=top_west,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_outer_left"
+    },
+    "orientation=top_west,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_outer_right"
+    },
+    "orientation=top_west,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_5_snow_outer_right"
+    },
+    "orientation=top_south,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_straight"
+    },
+    "orientation=top_south,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_straight"
+    },
+    "orientation=top_south,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_inner_left"
+    },
+    "orientation=top_south,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_inner_left"
+    },
+    "orientation=top_south,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_inner_right"
+    },
+    "orientation=top_south,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_inner_right"
+    },
+    "orientation=top_south,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_outer_left"
+    },
+    "orientation=top_south,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_outer_left"
+    },
+    "orientation=top_south,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_outer_right"
+    },
+    "orientation=top_south,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_dry_outer_right"
+    },
+    "orientation=top_south,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_straight"
+    },
+    "orientation=top_south,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_straight"
+    },
+    "orientation=top_south,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_inner_left"
+    },
+    "orientation=top_south,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_inner_left"
+    },
+    "orientation=top_south,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_inner_right"
+    },
+    "orientation=top_south,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_inner_right"
+    },
+    "orientation=top_south,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_outer_left"
+    },
+    "orientation=top_south,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_outer_left"
+    },
+    "orientation=top_south,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_outer_right"
+    },
+    "orientation=top_south,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_6_snow_outer_right"
+    },
+    "orientation=top_north,shape=straight,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_straight"
+    },
+    "orientation=top_north,shape=straight,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_straight"
+    },
+    "orientation=top_north,shape=inner_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_inner_left"
+    },
+    "orientation=top_north,shape=inner_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_inner_left"
+    },
+    "orientation=top_north,shape=inner_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_inner_right"
+    },
+    "orientation=top_north,shape=inner_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_inner_right"
+    },
+    "orientation=top_north,shape=outer_left,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_outer_left"
+    },
+    "orientation=top_north,shape=outer_left,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_outer_left"
+    },
+    "orientation=top_north,shape=outer_right,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_outer_right"
+    },
+    "orientation=top_north,shape=outer_right,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_dry_outer_right"
+    },
+    "orientation=top_north,shape=straight,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_straight"
+    },
+    "orientation=top_north,shape=straight,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_straight"
+    },
+    "orientation=top_north,shape=inner_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_inner_left"
+    },
+    "orientation=top_north,shape=inner_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_inner_left"
+    },
+    "orientation=top_north,shape=inner_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_inner_right"
+    },
+    "orientation=top_north,shape=inner_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_inner_right"
+    },
+    "orientation=top_north,shape=outer_left,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_outer_left"
+    },
+    "orientation=top_north,shape=outer_left,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_outer_left"
+    },
+    "orientation=top_north,shape=outer_right,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_outer_right"
+    },
+    "orientation=top_north,shape=outer_right,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_stairs_7_snow_outer_right"
+    }
+  }
+}

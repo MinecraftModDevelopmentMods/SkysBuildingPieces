@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:green_terracotta"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_hardened_clay_green_wall",
+    "count": 6
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_green_wall"
+    }
+  ]
+}
