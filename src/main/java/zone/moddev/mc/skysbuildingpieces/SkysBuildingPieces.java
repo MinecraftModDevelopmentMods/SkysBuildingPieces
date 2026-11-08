@@ -23,7 +23,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.2602002";
+    public static final String VERSION = "0.3.9.2602002";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;
@@ -38,7 +38,7 @@ public final class SkysBuildingPieces {
         NeoForge.EVENT_BUS.register(new PathPieces());
         NeoForge.EVENT_BUS.addListener(this::afterServer);
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
-            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(modBus);
+            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(modBus, container);
         }
     }
 

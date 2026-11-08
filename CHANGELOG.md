@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.9.2602002
+
+- Each material and shape now has its own block ID. Existing pieces keep their material, orientation and waterlogging.
+- Directional slab placement can be turned off from the Mods menu.
+- Vanilla items stay in their usual creative tabs.
+
 ## 0.3.8.2602002
 
 - Updated Building Pieces for Minecraft 26.2 on NeoForge.

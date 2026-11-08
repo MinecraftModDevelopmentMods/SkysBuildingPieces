@@ -236,6 +236,10 @@ def prepare(options, directory):
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
+    if getattr(options, "directional_slabs_off", False):
+        configuration = directory / "config/skysbuildingpieces-common.toml"
+        configuration.parent.mkdir(exist_ok=True)
+        configuration.write_text("[gameplay]\ndirectionalSlabPlacement=false\n", encoding="utf-8")
     profile = {"probe_kind": getattr(options, "probe_kind", "bootstrap"),
                "persistence_order": options.persistence_order,
                "no_early_display": no_early_display,
@@ -297,6 +301,7 @@ def main():
     parser.add_argument("--mode", choices=("server", "client"), required=True)
     parser.add_argument("--probe-kind", choices=("bootstrap", "integration"), default="bootstrap")
     parser.add_argument("--phase", required=True)
+    parser.add_argument("--directional-slabs-off", action="store_true")
     parser.add_argument("--assets", type=Path)
     parser.add_argument("--natives", type=Path)
     parser.add_argument("--fixture", type=Path)

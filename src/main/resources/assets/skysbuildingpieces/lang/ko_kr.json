@@ -1,4 +1,13 @@
 {
+  "skysbuildingpieces.configuration.title": "%s 설정",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "공통 설정",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "공통 설정",
+  "skysbuildingpieces.configuration.gameplay": "게임플레이",
+  "skysbuildingpieces.configuration.gameplay.button": "게임플레이",
+  "skysbuildingpieces.configuration.compat": "호환성",
+  "skysbuildingpieces.configuration.compat.button": "호환성",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "반 블록 방향 지정 배치",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "이전 건축 부품 교체",
   "pieces.skysbuildingpieces.slab": "%s 반 블록",
   "pieces.skysbuildingpieces.vertical_slab": "%s 세로 반 블록",
   "pieces.skysbuildingpieces.horizontal_step": "%s 사분의 일 블록",

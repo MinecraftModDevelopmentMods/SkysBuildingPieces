@@ -13,6 +13,9 @@ import net.neoforged.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
@@ -21,7 +24,9 @@ public final class ClientProxy {
     private ClientProxy() {
     }
 
-    public static void register(IEventBus modBus) {
+    public static void register(IEventBus modBus, ModContainer container) {
+        IConfigScreenFactory factory = ConfigurationScreen::new;
+        container.registerExtensionPoint(IConfigScreenFactory.class, factory);
         modBus.addListener(ClientProxy::mineralogyResources);
         modBus.addListener(ClientProxy::blockColors);
         modBus.addListener(ContinuousGlassModel::bake);
@@ -37,7 +42,7 @@ public final class ClientProxy {
     }
 
     private static void blockColors(RegisterColorHandlersEvent.BlockTintSources event) {
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             if (block.palette.group.equals("grass")) {
                 event.register(List.of(BlockTintSources.grassBlock()), block);
             }
