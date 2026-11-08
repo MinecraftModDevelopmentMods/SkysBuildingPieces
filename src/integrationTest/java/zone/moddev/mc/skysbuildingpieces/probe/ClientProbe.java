@@ -127,8 +127,8 @@ public final class ClientProbe extends ProbeProxy {
                     throw new AssertionError("Retired template in mod tab");
                 }
             }
-            if (!entries.contains("minecraft:wooden_slab:0")) {
-                throw new AssertionError("Reused oak slab missing from mod tab");
+            if (entries.stream().anyMatch(key -> key.startsWith("minecraft:"))) {
+                throw new AssertionError("Vanilla content appears in the Building Pieces tab");
             }
             if (entries.contains("skysbuildingpieces:legacy_piece_holder:0")) {
                 throw new AssertionError("Recovery holder in mod tab");
@@ -140,6 +140,7 @@ public final class ClientProbe extends ProbeProxy {
 
             System.out.println("BUILDING_PIECES_CREATIVE_TAB_PASS entries=" + creative.size());
 
+            ConfigScreenChecks.run(minecraft);
             int checked = 0;
 
             for (PieceBlock block : Pieces.BLOCKS.values()) {

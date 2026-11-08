@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8.110021
+
+- Directional slab placement can be turned off from the Mods menu.
+- Vanilla items stay in their usual creative tabs.
+
 ## 0.3.7.110021
 
 - Use a shovel to turn dirt and grass steps and corners into matching path

@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=laine verte
 material.skysbuildingpieces.minecraft.wool_red=laine rouge
 material.skysbuildingpieces.minecraft.wool_black=laine noire
 material.skysbuildingpieces.minecraft.grass_path=Chemin
+config.skysbuildingpieces.directionalSlabPlacement=Placement directionnel des dalles
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=Permet de poser les dalles à la verticale en cliquant sur une face ou une arête. Redémarre après avoir modifié ce réglage.
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=Remplacer les anciennes pièces
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=Remplace les pièces anciennes prises en charge si leur mod d'origine est installé. Fais d'abord une copie de ton monde.
