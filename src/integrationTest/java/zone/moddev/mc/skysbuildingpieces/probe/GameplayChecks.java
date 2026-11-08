@@ -47,6 +47,35 @@ public final class GameplayChecks {
         world.setChunkForced(FIXTURE_POSITION.getX() >> 4, FIXTURE_POSITION.getZ() >> 4, false);
     }
 
+    static void horizontalSlabsOnly(ServerLevel world) {
+        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        player.getAbilities().instabuild = false;
+        BlockPos support = FIXTURE_POSITION;
+        BlockPos placed = support.east();
+        world.setBlock(support, Blocks.STONE.defaultBlockState(), 3);
+        for (ItemStack slabs : List.of(new ItemStack(net.minecraft.world.item.Items.OAK_SLAB, 2),
+                Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 1), 2))) {
+            world.removeBlock(placed, false);
+            require(use(slabs, player, world, support, InteractionHand.MAIN_HAND,
+                    Direction.EAST, 1, .25f, .5f).consumesAction(), "Horizontal slab placement failed");
+            BlockState state = world.getBlockState(placed);
+            require(state.is(Blocks.OAK_SLAB)
+                    ? state.getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                            == net.minecraft.world.level.block.state.properties.SlabType.BOTTOM
+                    : state.getBlock() instanceof PieceBlock piece && piece.palette.shape == Shape.SLAB
+                            && piece.orientation(state) == 1,
+                    "Slab placement still chooses a vertical face with the setting off: " + state);
+            require(slabs.getCount() == 1, "Placing a slab should consume one item");
+            require(use(slabs, player, world, placed, InteractionHand.MAIN_HAND,
+                    Direction.UP, .5f, .5f, .5f).consumesAction(), "Matching horizontal slabs did not join");
+            require(slabs.isEmpty() && (state.is(Blocks.OAK_SLAB)
+                    ? world.getBlockState(placed).getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                            == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE
+                    : world.getBlockState(placed).is(Blocks.GLASS)), "Horizontal slab join changed the full block");
+        }
+        System.out.println("BUILDING_PIECES_DIRECTIONAL_SLABS_OFF_PASS");
+    }
+
     private static InteractionResult use(ItemStack stack, ServerPlayer player, ServerLevel world, BlockPos pos,
             InteractionHand hand, Direction face, float hitX, float hitY, float hitZ) {
         player.setItemInHand(hand, stack);
@@ -84,7 +113,7 @@ public final class GameplayChecks {
 
         int placed = 0;
 
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
+        for (PieceBlock pieceBlock : Pieces.playableBlocks()) {
             ItemStack item = Pieces.stack(pieceBlock.getStateFromMeta(0), 2);
 
             world.removeBlock(position, false);
@@ -298,7 +327,7 @@ public final class GameplayChecks {
 
         // Real BlockItem calls against a solid neighbour: centre plus four edges, all six faces, every custom
         // horizontal slab material and both sneak modes.
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.SLAB) {
                 for (int slot = 0; slot < block.palette.materials.size(); slot++) {
                     for (Direction face : Direction.values()) {
@@ -481,7 +510,7 @@ public final class GameplayChecks {
     }
 
     private static void materialPhysics(ServerLevel world, BlockPos position, ServerPlayer player) {
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
+        for (PieceBlock pieceBlock : Pieces.playableBlocks()) {
             for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
                 for (int orientation = 0; orientation < pieceBlock.palette.shape.states; orientation++) {
                     BlockState state = pieceBlock
@@ -583,7 +612,7 @@ public final class GameplayChecks {
     private static void nativeSlabs(ServerLevel world, BlockPos position, ServerPlayer player) {
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.VERTICAL_SLAB) {
                 NonNullList<ItemStack> creative = NonNullList.create();
 

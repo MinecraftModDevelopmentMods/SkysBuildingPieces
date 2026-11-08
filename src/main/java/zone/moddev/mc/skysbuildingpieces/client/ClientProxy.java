@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GrassColor;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -18,8 +19,11 @@ public final class ClientProxy {
     private ClientProxy() {
     }
 
-    public static void register() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static void register(FMLJavaModLoadingContext context) {
+        context.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(
+                        (minecraft, parent) -> new BuildingPiecesConfigScreen(parent)));
+        IEventBus modBus = context.getModEventBus();
 
         modBus.addListener(ClientProxy::blockColors);
         modBus.addListener(ClientProxy::itemColors);
@@ -28,7 +32,7 @@ public final class ClientProxy {
     }
 
     private static void renderLayers(FMLClientSetupEvent event) {
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             RenderType layer = RenderType.solid();
             if (block.palette.group.equals("grass")) {
                 layer = RenderType.cutoutMipped();
@@ -42,7 +46,7 @@ public final class ClientProxy {
     }
 
     private static void blockColors(RegisterColorHandlersEvent.Block event) {
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             if (block.palette.group.equals("grass")) {
                 event.getBlockColors().register(
                         (state, world, position,
@@ -59,7 +63,7 @@ public final class ClientProxy {
                 event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1, item);
             }
         }
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             if (block.palette.group.equals("grass")) {
                 event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1,
                         block.asItem());
