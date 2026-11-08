@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=緑色の羊毛
 material.skysbuildingpieces.minecraft.wool_red=赤色の羊毛
 material.skysbuildingpieces.minecraft.wool_black=黒色の羊毛
 material.skysbuildingpieces.minecraft.grass_path=土の道
+config.skysbuildingpieces.directionalSlabPlacement=ハーフブロックの向き指定
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=面や縁をクリックして、通常のハーフブロックを縦に設置できるようにします。変更後は再起動してください。
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=旧式の建材を置き換える
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=元のMODが入っているときに、対応する旧パーツを置き換えます。先にワールドをバックアップしてください。

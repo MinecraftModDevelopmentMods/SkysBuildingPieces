@@ -49,7 +49,9 @@ class ResourceTest {
                 assertTrue(line.substring(line.indexOf('=') + 1).length() > 0);
             }
 
-            assertEquals(17 + Catalogue.INSTANCE.materials.size(), current.size());
+            assertEquals(21 + Catalogue.INSTANCE.materials.size(), current.size());
+            assertTrue(current.contains("config.skysbuildingpieces.directionalSlabPlacement"));
+            assertTrue(current.contains("config.skysbuildingpieces.directionalSlabPlacement.tooltip"));
             assertTrue(current.contains("itemGroup.skysbuildingpieces"));
 
             if (keys == null) {

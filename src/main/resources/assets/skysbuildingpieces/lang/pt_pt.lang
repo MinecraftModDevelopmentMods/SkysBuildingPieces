@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=lã verde
 material.skysbuildingpieces.minecraft.wool_red=lã vermelha
 material.skysbuildingpieces.minecraft.wool_black=lã preta
 material.skysbuildingpieces.minecraft.grass_path=Caminho
+config.skysbuildingpieces.directionalSlabPlacement=Colocação direcional de lajes
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=Permite colocar lajes normais na vertical ao clicar numa face ou aresta. Reinicia o jogo depois de alterar esta opção.
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=Substituir peças antigas
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=Substitui peças antigas compatíveis se o mod original estiver instalado. Faz primeiro uma cópia do teu mundo.

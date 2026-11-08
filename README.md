@@ -18,8 +18,11 @@ Pieces doesn't generate terrain.
   pieces; corners are eighth-block pieces.
 - Matching pieces can join into supported larger shapes or a full block.
   Different materials don't combine.
-- Find the pieces, including the vanilla items the mod reuses, in the
-  **Sky's Building Pieces** creative tab.
+- Find the new pieces in the **Sky's Building Pieces** creative tab. Vanilla
+  pieces stay in their usual tabs.
+- To use ordinary horizontal placement for regular slabs, open **Mods → Sky's
+  Building Pieces → Config** and turn off **Directional slab placement**. Restart
+  Minecraft after saving.
 
 Walls have lower panels with posts at ends, corners and junctions. A torch or
 block above keeps a supporting post. Matching glass walls form a continuous

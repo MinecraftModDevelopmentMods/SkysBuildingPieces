@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.9.112021
+
+- Directional slab placement can be turned off from the Mods menu.
+- Vanilla items stay in their usual creative tabs.
+
 ## 0.3.8.112021
 
 - Added the missing recipe-book unlocks for crafting and rebuilding pieces.
