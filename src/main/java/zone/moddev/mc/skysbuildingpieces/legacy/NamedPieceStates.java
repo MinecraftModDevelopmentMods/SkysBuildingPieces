@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -17,27 +18,32 @@ final class NamedPieceStates {
     }
 
     static void flatten(CompoundTag root) {
-        List<Change> changes = new ArrayList<>();
+        List<Runnable> changes = new ArrayList<>();
         collect(root, false, changes);
-        for (Change change : changes) {
-            String nameKey = nameKey(change.saved);
-            String propertiesKey = propertiesKey(change.saved);
-            change.saved.putString(nameKey, change.target.getString(nameKey).orElseThrow());
-            if (change.target.get(propertiesKey) instanceof CompoundTag properties) {
-                change.saved.put(propertiesKey, properties);
-            } else {
-                change.saved.remove(propertiesKey);
+        changes.forEach(Runnable::run);
+    }
+
+    private static Tag collect(Tag value, boolean blockStates, List<Runnable> changes) {
+        if (blockStates) {
+            // The 26.3 palette codec stores default states as names, sometimes wrapped in a mixed list.
+            String compactName = value instanceof StringTag name ? name.value()
+                    : value instanceof CompoundTag compound && compound.keySet().size() == 1
+                            ? compound.getStringOr("", "") : "";
+            if (!compactName.isEmpty()) {
+                PieceBlock carrier = LegacyBridge.palette(compactName);
+                if (carrier != null) {
+                    return NbtUtils.writeBlockState(Pieces.canonicalState(carrier.defaultBlockState()));
+                }
             }
         }
-    }
-
-    private record Change(CompoundTag saved, CompoundTag target) {
-    }
-
-    private static void collect(Tag value, boolean blockStates, List<Change> changes) {
         if (value instanceof ListTag list) {
-            for (Tag entry : list) {
-                collect(entry, blockStates, changes);
+            for (int index = 0; index < list.size(); index++) {
+                Tag entry = list.get(index);
+                Tag target = collect(entry, blockStates, changes);
+                if (target != entry) {
+                    int slot = index;
+                    changes.add(() -> list.set(slot, target));
+                }
             }
         } else if (value instanceof CompoundTag compound) {
             String nameKey = nameKey(compound);
@@ -46,18 +52,42 @@ final class NamedPieceStates {
                 BlockState state = resolve(carrier, compound);
                 CompoundTag target = nameKey.equals("id") ? NbtUtils.writeBlockState(state)
                         : NumericStateBridge.writeSavedState(state);
-                changes.add(new Change(compound, target));
-                return;
+                changes.add(() -> replaceNamedState(compound, target, nameKey));
+                return value;
             }
+
             for (String key : compound.keySet()) {
                 switch (key) {
                     case "tag", "components", "ForgeCaps", "neoforge:attachments" -> { }
-                    case "Palette", "palette", "palettes", "BlockState", "blockState", "block_state",
-                            "carriedBlockState", "DisplayState" ->
-                        collect(compound.get(key), true, changes);
-                    default -> collect(compound.get(key), false, changes);
+                    default -> {
+                        Tag entry = compound.get(key);
+                        Tag target = collect(entry, isStateField(key), changes);
+                        if (target != entry) {
+                            changes.add(() -> compound.put(key, target));
+                        }
+                    }
                 }
             }
+        }
+
+        return value;
+    }
+
+    private static boolean isStateField(String key) {
+        return switch (key) {
+            case "Palette", "palette", "palettes", "BlockState", "blockState", "block_state",
+                    "carriedBlockState", "DisplayState" -> true;
+            default -> false;
+        };
+    }
+
+    private static void replaceNamedState(CompoundTag saved, CompoundTag target, String nameKey) {
+        String propertiesKey = propertiesKey(saved);
+        saved.putString(nameKey, target.getString(nameKey).orElseThrow());
+        if (target.get(propertiesKey) instanceof CompoundTag properties) {
+            saved.put(propertiesKey, properties);
+        } else {
+            saved.remove(propertiesKey);
         }
     }
 
