@@ -129,20 +129,22 @@ public final class RecombinationChecks {
             }
         }
 
-        // A different slot in the same metadata palette must never become this material.
         CraftingContainer mixed = grid(2);
         ItemStack ingredient = Pieces.stack(source, 1);
-
         mixed.setItem(0, ingredient);
 
-        int otherMaterial = block.canonicalMeta(source) == 0 ? shape.states : 0;
+        PieceBlock other = Pieces.playableBlocks().stream()
+                .filter(candidate -> candidate != block && candidate.palette.shape == shape)
+                .findFirst().orElseThrow();
+        mixed.setItem(2, Pieces.stack(other.defaultBlockState(), 1));
+        require(result(mixed, world).isEmpty(), "different materials do not recombine");
 
-        if (otherMaterial / shape.states < block.palette.materials.size()) {
-            mixed.setItem(2, Pieces.stack(block.getStateFromMeta(otherMaterial), 1));
-            require(result(mixed, world).isEmpty(), "different materials in one palette do not recombine");
-        }
-
-        ItemStack invalidCarrier = new ItemStack(block);
+        PieceBlock carrier = Pieces.BLOCKS.values().stream()
+                .filter(candidate -> candidate.palette.shape == shape)
+                .findFirst().orElseThrow();
+        Item legacyItem = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(
+                net.minecraft.resources.Identifier.parse(carrier.palette.registryId()));
+        ItemStack invalidCarrier = new ItemStack(legacyItem);
         net.minecraft.nbt.CompoundTag invalid = new net.minecraft.nbt.CompoundTag();
 
         invalid.putInt("Damage", 16);

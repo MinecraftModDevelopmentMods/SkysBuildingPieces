@@ -327,9 +327,15 @@ final class NativeForwardChecks {
                 expected.putString("id", "minecraft:dirt_path");
             }
 
-            require(net.minecraft.nbt.NbtUtils.writeBlockState(world.getBlockState(position)).equals(expected),
+            BlockState oldState = net.minecraft.nbt.NbtUtils.readBlockState(
+                    net.minecraft.core.registries.BuiltInRegistries.BLOCK, expected);
+            BlockState target = Pieces.canonicalState(oldState);
+            BlockState actual = world.getBlockState(position);
+            require(actual.equals(target),
                     "Named state changed during the native upgrade at " + position + ": "
-                            + world.getBlockState(position) + " expected " + expected);
+                            + actual + " expected " + target + " from " + expected);
+            require(!(actual.getBlock() instanceof PieceBlock piece) || !piece.isLegacyPalette(),
+                    "Named piece still uses a palette carrier at " + position);
             states++;
         }
 

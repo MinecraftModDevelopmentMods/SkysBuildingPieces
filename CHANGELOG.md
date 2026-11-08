@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.9.2603002
+
+- Each material and shape now has its own block ID. Existing pieces keep their material, orientation and waterlogging.
+- Directional slab placement can be turned off from the Mods menu.
+- Vanilla items stay in their usual creative tabs.
+
 ## 0.3.8.2603002
 
 - Updated for Minecraft 26.3 on NeoForge. Wool uses the new vanilla slabs and stairs for new builds.

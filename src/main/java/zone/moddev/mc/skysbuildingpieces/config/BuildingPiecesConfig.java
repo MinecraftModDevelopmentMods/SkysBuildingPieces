@@ -12,11 +12,12 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLPaths;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 
-/** Recovery choices are read at startup; old Forge CFG files are kept intact. */
+/** Building and recovery settings shared by the client and server. */
 public final class BuildingPiecesConfig {
     private static final String FILE_NAME = SkysBuildingPieces.ID + "-common.toml";
     private static final ModConfigSpec SPEC;
     private static final ModConfigSpec.BooleanValue FORCE_REPLACEMENT;
+    private static final ModConfigSpec.BooleanValue DIRECTIONAL_SLAB_PLACEMENT;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -27,6 +28,13 @@ public final class BuildingPiecesConfig {
                         "Back up the world before enabling this. Requires restart.",
                         "Recovery is automatic when the original mod is absent.")
                 .worldRestart().define("forceReplaceBuildingBricksPieces", false);
+        builder.pop();
+        builder.push("gameplay");
+        DIRECTIONAL_SLAB_PLACEMENT = builder
+                .comment("Use face and edge clicks to place regular slabs vertically as well as horizontally.",
+                        "Turn this off to keep native slab placement and use horizontal placement for regular Sky slabs.",
+                        "Use the same setting on the client and server. Requires restart.")
+                .worldRestart().define("directionalSlabPlacement", true);
         builder.pop();
         SPEC = builder.build();
     }
@@ -41,6 +49,10 @@ public final class BuildingPiecesConfig {
 
     public static boolean forceReplacement() {
         return FORCE_REPLACEMENT.get();
+    }
+
+    public static boolean directionalSlabPlacement() {
+        return !SPEC.isLoaded() || DIRECTIONAL_SLAB_PLACEMENT.get();
     }
 
     private static void migrateLegacyConfig() {

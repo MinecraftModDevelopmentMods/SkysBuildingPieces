@@ -1,4 +1,13 @@
 {
+  "skysbuildingpieces.configuration.title": "%s-Einstellungen",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Allgemeine Einstellungen",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Allgemeine Einstellungen",
+  "skysbuildingpieces.configuration.gameplay": "Spielregeln",
+  "skysbuildingpieces.configuration.gameplay.button": "Spielregeln",
+  "skysbuildingpieces.configuration.compat": "Kompatibilität",
+  "skysbuildingpieces.configuration.compat.button": "Kompatibilität",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Richtungsabhängige Stufenplatzierung",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Alte Bauteile ersetzen",
   "pieces.skysbuildingpieces.slab": "Stufe aus %s",
   "pieces.skysbuildingpieces.vertical_slab": "Senkrechte Stufe aus %s",
   "pieces.skysbuildingpieces.horizontal_step": "Viertelblock aus %s",

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "orientation=top,waterlogged=false": {
+      "model": "skysbuildingpieces:block/purpur_pillar_slab_0"
+    },
+    "orientation=top,waterlogged=true": {
+      "model": "skysbuildingpieces:block/purpur_pillar_slab_0"
+    },
+    "orientation=bottom,waterlogged=false": {
+      "model": "skysbuildingpieces:block/purpur_pillar_slab_1"
+    },
+    "orientation=bottom,waterlogged=true": {
+      "model": "skysbuildingpieces:block/purpur_pillar_slab_1"
+    }
+  }
+}

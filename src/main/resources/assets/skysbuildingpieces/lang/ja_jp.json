@@ -1,4 +1,13 @@
 {
+  "skysbuildingpieces.configuration.title": "%s の設定",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "共通設定",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "共通設定",
+  "skysbuildingpieces.configuration.gameplay": "ゲームプレイ",
+  "skysbuildingpieces.configuration.gameplay.button": "ゲームプレイ",
+  "skysbuildingpieces.configuration.compat": "互換性",
+  "skysbuildingpieces.configuration.compat.button": "互換性",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "ハーフブロックの向き指定",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "旧式の建材を置き換える",
   "pieces.skysbuildingpieces.slab": "%sのハーフブロック",
   "pieces.skysbuildingpieces.vertical_slab": "%sの縦ハーフブロック",
   "pieces.skysbuildingpieces.horizontal_step": "%sの四分の一ブロック",
