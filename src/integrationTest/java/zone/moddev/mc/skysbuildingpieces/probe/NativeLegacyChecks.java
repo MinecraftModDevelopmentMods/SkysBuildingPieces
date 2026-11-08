@@ -105,6 +105,19 @@ public final class NativeLegacyChecks {
     private static void flattenedPieces() {
         int checked = 0;
         for (PieceBlock carrier : Pieces.BLOCKS.values()) {
+            CompoundTag compact = new CompoundTag();
+            ListTag entries = new ListTag();
+            String oldName = carrier.palette.registryId();
+            entries.add(net.minecraft.nbt.StringTag.valueOf(oldName));
+            CompoundTag wrapped = new CompoundTag();
+            wrapped.putString("", oldName);
+            entries.add(wrapped);
+            compact.put("palette", entries);
+            LegacyBridge.finalizeNbt(compact);
+            CompoundTag expected = NbtUtils.writeBlockState(Pieces.canonicalState(carrier.defaultBlockState()));
+            require(entries.get(0).equals(expected) && entries.get(1).equals(expected),
+                    "Compact default palette state was not recovered: " + oldName);
+
             for (String material : carrier.palette.materials) {
                 for (int orientation = 0; orientation < carrier.palette.shape.states; orientation++) {
                     BlockState old = carrier.getStateFromMeta(carrier.palette.meta(material, orientation))
@@ -124,7 +137,7 @@ public final class NativeLegacyChecks {
                     palette.add(NbtUtils.writeBlockState(old));
                     sample.put("palette", palette);
                     LegacyBridge.finalizeNbt(sample);
-                    require(palette.getCompound(0).equals(NbtUtils.writeBlockState(target)),
+                    require(palette.get(0).equals(NbtUtils.writeBlockState(target)),
                             "Named palette recovery failed: " + old);
                     CompoundTag first = sample.copy();
                     LegacyBridge.finalizeNbt(sample);
