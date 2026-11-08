@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.InteractionResult;
@@ -24,14 +25,15 @@ import net.minecraft.world.level.Level;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 
-/** One material per inventory item; placement still uses the fixed block palette. */
-public final class PieceItem extends Item {
+/** One material and shape per inventory item. */
+public final class PieceItem extends BlockItem {
     public final PieceBlock piece;
     public final String material;
 
     public PieceItem(PieceBlock block, String material) {
-        super(properties(block, material));
+        super(block, properties(block, material));
         this.piece = block;
         this.material = material;
     }
@@ -129,7 +131,8 @@ public final class PieceItem extends Item {
 
         switch (shape) {
             case SLAB:
-                Direction slabSide = SlabPlacement.side(face, hitX, hitY, hitZ);
+                Direction slabSide = BuildingPiecesConfig.directionalSlabPlacement()
+                        ? SlabPlacement.side(face, hitX, hitY, hitZ) : SlabPlacement.horizontalSide(face, hitY);
                 placedShape = SlabPlacement.shape(slabSide);
                 orientation = SlabPlacement.orientation(slabSide);
                 break;
@@ -230,14 +233,25 @@ public final class PieceItem extends Item {
                 | (hitY + face.getStepY() * epsilon >= .5f ? 4 : 0);
         BlockState combinedState = null;
         boolean isSlab = shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB;
-        Shape[] additions = isSlab ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
+        boolean directionalSlabs = isSlab && BuildingPiecesConfig.directionalSlabPlacement();
+        if (isSlab && !directionalSlabs && Geometry.orientationFor(shape, existingCells) < 0) {
+            return false;
+        }
+        boolean horizontalJoin = shape == Shape.SLAB && !directionalSlabs;
+        if (horizontalJoin
+                && (existingCells == 15 ? face == Direction.DOWN || face.getAxis().isHorizontal() && hitY <= .5f
+                        : face == Direction.UP || face.getAxis().isHorizontal() && hitY > .5f)) {
+            return false;
+        }
+        Shape[] additions = directionalSlabs ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
 
         search:
         for (Shape addition : additions) {
             for (int orientation = 0; orientation < addition.states; orientation++) {
                 int addedCells = Geometry.mask(addition, orientation);
 
-                if ((addedCells & 1 << clickedCell) == 0 || (addedCells & existingCells) != 0) {
+                if ((!horizontalJoin && (addedCells & 1 << clickedCell) == 0)
+                        || (addedCells & existingCells) != 0) {
                     continue;
                 }
 

@@ -22,6 +22,7 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PresentationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GlassModelProbe.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientProbe.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ConfigScreenChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientStatus.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ProbeProxy.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipePreviewModels.java')

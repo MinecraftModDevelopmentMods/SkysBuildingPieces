@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "orientation=top,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_gray_slab_0"
+    },
+    "orientation=top,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_gray_slab_0"
+    },
+    "orientation=bottom,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_gray_slab_1"
+    },
+    "orientation=bottom,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_gray_slab_1"
+    }
+  }
+}

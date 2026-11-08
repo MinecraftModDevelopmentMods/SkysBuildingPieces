@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "orientation=top_north_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_0"
+    },
+    "orientation=top_north_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_0"
+    },
+    "orientation=top_north_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_1"
+    },
+    "orientation=top_north_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_1"
+    },
+    "orientation=top_south_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_2"
+    },
+    "orientation=top_south_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_2"
+    },
+    "orientation=top_south_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_3"
+    },
+    "orientation=top_south_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_3"
+    },
+    "orientation=bottom_north_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_4"
+    },
+    "orientation=bottom_north_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_4"
+    },
+    "orientation=bottom_north_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_5"
+    },
+    "orientation=bottom_north_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_5"
+    },
+    "orientation=bottom_south_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_6"
+    },
+    "orientation=bottom_south_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_6"
+    },
+    "orientation=bottom_south_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_7"
+    },
+    "orientation=bottom_south_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_corner_7"
+    }
+  }
+}

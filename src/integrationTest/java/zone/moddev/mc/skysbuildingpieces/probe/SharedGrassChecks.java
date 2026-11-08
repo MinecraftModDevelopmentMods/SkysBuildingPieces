@@ -38,7 +38,7 @@ public final class SharedGrassChecks {
 
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (!block.palette.group.equals("grass")) {
                 continue;
             }

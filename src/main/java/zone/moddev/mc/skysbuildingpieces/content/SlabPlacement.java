@@ -45,6 +45,10 @@ public final class SlabPlacement {
         return right(face, hitX, hitZ) >= hitY ? face.getClockWise() : face.getCounterClockWise();
     }
 
+    static Direction horizontalSide(Direction face, float hitY) {
+        return face == Direction.DOWN || face.getAxis().isHorizontal() && hitY > .5f ? Direction.UP : Direction.DOWN;
+    }
+
     public static Shape shape(Direction side) {
         return side.getAxis() == Direction.Axis.Y ? Shape.SLAB : Shape.VERTICAL_SLAB;
     }

@@ -205,8 +205,14 @@ def prepare(options, directory):
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
+    if options.directional_slabs_off:
+        configuration = directory / "config/skysbuildingpieces-common.toml"
+        configuration.parent.mkdir(exist_ok=True)
+        configuration.write_text("[gameplay]\ndirectionalSlabPlacement=false\n", encoding="utf-8")
     profile = {"persistence_order": options.persistence_order,
                "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
+    if options.directional_slabs_off:
+        profile["directional_slabs_off"] = True
     (directory / "qualification-options.json").write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
     if options.fixture:
         with zipfile.ZipFile(options.fixture) as archive:
@@ -246,6 +252,7 @@ def main():
         parser.add_argument("--" + option, type=Path, required=True)
     parser.add_argument("--mode", choices=("server", "client"), required=True)
     parser.add_argument("--phase", required=True)
+    parser.add_argument("--directional-slabs-off", action="store_true")
     parser.add_argument("--assets", type=Path)
     parser.add_argument("--natives", type=Path)
     parser.add_argument("--fixture", type=Path)
@@ -262,6 +269,8 @@ def main():
     else:
         profile = {"persistence_order": options.persistence_order,
                    "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
+        if options.directional_slabs_off:
+            profile["directional_slabs_off"] = True
         if json.loads((directory / "qualification-options.json").read_text(encoding="utf-8")) != profile:
             raise ValueError("Qualification options changed between loads")
         expected = json.loads((directory / "artifact-inputs.json").read_text(encoding="utf-8"))

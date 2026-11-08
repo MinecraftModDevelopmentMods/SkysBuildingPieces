@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.9.2603001
+
+- Each material and shape now has its own block ID. Existing pieces keep their shapes and orientation.
+- The creative tab shows the mod's own pieces.
+- Directional slab placement is on by default and can be turned off in the Mods menu.
+
 ## 0.3.8.2603001
 
 - Updated Building Pieces for Minecraft 26.3 on Forge.

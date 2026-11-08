@@ -1,10 +1,8 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -13,10 +11,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
-import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
-import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Keep new pieces and the native shapes they reuse together in one tab. */
+/** Show pieces supplied by this catalogue and its installed add-ons. */
 public final class PiecesTab {
     public static CreativeModeTab INSTANCE;
 
@@ -24,7 +20,7 @@ public final class PiecesTab {
         event.register(Registries.CREATIVE_MODE_TAB, registry -> {
             INSTANCE = CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.skysbuildingpieces"))
-                    .icon(() -> new ItemStack(Blocks.BRICK_STAIRS))
+                    .icon(() -> new ItemStack(Pieces.pieceItem(SkysBuildingPieces.ID + ":gold_block_wall")))
                     .displayItems((parameters, output) -> entries().values().forEach(output::accept))
                     .build();
             registry.register(Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
@@ -40,22 +36,6 @@ public final class PiecesTab {
             }
         }
 
-        for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
-            if (material.replacement() != null) {
-                continue;
-            }
-
-            for (Shape shape : new Shape[] { Shape.SLAB, Shape.STAIRS, Shape.WALL, Shape.PANE }) {
-                if (material.block(shape.name().toLowerCase(Locale.ROOT)) == null) {
-                    continue;
-                }
-
-                ItemStack nativeItem = Pieces.stack(Pieces.state(material.id, shape, shape == Shape.SLAB ? 1 : 0), 1);
-                if (nativeItem != null) {
-                    entries.putIfAbsent(ForgeRegistries.ITEMS.getKey(nativeItem.getItem()), nativeItem);
-                }
-            }
-        }
         return entries;
     }
 

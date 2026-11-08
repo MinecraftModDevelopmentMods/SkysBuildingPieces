@@ -53,7 +53,8 @@ class ResourceTest {
 
             reader.endObject();
 
-            assertEquals(17 + Catalogue.INSTANCE.materials.size(), current.size());
+            assertEquals(17 + 11 + Catalogue.INSTANCE.materials.size(), current.size());
+            assertTrue(current.contains("skysbuildingpieces.configuration.directionalSlabPlacement"));
             assertTrue(current.contains("itemGroup.skysbuildingpieces"));
 
             if (keys == null) {

@@ -34,7 +34,7 @@ final class MineralogyChecks {
             }
         }
 
-        require(registered == 35, "Mineralogy must use exactly 35 core block IDs");
+        require(registered == 35 + 81, "Mineralogy must register its 35 recovery palettes and 81 individual pieces: " + registered);
 
         int states = 0;
         if (disabled) {
@@ -68,8 +68,9 @@ final class MineralogyChecks {
                     BlockState state = Pieces.state(material, palette.shape, orientation);
 
                     require(state != null && !state.hasBlockEntity(), "invalid rock piece");
-                    require(((zone.moddev.mc.skysbuildingpieces.content.PieceBlock) state.getBlock())
-                            .getMetaFromState(state) == palette.meta(material, orientation),
+                    var block = (zone.moddev.mc.skysbuildingpieces.content.PieceBlock) state.getBlock();
+                    require(!block.isLegacyPalette() && block.definition(state).id.equals(material)
+                            && block.orientation(state) == orientation,
                             "saved material or orientation changed");
                     states++;
                 }

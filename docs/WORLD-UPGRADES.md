@@ -1,5 +1,8 @@
 # Existing worlds
 
+The first load converts old shared palettes to individual block IDs. The
+material, orientation and water in each saved piece carry across.
+
 The separate Mineralogy piece add-on from the earlier local tests is no longer
 needed. Use Building Pieces with Mineralogy instead. Its test-save piece IDs
 are recovered automatically, including item stacks in chunks opened after the

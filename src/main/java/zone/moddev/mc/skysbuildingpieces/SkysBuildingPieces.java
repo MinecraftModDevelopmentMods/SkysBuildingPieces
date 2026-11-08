@@ -30,7 +30,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.2603001";
+    public static final String VERSION = "0.3.9.2603001";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;
@@ -50,7 +50,7 @@ public final class SkysBuildingPieces {
         PathPieces.register();
         ServerStoppedEvent.BUS.addListener(this::afterServer);
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register();
+            zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(context);
         }
     }
 
@@ -58,6 +58,7 @@ public final class SkysBuildingPieces {
         // Install the legacy-world startup listener after parallel mod setup.
         event.enqueueWork(LegacyBridge::registerPersistence);
         forceReplace = BuildingPiecesConfig.forceReplacement();
+        BuildingPiecesConfig.activate();
         Pieces.validateMaterials();
         GrassLifecycle.initialize();
         NativeSlabPlacement.initialize();
