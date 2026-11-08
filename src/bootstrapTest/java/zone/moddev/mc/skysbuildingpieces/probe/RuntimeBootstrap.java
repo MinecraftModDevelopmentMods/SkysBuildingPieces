@@ -285,7 +285,7 @@ public final class RuntimeBootstrap {
         int checked = 0;
         java.util.Set<net.minecraft.world.item.Item> nativeItems = new java.util.HashSet<>();
 
-        for (PieceBlock block : Pieces.playableBlocks()) {
+        for (PieceBlock block : Pieces.BLOCKS.values()) {
             int assigned = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < assigned; metadata++) {

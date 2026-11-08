@@ -124,7 +124,7 @@ public final class NativeLegacyChecks {
                     palette.add(NbtUtils.writeBlockState(old));
                     sample.put("palette", palette);
                     LegacyBridge.finalizeNbt(sample);
-                    require(palette.getCompound(0).equals(NbtUtils.writeBlockState(target)),
+                    require(palette.get(0).equals(NbtUtils.writeBlockState(target)),
                             "Named palette recovery failed: " + old);
                     CompoundTag first = sample.copy();
                     LegacyBridge.finalizeNbt(sample);
