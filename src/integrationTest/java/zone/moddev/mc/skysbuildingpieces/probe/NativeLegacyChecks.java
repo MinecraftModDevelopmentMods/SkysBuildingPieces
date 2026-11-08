@@ -114,7 +114,7 @@ public final class NativeLegacyChecks {
             entries.add(wrapped);
             compact.put("palette", entries);
             LegacyBridge.finalizeNbt(compact);
-            CompoundTag expected = NbtUtils.writeBlockState(Pieces.canonicalState(carrier.defaultBlockState()));
+            CompoundTag expected = NbtUtils.writeBlockState(Pieces.canonicalNamedState(carrier.defaultBlockState()));
             require(entries.get(0).equals(expected) && entries.get(1).equals(expected),
                     "Compact default palette state was not recovered: " + oldName);
 
@@ -122,7 +122,7 @@ public final class NativeLegacyChecks {
                 for (int orientation = 0; orientation < carrier.palette.shape.states; orientation++) {
                     BlockState old = carrier.getStateFromMeta(carrier.palette.meta(material, orientation))
                             .setValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED, true);
-                    BlockState target = Pieces.canonicalState(old);
+                    BlockState target = Pieces.canonicalNamedState(old);
                     if (!(target.getBlock() instanceof PieceBlock piece)) {
                         continue;
                     }
