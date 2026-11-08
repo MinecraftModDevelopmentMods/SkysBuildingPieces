@@ -33,7 +33,7 @@ public final class WaterloggingChecks {
         int tested = 0;
         int decays = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             int assigned = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < assigned; metadata++) {

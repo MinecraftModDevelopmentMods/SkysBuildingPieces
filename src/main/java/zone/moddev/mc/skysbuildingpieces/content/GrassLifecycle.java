@@ -31,7 +31,7 @@ public final class GrassLifecycle {
             Method register = api.getMethod("registerGrassForm", BlockState.class, BlockState.class);
             Set<BlockState> registered = new HashSet<>();
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.playableBlocks()) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     if (!grass(state) || !block.definition(state).id.equals("minecraft:grass")) {
                         continue;

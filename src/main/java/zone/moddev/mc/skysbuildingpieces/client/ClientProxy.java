@@ -16,8 +16,10 @@ import net.minecraftforge.fml.ModList;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
@@ -28,7 +30,9 @@ public final class ClientProxy {
     private ClientProxy() {
     }
 
-    public static void register() {
+    public static void register(FMLJavaModLoadingContext context) {
+        context.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(BuildingPiecesConfigScreen::new));
         ModelEvent.ModifyBakingResult.BUS.addListener(ContinuousGlassModel::bake);
     }
 
@@ -51,7 +55,7 @@ public final class ClientProxy {
 
     @SubscribeEvent
     public static void blockColors(RegisterColorHandlersEvent.Block event) {
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
             if (block.palette.group.equals("grass")) {
                 event.register(List.of(BlockTintSources.grassBlock()), block);
             }
