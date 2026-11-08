@@ -37,7 +37,7 @@ public final class PresentationChecks {
 
         Set<String> coveredMaterials = new HashSet<String>();
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape != Shape.WALL) {
                 continue;
             }
@@ -179,7 +179,7 @@ public final class PresentationChecks {
 
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             for (String material : block.palette.materials) {
                 String previous = null;
 
@@ -215,7 +215,7 @@ public final class PresentationChecks {
         Direction[] sides = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
         List<BlockState> materials = new ArrayList<BlockState>();
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.WALL && block.palette.group.contains("glass")) {
                 for (int slot = 0; slot < block.palette.materials.size(); slot++) {
                     materials.add(block.getStateFromMeta(slot));
@@ -310,7 +310,7 @@ public final class PresentationChecks {
 
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape != Shape.WALL) {
                 continue;
             }

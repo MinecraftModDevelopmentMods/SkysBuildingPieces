@@ -83,6 +83,7 @@ public final class ClientProbe extends ProbeProxy {
         try {
             org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().getWindow());
 
+            ConfigScreenChecks.run(minecraft);
             var availableCreative = PiecesTab.entries();
 
             for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
@@ -131,8 +132,8 @@ public final class ClientProbe extends ProbeProxy {
                     throw new AssertionError("Retired template in mod tab");
                 }
             }
-            if (!entries.contains("minecraft:oak_slab")) {
-                throw new AssertionError("Reused oak slab missing from mod tab");
+            if (entries.stream().anyMatch(key -> key.startsWith("minecraft:"))) {
+                throw new AssertionError("Vanilla content appears in the Building Pieces tab");
             }
             if (entries.contains("skysbuildingpieces:legacy_piece_holder")) {
                 throw new AssertionError("Recovery holder in mod tab");
@@ -148,7 +149,7 @@ public final class ClientProbe extends ProbeProxy {
 
             int checked = 0;
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.registeredBlocks()) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     BakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
 
@@ -300,7 +301,7 @@ public final class ClientProbe extends ProbeProxy {
         int inventory = net.minecraft.world.level.GrassColor.get(.5, 1);
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (!block.palette.group.equals("grass")) {
                 continue;
             }

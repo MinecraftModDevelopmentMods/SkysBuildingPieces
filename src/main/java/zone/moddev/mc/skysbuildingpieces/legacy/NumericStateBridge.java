@@ -82,6 +82,7 @@ final class NumericStateBridge {
             if (state.isAir() || state.hasBlockEntity()) {
                 throw new LegacyBridge.RecoveryAbort("A saved migration target is no longer available: " + entry, null);
             }
+            state = Pieces.canonicalState(state);
 
             occupied.set(blockId);
             stagingIds.set(blockId);

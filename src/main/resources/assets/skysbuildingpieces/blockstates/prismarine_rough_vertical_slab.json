@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "orientation=south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_0"
+    },
+    "orientation=south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_0"
+    },
+    "orientation=west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_1"
+    },
+    "orientation=west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_1"
+    },
+    "orientation=north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_2"
+    },
+    "orientation=north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_2"
+    },
+    "orientation=east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_3"
+    },
+    "orientation=east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/prismarine_rough_vertical_slab_3"
+    }
+  }
+}

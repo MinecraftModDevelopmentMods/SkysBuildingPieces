@@ -22,7 +22,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 @Mod(SkysBuildingPieces.ID)
 public final class SkysBuildingPieces {
     public static final String ID = "skysbuildingpieces";
-    public static final String VERSION = "0.3.8.121011";
+    public static final String VERSION = "0.3.9.121011";
     public static final Logger LOGGER = LogManager.getLogger();
     public static boolean forceReplace;
     public static Block HOLDER;
@@ -32,17 +32,20 @@ public final class SkysBuildingPieces {
         Pieces.register();
         MineralogyCompat.register();
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
+        context.getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(new MigrationEvents());
         MinecraftForge.EVENT_BUS.register(new PathPieces());
         MinecraftForge.EVENT_BUS.addListener(this::afterServer);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> zone.moddev.mc.skysbuildingpieces.client.ClientProxy::register);
+        DistExecutor.runWhenOn(Dist.CLIENT,
+                () -> () -> zone.moddev.mc.skysbuildingpieces.client.ClientProxy.register(context));
     }
 
     private void setup(FMLCommonSetupEvent event) {
         // Install the legacy-world startup listener after parallel mod setup.
         event.enqueueWork(LegacyBridge::registerPersistence);
         forceReplace = BuildingPiecesConfig.forceReplacement();
+        BuildingPiecesConfig.activate();
         Pieces.validateMaterials();
         GrassLifecycle.initialize();
         NativeSlabPlacement.initialize();
