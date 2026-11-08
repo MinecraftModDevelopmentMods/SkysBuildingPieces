@@ -32,7 +32,7 @@ final class NamedPieceStates {
             if (!compactName.isEmpty()) {
                 PieceBlock carrier = LegacyBridge.palette(compactName);
                 if (carrier != null) {
-                    return NbtUtils.writeBlockState(Pieces.canonicalState(carrier.defaultBlockState()));
+                    return NbtUtils.writeBlockState(Pieces.canonicalNamedState(carrier.defaultBlockState()));
                 }
             }
         }
@@ -109,7 +109,7 @@ final class NamedPieceStates {
                     state = withProperty(state, property, properties.getStringOr(name, ""));
                 }
             }
-            return Pieces.canonicalState(state);
+            return Pieces.canonicalNamedState(state);
         } catch (RuntimeException failure) {
             throw new LegacyBridge.RecoveryAbort("Cannot recover " + saved.getStringOr(nameKey(saved), "") + ": "
                     + failure.getMessage(), failure);

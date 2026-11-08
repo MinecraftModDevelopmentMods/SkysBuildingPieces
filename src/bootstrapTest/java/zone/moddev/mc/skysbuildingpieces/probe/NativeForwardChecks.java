@@ -329,7 +329,7 @@ final class NativeForwardChecks {
 
             BlockState oldState = net.minecraft.nbt.NbtUtils.readBlockState(
                     net.minecraft.core.registries.BuiltInRegistries.BLOCK, expected);
-            BlockState target = Pieces.canonicalState(oldState);
+            BlockState target = Pieces.canonicalNamedState(oldState);
             BlockState actual = world.getBlockState(position);
             require(actual.equals(target),
                     "Named state changed during the native upgrade at " + position + ": "
