@@ -32,9 +32,9 @@ listener. Pass `BuiltInRegistries.BLOCK` during `Registries.BLOCK` and
 the first block registration freezes the catalogue. The helpers register only
 that contributor's namespace.
 
-The API returns native `BlockState` values. The permanent palette IDs and slots
-remain unchanged, while ordinary inventory items have one identity per material
-and shape. Use the public lookup rather than constructing inventory metadata.
+The API returns native `BlockState` values. Placed pieces and inventory items
+have their own IDs for each material and shape. Palette slots are kept for
+reading old saves. Use the public lookup to resolve the current block state.
 
 For a retired material, `replacement` can name another registered material.
 Keep its original ID and palette slots: saved pieces then use the replacement's

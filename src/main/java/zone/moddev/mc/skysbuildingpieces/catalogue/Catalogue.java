@@ -299,6 +299,20 @@ public final class Catalogue {
             return namespace + ":" + id;
         }
 
+        private Palette(Palette source, String id, String material) {
+            module = source.module;
+            namespace = source.namespace;
+            this.id = id;
+            group = source.group;
+            shape = source.shape;
+            materials = List.of(material);
+        }
+
+        /** Carry the catalogue's shape and material rules into a single registered block. */
+        public Palette forMaterial(String id, String material) {
+            return new Palette(this, id, material);
+        }
+
         /** The material slot is permanent; orientation occupies the values within that slot. */
         public String material(int meta) {
             int slot = (meta & 15) / shape.states;

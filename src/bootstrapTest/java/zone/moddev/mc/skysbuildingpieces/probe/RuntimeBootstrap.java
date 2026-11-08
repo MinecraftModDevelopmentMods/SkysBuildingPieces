@@ -121,6 +121,9 @@ public final class RuntimeBootstrap {
                 zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
+            } else if (!zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig.directionalSlabPlacement()
+                    && (phase.equals("fresh") || phase.equals("reload"))) {
+                GameplayChecks.horizontalSlabsOnly(world);
             } else if (phase.startsWith("client")) {
                 // The dedicated server exercises crafting and migration exhaustively.
                 // Here a real client must load, render and reopen the native piece states.
@@ -230,7 +233,7 @@ public final class RuntimeBootstrap {
 
         int number = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             int values = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < values; metadata++) {
@@ -282,7 +285,7 @@ public final class RuntimeBootstrap {
         int checked = 0;
         java.util.Set<net.minecraft.world.item.Item> nativeItems = new java.util.HashSet<>();
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             int assigned = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < assigned; metadata++) {
