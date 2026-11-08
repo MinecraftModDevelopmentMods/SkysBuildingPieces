@@ -17,8 +17,11 @@ Before relying on the beta in a modpack, check:
 - Check gold, packed ice and the other wall materials in straight runs, corners
   and junctions. The panels should be lower than the posts. Add and remove a
   block or torch above the middle of a run, then check selection and collision.
-- Open the Sky's Building Pieces creative tab. Reused vanilla pieces such as
-  oak slabs should appear once, without separate vertical slabs or old templates.
+- Open the Sky's Building Pieces creative tab. Look for pieces such as Gold
+  Wall and Oak Step. Oak slabs should still be in the vanilla creative tabs.
+- In **Mods → Sky's Building Pieces → Config**, check that
+  **Directional slab placement** starts on. Turn it off, restart Minecraft,
+  then place and join an oak slab and a glass slab as ordinary horizontal slabs.
 - Build clear and stained glass walls in straight runs, corners and junctions.
   Matching panels should look continuous; exposed ends, posts and colour changes
   should keep their borders. Add and remove a block above a straight run to check
