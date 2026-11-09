@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/slate",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:slate_slab"
+  },
+  "result": {
+    "id": "mineralogy:slate",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:slate"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:slate_slab"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "minecraft:cracked_stone_bricks"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_cracked_slab",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stonebrick_cracked_slab"
+  }
+}

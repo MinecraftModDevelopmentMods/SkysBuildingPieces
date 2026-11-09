@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skysbuildingpieces/wool_magenta",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_magenta_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:magenta_wool_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_magenta_horizontal_step"
+  }
+}

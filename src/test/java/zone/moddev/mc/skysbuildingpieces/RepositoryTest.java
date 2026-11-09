@@ -55,12 +55,18 @@ class RepositoryTest {
         String ciWorkflow = new String(Files.readAllBytes(Paths.get(".github/workflows/ci.yml")),
                 StandardCharsets.UTF_8);
 
-        assertTrue(ciWorkflow.contains("'master-*'"));
-        assertTrue(ciWorkflow.contains("artifact_prefix=SkysBuildingPieces-$(value mod_version)"));
+        java.util.Properties target = new java.util.Properties();
+
+        try (java.io.Reader reader = Files.newBufferedReader(Paths.get("gradle.properties"), StandardCharsets.UTF_8)) {
+            target.load(reader);
+        }
+
+        assertTrue(ciWorkflow.contains("master-" + target.getProperty("minecraft_version")));
         assertTrue(ciWorkflow.contains("if-no-files-found: error"));
 
         for (String classifier : new String[] { "", "-sources", "-javadoc" }) {
-            assertTrue(ciWorkflow.contains("${{ steps.target.outputs.artifact_prefix }}" + classifier + ".jar"));
+            assertTrue(ciWorkflow.contains(
+                    "build/libs/SkysBuildingPieces-" + target.getProperty("mod_version") + classifier + ".jar"));
         }
 
         String tags = new String(Files.readAllBytes(Paths.get(".github/workflows/release-on-tag.yml")),

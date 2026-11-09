@@ -7,7 +7,8 @@ def prepareBook = tasks.register('prepareRecipeBookTest') {
         if (directory.canonicalFile != new File(buildDir, 'recipe-book-test-run').canonicalFile) {
             throw new GradleException('Recipe-book verification must stay inside the build directory')
         }
-        delete directory
+        if (directory.exists()) throw new GradleException('Preserve the existing recipe-book evidence: ' + directory)
+        copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
         copy {
             from tasks.named('integrationTestModJar', Jar).flatMap { it.archiveFile }
             into new File(directory, 'mods')
@@ -37,7 +38,6 @@ def bookTasks = [:]
         dependsOn phase == 'fresh' ? prepareBook : bookTasks.fresh
         workingDir bookDirectory
         systemProperty 'skysbuildingpieces.integrationPhase', 'recipe-book-' + phase
-        systemProperty 'log4j.configurationFile', project.ext.recipeBookLogConfiguration
         project.ext.configureRecipeBookRun(delegate, 'runServer')
         doLast {
             if (!new File(bookDirectory.get().asFile, 'world/recipe-book-' + phase + '.pass').isFile()) {

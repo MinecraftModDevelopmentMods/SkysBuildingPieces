@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/smooth_sandstone",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:cut_sandstone_slab"
+  },
+  "result": {
+    "id": "minecraft:cut_sandstone",
+    "count": 1
+  }
+}

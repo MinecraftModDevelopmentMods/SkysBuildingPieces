@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/diorite_smooth",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:polished_diorite_slab"
+  },
+  "result": {
+    "id": "minecraft:polished_diorite",
+    "count": 1
+  }
+}

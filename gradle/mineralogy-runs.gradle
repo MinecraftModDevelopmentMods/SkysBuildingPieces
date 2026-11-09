@@ -18,56 +18,21 @@ def gameDirectory = layout.projectDirectory.dir(
 
 def configureVerification = project.ext.configureMineralogyVerificationRun
 
-// Legacy release jars declare SRG access rules. The mapped development game needs
-// their MCP names before launch; the original optional jars remain untouched.
-configurations { mineralogyDevelopmentMappings }
-repositories {
-    maven {
-        name = 'MineralogyDevelopmentMappings'
-        url = 'https://maven.minecraftforge.net/'
-        metadataSources { artifact() }
-        content { includeModule('de.oceanlabs.mcp', 'mcp_stable') }
-    }
-}
-dependencies {
-    mineralogyDevelopmentMappings "de.oceanlabs.mcp:mcp_stable:${project.mapping_version}@zip"
-}
-if (runtimeSources.values().every { it.isFile() }) {
-    Map<String, String> mappedMembers = [:]
-    new java.util.zip.ZipFile(configurations.mineralogyDevelopmentMappings.singleFile).withCloseable { mappings ->
-        ['fields.csv', 'methods.csv'].each { name ->
-            mappings.getInputStream(mappings.getEntry(name)).withCloseable { input ->
-                input.getText('UTF-8').readLines().drop(1).each { row ->
-                    String[] columns = row.split(',', 3)
-                    mappedMembers[columns[0]] = columns[1]
-                }
+// Forge uses the same official names in development and in the game.
+ext.nativeOptionalDevelopmentJars = runtimeSources
+ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') {
+    group = 'verification'
+    doLast {
+        runtimeSources.each { mod, source ->
+            if (!source.isFile()) throw new GradleException('Missing optional reference jar: ' + source)
+            String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
+                    .encodeHex().toString().toUpperCase(Locale.ROOT)
+            if (actual != runtimeLock.getProperty(mod + '.sha256')) {
+                throw new GradleException('Optional reference hash changed: ' + source.name)
             }
         }
     }
-    List<String> rules = []
-    runtimeSources.each { mod, source ->
-        new java.util.jar.JarFile(source).withCloseable { archive ->
-            String declared = archive.manifest?.mainAttributes?.getValue('FMLAT')
-            declared?.tokenize()?.each { name ->
-                def entry = archive.getJarEntry('META-INF/' + name)
-                if (entry == null) throw new GradleException("Missing ${mod} access rules: ${name}")
-                archive.getInputStream(entry).withCloseable { input ->
-                    String mapped = input.getText('UTF-8').replaceAll(/\b(?:func|field)_\d+_[A-Za-z_]+\b/) { member ->
-                        if (!mappedMembers.containsKey(member)) throw new GradleException("Unmapped optional access rule: ${member}")
-                        mappedMembers[member]
-                    }
-                    rules.add(mapped)
-                }
-            }
-        }
-    }
-    File accessRules = file('.gradle/mineralogy-runtime/access-transformers.cfg')
-    accessRules.parentFile.mkdirs()
-    accessRules.setText(rules.join('\n') + '\n', 'UTF-8')
-    minecraft.accessTransformers.from(accessRules)
 }
-def developmentLogging = file('gradle/development-log4j2.xml').toURI().toString()
-
 
 def installRuntimeMods = {
     runtimeSources.each { mod, source ->
@@ -104,6 +69,7 @@ def installRuntimeMods = {
 def prepareMineralogyDevelopmentRun = tasks.register('prepareMineralogyDevelopmentRun') {
     group = 'ide'
     description = 'Checks and installs the optional Mineralogy/OreSpawn jars in the separate game folder.'
+    dependsOn project.ext.verifyNativeOptionalRuntime
     doLast { installRuntimeMods() }
 }
 
@@ -126,7 +92,6 @@ tasks.register('runMineralogyClient', JavaExec) {
     description = 'Runs a separate client with Mineralogy and OreSpawn installed.'
     dependsOn prepareMineralogyDevelopmentRun
     workingDir gameDirectory
-    systemProperty 'log4j.configurationFile', developmentLogging
     configureVerification(delegate, 'runClient')
 }
 tasks.register('runMineralogyServer', JavaExec) {
@@ -134,7 +99,6 @@ tasks.register('runMineralogyServer', JavaExec) {
     description = 'Runs a separate server with Mineralogy and OreSpawn installed.'
     dependsOn prepareMineralogyDevelopmentRun
     workingDir gameDirectory
-    systemProperty 'log4j.configurationFile', developmentLogging
     args '--nogui'
     configureVerification(delegate, 'runServer')
 }
@@ -150,10 +114,6 @@ def generateMineralogyEclipseRuns = tasks.register('generateMineralogyEclipseRun
             xml.stringAttribute.find {
                 it.@key == 'org.eclipse.jdt.launching.WORKING_DIRECTORY'
             }.@value = gameDirectory.asFile.absolutePath
-            def vmArguments = xml.stringAttribute.find {
-                it.@key == 'org.eclipse.jdt.launching.VM_ARGUMENTS'
-            }
-            vmArguments.@value = vmArguments.@value.toString() + ' -Dlog4j.configurationFile=' + developmentLogging
             file("runMineralogy${side}.launch").setText(groovy.xml.XmlUtil.serialize(xml).replace('\r\n', '\n'), 'UTF-8')
         }
     }
@@ -195,22 +155,27 @@ tasks.register('verifyMineralogyDevelopmentProfile') {
 
 // Verification uses another directory. Probes never enter the manual Eclipse profile.
 def probeId = project.ext.mineralogyProfileProbeId
-def verificationDirectory = layout.buildDirectory.dir('mineralogy-integration-run')
+def verificationRunName = providers.gradleProperty('mineralogyIntegrationRunName')
+        .getOrElse('mineralogy-integration-run')
+if (!(verificationRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable Mineralogy directory name')
+}
+def verificationDirectory = layout.buildDirectory.dir(verificationRunName)
 def prepareMineralogyIntegrationTest = tasks.register('prepareMineralogyIntegrationTest') {
     group = 'verification'
     dependsOn prepareMineralogyDevelopmentRun, tasks.named('integrationTestModJar')
     doLast {
         File directory = verificationDirectory.get().asFile
-        File expected = new File(layout.buildDirectory.get().asFile, 'mineralogy-integration-run')
+        File expected = new File(layout.buildDirectory.get().asFile, verificationRunName)
         if (directory.canonicalFile != expected.canonicalFile) {
             throw new GradleException('Refusing to clear a Mineralogy verification directory outside the build output')
         }
-        project.delete(directory)
+        if (directory.exists()) throw new GradleException('Preserve the existing Mineralogy verification evidence: ' + directory)
         if (providers.gradleProperty('testNativeSlabs').getOrElse('true') == 'false') {
             File configDirectory = new File(directory, 'config')
             configDirectory.mkdirs()
-            new File(configDirectory, 'mineralogy.cfg').setText(
-                    'options {\n    B:GENERATE_ROCKSLAB=false\n}\n', 'UTF-8')
+            new File(configDirectory, 'mineralogy-common.toml').setText(
+                    '[options]\nGENERATE_ROCKSLAB=false\n', 'UTF-8')
         }
         copy {
             from new File(gameDirectory.asFile, 'mods')
@@ -224,7 +189,7 @@ def prepareMineralogyIntegrationTest = tasks.register('prepareMineralogyIntegrat
         new File(directory, 'server.properties').setText('''\
 level-name=world
 level-seed=4815162342
-level-type=default
+level-type=minecraft:normal
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
@@ -233,8 +198,8 @@ spawn-animals=false
 spawn-monsters=false
 spawn-protection=0
 max-tick-time=120000
-'''.replace('level-type=default',
-                probeId == 'skysterrainsmootherbop' ? 'level-type=BIOMESOP' : 'level-type=default'), 'UTF-8')
+'''.replace('level-type=minecraft:normal',
+                probeId == 'skysterrainsmootherbop' ? 'level-type=BIOMESOP' : 'level-type=minecraft:normal'), 'UTF-8')
     }
 }
 
@@ -243,7 +208,6 @@ def fresh = tasks.register('integrationMineralogyFreshProcess', JavaExec) {
     dependsOn prepareMineralogyIntegrationTest
     workingDir verificationDirectory
     systemProperty probeId + '.integrationPhase', 'fresh'
-    systemProperty 'log4j.configurationFile', developmentLogging
     systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
     systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
     configureVerification(delegate, 'runServer')
@@ -253,7 +217,6 @@ def reload = tasks.register('integrationMineralogyReloadProcess', JavaExec) {
     dependsOn fresh
     workingDir verificationDirectory
     systemProperty probeId + '.integrationPhase', 'reload'
-    systemProperty 'log4j.configurationFile', developmentLogging
     systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
     systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
     configureVerification(delegate, 'runServer')
@@ -282,7 +245,6 @@ tasks.register('integrationMineralogyClientProcess', JavaExec) {
     dependsOn prepareMineralogyIntegrationTest
     workingDir verificationDirectory
     systemProperty probeId + '.integrationPhase', 'client'
-    systemProperty 'log4j.configurationFile', developmentLogging
     systemProperty 'skysterrainsmoother.requireMineralogy', 'true'
     systemProperty 'skysterrainsmoother.testMineralogyShapes', 'false'
     configureVerification(delegate, 'runClient')

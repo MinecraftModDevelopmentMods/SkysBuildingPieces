@@ -1,5 +1,102 @@
 # Changelog
 
+## 0.3.9.2603001
+
+- Removed duplicate grass and dirt slab recipes when Sky's Grass Slabs is installed.
+- Each material and shape now has its own block ID. Existing pieces keep their shapes and orientation.
+- The creative tab shows the mod's own pieces.
+- Directional slab placement is on by default and can be turned off in the Mods menu.
+
+## 0.3.8.2603001
+
+- Updated Building Pieces for Minecraft 26.3 on Forge.
+- Existing pieces, recipes and migration totals carry forward.
+- The Building Pieces tab now uses Minecraft's wool slabs and stairs. Older
+  Sky wool slabs and stairs still load and can be exchanged in the crafting grid.
+
+## 0.3.8.2602001
+
+- Updated Building Pieces for Minecraft 26.2 on Forge.
+- Existing pieces, recipes and migration totals carry forward.
+- Larger modded saves can upgrade without losing their saved registry data.
+
+## 0.3.8.2601021
+
+- Bring Building Pieces to Minecraft 26.1.2 on Forge.
+- Carry forward the saved pieces, recipes and migration totals from earlier worlds.
+
+## 0.3.8.121111
+
+- Update Building Pieces to Minecraft 1.21.11 on Forge.
+- Keep the existing pieces, recipes and supported world upgrades.
+- Grass Slabs and Mineralogy remain optional.
+
+## 0.3.8.121011
+
+- Bring Building Pieces to Minecraft 1.21.1 on Forge.
+- Keep existing pieces, recipes and supported world upgrades.
+- Grass Slabs and Mineralogy are still optional.
+
+## 0.3.8.120061
+
+- Bring the building pieces and recipes to Minecraft 1.20.6.
+- Keep custom names and other item data when rotating or recovering pieces.
+- Keep Grass Slabs and Mineralogy optional.
+
+## 0.3.8.120011
+
+- Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.20.1.
+- Preserve existing pieces, their recipes and supported world upgrades.
+- Keep Grass Slabs and Mineralogy integration optional.
+
+## 0.3.8.119041
+
+- Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.19.4.
+- Keep the existing palettes, recipes and supported world recovery.
+- Retain optional Grass Slabs and Mineralogy integration without requiring either mod.
+
+
+## 0.3.8.118021 - Minecraft 1.18.2 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.18.2.
+- Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
+- Keep saved palettes, orientations, inventories and custom item data when upgrading.
+- Preserve recovery progress in the new chunk format, including add-on coverage.
+- Keep add-on biome names through Minecraft's conversion to section palettes.
+- Fix loading of older worlds with gaps in their saved biome numbers.
+- Use the matching Grass Slabs version for shared grass behaviour when installed.
+
+## 0.3.8.117011 - Minecraft 1.17.1 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.17.1.
+- Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
+- Show recipes in the recipe book when their matching ingredients are collected.
+- Keep saved palettes, orientations and custom item data when upgrading.
+- Keep add-on material names short and translated, including BOP wood pieces.
+- Keep the full material's mining rules for pieces made from retired rocks.
+- Fix a startup crash when several mods preserve old world data.
+
+## 0.3.8.116051 - Minecraft 1.16.5 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.16.5.
+- Keep placement, joins, continuous glass walls, grass, snow, waterlogging and paths.
+- Preserve saved palette identities, older pieces and custom item data.
+- Use the matching Grass Slabs version for shared grass behaviour when installed.
+
+## 0.3.8.115021 - Minecraft 1.15.2 (unreleased)
+
+- Bring the existing building shapes and Mineralogy pieces to Minecraft 1.15.2.
+- Keep placement, joining, glass walls, grass, snow, waterlogging and paths.
+- Keep saved palette identities and recovery of older pieces and item data.
+- Use the matching Grass Slabs release for shared grass behaviour when installed.
+
+## 0.3.8.114041
+
+Minecraft 1.14.4 support, native waterlogging and recipe-book integration.
+Existing piece palettes, orientations and custom item data are kept when
+upgrading from 1.12.2. Saved item frames also load without stalling the world.
+See the [release notes](docs/RELEASE-0.3.8.114041.md).
+
 ## 0.3.8.112021
 
 - Added the missing recipe-book unlocks for crafting and rebuilding pieces.

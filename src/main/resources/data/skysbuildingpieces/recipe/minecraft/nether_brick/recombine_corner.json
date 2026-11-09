@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/nether_brick",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:nether_brick_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:nether_brick_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:nether_brick_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:nether_brick_horizontal_step"
+      }
+    ]
+  }
+}

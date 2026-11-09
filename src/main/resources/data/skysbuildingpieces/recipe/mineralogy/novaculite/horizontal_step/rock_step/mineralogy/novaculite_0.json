@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/mineralogy",
+  "pattern": ["X  ", " X ", "  X"],
+  "key": {
+    "X": "mineralogy:novaculite"
+  },
+  "result": {
+    "id": "skysbuildingpieces:mineralogy_novaculite_horizontal_step",
+    "count": 12
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:novaculite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_novaculite_horizontal_step"
+      }
+    ]
+  }
+}

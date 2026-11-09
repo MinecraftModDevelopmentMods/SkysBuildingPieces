@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stained_glass_red",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stained_glass_red_slab"
+  },
+  "result": {
+    "id": "minecraft:red_stained_glass",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_glass_red_slab"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/granite_smooth",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:granite_smooth_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:polished_granite_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:granite_smooth_horizontal_step"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/diorite",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:mineralogy_diorite_vertical_step"
+  },
+  "result": {
+    "id": "mineralogy:diorite_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:diorite_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_diorite_vertical_step"
+      }
+    ]
+  }
+}

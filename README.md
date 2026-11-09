@@ -13,13 +13,15 @@ Pieces doesn't generate terrain.
 
 - Use the same slab item for horizontal and vertical placement. Click the centre
   of a face to place against it, or near an edge to place along that edge.
-  Breaking a vertical slab returns the regular slab.
+  Breaking a vertical slab returns the regular slab. To use ordinary slab
+  placement, open **Mods → Sky's Building Pieces → Config** and
+  turn off **Directional slab placement**.
 - Sneak while placing a step to turn it vertically. Steps are quarter-block
   pieces; corners are eighth-block pieces.
 - Matching pieces can join into supported larger shapes or a full block.
   Different materials don't combine.
-- Find the pieces, including the vanilla items the mod reuses, in the
-  **Sky's Building Pieces** creative tab.
+- Find the mod's pieces in the **Sky's Building Pieces** creative tab. Vanilla
+  pieces stay in their usual tabs.
 
 Walls have lower panels with posts at ends, corners and junctions. A torch or
 block above keeps a supporting post. Matching glass walls form a continuous
@@ -31,6 +33,10 @@ Use a shovel on an uncovered dirt or grass step or corner to turn it into a
 matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath
 it into a path, using the same shovel action.
+
+Pieces support native waterlogging. Wet grass and path pieces turn into their
+matching dirt shapes, keeping the water and orientation. Drain them before
+using a shovel.
 
 ## Crafting
 
@@ -50,14 +56,14 @@ when Grass Slabs isn't installed.
 
 ## Installation and other Sky mods
 
-For **Minecraft 1.12.2**, use **Forge 14.23.5.2859** and **Java 8**.
+For **Minecraft 26.3**, use **Forge 66.0.2** and **Java 25**.
 No other mod is required. Put the main jar in `mods` on both the client and
 server.
 
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.1 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.0.2603001 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skysbuildingpieces/wool_black",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_black_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_black_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_black_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_black_horizontal_step"
+      }
+    ]
+  }
+}

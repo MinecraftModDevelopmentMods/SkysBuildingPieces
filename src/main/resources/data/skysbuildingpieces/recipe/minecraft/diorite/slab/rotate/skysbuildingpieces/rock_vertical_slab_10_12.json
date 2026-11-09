@@ -1,0 +1,17 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:diorite_vertical_slab"
+  },
+  "result": {
+    "id": "minecraft:diorite_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:diorite_vertical_slab"
+  }
+}

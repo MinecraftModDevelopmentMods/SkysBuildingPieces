@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skysbuildingpieces/wool_green",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_green_vertical_step"
+  },
+  "result": {
+    "id": "minecraft:green_wool_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_green_vertical_step"
+  }
+}

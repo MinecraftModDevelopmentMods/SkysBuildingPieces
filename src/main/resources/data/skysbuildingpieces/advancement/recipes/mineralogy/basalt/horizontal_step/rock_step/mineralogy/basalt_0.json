@@ -1,0 +1,43 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["mineralogy:basalt"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "skysbuildingpieces:mineralogy/basalt/horizontal_step/rock_step/mineralogy/basalt_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:mineralogy/basalt/horizontal_step/rock_step/mineralogy/basalt_0"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:basalt"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_basalt_horizontal_step"
+      }
+    ]
+  }
+}

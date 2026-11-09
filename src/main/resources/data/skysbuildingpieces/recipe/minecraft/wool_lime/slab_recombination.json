@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skysbuildingpieces/wool_lime",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:lime_wool_slab"
+  },
+  "result": {
+    "id": "minecraft:lime_wool",
+    "count": 1
+  }
+}

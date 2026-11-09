@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:wool_cyan_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_cyan_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_cyan_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_cyan_vertical_step"
+      }
+    ]
+  }
+}

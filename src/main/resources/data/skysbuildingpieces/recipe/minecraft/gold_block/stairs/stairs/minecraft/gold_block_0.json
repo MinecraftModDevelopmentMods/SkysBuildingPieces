@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": "minecraft:gold_block"
+  },
+  "result": {
+    "id": "skysbuildingpieces:gold_block_stairs",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:gold_block_stairs"
+  }
+}

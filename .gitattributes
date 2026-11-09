@@ -5,8 +5,21 @@
 *.md text eol=lf
 *.gradle text eol=lf
 *.properties text eol=lf
+*.mcmeta text eol=lf
+*.py text eol=lf
+*.toml text eol=lf
 *.yml text eol=lf
 gradlew text eol=lf
 *.bat text eol=crlf
 *.png binary
 *.jar binary
+*.zip binary
+*.nbt binary
+
+# Keep build scripts and the sealed Mavenizer fixture stable on Windows.
+.gitattributes text eol=lf
+*.js text eol=lf
+ci-fixtures/tools/** -text
+
+# Keep the signed-off registry proof bytes unchanged on every checkout.
+src/testFixtures/worlds/*.forge61-registry.json -text whitespace=cr-at-eol

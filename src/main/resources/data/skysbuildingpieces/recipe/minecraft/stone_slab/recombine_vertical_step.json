@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stone_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:stone_slab_vertical_step"
+  },
+  "result": {
+    "id": "minecraft:smooth_stone_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stone_slab_vertical_step"
+  }
+}

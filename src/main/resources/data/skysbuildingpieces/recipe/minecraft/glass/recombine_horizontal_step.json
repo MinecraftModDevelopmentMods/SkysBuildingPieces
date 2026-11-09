@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/glass",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:glass_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:glass_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:glass_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:glass_step"
+      }
+    ]
+  }
+}

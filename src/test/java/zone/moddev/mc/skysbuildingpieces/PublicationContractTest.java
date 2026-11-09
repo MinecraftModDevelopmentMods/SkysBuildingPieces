@@ -49,7 +49,10 @@ class PublicationContractTest {
         assertTrue(workflow.contains("2) loader_suffix=-neo"));
         assertTrue(workflow.contains("value java_toolchain_version"));
         assertTrue(ci.contains("steps.target.outputs.java_setup_version"));
-        assertTrue(ci.contains("steps.target.outputs.gradle_java_version"));
+        assertTrue(ci.contains("$(value java_setup_version)"));
+        assertTrue(ci.contains("$(value java_toolchain_version)"));
+        assertTrue(ci.contains("$(value gradle_java_toolchain_version)"));
+        assertTrue(text("gradle.properties").contains("java_setup_version=25.0.3+9.0.LTS"));
         assertTrue(tags.contains("s/^minecraft_version=//p"));
         assertTrue(tags.contains("s/^loader_code=//p"));
         assertFalse(tags.contains("\\.112021$"));

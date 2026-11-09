@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/tuff",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:tuff_slab"
+  },
+  "result": {
+    "id": "mineralogy:tuff",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:tuff"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:tuff_slab"
+      }
+    ]
+  }
+}

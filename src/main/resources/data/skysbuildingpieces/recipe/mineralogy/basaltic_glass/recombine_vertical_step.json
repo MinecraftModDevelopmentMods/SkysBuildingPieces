@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/basaltic_glass",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:mineralogy_basaltic_glass_vertical_step"
+  },
+  "result": {
+    "id": "mineralogy:basaltic_glass_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:basaltic_glass_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_basaltic_glass_vertical_step"
+      }
+    ]
+  }
+}

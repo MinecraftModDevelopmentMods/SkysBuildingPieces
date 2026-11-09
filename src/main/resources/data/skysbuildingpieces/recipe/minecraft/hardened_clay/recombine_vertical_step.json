@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/hardened_clay",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:hardened_clay_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:hardened_clay_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_vertical_step"
+      }
+    ]
+  }
+}

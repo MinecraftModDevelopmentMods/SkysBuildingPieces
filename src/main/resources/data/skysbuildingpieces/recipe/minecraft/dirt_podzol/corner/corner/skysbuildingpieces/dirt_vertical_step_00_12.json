@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:dirt_podzol_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:dirt_podzol_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_vertical_step"
+      }
+    ]
+  }
+}

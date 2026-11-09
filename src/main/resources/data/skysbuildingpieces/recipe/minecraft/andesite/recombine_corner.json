@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/andesite",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:andesite_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:andesite_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:andesite_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:andesite_horizontal_step"
+      }
+    ]
+  }
+}

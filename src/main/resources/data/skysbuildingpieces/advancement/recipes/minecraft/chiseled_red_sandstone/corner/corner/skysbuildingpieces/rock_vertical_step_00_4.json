@@ -1,0 +1,39 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:chiseled_red_sandstone_vertical_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "skysbuildingpieces:minecraft/chiseled_red_sandstone/corner/corner/skysbuildingpieces/rock_vertical_step_00_4"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/chiseled_red_sandstone/corner/corner/skysbuildingpieces/rock_vertical_step_00_4"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_red_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_step"
+      }
+    ]
+  }
+}

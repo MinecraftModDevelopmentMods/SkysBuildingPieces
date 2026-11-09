@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XXX"],
+  "key": {
+    "X": "minecraft:netherrack"
+  },
+  "result": {
+    "id": "skysbuildingpieces:netherrack_slab",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:netherrack_slab"
+  }
+}

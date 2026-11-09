@@ -77,3 +77,8 @@ agent_notes/
 # Files from Forge MDK
 forge*changelog.txt
 /README.txt
+
+# Resource-generation tools
+__pycache__/
+*.py[cod]
+.pytest_cache/

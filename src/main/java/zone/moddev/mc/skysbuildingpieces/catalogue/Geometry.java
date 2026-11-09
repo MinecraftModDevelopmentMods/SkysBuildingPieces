@@ -15,8 +15,7 @@ public final class Geometry {
 
         int occupiedCells = 0;
 
-        // Each grid cell occupies one eighth of a block. Corners fill one cell,
-        // steps fill two and slabs fill four.
+        // Each grid cell occupies one eighth of a block. Corners fill one cell, steps fill two and slabs fill four.
         for (int cellY = 0; cellY < 2; cellY++) {
             for (int cellZ = 0; cellZ < 2; cellZ++) {
                 for (int cellX = 0; cellX < 2; cellX++) {
@@ -31,7 +30,7 @@ public final class Geometry {
                         case SLAB:
                             cellIsOccupied = cellY == (orientation == 0 ? 1 : 0);
                             break;
-                        // EnumFacing horizontal indices: south, west, north, east.
+                        // Direction horizontal indices: south, west, north, east.
                         case VERTICAL_SLAB:
                             cellIsOccupied = orientation == 0 ? cellZ == 1
                                     : orientation == 1 ? cellX == 0 : orientation == 2 ? cellZ == 0 : cellX == 1;
@@ -75,7 +74,7 @@ public final class Geometry {
     }
 
     public static boolean completeFace(int mask, int face) {
-        // Face indices follow EnumFacing: down, up, north, south, west and east.
+        // Face indices follow Direction: down, up, north, south, west and east.
         int faceMask = face == 0 ? 15 : face == 1 ? 240 : face == 2 ? 51 : face == 3 ? 204 : face == 4 ? 85 : 170;
 
         return (mask & faceMask) == faceMask;

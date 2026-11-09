@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stone_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:stone_slab_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stone_slab_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stone_slab_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stone_slab_horizontal_step"
+      }
+    ]
+  }
+}

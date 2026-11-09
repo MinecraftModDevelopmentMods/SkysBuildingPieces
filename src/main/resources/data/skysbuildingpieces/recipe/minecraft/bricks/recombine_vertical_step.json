@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/bricks",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:bricks_vertical_step"
+  },
+  "result": {
+    "id": "minecraft:brick_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:bricks_vertical_step"
+  }
+}

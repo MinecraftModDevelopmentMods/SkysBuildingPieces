@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/red_sandstone",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:red_sandstone_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:red_sandstone_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:red_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:red_sandstone_horizontal_step"
+      }
+    ]
+  }
+}

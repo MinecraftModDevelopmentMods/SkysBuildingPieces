@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:diorite_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:diorite_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_vertical_step"
+      }
+    ]
+  }
+}

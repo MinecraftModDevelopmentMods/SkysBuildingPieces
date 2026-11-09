@@ -1,0 +1,17 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:mossy_cobblestone_vertical_slab"
+  },
+  "result": {
+    "id": "minecraft:mossy_cobblestone_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:mossy_cobblestone_vertical_slab"
+  }
+}

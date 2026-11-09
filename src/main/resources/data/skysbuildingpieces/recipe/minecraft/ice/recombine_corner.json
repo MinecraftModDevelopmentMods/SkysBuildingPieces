@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/ice",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:ice_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:ice_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:ice_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:ice_step"
+      }
+    ]
+  }
+}

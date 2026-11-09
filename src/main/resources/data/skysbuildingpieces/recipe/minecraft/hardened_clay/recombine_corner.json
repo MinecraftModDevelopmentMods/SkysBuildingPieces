@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/hardened_clay",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:hardened_clay_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:hardened_clay_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:hardened_clay_horizontal_step"
+      }
+    ]
+  }
+}

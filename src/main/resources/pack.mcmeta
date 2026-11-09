@@ -1,1 +1,7 @@
-{"pack":{"pack_format":3,"description":"Sky's Building Pieces resources"}}
+{
+    "pack": {
+        "description": "Sky's Building Pieces resources",
+        "max_format": 121,
+        "min_format": 121
+    }
+}

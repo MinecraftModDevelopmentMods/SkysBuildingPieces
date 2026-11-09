@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "minecraft:prismarine_bricks"
+  },
+  "result": {
+    "id": "skysbuildingpieces:prismarine_bricks_slab",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:prismarine_bricks_slab"
+  }
+}

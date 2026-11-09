@@ -1,0 +1,39 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:dirt_podzol_horizontal_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "skysbuildingpieces:minecraft/dirt_podzol/corner/corner/skysbuildingpieces/dirt_horizontal_step_01_8"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/dirt_podzol/corner/corner/skysbuildingpieces/dirt_horizontal_step_01_8"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_horizontal_step"
+      }
+    ]
+  }
+}

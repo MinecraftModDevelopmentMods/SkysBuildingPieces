@@ -1,0 +1,27 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_yellow_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_yellow_vertical_step",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_yellow_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_yellow_vertical_step"
+      }
+    ]
+  }
+}

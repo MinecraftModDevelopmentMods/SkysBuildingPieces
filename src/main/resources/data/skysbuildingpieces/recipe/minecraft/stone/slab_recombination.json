@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stone",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:stone_slab"
+  },
+  "result": {
+    "id": "minecraft:stone",
+    "count": 1
+  }
+}

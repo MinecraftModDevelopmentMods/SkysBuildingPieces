@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "minecraft:purpur_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:purpur_block_horizontal_step",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:purpur_block_horizontal_step"
+  }
+}

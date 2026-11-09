@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/iron_block",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:iron_block_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:iron_block_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_vertical_step"
+      }
+    ]
+  }
+}

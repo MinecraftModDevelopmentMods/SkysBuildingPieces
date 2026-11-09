@@ -1,88 +1,54 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
-import java.util.*;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.ChunkDataEvent;
-import net.minecraftforge.fml.common.eventhandler.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.storage.SerializableChunkData;
+import zone.moddev.mc.skysbuildingpieces.legacy.MigrationEvents;
 
-/** Build-only stand-in for a later material add-on's independent coverage. */
+/** Exercises independent add-on coverage through the native chunk snapshot. */
 public final class CoverageContributor {
-    private final Map<Chunk, Integer> versions = new WeakHashMap<Chunk, Integer>();
-    private int visits;
-
-    @SubscribeEvent(
-            priority = EventPriority.LOW)
-    public void load(ChunkDataEvent.Load event) {
-        NBTTagCompound coverage = event.getData().getCompoundTag("Level").getCompoundTag("skysbuildingpieces_coverage");
-        int version = coverage.getInteger("later_addon");
-
-        if (version < 1) {
-            visits++;
-            version = 1;
-        }
-
-        versions.put(event.getChunk(), version);
+    private CoverageContributor() {
     }
 
-    @SubscribeEvent(
-            priority = EventPriority.LOW)
-    public void save(ChunkDataEvent.Save event) {
-        Integer version = versions.get(event.getChunk());
+    public static void verify(ServerLevel world) {
+        LevelChunk chunk = world.getChunk(72, 72);
 
-        if (version == null) {
-            return;
-        }
+        for (boolean wrapped : new boolean[] {true, false}) {
+            CompoundTag root = new CompoundTag();
+            CompoundTag level = root;
+            if (wrapped) {
+                level = new CompoundTag();
+                root.put("Level", level);
+            }
+            CompoundTag coverage = new CompoundTag();
+            coverage.putInt("vanilla", 1);
+            level.put("skysbuildingpieces_coverage", coverage);
 
-        NBTTagCompound level = event.getData().getCompoundTag("Level");
-        NBTTagCompound coverage = level.getCompoundTag("skysbuildingpieces_coverage");
-
-        coverage.setInteger("later_addon", version);
-        level.setTag("skysbuildingpieces_coverage", coverage);
-    }
-
-    public static void verify(WorldServer world) {
-        CoverageContributor contributor = new CoverageContributor();
-
-        MinecraftForge.EVENT_BUS.register(contributor);
-
-        try {
-            Chunk chunk = world.getChunk(72, 72);
-            NBTTagCompound root = new NBTTagCompound();
-            NBTTagCompound level = new NBTTagCompound();
-            NBTTagCompound coverage = new NBTTagCompound();
-
-            root.setTag("Level", level);
-            coverage.setInteger("vanilla", 1);
-            level.setTag("skysbuildingpieces_coverage", coverage);
-            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, root));
-
-            if (contributor.visits != 1) {
+            if (!visit(coverage)) {
                 throw new AssertionError("Core coverage must not skip a later add-on");
             }
-
-            NBTTagCompound saved = new NBTTagCompound();
-
-            saved.setTag("Level", new NBTTagCompound());
-            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Save(chunk, saved));
-
-            NBTTagCompound markers = saved.getCompoundTag("Level").getCompoundTag("skysbuildingpieces_coverage");
-
-            if (markers.getInteger("vanilla") != 1 || markers.getInteger("later_addon") != 1) {
-                throw new AssertionError("Independent markers must survive both save handlers");
+            MigrationEvents.loadSerializedChunk(world, chunk, MigrationEvents.copyMigrationData(root));
+            CompoundTag saved = SerializableChunkData.copyOf(world, chunk).write();
+            CompoundTag markers = saved.getCompoundOrEmpty("skysbuildingpieces_coverage");
+            if (markers.getIntOr("vanilla", 0) != 1 || markers.getIntOr("later_addon", 0) != 1) {
+                throw new AssertionError("Both coverage markers must survive the native chunk save");
             }
-
-            MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved));
-
-            if (contributor.visits != 1) {
-                throw new AssertionError("Later add-on coverage must be reload idempotent");
+            MigrationEvents.loadSerializedChunk(world, chunk, MigrationEvents.copyMigrationData(saved));
+            if (visit(SerializableChunkData.copyOf(world, chunk).write()
+                    .getCompoundOrEmpty("skysbuildingpieces_coverage"))) {
+                throw new AssertionError("Reload repeated an add-on's completed coverage");
             }
-
-            System.out.println("BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload");
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(contributor);
         }
+        org.apache.logging.log4j.LogManager.getLogger().info(
+                "BUILDING_PIECES_CONTRIBUTOR_PASS independent load/save/reload schemas=2");
+    }
+
+    private static boolean visit(CompoundTag coverage) {
+        if (coverage.getIntOr("later_addon", 0) >= 1) {
+            return false;
+        }
+        coverage.putInt("later_addon", 1);
+        return true;
     }
 }

@@ -1,0 +1,7 @@
+{
+    "pack": {
+        "description": "Optional dependency control",
+        "max_format": 121,
+        "min_format": 121
+    }
+}

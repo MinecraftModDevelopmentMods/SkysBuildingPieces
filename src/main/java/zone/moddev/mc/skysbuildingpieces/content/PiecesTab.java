@@ -1,56 +1,44 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import java.util.*;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.*;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
-import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 
-/** Keeps the pieces together, including the vanilla items reused by the catalogue. */
-public final class PiecesTab extends CreativeTabs {
-    public static final PiecesTab INSTANCE = new PiecesTab();
+/** Show pieces supplied by this catalogue and its installed add-ons. */
+public final class PiecesTab {
+    public static CreativeModeTab INSTANCE;
 
-    private PiecesTab() {
-        super("skysbuildingpieces");
+    public static void register(RegisterEvent event) {
+        event.register(Registries.CREATIVE_MODE_TAB, registry -> {
+            INSTANCE = CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.skysbuildingpieces"))
+                    .icon(() -> new ItemStack(Pieces.pieceItem(SkysBuildingPieces.ID + ":gold_block_wall")))
+                    .displayItems((parameters, output) -> entries().values().forEach(output::accept))
+                    .build();
+            registry.register(Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "pieces"), INSTANCE);
+        });
     }
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public ItemStack createIcon() {
-        return new ItemStack(Blocks.BRICK_STAIRS);
-    }
+    public static Map<Identifier, ItemStack> entries() {
+        Map<Identifier, ItemStack> entries = new LinkedHashMap<>();
 
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void displayAllRelevantItems(net.minecraft.util.NonNullList<ItemStack> items) {
-        super.displayAllRelevantItems(items);
-
-        Set<String> present = new HashSet<String>();
-
-        for (ItemStack stack : items) {
-            present.add(key(stack));
-        }
-        for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
-            for (Shape shape : new Shape[] { Shape.SLAB, Shape.STAIRS, Shape.WALL, Shape.PANE }) {
-                String nativeShape = shape.name().toLowerCase(Locale.ROOT);
-
-                if (!Catalogue.supportsShape(material, shape) || material.block(nativeShape) == null) {
-                    continue;
-                }
-
-                ItemStack stack = Pieces.stack(Pieces.nativeState(material, nativeShape), 1);
-
-                if (stack != null && !stack.isEmpty() && present.add(key(stack))) {
-                    items.add(stack);
-                }
+        for (Item item : ForgeRegistries.ITEMS.getValues()) {
+            if (item instanceof PieceItem && ((PieceItem) item).visibleInCreativeTab()) {
+                entries.put(ForgeRegistries.ITEMS.getKey(item), new ItemStack(item));
             }
         }
+
+        return entries;
     }
 
-    private static String key(ItemStack stack) {
-        return stack.getItem().getRegistryName() + ":" + stack.getMetadata();
+    private PiecesTab() {
     }
 }

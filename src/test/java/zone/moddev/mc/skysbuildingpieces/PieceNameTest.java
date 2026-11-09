@@ -28,8 +28,8 @@ class PieceNameTest {
     @Test
     void englishUsesTheMaterialRatherThanTheFullBlockLabel() throws Exception {
         Path root = Paths.get("src/main/resources/assets/skysbuildingpieces/lang");
-        Path english = Files.exists(root.resolve("en_US.lang")) ? root.resolve("en_US.lang")
-                : root.resolve("en_us.lang");
+        Path english = Files.exists(root.resolve("en_us.json")) ? root.resolve("en_us.json")
+                : root.resolve("en_us.json");
         Properties names = read(english);
 
         assertEquals("Gold Wall", name(names, "gold_block", "wall"));
@@ -49,7 +49,9 @@ class PieceNameTest {
         Properties result = new Properties();
 
         try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-            result.load(reader);
+            com.google.gson.JsonObject names = new com.google.gson.JsonParser().parse(reader).getAsJsonObject();
+
+            names.entrySet().forEach(entry -> result.setProperty(entry.getKey(), entry.getValue().getAsString()));
         }
 
         return result;

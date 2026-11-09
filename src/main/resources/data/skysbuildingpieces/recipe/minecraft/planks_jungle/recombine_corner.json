@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/planks_jungle",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:planks_jungle_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:planks_jungle_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_jungle_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_jungle_horizontal_step"
+      }
+    ]
+  }
+}

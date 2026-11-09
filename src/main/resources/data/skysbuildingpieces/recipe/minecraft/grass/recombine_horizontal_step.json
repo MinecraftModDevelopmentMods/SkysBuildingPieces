@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/grass",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:grass_step"
+  },
+  "result": {
+    "id": "skysgrassslabs:grass_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:grass_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:grass_slab"
+      }
+    ]
+  }
+}

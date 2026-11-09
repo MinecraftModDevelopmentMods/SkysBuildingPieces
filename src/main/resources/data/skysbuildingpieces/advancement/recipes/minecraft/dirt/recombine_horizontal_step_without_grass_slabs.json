@@ -1,0 +1,46 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:dirt_horizontal_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "skysbuildingpieces:minecraft/dirt/recombine_horizontal_step_without_grass_slabs"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/dirt/recombine_horizontal_step_without_grass_slabs"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:item_exists",
+          "item": "skysgrassslabs:dirt_slab"
+        }
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_vertical_slab"
+      }
+    ]
+  }
+}

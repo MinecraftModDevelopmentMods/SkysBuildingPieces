@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/peridotite",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:mineralogy_peridotite_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:mineralogy_peridotite_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_peridotite_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_peridotite_horizontal_step"
+      }
+    ]
+  }
+}

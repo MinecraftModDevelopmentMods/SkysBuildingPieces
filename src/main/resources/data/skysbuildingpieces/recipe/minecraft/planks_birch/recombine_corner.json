@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/planks_birch",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:planks_birch_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:planks_birch_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_birch_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_birch_horizontal_step"
+      }
+    ]
+  }
+}

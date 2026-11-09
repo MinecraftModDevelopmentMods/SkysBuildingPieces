@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/hornfels",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:mineralogy_hornfels_horizontal_step"
+  },
+  "result": {
+    "id": "mineralogy:hornfels_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:hornfels_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_hornfels_horizontal_step"
+      }
+    ]
+  }
+}

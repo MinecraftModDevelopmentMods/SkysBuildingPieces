@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stained_hardened_clay_red",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:stained_hardened_clay_red_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_hardened_clay_red_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_red_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_red_slab"
+      }
+    ]
+  }
+}

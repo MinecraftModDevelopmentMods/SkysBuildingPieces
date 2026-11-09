@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "skysbuildingpieces:planks_jungle_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:planks_jungle_horizontal_step",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_jungle_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_jungle_vertical_slab"
+      }
+    ]
+  }
+}

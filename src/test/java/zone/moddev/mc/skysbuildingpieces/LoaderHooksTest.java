@@ -1,155 +1,84 @@
 package zone.moddev.mc.skysbuildingpieces;
 
+import com.google.gson.JsonParser;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
-import org.objectweb.asm.*;
-import org.objectweb.asm.tree.*;
-import zone.moddev.mc.skysbuildingpieces.legacy.LoaderTransformer;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderHooksTest {
-    private byte[] fixture(String name, String method, String descriptor) {
-        ClassWriter w = new ClassWriter(0);
+    @Test
+    void theNativeChunkAndInventoryTargetsMatchThisForgeBuild() throws Exception {
+        assertNativeReturn("net.minecraft.world.level.chunk.storage.SimpleRegionStorage", "upgradeChunkTag",
+                "(Lnet/minecraft/nbt/CompoundTag;ILnet/minecraft/nbt/CompoundTag;I)Lnet/minecraft/nbt/CompoundTag;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraft.util.datafix.DataFixTypes", "update",
+                "(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraft.world.level.chunk.storage.SerializableChunkData", "copyOf",
+                "(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;)"
+                        + "Lnet/minecraft/world/level/chunk/storage/SerializableChunkData;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraft.util.filefix.FileFixerUpper", "fix",
+                "(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"
+                        + "Lcom/mojang/serialization/Dynamic;Lnet/minecraft/util/worldupdate/UpgradeProgress;)"
+                        + "Lcom/mojang/serialization/Dynamic;",
+                Opcodes.ARETURN);
+        assertNativeReturn("net.minecraftforge.common.ForgeHooks", "readAdditionalLevelSaveData",
+                "(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"
+                        + "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;)V",
+                Opcodes.RETURN);
+    }
 
-        w.visit(52, Opcodes.ACC_PUBLIC, name, null, "java/lang/Object", null);
+    @Test
+    void missingMixinsAreAnErrorInsteadOfSilentlySkippingRecovery() throws Exception {
+        Path resources = Path.of("src/main/resources");
+        var config = JsonParser.parseString(Files.readString(resources.resolve("skysbuildingpieces.mixins.json")))
+                .getAsJsonObject();
+        assertTrue(config.get("required").getAsBoolean());
+        assertEquals(1, config.getAsJsonObject("injectors").get("defaultRequire").getAsInt());
+        assertFalse(Files.exists(resources.resolve("META-INF/coremods.json")));
+    }
 
-        MethodVisitor m = w.visitMethod(Opcodes.ACC_PUBLIC, method, descriptor, null, null);
+    @Test
+    void theFileUpgradeHasOneLocalLevelDataRead() throws Exception {
+        MethodNode writer = nativeMethod("net.minecraft.util.filefix.FileFixerUpper",
+                "writeUpdatedLevelData", "(Ljava/nio/file/Path;I)V");
+        long reads = java.util.Arrays.stream(writer.instructions.toArray())
+                .filter(instruction -> instruction instanceof MethodInsnNode call
+                        && call.owner.equals("net/minecraft/nbt/NbtIo")
+                        && call.name.equals("readCompressed")
+                        && call.desc.equals("(Ljava/nio/file/Path;Lnet/minecraft/nbt/NbtAccounter;)"
+                                + "Lnet/minecraft/nbt/CompoundTag;"))
+                .count();
+        assertEquals(1, reads);
+    }
 
-        m.visitCode();
-
-        if (Type.getReturnType(descriptor).getSort() == Type.VOID) {
-            m.visitInsn(Opcodes.RETURN);
-        } else {
-            m.visitInsn(Opcodes.ACONST_NULL);
-            m.visitInsn(Opcodes.ARETURN);
+    static void assertNativeReturn(String type, String method, String descriptor, int opcode) throws Exception {
+        MethodNode target = nativeMethod(type, method, descriptor);
+        boolean returns = false;
+        for (var instruction : target.instructions) {
+            returns |= instruction.getOpcode() == opcode;
         }
-
-        m.visitMaxs(1, 10);
-        m.visitEnd();
-        w.visitEnd();
-        return w.toByteArray();
+        assertTrue(returns, type + "." + method);
     }
 
-    @Test
-    void exactChunkAndItemHooksAreIdempotent() {
-        for (boolean chunk : new boolean[] { true, false }) {
-            String name = chunk ? "net.minecraft.world.chunk.storage.AnvilChunkLoader" : "net.minecraft.item.ItemStack";
-            byte[] original = fixture(name.replace('.', '/'), chunk ? "checkedReadChunkFromNBT__Async" : "<init>",
-                    chunk ? "(Lnet/minecraft/world/World;IILnet/minecraft/nbt/NBTTagCompound;)[Ljava/lang/Object;"
-                            : "(Lnet/minecraft/nbt/NBTTagCompound;)V");
-            LoaderTransformer t = new LoaderTransformer();
-            byte[] patched = t.transform(name, name, original);
-
-            assertArrayEquals(patched, t.transform(name, name, patched));
-
-            ClassNode n = new ClassNode();
-
-            new ClassReader(patched).accept(n, 0);
-
-            int hooks = 0;
-            int placements = 0;
-
-            for (MethodNode method : n.methods) {
-                for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                    if (instruction instanceof MethodInsnNode) {
-                        if (((MethodInsnNode) instruction).owner.endsWith("/LegacyBridge")) {
-                            hooks++;
-                        }
-                        if (((MethodInsnNode) instruction).owner.endsWith("/NativeSlabPlacement")) {
-                            placements++;
-                        }
-                    }
-                }
-            }
-
-            assertEquals(1, hooks);
-            assertEquals(0, placements);
-        }
-    }
-
-    @Test
-    void unexpectedLoaderStructuresFailClearly() {
-        String name = "net.minecraft.world.chunk.storage.AnvilChunkLoader";
-
-        assertThrows(IllegalStateException.class,
-                () -> new LoaderTransformer().transform(name, name,
-                        fixture(name.replace('.', '/'), "checkedReadChunkFromNBT__Async",
-                                "(Lnet/minecraft/world/World;IILjava/lang/Object;)[Ljava/lang/Object;")));
-        assertThrows(IllegalStateException.class, () -> new LoaderTransformer().transform(name, name,
-                fixture(name.replace('.', '/'), "unexpectedMethod", "()V")));
-
-        String item = "net.minecraft.item.ItemSlab";
-
-        assertThrows(IllegalStateException.class, () -> new LoaderTransformer().transform(item, item,
-                fixture(item.replace('.', '/'), "onItemUse", "()V")));
-    }
-
-    @Test
-    void nativePlacementHooksAreExactAndIdempotent() {
-        for (String name : new String[] { "net.minecraft.item.ItemSlab", "net.minecraft.item.ItemBlock" }) {
-            String descriptor = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumHand;Lnet/minecraft/util/EnumFacing;FFF)Lnet/minecraft/util/EnumActionResult;";
-            LoaderTransformer transformer = new LoaderTransformer();
-            byte[] patched = transformer.transform(name, name,
-                    fixture(name.replace('.', '/'), "onItemUse", descriptor));
-
-            assertArrayEquals(patched, transformer.transform(name, name, patched));
-
-            ClassNode node = new ClassNode();
-
-            new ClassReader(patched).accept(node, 0);
-
-            int hooks = 0;
-
-            for (MethodNode method : node.methods) {
-                for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                    if (instruction instanceof MethodInsnNode
-                            && ((MethodInsnNode) instruction).owner.endsWith("/NativeSlabPlacement")) {
-                        ++hooks;
-                    }
-                }
-            }
-
-            assertEquals(1, hooks);
-        }
-    }
-
-    @Test
-    void realForge112ClassesMatchAllFourHooks() throws Exception {
-        for (String name : new String[] { "net.minecraft.item.ItemStack", "net.minecraft.item.ItemBlock",
-                "net.minecraft.item.ItemSlab", "net.minecraft.world.chunk.storage.AnvilChunkLoader" }) {
-            try (java.io.InputStream stream = getClass().getClassLoader()
-                    .getResourceAsStream(name.replace('.', '/') + ".class")) {
-                assertNotNull(stream, name);
-
-                java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
-                byte[] buffer = new byte[8192];
-                int count;
-
-                while ((count = stream.read(buffer)) != -1) {
-                    bytes.write(buffer, 0, count);
-                }
-
-                LoaderTransformer transformer = new LoaderTransformer();
-                byte[] patched = transformer.transform(name, name, bytes.toByteArray());
-
-                assertArrayEquals(patched, transformer.transform(name, name, patched), name);
-
-                ClassNode node = new ClassNode();
-
-                new ClassReader(patched).accept(node, 0);
-
-                int hooks = 0;
-
-                for (MethodNode method : node.methods) {
-                    for (AbstractInsnNode instruction : method.instructions.toArray()) {
-                        if (instruction instanceof MethodInsnNode && ((MethodInsnNode) instruction).owner
-                                .startsWith("zone/moddev/mc/skysbuildingpieces/")) {
-                            hooks++;
-                        }
-                    }
-                }
-
-                assertEquals(1, hooks, name);
-            }
+    private static MethodNode nativeMethod(String type, String method, String descriptor) throws Exception {
+        String resource = "/" + type.replace('.', '/') + ".class";
+        try (var stream = LoaderHooksTest.class.getResourceAsStream(resource)) {
+            assertNotNull(stream, type);
+            ClassNode nativeClass = new ClassNode();
+            new ClassReader(stream).accept(nativeClass, 0);
+            var methods = nativeClass.methods.stream()
+                    .filter(candidate -> candidate.name.equals(method) && candidate.desc.equals(descriptor))
+                    .toList();
+            assertEquals(1, methods.size(), type + "." + method);
+            return methods.getFirst();
         }
     }
 }

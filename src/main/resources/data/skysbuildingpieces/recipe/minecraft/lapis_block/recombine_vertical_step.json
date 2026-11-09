@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/lapis_block",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:lapis_block_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:lapis_block_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:lapis_block_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:lapis_block_vertical_step"
+      }
+    ]
+  }
+}

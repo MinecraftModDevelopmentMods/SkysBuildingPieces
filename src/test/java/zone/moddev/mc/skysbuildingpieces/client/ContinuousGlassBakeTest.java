@@ -1,98 +1,88 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import java.util.*;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.registry.RegistrySimple;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import zone.moddev.mc.skysbuildingpieces.MinecraftTestBootstrap;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContinuousGlassBakeTest {
+    @BeforeAll
+    static void bootstrap() {
+        MinecraftTestBootstrap.registerVanilla();
+    }
+
     @Test
-    void onlyWallBlockVariantsAreWrappedAndAliasesStayShared() {
-        RegistrySimple<ModelResourceLocation, IBakedModel> registry = new RegistrySimple<ModelResourceLocation, IBakedModel>();
-        IBakedModel base = new EmptyModel();
-        IBakedModel missing = new EmptyModel();
+    void onlyGlassWallBlockStatesAreWrappedAndAliasesStayShared() {
+        Map<BlockState, BlockStateModel> models = new LinkedHashMap<>();
+        BlockStateModel base = new EmptyModel();
+        BlockStateModel missing = new EmptyModel();
+        PieceBlock clear = wall("clear_glass");
+        BlockState wall = clear.defaultBlockState();
+        BlockState alias = wall.setValue(PieceBlock.CONNECTIONS, 10);
+        BlockState absent = wall("stained_glass").defaultBlockState();
+        BlockState other = Blocks.COBBLESTONE_WALL.defaultBlockState();
+        models.put(wall, base);
+        models.put(alias, base);
+        models.put(other, base);
+        models.put(absent, missing);
 
-        ModelResourceLocation wall = key("clear_glass_wall_00", "connections=10,meta=0,up=false");
-        ModelResourceLocation alias = key("clear_glass_wall_00", "connections=10,meta=1,up=false");
-        ModelResourceLocation item = key("clear_glass_wall_00", "inventory");
-        ModelResourceLocation other = key("rock_wall_00", "connections=10,meta=0");
+        ContinuousGlassModel.install(models, missing);
 
-        ModelResourceLocation absent = key("stained_glass_wall_00", "connections=0,meta=0,up=true");
-
-        registry.putObject(wall, base);
-        registry.putObject(alias, base);
-        registry.putObject(item, base);
-        registry.putObject(other, base);
-        registry.putObject(absent, missing);
-
-        Set<String> targets = new HashSet<String>(
-                Arrays.asList("skysbuildingpieces:clear_glass_wall_00", "skysbuildingpieces:stained_glass_wall_00"));
-
-        ContinuousGlassModel.install(registry, missing, targets);
-
-        IBakedModel wrapped = registry.getObject(wall);
-
-        assertTrue(wrapped instanceof ContinuousGlassModel);
-        assertSame(wrapped, registry.getObject(alias));
-        assertSame(base, registry.getObject(item));
-        assertSame(base, registry.getObject(other));
-        assertSame(missing, registry.getObject(absent));
-        ContinuousGlassModel.install(registry, missing, targets);
-        assertSame(wrapped, registry.getObject(wall));
+        BlockStateModel wrapped = models.get(wall);
+        assertInstanceOf(ContinuousGlassModel.class, wrapped);
+        assertSame(wrapped, models.get(alias));
+        assertSame(base, models.get(other));
+        assertSame(missing, models.get(absent));
+        ContinuousGlassModel.install(models, missing);
+        assertSame(wrapped, models.get(wall));
     }
 
     @Test
     void aResourceReloadUsesTheNewBaseModel() {
-        ModelResourceLocation key = key("clear_glass_wall_00", "connections=10,meta=0,up=false");
-        Set<String> targets = Collections.singleton("skysbuildingpieces:clear_glass_wall_00");
-        RegistrySimple<ModelResourceLocation, IBakedModel> registry = new RegistrySimple<ModelResourceLocation, IBakedModel>();
+        BlockState state = wall("clear_glass").defaultBlockState();
+        Map<BlockState, BlockStateModel> models = new LinkedHashMap<>();
+        models.put(state, new EmptyModel());
+        ContinuousGlassModel.install(models, null);
+        BlockStateModel previous = models.get(state);
 
-        registry.putObject(key, new EmptyModel());
-        ContinuousGlassModel.install(registry, null, targets);
-
-        IBakedModel previous = registry.getObject(key);
-
-        registry.putObject(key, new EmptyModel());
-        ContinuousGlassModel.install(registry, null, targets);
-        assertTrue(registry.getObject(key) instanceof ContinuousGlassModel);
-        assertNotSame(previous, registry.getObject(key));
+        models.put(state, new EmptyModel());
+        ContinuousGlassModel.install(models, null);
+        assertInstanceOf(ContinuousGlassModel.class, models.get(state));
+        assertNotSame(previous, models.get(state));
     }
 
-    private static ModelResourceLocation key(String block, String variant) {
-        return new ModelResourceLocation("skysbuildingpieces:" + block, variant);
+    private static PieceBlock wall(String materialGroup) {
+        Catalogue.Palette palette = Catalogue.INSTANCE.palettes.stream()
+                .filter(entry -> entry.shape == Shape.WALL && entry.group.equals(materialGroup))
+                .findFirst().orElseThrow();
+        return new PieceBlock(palette);
     }
 
-    private static final class EmptyModel implements IBakedModel {
-        public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long random) {
-            return Collections.emptyList();
+    private static final class EmptyModel implements BlockStateModel {
+        @Override
+        public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
         }
 
-        public boolean isAmbientOcclusion() {
-            return false;
-        }
-
-        public boolean isGui3d() {
-            return true;
-        }
-
-        public boolean isBuiltInRenderer() {
-            return false;
-        }
-
-        public TextureAtlasSprite getParticleTexture() {
+        @Override
+        public Material.Baked particleMaterial() {
             return null;
         }
 
-        public ItemCameraTransforms getItemCameraTransforms() {
-            return null;
-        }
-
-        public ItemOverrideList getOverrides() {
-            return ItemOverrideList.NONE;
+        @Override
+        public int materialFlags() {
+            return 0;
         }
     }
 }

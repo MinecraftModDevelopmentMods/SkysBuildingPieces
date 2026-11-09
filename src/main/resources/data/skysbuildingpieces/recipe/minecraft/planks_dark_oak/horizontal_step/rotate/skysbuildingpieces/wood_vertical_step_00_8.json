@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:planks_dark_oak_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:planks_dark_oak_horizontal_step",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_dark_oak_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:planks_dark_oak_vertical_step"
+      }
+    ]
+  }
+}

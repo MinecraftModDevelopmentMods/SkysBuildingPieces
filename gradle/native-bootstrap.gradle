@@ -1,0 +1,271 @@
+// This probe is excluded from ordinary runs and from all production artifacts.
+def auditServerLogs = { File directory, String phase ->
+    logger.lifecycle(providers.exec {
+        commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+                file('tools/native_client_log.py'), '--server', '--directory', directory,
+                '--phase', phase
+    }.standardOutput.asText.get().trim())
+}
+ext.auditNativeServerLogs = auditServerLogs
+
+def bootstrapClasses = layout.buildDirectory.dir('native-bootstrap-probe/classes')
+def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile) {
+    dependsOn tasks.named('classes')
+    source fileTree('src/bootstrapTest/java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PersistenceRegistrationChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeProbeItems.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GameplayChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PathChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SharedGrassChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecombinationChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeBookChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PresentationChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GlassModelProbe.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientProbe.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ConfigScreenChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientStatus.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ProbeProxy.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipePreviewModels.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/MineralogyChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeRecipeProbe.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeLegacyChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeBiomeChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/WaterloggingChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/DirtCoverageChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/CoverageContributor.java')
+    source fileTree('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/legacy')
+    classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
+    destinationDirectory = bootstrapClasses
+}
+def bootstrapJar = tasks.register('nativeBootstrapProbeJar', Jar) {
+    dependsOn compileBootstrap
+    archiveFileName = 'building-pieces-native-checks.jar'
+    destinationDirectory = layout.buildDirectory.dir('native-bootstrap-probe')
+    from bootstrapClasses
+    from 'src/bootstrapTest/resources'
+}
+
+def packagedBootstrap = bootstrapJar
+tasks.register('preparePackagedNativeProbe') { dependsOn packagedBootstrap }
+def bootstrapRunName = providers.gradleProperty('nativeBootstrapRunName')
+        .getOrElse('native-bootstrap-test-run')
+if (!(bootstrapRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable bootstrap directory name')
+}
+def directory = layout.buildDirectory.dir(bootstrapRunName)
+def prepare = tasks.register('prepareNativeBootstrapTest') {
+    dependsOn bootstrapJar
+    if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
+        dependsOn tasks.named('verifyGrassSlabsRelease')
+    }
+    if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
+        dependsOn project.ext.verifyNativeOptionalRuntime
+    }
+    doLast {
+        File target = directory.get().asFile
+        if (target.canonicalFile != new File(buildDir, bootstrapRunName).canonicalFile) {
+            throw new GradleException('Bootstrap checks must stay inside the build directory')
+        }
+        if (target.exists()) throw new GradleException('Preserve the existing bootstrap evidence before starting another run: ' + target)
+        copy { from 'src/bootstrapTest/defaultconfigs'; into target }
+        copy { from bootstrapJar.flatMap { it.archiveFile }; into new File(target, 'mods') }
+        if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
+            copy { from project.ext.nativeGrassDevelopmentJar; into new File(target, 'mods') }
+        }
+        if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
+            copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
+            if (providers.gradleProperty('nativeMineralogySlabsDisabled').getOrElse('false').toBoolean()) {
+                File configuration = new File(target, 'config/mineralogy-common.toml')
+                configuration.parentFile.mkdirs()
+                configuration.text = '[options]\nGENERATE_ROCKSLAB=false\n'
+            }
+        }
+        new File(target, 'eula.txt').text = 'eula=true\n'
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
+            new File(target, it).text = '[]\n'
+        }
+        new File(target, 'server.properties').text = '''level-name=world
+level-seed=4815162342
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+generate-structures=false
+spawn-animals=false
+spawn-monsters=false
+max-tick-time=120000
+'''
+    }
+}
+def phases = [:]
+['fresh', 'reload'].each { phase ->
+    phases[phase] = tasks.register('nativeBootstrap' + phase.capitalize() + 'Process', JavaExec) {
+        dependsOn phase == 'fresh' ? prepare : phases.fresh
+        workingDir directory
+        systemProperty 'skysbuildingpieces.bootstrapPhase', phase
+        systemProperty 'skysbuildingpieces.expectMineralogySlabsDisabled',
+                providers.gradleProperty('nativeMineralogySlabsDisabled').getOrElse('false')
+        project.ext.configureNativeBootstrapRun(delegate, 'runServer')
+        doLast {
+            auditServerLogs(directory.get().asFile, phase)
+            File marker = new File(directory.get().asFile, 'world/native-bootstrap.properties')
+            if (!marker.isFile()) throw new GradleException('Native bootstrap marker is missing')
+            Properties result = new Properties()
+            marker.withInputStream { result.load(it) }
+            if (result.getProperty(phase + '_complete') != 'true') {
+                throw new GradleException('Native bootstrap did not finish: ' + phase)
+            }
+            File log = new File(directory.get().asFile, 'logs/latest.log')
+            if (!log.isFile()) throw new GradleException('Native bootstrap log is missing')
+            String text = readForgeRuntimeLog(log)
+            if (!text.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS ' + phase) ||
+                    !text.contains('Done (') || text =~ /(?m)\[[^\r\n]*\/(?:ERROR|FATAL)\]/ ||
+                    text.contains('[STDERR/') || text.contains('Encountered an unexpected exception')) {
+                throw new GradleException('Native bootstrap log contains a failure or incomplete startup')
+            }
+            if (!fileTree(new File(directory.get().asFile, 'crash-reports')).isEmpty()) {
+                throw new GradleException('Native bootstrap produced a crash report')
+            }
+        }
+    }
+}
+tasks.register('nativeBootstrapTest') { dependsOn phases.reload }
+
+tasks.register('nativeWaterloggingTest', JavaExec) {
+    dependsOn prepare
+    workingDir directory
+    systemProperty 'skysbuildingpieces.bootstrapPhase', 'water'
+    project.ext.configureNativeBootstrapRun(delegate, 'runServer')
+    doLast {
+        auditServerLogs(directory.get().asFile, systemProperties['skysbuildingpieces.bootstrapPhase'].toString())
+        String log = readForgeRuntimeLog(new File(directory.get().asFile, 'logs/latest.log'))
+        if (!log.contains('BUILDING_PIECES_WATERLOGGING_PASS') ||
+                !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS water') ||
+                log =~ /\/(?:ERROR|FATAL)\]/ || log.contains('[STDERR/')) {
+            throw new GradleException('Native waterlogging checks did not complete cleanly')
+        }
+    }
+}
+
+tasks.register('nativeStagingTest', JavaExec) {
+    dependsOn prepare
+    workingDir directory
+    systemProperty 'skysbuildingpieces.bootstrapPhase', 'staging'
+    project.ext.configureNativeBootstrapRun(delegate, 'runServer')
+    doLast {
+        auditServerLogs(directory.get().asFile, systemProperties['skysbuildingpieces.bootstrapPhase'].toString())
+        String log = readForgeRuntimeLog(new File(directory.get().asFile, 'logs/latest.log'))
+        if (!log.contains('BUILDING_PIECES_NATIVE_STAGING_PASS') ||
+                !log.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS staging') ||
+                log =~ /\/(?:ERROR|FATAL)\]/ || log.contains('[STDERR/')) {
+            throw new GradleException('Native staging checks did not complete cleanly')
+        }
+    }
+}
+
+def forwardDirectory = layout.buildDirectory.dir('native-forward-test-run')
+def prepareForward = tasks.register('prepareNativeForwardTest') {
+    dependsOn bootstrapJar
+    doLast {
+        File target = forwardDirectory.get().asFile
+        if (target.canonicalFile != new File(buildDir, 'native-forward-test-run').canonicalFile) {
+            throw new GradleException('Forward checks must stay inside their build directory')
+        }
+        if (target.exists()) throw new GradleException('Preserve the existing forward-upgrade evidence before starting another run: ' + target)
+        copy { from 'src/bootstrapTest/defaultconfigs'; into target }
+        copy { from zipTree('src/testFixtures/worlds/building-pieces-1.12.2.zip'); into new File(target, 'world') }
+        copy { from 'src/testFixtures/worlds/building-pieces-1.12.2.json'; into target; rename { 'forward-fixture.json' } }
+        copy { from bootstrapJar.flatMap { it.archiveFile }; into new File(target, 'mods') }
+        new File(target, 'eula.txt').text = 'eula=true\n'
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
+            new File(target, it).text = '[]\n'
+        }
+        new File(target, 'server.properties').text = '''level-name=world
+online-mode=false
+server-ip=127.0.0.1
+server-port=0
+generate-structures=false
+spawn-animals=false
+spawn-monsters=false
+max-tick-time=120000
+'''
+    }
+}
+def forwardPhases = [:]
+['forward', 'forward-reload'].each { phase ->
+    forwardPhases[phase] = tasks.register('native' + phase.split('-').collect { it.capitalize() }.join('') + 'Process', JavaExec) {
+        dependsOn phase == 'forward' ? prepareForward : forwardPhases.forward
+        workingDir forwardDirectory
+        systemProperty 'skysbuildingpieces.bootstrapPhase', phase
+        project.ext.configureNativeBootstrapRun(delegate, 'runServer')
+        doLast {
+            auditServerLogs(forwardDirectory.get().asFile, phase)
+            File log = new File(forwardDirectory.get().asFile, 'logs/latest.log')
+            String text = log.isFile() ? readForgeRuntimeLog(log) : ''
+            if (!text.contains('BUILDING_PIECES_NATIVE_FORWARD_PASS') ||
+                    !text.contains('BUILDING_PIECES_NATIVE_BOOTSTRAP_PASS ' + phase) ||
+                    !text.contains('Done (') || text =~ /(?m)\[[^\r\n]*\/(?:ERROR|FATAL)\]/ ||
+                    text.contains('[STDERR/') || text.contains('Encountered an unexpected exception') ||
+                    !fileTree(new File(forwardDirectory.get().asFile, 'crash-reports')).isEmpty()) {
+                throw new GradleException('Forward upgrade did not complete cleanly: ' + phase)
+            }
+        }
+    }
+}
+tasks.register('nativeForwardTest') { dependsOn forwardPhases['forward-reload'] }
+
+def clientRunName = providers.gradleProperty('nativeClientRunName').getOrElse('native-client-test-run')
+if (!(clientRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable client directory name')
+}
+def clientDirectory = layout.buildDirectory.dir(clientRunName)
+def prepareClient = tasks.register('prepareNativeClientTest') {
+    dependsOn bootstrapJar
+    if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
+        dependsOn tasks.named('verifyGrassSlabsRelease')
+    }
+    if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
+        dependsOn project.ext.verifyNativeOptionalRuntime
+    }
+    doLast {
+        File target = clientDirectory.get().asFile
+        if (target.canonicalFile != new File(buildDir, clientRunName).canonicalFile) {
+            throw new GradleException('Client checks must stay inside their build directory')
+        }
+        if (target.exists()) throw new GradleException('Preserve the existing client evidence before starting another run: ' + target)
+        copy { from bootstrapJar.flatMap { it.archiveFile }; into new File(target, 'mods') }
+        if (providers.gradleProperty('nativeGrass').getOrElse('false').toBoolean()) {
+            copy { from project.ext.nativeGrassDevelopmentJar; into new File(target, 'mods') }
+        }
+        if (providers.gradleProperty('nativeMineralogy').getOrElse('false').toBoolean()) {
+            copy { from project.ext.nativeOptionalDevelopmentJars.values(); into new File(target, 'mods') }
+        }
+        // Set native defaults before Forge's configuration watcher starts. The
+        // failed first-start receipt remains part of the qualification evidence.
+        copy { from 'src/bootstrapTest/defaultconfigs'; into target }
+        ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
+            new File(target, it).text = '[]\n'
+        }
+        new File(target, 'options.txt').text = 'lang:en_us\nfullscreen:false\nrenderDistance:2\npauseOnLostFocus:false\n'
+    }
+}
+// ForgeGradle supplies BootstrapLauncher and its module path. Keep the
+// build-only probe in this disposable mods folder, outside ordinary runs.
+def clientPhases = [:]
+['client-fresh', 'client-reload'].each { phase ->
+    clientPhases[phase] = tasks.register('native' + phase.split('-').collect { it.capitalize() }.join('') + 'Process', JavaExec) {
+        dependsOn phase == 'client-fresh' ? prepareClient : clientPhases['client-fresh']
+        workingDir clientDirectory
+        systemProperty 'skysbuildingpieces.bootstrapPhase', phase
+        project.ext.configureNativeBootstrapRun(delegate, 'runClient')
+        doLast {
+            logger.lifecycle(providers.exec {
+                commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+                        file('tools/native_client_log.py'), '--directory', clientDirectory.get().asFile,
+                        '--phase', phase
+            }.standardOutput.asText.get().trim())
+        }
+    }
+}
+
+tasks.register('nativeClientTest') { dependsOn clientPhases['client-reload'] }

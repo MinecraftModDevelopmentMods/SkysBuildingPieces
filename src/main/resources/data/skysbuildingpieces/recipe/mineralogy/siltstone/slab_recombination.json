@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/siltstone",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:siltstone_slab"
+  },
+  "result": {
+    "id": "mineralogy:siltstone",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:siltstone"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:siltstone_slab"
+      }
+    ]
+  }
+}

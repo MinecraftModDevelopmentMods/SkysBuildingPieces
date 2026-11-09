@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:prismarine_rough_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:prismarine_rough_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_rough_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_rough_vertical_step"
+      }
+    ]
+  }
+}

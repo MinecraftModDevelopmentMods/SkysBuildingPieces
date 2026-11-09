@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/granite",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:granite_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:granite_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:granite_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:granite_horizontal_step"
+      }
+    ]
+  }
+}

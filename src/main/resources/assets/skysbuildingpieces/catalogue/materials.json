@@ -5,8 +5,23 @@
     "type": "rock",
     "hardness": 2,
     "resistance": 10,
-    "textures": "minecraft:blocks/brick",
+    "textures": "minecraft:block/bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:bricks"
+      },
+      "stairs": {
+        "id": "minecraft:brick_stairs"
+      },
+      "slab": {
+        "id": "minecraft:brick_slab"
+      },
+      "wall": {
+        "id": "minecraft:brick_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:brick_block",
       "stairs": "minecraft:brick_stairs",
       "slab": {
@@ -14,7 +29,7 @@
         "meta": 4
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/brick"
   },
   {
     "name": "Chiseled Red Sandstone",
@@ -22,17 +37,27 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/red_sandstone_top",
-      "side": "minecraft:blocks/red_sandstone_carved",
-      "bottom": "minecraft:blocks/red_sandstone_bottom"
+      "top": "minecraft:block/red_sandstone_top",
+      "side": "minecraft:block/chiseled_red_sandstone",
+      "bottom": "minecraft:block/red_sandstone_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:chiseled_red_sandstone"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:red_sandstone",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/red_sandstone_top",
+      "side": "minecraft:blocks/red_sandstone_carved",
+      "bottom": "minecraft:blocks/red_sandstone_bottom"
+    }
   },
   {
     "name": "Chiseled Sandstone",
@@ -40,17 +65,27 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/sandstone_top",
-      "side": "minecraft:blocks/sandstone_carved",
-      "bottom": "minecraft:blocks/sandstone_bottom"
+      "top": "minecraft:block/sandstone_top",
+      "side": "minecraft:block/chiseled_sandstone",
+      "bottom": "minecraft:block/sandstone_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:chiseled_sandstone"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:sandstone",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/sandstone_top",
+      "side": "minecraft:blocks/sandstone_carved",
+      "bottom": "minecraft:blocks/sandstone_bottom"
+    }
   },
   {
     "name": "Coal Block",
@@ -58,11 +93,17 @@
     "type": "rock",
     "hardness": 5,
     "resistance": 10,
-    "textures": "minecraft:blocks/coal_block",
+    "textures": "minecraft:block/coal_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:coal_block"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:coal_block"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/coal_block"
   },
   {
     "name": "Cobblestone",
@@ -70,8 +111,23 @@
     "type": "rock",
     "hardness": 2,
     "resistance": 10,
-    "textures": "minecraft:blocks/cobblestone",
+    "textures": "minecraft:block/cobblestone",
     "blocks": {
+      "full": {
+        "id": "minecraft:cobblestone"
+      },
+      "stairs": {
+        "id": "minecraft:cobblestone_stairs"
+      },
+      "slab": {
+        "id": "minecraft:cobblestone_slab"
+      },
+      "wall": {
+        "id": "minecraft:cobblestone_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:cobblestone",
       "stairs": "minecraft:stone_stairs",
       "slab": {
@@ -83,7 +139,7 @@
         "meta": 0
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/cobblestone"
   },
   {
     "name": "Diamond Block",
@@ -91,36 +147,58 @@
     "type": "metal",
     "hardness": 5,
     "resistance": 10,
-    "textures": "minecraft:blocks/diamond_block",
+    "textures": "minecraft:block/diamond_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:diamond_block"
+      }
+    },
+    "group": "metal",
+    "legacy_blocks": {
       "full": "minecraft:diamond_block"
     },
-    "group": "metal"
+    "legacy_textures": "minecraft:blocks/diamond_block"
   },
   {
     "name": "Dirt",
     "id": "minecraft:dirt",
     "type": "dirt",
     "hardness": 0.5,
-    "textures": "minecraft:blocks/dirt",
+    "textures": "minecraft:block/dirt",
     "blocks": {
+      "full": {
+        "id": "minecraft:dirt"
+      },
+      "slab": {
+        "id": "skysgrassslabs:dirt_slab",
+        "optional": true
+      }
+    },
+    "group": "dirt",
+    "legacy_blocks": {
       "full": "minecraft:dirt"
     },
-    "group": "dirt"
+    "legacy_textures": "minecraft:blocks/dirt"
   },
   {
     "name": "Coarse",
     "id": "minecraft:dirt_coarse",
     "type": "dirt",
     "hardness": 0.5,
-    "textures": "minecraft:blocks/coarse_dirt",
+    "textures": "minecraft:block/coarse_dirt",
     "blocks": {
+      "full": {
+        "id": "minecraft:coarse_dirt"
+      }
+    },
+    "group": "dirt",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:dirt",
         "meta": 1
       }
     },
-    "group": "dirt"
+    "legacy_textures": "minecraft:blocks/coarse_dirt"
   },
   {
     "name": "Mycelium",
@@ -128,14 +206,27 @@
     "type": "dirt",
     "hardness": 0.6,
     "textures": {
+      "top": "minecraft:block/mycelium_top",
+      "side": "minecraft:block/mycelium_side",
+      "bottom": "minecraft:block/dirt"
+    },
+    "blocks": {
+      "full": {
+        "id": "minecraft:mycelium",
+        "properties": {
+          "snowy": "false"
+        }
+      }
+    },
+    "group": "dirt",
+    "legacy_blocks": {
+      "full": "minecraft:mycelium"
+    },
+    "legacy_textures": {
       "top": "minecraft:blocks/mycelium_top",
       "side": "minecraft:blocks/mycelium_side",
       "bottom": "minecraft:blocks/dirt"
-    },
-    "blocks": {
-      "full": "minecraft:mycelium"
-    },
-    "group": "dirt"
+    }
   },
   {
     "name": "Podzol",
@@ -143,17 +234,30 @@
     "type": "dirt",
     "hardness": 0.5,
     "textures": {
-      "top": "minecraft:blocks/dirt_podzol_top",
-      "side": "minecraft:blocks/dirt_podzol_side",
-      "bottom": "minecraft:blocks/dirt"
+      "top": "minecraft:block/podzol_top",
+      "side": "minecraft:block/podzol_side",
+      "bottom": "minecraft:block/dirt"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:podzol",
+        "properties": {
+          "snowy": "false"
+        }
+      }
+    },
+    "group": "dirt",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:dirt",
         "meta": 2
       }
     },
-    "group": "dirt"
+    "legacy_textures": {
+      "top": "minecraft:blocks/dirt_podzol_top",
+      "side": "minecraft:blocks/dirt_podzol_side",
+      "bottom": "minecraft:blocks/dirt"
+    }
   },
   {
     "name": "Emerald Block",
@@ -161,11 +265,17 @@
     "type": "metal",
     "hardness": 5,
     "resistance": 10,
-    "textures": "minecraft:blocks/emerald_block",
+    "textures": "minecraft:block/emerald_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:emerald_block"
+      }
+    },
+    "group": "metal",
+    "legacy_blocks": {
       "full": "minecraft:emerald_block"
     },
-    "group": "metal"
+    "legacy_textures": "minecraft:blocks/emerald_block"
   },
   {
     "name": "End Stone Bricks",
@@ -173,11 +283,26 @@
     "type": "rock",
     "hardness": 0.8,
     "resistance": 1.3333334,
-    "textures": "minecraft:blocks/end_bricks",
+    "textures": "minecraft:block/end_stone_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:end_stone_bricks"
+      },
+      "slab": {
+        "id": "minecraft:end_stone_brick_slab"
+      },
+      "stairs": {
+        "id": "minecraft:end_stone_brick_stairs"
+      },
+      "wall": {
+        "id": "minecraft:end_stone_brick_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:end_bricks"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/end_bricks"
   },
   {
     "name": "End Stone",
@@ -185,11 +310,17 @@
     "type": "rock",
     "hardness": 3,
     "resistance": 15,
-    "textures": "minecraft:blocks/end_stone",
+    "textures": "minecraft:block/end_stone",
     "blocks": {
+      "full": {
+        "id": "minecraft:end_stone"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:end_stone"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/end_stone"
   },
   {
     "name": "Glass",
@@ -198,12 +329,27 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:glass",
-    "textures": "minecraft:blocks/glass",
+    "textures": "minecraft:block/glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:glass"
+      },
+      "pane": {
+        "id": "minecraft:glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "clear_glass",
+    "legacy_blocks": {
       "full": "minecraft:glass",
       "pane": "minecraft:glass_pane"
     },
-    "group": "clear_glass"
+    "legacy_textures": "minecraft:blocks/glass"
   },
   {
     "name": "Gold Block",
@@ -211,11 +357,17 @@
     "type": "metal",
     "hardness": 3,
     "resistance": 10,
-    "textures": "minecraft:blocks/gold_block",
+    "textures": "minecraft:block/gold_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:gold_block"
+      }
+    },
+    "group": "metal",
+    "legacy_blocks": {
       "full": "minecraft:gold_block"
     },
-    "group": "metal"
+    "legacy_textures": "minecraft:blocks/gold_block"
   },
   {
     "name": "Grass",
@@ -225,12 +377,25 @@
     "silkHarvest": "minecraft:grass",
     "uvlock": false,
     "textures": {
-      "top": "minecraft:blocks/grass_top",
-      "bottom": "minecraft:blocks/dirt",
-      "side": "minecraft:blocks/grass_side",
-      "overlay": "minecraft:blocks/grass_side_overlay"
+      "top": "minecraft:block/grass_block_top",
+      "bottom": "minecraft:block/dirt",
+      "side": "minecraft:block/grass_block_side",
+      "overlay": "minecraft:block/grass_block_side_overlay"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:grass_block",
+        "properties": {
+          "snowy": "false"
+        }
+      },
+      "slab": {
+        "id": "skysgrassslabs:grass_slab",
+        "optional": true
+      }
+    },
+    "group": "grass",
+    "legacy_blocks": {
       "full": "minecraft:grass",
       "slab": {
         "id": "buildingbricks:grass_slab",
@@ -254,7 +419,12 @@
         ]
       }
     },
-    "group": "grass"
+    "legacy_textures": {
+      "top": "minecraft:blocks/grass_top",
+      "bottom": "minecraft:blocks/dirt",
+      "side": "minecraft:blocks/grass_side",
+      "overlay": "minecraft:blocks/grass_side_overlay"
+    }
   },
   {
     "name": "Hardened Clay",
@@ -262,11 +432,17 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay",
+    "textures": "minecraft:block/terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:hardened_clay"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay"
   },
   {
     "name": "Ice",
@@ -275,11 +451,17 @@
     "hardness": 0.5,
     "normalHarvest": "",
     "silkHarvest": "minecraft:ice",
-    "textures": "minecraft:blocks/ice",
+    "textures": "minecraft:block/ice",
     "blocks": {
+      "full": {
+        "id": "minecraft:ice"
+      }
+    },
+    "group": "ice",
+    "legacy_blocks": {
       "full": "minecraft:ice"
     },
-    "group": "ice"
+    "legacy_textures": "minecraft:blocks/ice"
   },
   {
     "name": "Iron Block",
@@ -287,11 +469,17 @@
     "type": "metal",
     "hardness": 5,
     "resistance": 10,
-    "textures": "minecraft:blocks/iron_block",
+    "textures": "minecraft:block/iron_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:iron_block"
+      }
+    },
+    "group": "metal",
+    "legacy_blocks": {
       "full": "minecraft:iron_block"
     },
-    "group": "metal"
+    "legacy_textures": "minecraft:blocks/iron_block"
   },
   {
     "name": "Lapis Block",
@@ -299,11 +487,17 @@
     "type": "rock",
     "hardness": 3,
     "resistance": 5,
-    "textures": "minecraft:blocks/lapis_block",
+    "textures": "minecraft:block/lapis_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:lapis_block"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:lapis_block"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/lapis_block"
   },
   {
     "name": "Mossy Cobblestone",
@@ -311,15 +505,30 @@
     "type": "rock",
     "hardness": 2,
     "resistance": 10,
-    "textures": "minecraft:blocks/cobblestone_mossy",
+    "textures": "minecraft:block/mossy_cobblestone",
     "blocks": {
+      "full": {
+        "id": "minecraft:mossy_cobblestone"
+      },
+      "wall": {
+        "id": "minecraft:mossy_cobblestone_wall"
+      },
+      "slab": {
+        "id": "minecraft:mossy_cobblestone_slab"
+      },
+      "stairs": {
+        "id": "minecraft:mossy_cobblestone_stairs"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:mossy_cobblestone",
       "wall": {
         "id": "minecraft:cobblestone_wall",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/cobblestone_mossy"
   },
   {
     "name": "Nether Brick",
@@ -327,8 +536,26 @@
     "type": "rock",
     "hardness": 2,
     "resistance": 10,
-    "textures": "minecraft:blocks/nether_brick",
+    "textures": "minecraft:block/nether_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:nether_bricks"
+      },
+      "stairs": {
+        "id": "minecraft:nether_brick_stairs"
+      },
+      "slab": {
+        "id": "minecraft:nether_brick_slab"
+      },
+      "wall": {
+        "id": "minecraft:nether_brick_wall"
+      },
+      "fence": {
+        "id": "minecraft:nether_brick_fence"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:nether_brick",
       "stairs": "minecraft:nether_brick_stairs",
       "slab": {
@@ -336,18 +563,24 @@
         "meta": 6
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/nether_brick"
   },
   {
     "name": "Netherrack",
     "id": "minecraft:netherrack",
     "type": "rock",
     "hardness": 0.4,
-    "textures": "minecraft:blocks/netherrack",
+    "textures": "minecraft:block/netherrack",
     "blocks": {
+      "full": {
+        "id": "minecraft:netherrack"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:netherrack"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/netherrack"
   },
   {
     "name": "Obsidian",
@@ -355,11 +588,17 @@
     "type": "rock",
     "hardness": 50,
     "resistance": 2000,
-    "textures": "minecraft:blocks/obsidian",
+    "textures": "minecraft:block/obsidian",
     "blocks": {
+      "full": {
+        "id": "minecraft:obsidian"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:obsidian"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/obsidian"
   },
   {
     "name": "Packed Ice",
@@ -368,11 +607,17 @@
     "hardness": 0.5,
     "normalHarvest": "",
     "silkHarvest": "minecraft:packed_ice",
-    "textures": "minecraft:blocks/ice_packed",
+    "textures": "minecraft:block/packed_ice",
     "blocks": {
+      "full": {
+        "id": "minecraft:packed_ice"
+      }
+    },
+    "group": "packed_ice",
+    "legacy_blocks": {
       "full": "minecraft:packed_ice"
     },
-    "group": "packed_ice"
+    "legacy_textures": "minecraft:blocks/ice_packed"
   },
   {
     "name": "Acacia Planks",
@@ -380,8 +625,26 @@
     "type": "wood",
     "hardness": 2,
     "resistance": 5,
-    "textures": "minecraft:blocks/planks_acacia",
+    "textures": "minecraft:block/acacia_planks",
     "blocks": {
+      "full": {
+        "id": "minecraft:acacia_planks"
+      },
+      "stairs": {
+        "id": "minecraft:acacia_stairs"
+      },
+      "slab": {
+        "id": "minecraft:acacia_slab"
+      },
+      "fence": {
+        "id": "minecraft:acacia_fence"
+      },
+      "fence_gate": {
+        "id": "minecraft:acacia_fence_gate"
+      }
+    },
+    "group": "wood",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:planks",
         "meta": 4
@@ -394,7 +657,7 @@
       "fence": "minecraft:acacia_fence",
       "fence_gate": "minecraft:acacia_fence_gate"
     },
-    "group": "wood"
+    "legacy_textures": "minecraft:blocks/planks_acacia"
   },
   {
     "name": "Birch Planks",
@@ -402,8 +665,26 @@
     "type": "wood",
     "hardness": 2,
     "resistance": 5,
-    "textures": "minecraft:blocks/planks_birch",
+    "textures": "minecraft:block/birch_planks",
     "blocks": {
+      "full": {
+        "id": "minecraft:birch_planks"
+      },
+      "stairs": {
+        "id": "minecraft:birch_stairs"
+      },
+      "slab": {
+        "id": "minecraft:birch_slab"
+      },
+      "fence": {
+        "id": "minecraft:birch_fence"
+      },
+      "fence_gate": {
+        "id": "minecraft:birch_fence_gate"
+      }
+    },
+    "group": "wood",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:planks",
         "meta": 2
@@ -416,7 +697,7 @@
       "fence": "minecraft:birch_fence",
       "fence_gate": "minecraft:birch_fence_gate"
     },
-    "group": "wood"
+    "legacy_textures": "minecraft:blocks/planks_birch"
   },
   {
     "name": "Dark Oak Planks",
@@ -424,8 +705,26 @@
     "type": "wood",
     "hardness": 2,
     "resistance": 5,
-    "textures": "minecraft:blocks/planks_big_oak",
+    "textures": "minecraft:block/dark_oak_planks",
     "blocks": {
+      "full": {
+        "id": "minecraft:dark_oak_planks"
+      },
+      "stairs": {
+        "id": "minecraft:dark_oak_stairs"
+      },
+      "slab": {
+        "id": "minecraft:dark_oak_slab"
+      },
+      "fence": {
+        "id": "minecraft:dark_oak_fence"
+      },
+      "fence_gate": {
+        "id": "minecraft:dark_oak_fence_gate"
+      }
+    },
+    "group": "wood",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:planks",
         "meta": 5
@@ -438,7 +737,7 @@
       "fence": "minecraft:dark_oak_fence",
       "fence_gate": "minecraft:dark_oak_fence_gate"
     },
-    "group": "wood"
+    "legacy_textures": "minecraft:blocks/planks_big_oak"
   },
   {
     "name": "Jungle Planks",
@@ -446,8 +745,26 @@
     "type": "wood",
     "hardness": 2,
     "resistance": 5,
-    "textures": "minecraft:blocks/planks_jungle",
+    "textures": "minecraft:block/jungle_planks",
     "blocks": {
+      "full": {
+        "id": "minecraft:jungle_planks"
+      },
+      "stairs": {
+        "id": "minecraft:jungle_stairs"
+      },
+      "slab": {
+        "id": "minecraft:jungle_slab"
+      },
+      "fence": {
+        "id": "minecraft:jungle_fence"
+      },
+      "fence_gate": {
+        "id": "minecraft:jungle_fence_gate"
+      }
+    },
+    "group": "wood",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:planks",
         "meta": 3
@@ -460,7 +777,7 @@
       "fence": "minecraft:jungle_fence",
       "fence_gate": "minecraft:jungle_fence_gate"
     },
-    "group": "wood"
+    "legacy_textures": "minecraft:blocks/planks_jungle"
   },
   {
     "name": "Oak Planks",
@@ -468,8 +785,26 @@
     "type": "wood",
     "hardness": 2,
     "resistance": 5,
-    "textures": "minecraft:blocks/planks_oak",
+    "textures": "minecraft:block/oak_planks",
     "blocks": {
+      "full": {
+        "id": "minecraft:oak_planks"
+      },
+      "stairs": {
+        "id": "minecraft:oak_stairs"
+      },
+      "slab": {
+        "id": "minecraft:oak_slab"
+      },
+      "fence": {
+        "id": "minecraft:oak_fence"
+      },
+      "fence_gate": {
+        "id": "minecraft:oak_fence_gate"
+      }
+    },
+    "group": "wood",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:planks",
         "meta": 0
@@ -482,7 +817,7 @@
       "fence": "minecraft:fence",
       "fence_gate": "minecraft:fence_gate"
     },
-    "group": "wood"
+    "legacy_textures": "minecraft:blocks/planks_oak"
   },
   {
     "name": "Spruce Planks",
@@ -490,8 +825,26 @@
     "type": "wood",
     "hardness": 2,
     "resistance": 5,
-    "textures": "minecraft:blocks/planks_spruce",
+    "textures": "minecraft:block/spruce_planks",
     "blocks": {
+      "full": {
+        "id": "minecraft:spruce_planks"
+      },
+      "stairs": {
+        "id": "minecraft:spruce_stairs"
+      },
+      "slab": {
+        "id": "minecraft:spruce_slab"
+      },
+      "fence": {
+        "id": "minecraft:spruce_fence"
+      },
+      "fence_gate": {
+        "id": "minecraft:spruce_fence_gate"
+      }
+    },
+    "group": "wood",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:planks",
         "meta": 1
@@ -504,7 +857,7 @@
       "fence": "minecraft:spruce_fence",
       "fence_gate": "minecraft:spruce_fence_gate"
     },
-    "group": "wood"
+    "legacy_textures": "minecraft:blocks/planks_spruce"
   },
   {
     "name": "Prismarine Bricks",
@@ -512,14 +865,20 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/prismarine_bricks",
+    "textures": "minecraft:block/prismarine_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:prismarine_bricks"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:prismarine",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/prismarine_bricks"
   },
   {
     "name": "Dark Prismarine",
@@ -527,14 +886,26 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/prismarine_dark",
+    "textures": "minecraft:block/dark_prismarine",
     "blocks": {
+      "full": {
+        "id": "minecraft:dark_prismarine"
+      },
+      "slab": {
+        "id": "minecraft:dark_prismarine_slab"
+      },
+      "stairs": {
+        "id": "minecraft:dark_prismarine_stairs"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:prismarine",
         "meta": 2
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/prismarine_dark"
   },
   {
     "name": "Prismarine",
@@ -542,14 +913,29 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/prismarine_rough",
+    "textures": "minecraft:block/prismarine",
     "blocks": {
+      "full": {
+        "id": "minecraft:prismarine"
+      },
+      "slab": {
+        "id": "minecraft:prismarine_slab"
+      },
+      "stairs": {
+        "id": "minecraft:prismarine_stairs"
+      },
+      "wall": {
+        "id": "minecraft:prismarine_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:prismarine",
         "meta": 0
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/prismarine_rough"
   },
   {
     "name": "Purpur Block",
@@ -557,8 +943,28 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/purpur_block",
+    "textures": "minecraft:block/purpur_block",
     "blocks": {
+      "full": {
+        "id": "minecraft:purpur_block"
+      },
+      "stairs": {
+        "id": "minecraft:purpur_stairs",
+        "properties": {
+          "facing": "east",
+          "half": "bottom",
+          "shape": "straight"
+        }
+      },
+      "slab": {
+        "id": "minecraft:purpur_slab",
+        "properties": {
+          "type": "bottom"
+        }
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:purpur_block",
       "stairs": "minecraft:purpur_stairs",
       "slab": {
@@ -566,7 +972,7 @@
         "meta": 0
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/purpur_block"
   },
   {
     "name": "Purpur Pillar",
@@ -575,13 +981,25 @@
     "hardness": 1.5,
     "resistance": 10,
     "textures": {
-      "top": "minecraft:blocks/purpur_pillar_top",
-      "side": "minecraft:blocks/purpur_pillar"
+      "top": "minecraft:block/purpur_pillar_top",
+      "side": "minecraft:block/purpur_pillar_side"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:purpur_pillar",
+        "properties": {
+          "axis": "y"
+        }
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:purpur_pillar"
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/purpur_pillar_top",
+      "side": "minecraft:blocks/purpur_pillar"
+    }
   },
   {
     "name": "Quartz Block",
@@ -589,11 +1007,31 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/quartz_block_top",
-      "side": "minecraft:blocks/quartz_block_side",
-      "bottom": "minecraft:blocks/quartz_block_bottom"
+      "top": "minecraft:block/quartz_block_top",
+      "side": "minecraft:block/quartz_block_side",
+      "bottom": "minecraft:block/quartz_block_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:quartz_block"
+      },
+      "stairs": {
+        "id": "minecraft:quartz_stairs",
+        "properties": {
+          "facing": "east",
+          "half": "bottom",
+          "shape": "straight"
+        }
+      },
+      "slab": {
+        "id": "minecraft:quartz_slab",
+        "properties": {
+          "type": "bottom"
+        }
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:quartz_block",
       "stairs": "minecraft:quartz_stairs",
       "slab": {
@@ -601,7 +1039,11 @@
         "meta": 7
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/quartz_block_top",
+      "side": "minecraft:blocks/quartz_block_side",
+      "bottom": "minecraft:blocks/quartz_block_bottom"
+    }
   },
   {
     "name": "Red Sandstone",
@@ -609,11 +1051,26 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/red_sandstone_top",
-      "side": "minecraft:blocks/red_sandstone_normal",
-      "bottom": "minecraft:blocks/red_sandstone_bottom"
+      "top": "minecraft:block/red_sandstone_top",
+      "side": "minecraft:block/red_sandstone",
+      "bottom": "minecraft:block/red_sandstone_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:red_sandstone"
+      },
+      "stairs": {
+        "id": "minecraft:red_sandstone_stairs"
+      },
+      "slab": {
+        "id": "minecraft:red_sandstone_slab"
+      },
+      "wall": {
+        "id": "minecraft:red_sandstone_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:red_sandstone",
         "meta": 0
@@ -624,7 +1081,11 @@
         "meta": 0
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/red_sandstone_top",
+      "side": "minecraft:blocks/red_sandstone_normal",
+      "bottom": "minecraft:blocks/red_sandstone_bottom"
+    }
   },
   {
     "name": "Sandstone",
@@ -632,11 +1093,26 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/sandstone_top",
-      "side": "minecraft:blocks/sandstone_normal",
-      "bottom": "minecraft:blocks/sandstone_bottom"
+      "top": "minecraft:block/sandstone_top",
+      "side": "minecraft:block/sandstone",
+      "bottom": "minecraft:block/sandstone_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:sandstone"
+      },
+      "stairs": {
+        "id": "minecraft:sandstone_stairs"
+      },
+      "slab": {
+        "id": "minecraft:sandstone_slab"
+      },
+      "wall": {
+        "id": "minecraft:sandstone_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:sandstone",
         "meta": 0
@@ -647,7 +1123,11 @@
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/sandstone_top",
+      "side": "minecraft:blocks/sandstone_normal",
+      "bottom": "minecraft:blocks/sandstone_bottom"
+    }
   },
   {
     "name": "Smooth Red Sandstone",
@@ -655,17 +1135,30 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/red_sandstone_top",
-      "side": "minecraft:blocks/red_sandstone_smooth",
-      "bottom": "minecraft:blocks/red_sandstone_bottom"
+      "top": "minecraft:block/red_sandstone_top",
+      "side": "minecraft:block/cut_red_sandstone",
+      "bottom": "minecraft:block/red_sandstone_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:cut_red_sandstone"
+      },
+      "slab": {
+        "id": "minecraft:cut_red_sandstone_slab"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:red_sandstone",
         "meta": 2
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/red_sandstone_top",
+      "side": "minecraft:blocks/red_sandstone_smooth",
+      "bottom": "minecraft:blocks/red_sandstone_bottom"
+    }
   },
   {
     "name": "Smooth Sandstone",
@@ -673,28 +1166,47 @@
     "type": "rock",
     "hardness": 0.8,
     "textures": {
-      "top": "minecraft:blocks/sandstone_top",
-      "side": "minecraft:blocks/sandstone_smooth",
-      "bottom": "minecraft:blocks/sandstone_bottom"
+      "top": "minecraft:block/sandstone_top",
+      "side": "minecraft:block/cut_sandstone",
+      "bottom": "minecraft:block/sandstone_bottom"
     },
     "blocks": {
+      "full": {
+        "id": "minecraft:cut_sandstone"
+      },
+      "slab": {
+        "id": "minecraft:cut_sandstone_slab"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:sandstone",
         "meta": 2
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/sandstone_top",
+      "side": "minecraft:blocks/sandstone_smooth",
+      "bottom": "minecraft:blocks/sandstone_bottom"
+    }
   },
   {
     "name": "Snow",
     "id": "minecraft:snow",
     "type": "snow",
     "hardness": 0.2,
-    "textures": "minecraft:blocks/snow",
+    "textures": "minecraft:block/snow",
     "blocks": {
+      "full": {
+        "id": "minecraft:snow_block"
+      }
+    },
+    "group": "snow",
+    "legacy_blocks": {
       "full": "minecraft:snow"
     },
-    "group": "snow"
+    "legacy_textures": "minecraft:blocks/snow"
   },
   {
     "name": "white Stained Glass",
@@ -703,8 +1215,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_white",
-    "textures": "minecraft:blocks/glass_white",
+    "textures": "minecraft:block/white_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:white_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:white_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 0
@@ -714,7 +1241,7 @@
         "meta": 0
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_white"
   },
   {
     "name": "orange Stained Glass",
@@ -723,8 +1250,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_orange",
-    "textures": "minecraft:blocks/glass_orange",
+    "textures": "minecraft:block/orange_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:orange_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:orange_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 1
@@ -734,7 +1276,7 @@
         "meta": 1
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_orange"
   },
   {
     "name": "magenta Stained Glass",
@@ -743,8 +1285,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_magenta",
-    "textures": "minecraft:blocks/glass_magenta",
+    "textures": "minecraft:block/magenta_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:magenta_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:magenta_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 2
@@ -754,7 +1311,7 @@
         "meta": 2
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_magenta"
   },
   {
     "name": "light blue Stained Glass",
@@ -763,8 +1320,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_light_blue",
-    "textures": "minecraft:blocks/glass_light_blue",
+    "textures": "minecraft:block/light_blue_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:light_blue_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:light_blue_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 3
@@ -774,7 +1346,7 @@
         "meta": 3
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_light_blue"
   },
   {
     "name": "yellow Stained Glass",
@@ -783,8 +1355,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_yellow",
-    "textures": "minecraft:blocks/glass_yellow",
+    "textures": "minecraft:block/yellow_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:yellow_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:yellow_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 4
@@ -794,7 +1381,7 @@
         "meta": 4
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_yellow"
   },
   {
     "name": "lime Stained Glass",
@@ -803,8 +1390,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_lime",
-    "textures": "minecraft:blocks/glass_lime",
+    "textures": "minecraft:block/lime_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:lime_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:lime_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 5
@@ -814,7 +1416,7 @@
         "meta": 5
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_lime"
   },
   {
     "name": "pink Stained Glass",
@@ -823,8 +1425,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_pink",
-    "textures": "minecraft:blocks/glass_pink",
+    "textures": "minecraft:block/pink_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:pink_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:pink_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 6
@@ -834,7 +1451,7 @@
         "meta": 6
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_pink"
   },
   {
     "name": "gray Stained Glass",
@@ -843,8 +1460,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_gray",
-    "textures": "minecraft:blocks/glass_gray",
+    "textures": "minecraft:block/gray_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:gray_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:gray_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 7
@@ -854,7 +1486,7 @@
         "meta": 7
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_gray"
   },
   {
     "name": "silver Stained Glass",
@@ -863,8 +1495,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_silver",
-    "textures": "minecraft:blocks/glass_silver",
+    "textures": "minecraft:block/light_gray_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:light_gray_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:light_gray_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 8
@@ -874,7 +1521,7 @@
         "meta": 8
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_silver"
   },
   {
     "name": "cyan Stained Glass",
@@ -883,8 +1530,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_cyan",
-    "textures": "minecraft:blocks/glass_cyan",
+    "textures": "minecraft:block/cyan_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:cyan_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:cyan_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 9
@@ -894,7 +1556,7 @@
         "meta": 9
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_cyan"
   },
   {
     "name": "purple Stained Glass",
@@ -903,8 +1565,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_purple",
-    "textures": "minecraft:blocks/glass_purple",
+    "textures": "minecraft:block/purple_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:purple_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:purple_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 10
@@ -914,7 +1591,7 @@
         "meta": 10
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_purple"
   },
   {
     "name": "blue Stained Glass",
@@ -923,8 +1600,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_blue",
-    "textures": "minecraft:blocks/glass_blue",
+    "textures": "minecraft:block/blue_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:blue_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:blue_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 11
@@ -934,7 +1626,7 @@
         "meta": 11
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_blue"
   },
   {
     "name": "brown Stained Glass",
@@ -943,8 +1635,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_brown",
-    "textures": "minecraft:blocks/glass_brown",
+    "textures": "minecraft:block/brown_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:brown_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:brown_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 12
@@ -954,7 +1661,7 @@
         "meta": 12
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_brown"
   },
   {
     "name": "green Stained Glass",
@@ -963,8 +1670,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_green",
-    "textures": "minecraft:blocks/glass_green",
+    "textures": "minecraft:block/green_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:green_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:green_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 13
@@ -974,7 +1696,7 @@
         "meta": 13
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_green"
   },
   {
     "name": "red Stained Glass",
@@ -983,8 +1705,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_red",
-    "textures": "minecraft:blocks/glass_red",
+    "textures": "minecraft:block/red_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:red_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:red_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 14
@@ -994,7 +1731,7 @@
         "meta": 14
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_red"
   },
   {
     "name": "black Stained Glass",
@@ -1003,8 +1740,23 @@
     "hardness": 0.3,
     "normalHarvest": "",
     "silkHarvest": "minecraft:stained_glass_black",
-    "textures": "minecraft:blocks/glass_black",
+    "textures": "minecraft:block/black_stained_glass",
     "blocks": {
+      "full": {
+        "id": "minecraft:black_stained_glass"
+      },
+      "pane": {
+        "id": "minecraft:black_stained_glass_pane",
+        "properties": {
+          "east": "false",
+          "north": "false",
+          "south": "false",
+          "west": "false"
+        }
+      }
+    },
+    "group": "stained_glass",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_glass",
         "meta": 15
@@ -1014,7 +1766,7 @@
         "meta": 15
       }
     },
-    "group": "stained_glass"
+    "legacy_textures": "minecraft:blocks/glass_black"
   },
   {
     "name": "white Stained Clay",
@@ -1022,14 +1774,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_white",
+    "textures": "minecraft:block/white_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:white_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 0
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_white"
   },
   {
     "name": "orange Stained Clay",
@@ -1037,14 +1795,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_orange",
+    "textures": "minecraft:block/orange_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:orange_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_orange"
   },
   {
     "name": "magenta Stained Clay",
@@ -1052,14 +1816,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_magenta",
+    "textures": "minecraft:block/magenta_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:magenta_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 2
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_magenta"
   },
   {
     "name": "light blue Stained Clay",
@@ -1067,14 +1837,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_light_blue",
+    "textures": "minecraft:block/light_blue_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:light_blue_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 3
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_light_blue"
   },
   {
     "name": "yellow Stained Clay",
@@ -1082,14 +1858,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_yellow",
+    "textures": "minecraft:block/yellow_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:yellow_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 4
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_yellow"
   },
   {
     "name": "lime Stained Clay",
@@ -1097,14 +1879,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_lime",
+    "textures": "minecraft:block/lime_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:lime_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 5
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_lime"
   },
   {
     "name": "pink Stained Clay",
@@ -1112,14 +1900,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_pink",
+    "textures": "minecraft:block/pink_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:pink_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 6
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_pink"
   },
   {
     "name": "gray Stained Clay",
@@ -1127,14 +1921,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_gray",
+    "textures": "minecraft:block/gray_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:gray_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 7
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_gray"
   },
   {
     "name": "silver Stained Clay",
@@ -1142,14 +1942,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_silver",
+    "textures": "minecraft:block/light_gray_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:light_gray_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 8
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_silver"
   },
   {
     "name": "cyan Stained Clay",
@@ -1157,14 +1963,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_cyan",
+    "textures": "minecraft:block/cyan_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:cyan_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 9
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_cyan"
   },
   {
     "name": "purple Stained Clay",
@@ -1172,14 +1984,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_purple",
+    "textures": "minecraft:block/purple_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:purple_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 10
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_purple"
   },
   {
     "name": "blue Stained Clay",
@@ -1187,14 +2005,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_blue",
+    "textures": "minecraft:block/blue_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:blue_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 11
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_blue"
   },
   {
     "name": "brown Stained Clay",
@@ -1202,14 +2026,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_brown",
+    "textures": "minecraft:block/brown_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:brown_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 12
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_brown"
   },
   {
     "name": "green Stained Clay",
@@ -1217,14 +2047,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_green",
+    "textures": "minecraft:block/green_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:green_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 13
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_green"
   },
   {
     "name": "red Stained Clay",
@@ -1232,14 +2068,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_red",
+    "textures": "minecraft:block/red_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:red_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 14
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_red"
   },
   {
     "name": "black Stained Clay",
@@ -1247,14 +2089,20 @@
     "type": "rock",
     "hardness": 1.25,
     "resistance": 7,
-    "textures": "minecraft:blocks/hardened_clay_stained_black",
+    "textures": "minecraft:block/black_terracotta",
     "blocks": {
+      "full": {
+        "id": "minecraft:black_terracotta"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stained_hardened_clay",
         "meta": 15
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/hardened_clay_stained_black"
   },
   {
     "name": "Stone",
@@ -1262,11 +2110,23 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone",
+    "textures": "minecraft:block/stone",
     "blocks": {
+      "full": {
+        "id": "minecraft:stone"
+      },
+      "slab": {
+        "id": "minecraft:stone_slab"
+      },
+      "stairs": {
+        "id": "minecraft:stone_stairs"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:stone"
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone"
   },
   {
     "name": "Stone Slab",
@@ -1275,11 +2135,23 @@
     "hardness": 2,
     "resistance": 10,
     "textures": {
-      "top": "minecraft:blocks/stone_slab_top",
-      "side": "minecraft:blocks/stone_slab_side",
-      "bottom": "minecraft:blocks/stone_slab_top"
+      "top": "minecraft:block/smooth_stone",
+      "side": "minecraft:block/smooth_stone_slab_side",
+      "bottom": "minecraft:block/smooth_stone"
     },
     "blocks": {
+      "slab": {
+        "id": "minecraft:smooth_stone_slab",
+        "properties": {
+          "type": "bottom"
+        }
+      },
+      "full": {
+        "id": "minecraft:smooth_stone"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "slab": {
         "id": "minecraft:stone_slab",
         "meta": 0
@@ -1289,7 +2161,11 @@
         "meta": 0
       }
     },
-    "group": "rock"
+    "legacy_textures": {
+      "top": "minecraft:blocks/stone_slab_top",
+      "side": "minecraft:blocks/stone_slab_side",
+      "bottom": "minecraft:blocks/stone_slab_top"
+    }
   },
   {
     "name": "Andesite",
@@ -1297,14 +2173,29 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone_andesite",
+    "textures": "minecraft:block/andesite",
     "blocks": {
+      "full": {
+        "id": "minecraft:andesite"
+      },
+      "slab": {
+        "id": "minecraft:andesite_slab"
+      },
+      "stairs": {
+        "id": "minecraft:andesite_stairs"
+      },
+      "wall": {
+        "id": "minecraft:andesite_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stone",
         "meta": 5
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone_andesite"
   },
   {
     "name": "Smooth Andesite",
@@ -1312,14 +2203,26 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone_andesite_smooth",
+    "textures": "minecraft:block/polished_andesite",
     "blocks": {
+      "full": {
+        "id": "minecraft:polished_andesite"
+      },
+      "slab": {
+        "id": "minecraft:polished_andesite_slab"
+      },
+      "stairs": {
+        "id": "minecraft:polished_andesite_stairs"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stone",
         "meta": 6
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone_andesite_smooth"
   },
   {
     "name": "Diorite",
@@ -1327,14 +2230,29 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone_diorite",
+    "textures": "minecraft:block/diorite",
     "blocks": {
+      "full": {
+        "id": "minecraft:diorite"
+      },
+      "slab": {
+        "id": "minecraft:diorite_slab"
+      },
+      "stairs": {
+        "id": "minecraft:diorite_stairs"
+      },
+      "wall": {
+        "id": "minecraft:diorite_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stone",
         "meta": 3
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone_diorite"
   },
   {
     "name": "Smooth Diorite",
@@ -1342,14 +2260,26 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone_diorite_smooth",
+    "textures": "minecraft:block/polished_diorite",
     "blocks": {
+      "full": {
+        "id": "minecraft:polished_diorite"
+      },
+      "slab": {
+        "id": "minecraft:polished_diorite_slab"
+      },
+      "stairs": {
+        "id": "minecraft:polished_diorite_stairs"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stone",
         "meta": 4
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone_diorite_smooth"
   },
   {
     "name": "Granite",
@@ -1357,14 +2287,29 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone_granite",
+    "textures": "minecraft:block/granite",
     "blocks": {
+      "full": {
+        "id": "minecraft:granite"
+      },
+      "slab": {
+        "id": "minecraft:granite_slab"
+      },
+      "stairs": {
+        "id": "minecraft:granite_stairs"
+      },
+      "wall": {
+        "id": "minecraft:granite_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stone",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone_granite"
   },
   {
     "name": "Smooth Granite",
@@ -1372,14 +2317,26 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stone_granite_smooth",
+    "textures": "minecraft:block/polished_granite",
     "blocks": {
+      "full": {
+        "id": "minecraft:polished_granite"
+      },
+      "slab": {
+        "id": "minecraft:polished_granite_slab"
+      },
+      "stairs": {
+        "id": "minecraft:polished_granite_stairs"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stone",
         "meta": 2
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stone_granite_smooth"
   },
   {
     "name": "Stone Brick",
@@ -1387,8 +2344,23 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stonebrick",
+    "textures": "minecraft:block/stone_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:stone_bricks"
+      },
+      "stairs": {
+        "id": "minecraft:stone_brick_stairs"
+      },
+      "slab": {
+        "id": "minecraft:stone_brick_slab"
+      },
+      "wall": {
+        "id": "minecraft:stone_brick_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": "minecraft:stonebrick",
       "stairs": "minecraft:stone_brick_stairs",
       "slab": {
@@ -1396,7 +2368,7 @@
         "meta": 5
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stonebrick"
   },
   {
     "name": "Chiseled Stone Brick",
@@ -1404,14 +2376,20 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stonebrick_carved",
+    "textures": "minecraft:block/chiseled_stone_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:chiseled_stone_bricks"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stonebrick",
         "meta": 3
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stonebrick_carved"
   },
   {
     "name": "Cracked Stone Brick",
@@ -1419,14 +2397,20 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stonebrick_cracked",
+    "textures": "minecraft:block/cracked_stone_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:cracked_stone_bricks"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stonebrick",
         "meta": 2
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stonebrick_cracked"
   },
   {
     "name": "Mossy Stone Brick",
@@ -1434,238 +2418,381 @@
     "type": "rock",
     "hardness": 1.5,
     "resistance": 10,
-    "textures": "minecraft:blocks/stonebrick_mossy",
+    "textures": "minecraft:block/mossy_stone_bricks",
     "blocks": {
+      "full": {
+        "id": "minecraft:mossy_stone_bricks"
+      },
+      "slab": {
+        "id": "minecraft:mossy_stone_brick_slab"
+      },
+      "stairs": {
+        "id": "minecraft:mossy_stone_brick_stairs"
+      },
+      "wall": {
+        "id": "minecraft:mossy_stone_brick_wall"
+      }
+    },
+    "group": "rock",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:stonebrick",
         "meta": 1
       }
     },
-    "group": "rock"
+    "legacy_textures": "minecraft:blocks/stonebrick_mossy"
   },
   {
     "name": "white Wool",
     "id": "minecraft:wool_white",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_white",
+    "textures": "minecraft:block/white_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:white_wool"
+      },
+      "slab": "minecraft:white_wool_slab",
+      "stairs": "minecraft:white_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 0
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_white"
   },
   {
     "name": "orange Wool",
     "id": "minecraft:wool_orange",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_orange",
+    "textures": "minecraft:block/orange_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:orange_wool"
+      },
+      "slab": "minecraft:orange_wool_slab",
+      "stairs": "minecraft:orange_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 1
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_orange"
   },
   {
     "name": "magenta Wool",
     "id": "minecraft:wool_magenta",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_magenta",
+    "textures": "minecraft:block/magenta_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:magenta_wool"
+      },
+      "slab": "minecraft:magenta_wool_slab",
+      "stairs": "minecraft:magenta_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 2
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_magenta"
   },
   {
     "name": "light blue Wool",
     "id": "minecraft:wool_light_blue",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_light_blue",
+    "textures": "minecraft:block/light_blue_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:light_blue_wool"
+      },
+      "slab": "minecraft:light_blue_wool_slab",
+      "stairs": "minecraft:light_blue_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 3
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_light_blue"
   },
   {
     "name": "yellow Wool",
     "id": "minecraft:wool_yellow",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_yellow",
+    "textures": "minecraft:block/yellow_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:yellow_wool"
+      },
+      "slab": "minecraft:yellow_wool_slab",
+      "stairs": "minecraft:yellow_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 4
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_yellow"
   },
   {
     "name": "lime Wool",
     "id": "minecraft:wool_lime",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_lime",
+    "textures": "minecraft:block/lime_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:lime_wool"
+      },
+      "slab": "minecraft:lime_wool_slab",
+      "stairs": "minecraft:lime_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 5
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_lime"
   },
   {
     "name": "pink Wool",
     "id": "minecraft:wool_pink",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_pink",
+    "textures": "minecraft:block/pink_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:pink_wool"
+      },
+      "slab": "minecraft:pink_wool_slab",
+      "stairs": "minecraft:pink_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 6
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_pink"
   },
   {
     "name": "gray Wool",
     "id": "minecraft:wool_gray",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_gray",
+    "textures": "minecraft:block/gray_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:gray_wool"
+      },
+      "slab": "minecraft:gray_wool_slab",
+      "stairs": "minecraft:gray_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 7
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_gray"
   },
   {
     "name": "silver Wool",
     "id": "minecraft:wool_silver",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_silver",
+    "textures": "minecraft:block/light_gray_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:light_gray_wool"
+      },
+      "slab": "minecraft:light_gray_wool_slab",
+      "stairs": "minecraft:light_gray_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 8
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_silver"
   },
   {
     "name": "cyan Wool",
     "id": "minecraft:wool_cyan",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_cyan",
+    "textures": "minecraft:block/cyan_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:cyan_wool"
+      },
+      "slab": "minecraft:cyan_wool_slab",
+      "stairs": "minecraft:cyan_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 9
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_cyan"
   },
   {
     "name": "purple Wool",
     "id": "minecraft:wool_purple",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_purple",
+    "textures": "minecraft:block/purple_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:purple_wool"
+      },
+      "slab": "minecraft:purple_wool_slab",
+      "stairs": "minecraft:purple_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 10
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_purple"
   },
   {
     "name": "blue Wool",
     "id": "minecraft:wool_blue",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_blue",
+    "textures": "minecraft:block/blue_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:blue_wool"
+      },
+      "slab": "minecraft:blue_wool_slab",
+      "stairs": "minecraft:blue_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 11
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_blue"
   },
   {
     "name": "brown Wool",
     "id": "minecraft:wool_brown",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_brown",
+    "textures": "minecraft:block/brown_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:brown_wool"
+      },
+      "slab": "minecraft:brown_wool_slab",
+      "stairs": "minecraft:brown_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 12
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_brown"
   },
   {
     "name": "green Wool",
     "id": "minecraft:wool_green",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_green",
+    "textures": "minecraft:block/green_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:green_wool"
+      },
+      "slab": "minecraft:green_wool_slab",
+      "stairs": "minecraft:green_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 13
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_green"
   },
   {
     "name": "red Wool",
     "id": "minecraft:wool_red",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_red",
+    "textures": "minecraft:block/red_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:red_wool"
+      },
+      "slab": "minecraft:red_wool_slab",
+      "stairs": "minecraft:red_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 14
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_red"
   },
   {
     "name": "black Wool",
     "id": "minecraft:wool_black",
     "type": "cloth",
     "hardness": 0.8,
-    "textures": "minecraft:blocks/wool_colored_black",
+    "textures": "minecraft:block/black_wool",
     "blocks": {
+      "full": {
+        "id": "minecraft:black_wool"
+      },
+      "slab": "minecraft:black_wool_slab",
+      "stairs": "minecraft:black_wool_stairs"
+    },
+    "group": "cloth",
+    "legacy_blocks": {
       "full": {
         "id": "minecraft:wool",
         "meta": 15
       }
     },
-    "group": "cloth"
+    "legacy_textures": "minecraft:blocks/wool_colored_black"
   },
   {
     "name": "Path",
@@ -1675,12 +2802,26 @@
     "hardness": 0.65,
     "normalHarvest": "minecraft:dirt",
     "textures": {
+      "top": "minecraft:block/dirt_path_top",
+      "side": "minecraft:block/dirt_path_side",
+      "bottom": "minecraft:block/dirt"
+    },
+    "blocks": {
+      "full": {
+        "id": "minecraft:dirt_path"
+      },
+      "slab": {
+        "id": "skysgrassslabs:path_slab",
+        "optional": true
+      }
+    },
+    "legacy_blocks": {
+      "full": "minecraft:grass_path"
+    },
+    "legacy_textures": {
       "top": "minecraft:blocks/grass_path_top",
       "side": "minecraft:blocks/grass_path_side",
       "bottom": "minecraft:blocks/dirt"
-    },
-    "blocks": {
-      "full": "minecraft:grass_path"
     }
   }
 ]

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stonebrick_carved",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stonebrick_carved_slab"
+  },
+  "result": {
+    "id": "minecraft:chiseled_stone_bricks",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stonebrick_carved_slab"
+  }
+}

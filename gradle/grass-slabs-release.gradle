@@ -8,46 +8,49 @@ def lock = new Properties()
 file('gradle/grass-slabs-release.properties').withInputStream { lock.load(it) }
 def configureVerification = project.ext.configureMineralogyVerificationRun
 if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.version}" ||
-        !(lock.sha256 ==~ /[A-F0-9]{64}/)) {
-    throw new GradleException('The released Grass Slabs dependency needs its public version and checksum')
+        lock.kind != 'local-candidate' || !(lock.sha256 ==~ /[A-F0-9]{64}/) ||
+        !(lock.getProperty('development.sha256') ==~ /[A-F0-9]{64}/)) {
+    throw new GradleException('The coordinated Grass Slabs dependency needs exact candidate checksums')
 }
 
-configurations { grassSlabsPublishedRelease { transitive = false } }
-dependencies { grassSlabsPublishedRelease lock.coordinate }
-def publishedJar = providers.provider { configurations.grassSlabsPublishedRelease.singleFile }
-def developmentJar = layout.projectDirectory.file(
-        ".gradle/released-content/SkysGrassSlabs-${lock.version}-deobf.jar")
+def sibling = "../../SkysGrassSlabs263/SkysGrassSlabs"
+def pinnedJar = providers.provider {
+    file(providers.gradleProperty('grassSlabsMainJar').getOrElse(
+            "${sibling}/build/libs/SkysGrassSlabs-${lock.version}.jar"))
+}
+def developmentJar = layout.projectDirectory.file(providers.gradleProperty('grassSlabsDeobfJar')
+        .getOrElse(pinnedJar.get().absolutePath))
+
 def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
     group = 'verification'
-    description = 'Checks the exact public Grass Slabs jar used by the optional development profile.'
-    inputs.file publishedJar
+    description = 'Checks both exact Grass Slabs candidate jars used by optional family tests.'
+    inputs.file pinnedJar
+    inputs.file developmentJar
     inputs.file 'gradle/grass-slabs-release.properties'
     doLast {
-        File source = publishedJar.get()
-        String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
-                .encodeHex().toString().toUpperCase(Locale.ROOT)
-        if (actual != lock.sha256) {
-            throw new GradleException('The public Grass Slabs jar does not match its release checksum')
-        }
-        new ZipFile(source).withCloseable { archive ->
-            def metadata = new JsonSlurper().parseText(
-                    archive.getInputStream(archive.getEntry('mcmod.info')).getText('UTF-8'))
-            if (metadata[0].modid != 'skysgrassslabs' || metadata[0].version != lock.version) {
-                throw new GradleException('The public Grass Slabs jar has unexpected mod metadata')
+        [[pinnedJar.get(), lock.sha256], [developmentJar.asFile, lock.getProperty('development.sha256')]].each { entry ->
+            File source = entry[0]
+            String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
+                    .encodeHex().toString().toUpperCase(Locale.ROOT)
+            if (actual != entry[1]) {
+                throw new GradleException('Grass Slabs does not match its pinned candidate checksum: ' + source.name)
+            }
+            new ZipFile(source).withCloseable { archive ->
+                def descriptor = archive.getEntry('META-INF/mods.toml')
+                if (descriptor == null) throw new GradleException('Grass Slabs has no Forge 66 metadata')
+                String metadata = archive.getInputStream(descriptor).getText('UTF-8')
+                if (!(metadata =~ /(?m)^\s*modId\s*=\s*"skysgrassslabs"\s*$/) ||
+                        !(metadata =~ /(?m)^\s*version\s*=\s*"${java.util.regex.Pattern.quote(lock.version)}"\s*$/)) {
+                    throw new GradleException('Grass Slabs has unexpected candidate metadata')
+                }
             }
         }
     }
 }
-
-def mapRelease = renamer.classes('deobfuscateGrassSlabsRelease') {
-    dependsOn verifyRelease
-    input.set(layout.file(publishedJar))
-    map.from minecraft.dependency.toSrgFile
-    reverse.set(true)
-    libraries.from sourceSets.main.compileClasspath
-    output.set(developmentJar)
-}
-ext.publishedGrassSlabsJar = publishedJar
+// The qualified development jar is pinned directly; do not silently remap or replace it.
+def mapRelease = verifyRelease
+ext.pinnedGrassSlabsJar = pinnedJar
+ext.nativeGrassDevelopmentJar = developmentJar
 
 def manualDirectory = layout.projectDirectory.dir('run-grass-slabs')
 def prepareManual = tasks.register('prepareGrassSlabsDevelopmentRun') {
@@ -68,10 +71,9 @@ def prepareManual = tasks.register('prepareGrassSlabsDevelopmentRun') {
 ['Client', 'Server'].each { side ->
     tasks.register('runGrassSlabs' + side, JavaExec) {
         group = 'forgegradle runs'
-        description = "Runs a separate ${side.toLowerCase(Locale.ROOT)} with released Grass Slabs."
+        description = "Runs a separate ${side.toLowerCase(Locale.ROOT)} with pinned Grass Slabs."
         dependsOn prepareManual
         workingDir manualDirectory
-        systemProperty 'log4j.configurationFile', file('gradle/development-log4j2.xml').toURI().toString()
         if (side == 'Server') args '--nogui'
         configureVerification(delegate, 'run' + side)
     }
@@ -107,17 +109,23 @@ tasks.named('verifyEclipseProductionClasspath') {
     }
 }
 
-def runtime = layout.buildDirectory.dir('grass-slabs-integration-run')
+def grassSlabsIntegrationRunName = providers.gradleProperty('grassSlabsIntegrationRunName')
+        .getOrElse('grass-slabs-integration-run')
+if (!(grassSlabsIntegrationRunName ==~ /[a-z0-9-]+/)) {
+    throw new GradleException('Use a simple disposable Grass Slabs integration directory name')
+}
+def runtime = layout.buildDirectory.dir(grassSlabsIntegrationRunName)
 def prepareTest = tasks.register('prepareGrassSlabsIntegrationTest') {
     group = 'verification'
     dependsOn mapRelease, tasks.named('integrationTestModJar')
     doLast {
         File directory = runtime.get().asFile
         if (directory.canonicalFile != new File(layout.buildDirectory.get().asFile,
-                'grass-slabs-integration-run').canonicalFile) {
+                grassSlabsIntegrationRunName).canonicalFile) {
             throw new GradleException('Refusing to clear a verification directory outside the build output')
         }
-        project.delete(directory)
+        if (directory.exists()) throw new GradleException('Preserve the existing Grass Slabs verification evidence: ' + directory)
+        copy { from 'src/bootstrapTest/defaultconfigs'; into directory }
         copy {
             from developmentJar
             from tasks.named('integrationTestModJar', Jar).flatMap { it.archiveFile }
@@ -147,15 +155,25 @@ def fresh = tasks.register('integrationGrassSlabsFreshProcess', JavaExec) {
     dependsOn prepareTest
     workingDir runtime
     systemProperty 'skysbuildingpieces.integrationPhase', 'fresh'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runServer')
+    doLast {
+        File directory = runtime.get().asFile
+        File result = new File(directory, 'world/skysbuildingpieces-integration.properties')
+        Properties marker = new Properties()
+        if (result.isFile()) result.withInputStream { marker.load(it) }
+        String log = readForgeRuntimeLog(new File(directory, 'logs/latest.log'))
+        if (marker.fresh_complete != 'true' || !log.contains('Done (')
+                || log.find(/\/(?:ERROR|FATAL)\]/) || log.contains('[STDERR')
+                || !fileTree(new File(directory, 'crash-reports')).isEmpty()) {
+            throw new GradleException('The pinned Grass Slabs fresh phase failed; preserve it before a reload')
+        }
+    }
 }
 def reload = tasks.register('integrationGrassSlabsReloadProcess', JavaExec) {
     group = 'verification'
     dependsOn fresh
     workingDir runtime
     systemProperty 'skysbuildingpieces.integrationPhase', 'reload'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runServer')
 }
 tasks.register('integrationGrassSlabsTest') {
@@ -167,7 +185,7 @@ tasks.register('integrationGrassSlabsTest') {
         new File(directory, 'world/skysbuildingpieces-integration.properties').withInputStream { marker.load(it) }
         if (marker.fresh_complete != 'true' || marker.reload_complete != 'true' ||
                 !fileTree(new File(directory, 'crash-reports')).isEmpty()) {
-            throw new GradleException('The released Grass Slabs integration did not complete cleanly')
+            throw new GradleException('The pinned Grass Slabs integration did not complete cleanly')
         }
     }
 }
@@ -176,11 +194,15 @@ tasks.register('integrationGrassSlabsClientProcess', JavaExec) {
     dependsOn prepareTest
     workingDir runtime
     systemProperty 'skysbuildingpieces.integrationPhase', 'client'
-    systemProperty 'log4j.configurationFile', file('src/integrationTest/resources/log4j2.xml').toURI().toString()
     configureVerification(delegate, 'runClient')
     doLast {
         if (!new File(runtime.get().asFile, 'building-pieces-client-pass.txt').isFile()) {
-            throw new GradleException('The released Grass Slabs client did not complete model checks')
+            throw new GradleException('The pinned Grass Slabs client did not complete model checks')
+        }
+        String log = readForgeRuntimeLog(new File(runtime.get().asFile, 'logs/latest.log'))
+        if (log =~ /\/(?:ERROR|FATAL)\]/ || log.contains('[STDERR/') || log.contains('[STDERR]') ||
+                !fileTree(new File(runtime.get().asFile, 'crash-reports')).isEmpty()) {
+            throw new GradleException('The ordinary Grass Slabs client launch contains runtime errors')
         }
     }
 }

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/diorite_smooth",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:diorite_smooth_corner"
+  },
+  "result": {
+    "id": "skysbuildingpieces:diorite_smooth_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_smooth_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:diorite_smooth_horizontal_step"
+      }
+    ]
+  }
+}

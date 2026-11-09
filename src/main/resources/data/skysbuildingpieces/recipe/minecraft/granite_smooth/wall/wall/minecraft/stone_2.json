@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": "minecraft:polished_granite"
+  },
+  "result": {
+    "id": "skysbuildingpieces:granite_smooth_wall",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:granite_smooth_wall"
+  }
+}

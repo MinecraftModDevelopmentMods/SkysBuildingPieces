@@ -31,7 +31,8 @@ class CatalogueExtensionTest {
         input.get(0).getAsJsonObject().addProperty("flammability", 20);
         assertEquals(0, catalogueModule.materials.get("example:wood").flammability());
         assertEquals(0, catalogueModule.materials.get("example:wood").fireSpread());
-        assertThrows(UnsupportedOperationException.class, () -> catalogueModule.palettes.get(0).materials.add("example:other"));
+        assertThrows(UnsupportedOperationException.class,
+                () -> catalogueModule.palettes.get(0).materials.add("example:other"));
         assertThrows(UnsupportedOperationException.class, () -> catalogue.materials.clear());
     }
 

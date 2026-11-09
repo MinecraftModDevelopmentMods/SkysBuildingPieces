@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/minecraft",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": "minecraft:orange_stained_glass"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_glass_orange_wall",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_glass_orange_wall"
+  }
+}

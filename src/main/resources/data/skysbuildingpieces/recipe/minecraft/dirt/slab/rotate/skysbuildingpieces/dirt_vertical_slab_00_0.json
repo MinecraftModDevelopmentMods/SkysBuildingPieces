@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:dirt_vertical_slab"
+  },
+  "result": {
+    "id": "skysgrassslabs:dirt_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_vertical_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysgrassslabs:dirt_slab"
+      }
+    ]
+  }
+}

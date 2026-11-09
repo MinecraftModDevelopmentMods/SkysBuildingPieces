@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/marble",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:marble_slab"
+  },
+  "result": {
+    "id": "mineralogy:marble",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:marble"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:marble_slab"
+      }
+    ]
+  }
+}

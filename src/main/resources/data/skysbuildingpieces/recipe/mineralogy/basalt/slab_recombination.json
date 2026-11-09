@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/basalt",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:basalt_slab"
+  },
+  "result": {
+    "id": "mineralogy:basalt",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:basalt"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:basalt_slab"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/andesite",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:andesite_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:andesite_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:andesite_horizontal_step"
+  }
+}

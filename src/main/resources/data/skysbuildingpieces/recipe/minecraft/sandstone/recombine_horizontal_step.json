@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/sandstone",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:sandstone_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:sandstone_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:sandstone_horizontal_step"
+  }
+}

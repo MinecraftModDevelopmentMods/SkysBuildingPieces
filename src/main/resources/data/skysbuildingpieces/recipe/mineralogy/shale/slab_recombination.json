@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/shale",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:shale_slab"
+  },
+  "result": {
+    "id": "mineralogy:shale",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:shale"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:shale_slab"
+      }
+    ]
+  }
+}

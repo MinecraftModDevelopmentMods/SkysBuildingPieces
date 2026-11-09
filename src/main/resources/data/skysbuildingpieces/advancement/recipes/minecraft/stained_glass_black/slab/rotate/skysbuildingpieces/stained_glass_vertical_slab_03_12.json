@@ -1,0 +1,39 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:stained_glass_black_vertical_slab"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "skysbuildingpieces:minecraft/stained_glass_black/slab/rotate/skysbuildingpieces/stained_glass_vertical_slab_03_12"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/stained_glass_black/slab/rotate/skysbuildingpieces/stained_glass_vertical_slab_03_12"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_black_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_black_vertical_slab"
+      }
+    ]
+  }
+}

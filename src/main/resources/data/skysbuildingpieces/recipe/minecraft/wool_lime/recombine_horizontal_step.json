@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skysbuildingpieces/wool_lime",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_lime_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:lime_wool_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_lime_horizontal_step"
+  }
+}

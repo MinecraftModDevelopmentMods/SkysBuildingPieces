@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/planks_birch",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:planks_birch_vertical_step"
+  },
+  "result": {
+    "id": "minecraft:birch_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:planks_birch_vertical_step"
+  }
+}

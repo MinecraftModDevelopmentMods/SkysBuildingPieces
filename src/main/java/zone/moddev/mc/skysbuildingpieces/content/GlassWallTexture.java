@@ -1,27 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraftforge.common.property.IUnlistedProperty;
-
 /** Render-only joins and texture coordinates for matching glass wall sections. */
 public final class GlassWallTexture {
-    public static final IUnlistedProperty<Integer> JOINS = new IUnlistedProperty<Integer>() {
-        public String getName() {
-            return "glass_joins";
-        }
-
-        public boolean isValid(Integer value) {
-            return value != null && value >= 0 && value < 16;
-        }
-
-        public Class<Integer> getType() {
-            return Integer.class;
-        }
-
-        public String valueToString(Integer value) {
-            return value.toString();
-        }
-    };
-
     /** Crops one texture pixel only at an outer edge joined to matching glass. */
     public static int[] trim(int[] vertices, int stride, int position, int uvOffset, int joins) {
         if (vertices.length != stride * 4 || position < 0 || position + 2 >= stride || uvOffset < 0

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/skysbuildingpieces",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stained_glass_pink_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_glass_pink_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_pink_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_glass_pink_horizontal_step"
+      }
+    ]
+  }
+}

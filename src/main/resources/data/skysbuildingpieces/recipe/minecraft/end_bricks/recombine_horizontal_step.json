@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/end_bricks",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:end_bricks_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:end_stone_brick_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:end_bricks_horizontal_step"
+  }
+}

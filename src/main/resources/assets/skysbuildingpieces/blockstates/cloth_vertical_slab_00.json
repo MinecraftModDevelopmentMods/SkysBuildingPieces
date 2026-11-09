@@ -1,1 +1,100 @@
-{"variants":{"meta=0":{"model":"skysbuildingpieces:wool_white_vertical_slab_0"},"meta=1":{"model":"skysbuildingpieces:wool_white_vertical_slab_1"},"meta=2":{"model":"skysbuildingpieces:wool_white_vertical_slab_2"},"meta=3":{"model":"skysbuildingpieces:wool_white_vertical_slab_3"},"meta=4":{"model":"skysbuildingpieces:wool_orange_vertical_slab_0"},"meta=5":{"model":"skysbuildingpieces:wool_orange_vertical_slab_1"},"meta=6":{"model":"skysbuildingpieces:wool_orange_vertical_slab_2"},"meta=7":{"model":"skysbuildingpieces:wool_orange_vertical_slab_3"},"meta=8":{"model":"skysbuildingpieces:wool_magenta_vertical_slab_0"},"meta=9":{"model":"skysbuildingpieces:wool_magenta_vertical_slab_1"},"meta=10":{"model":"skysbuildingpieces:wool_magenta_vertical_slab_2"},"meta=11":{"model":"skysbuildingpieces:wool_magenta_vertical_slab_3"},"meta=12":{"model":"skysbuildingpieces:wool_light_blue_vertical_slab_0"},"meta=13":{"model":"skysbuildingpieces:wool_light_blue_vertical_slab_1"},"meta=14":{"model":"skysbuildingpieces:wool_light_blue_vertical_slab_2"},"meta=15":{"model":"skysbuildingpieces:wool_light_blue_vertical_slab_3"}}}
+{
+  "variants": {
+    "meta=0,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_0"
+    },
+    "meta=0,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_0"
+    },
+    "meta=1,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_1"
+    },
+    "meta=1,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_1"
+    },
+    "meta=2,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_2"
+    },
+    "meta=2,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_2"
+    },
+    "meta=3,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_3"
+    },
+    "meta=3,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_white_vertical_slab_3"
+    },
+    "meta=4,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_0"
+    },
+    "meta=4,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_0"
+    },
+    "meta=5,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_1"
+    },
+    "meta=5,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_1"
+    },
+    "meta=6,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_2"
+    },
+    "meta=6,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_2"
+    },
+    "meta=7,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_3"
+    },
+    "meta=7,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_orange_vertical_slab_3"
+    },
+    "meta=8,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_0"
+    },
+    "meta=8,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_0"
+    },
+    "meta=9,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_1"
+    },
+    "meta=9,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_1"
+    },
+    "meta=10,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_2"
+    },
+    "meta=10,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_2"
+    },
+    "meta=11,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_3"
+    },
+    "meta=11,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_magenta_vertical_slab_3"
+    },
+    "meta=12,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_0"
+    },
+    "meta=12,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_0"
+    },
+    "meta=13,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_1"
+    },
+    "meta=13,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_1"
+    },
+    "meta=14,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_2"
+    },
+    "meta=14,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_2"
+    },
+    "meta=15,waterlogged=false": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_3"
+    },
+    "meta=15,waterlogged=true": {
+      "model": "skysbuildingpieces:block/wool_light_blue_vertical_slab_3"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "skysbuildingpieces/stained_hardened_clay_pink",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stained_hardened_clay_pink_slab"
+  },
+  "result": {
+    "id": "minecraft:pink_terracotta",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_pink_slab"
+  }
+}

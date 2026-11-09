@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "orientation=south,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_0_dry"
+    },
+    "orientation=south,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_0_dry"
+    },
+    "orientation=south,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_0_snow"
+    },
+    "orientation=south,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_0_snow"
+    },
+    "orientation=west,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_1_dry"
+    },
+    "orientation=west,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_1_dry"
+    },
+    "orientation=west,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_1_snow"
+    },
+    "orientation=west,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_1_snow"
+    },
+    "orientation=north,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_2_dry"
+    },
+    "orientation=north,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_2_dry"
+    },
+    "orientation=north,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_2_snow"
+    },
+    "orientation=north,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_2_snow"
+    },
+    "orientation=east,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_3_dry"
+    },
+    "orientation=east,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_3_dry"
+    },
+    "orientation=east,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_3_snow"
+    },
+    "orientation=east,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_vertical_slab_3_snow"
+    }
+  }
+}
