@@ -2,6 +2,7 @@
 
 ## 0.3.9.2603001
 
+- Removed duplicate grass and dirt slab recipes when Sky's Grass Slabs is installed.
 - Each material and shape now has its own block ID. Existing pieces keep their shapes and orientation.
 - The creative tab shows the mod's own pieces.
 - Directional slab placement is on by default and can be turned off in the Mods menu.

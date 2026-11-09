@@ -248,7 +248,8 @@ def prepare(resources, native_recipes=(), tags=None):
                         add(base + '/native_' + shape, ['X'], old_item, piece(material, shape), 1, preserve=True)
             if slab is not None and vertical is not None:
                 cut('slab', 'rotate', vertical)
-            if slab is not None and not half_input:
+            # Grass Slabs already supplies the recipe for rebuilding its own slabs.
+            if slab is not None and not half_input and not slab.startswith('skysgrassslabs:'):
                 add(base + '/slab_recombination', ['XX'], slab, full, 1)
             if corner is not None and step is not None:
                 add(base + '/recombine_corner', ['X', 'X'], corner, step, 1)

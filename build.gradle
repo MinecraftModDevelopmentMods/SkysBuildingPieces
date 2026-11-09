@@ -710,6 +710,7 @@ eclipse {
     synchronizationTasks 'genEclipseRuns'
 }
 
+def eclipseRecipeDirectories = ['data/skysbuildingpieces/recipe', 'data/skysbuildingpieces/advancement/recipes']
 def prepareEclipseResources = tasks.register('prepareEclipseResources') {
     group = 'ide'
     dependsOn tasks.named('processResources'), prepareDevelopmentManifest
@@ -718,6 +719,18 @@ def prepareEclipseResources = tasks.register('prepareEclipseResources') {
             from(layout.buildDirectory.dir('resources/main'))
             from(developmentManifest) { into 'META-INF' }
             into(layout.projectDirectory.dir('bin/main'))
+            eclipseRecipeDirectories.each { directory -> exclude directory + '/**' }
+        }
+        // Keep the recipe folders in sync so Eclipse drops recipes removed from the mod.
+        eclipseRecipeDirectories.each { directory ->
+            File destination = layout.projectDirectory.dir("bin/main/${directory}").asFile
+            if (destination.canonicalFile != new File(projectDir.canonicalFile, "bin/main/${directory}")) {
+                throw new GradleException("Unexpected Eclipse resource output: ${destination}")
+            }
+            project.sync {
+                from(layout.buildDirectory.dir("resources/main/${directory}"))
+                into(destination)
+            }
         }
     }
 }
