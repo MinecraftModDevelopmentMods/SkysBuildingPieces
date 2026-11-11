@@ -3,6 +3,7 @@
 ## 0.3.10.121012
 
 - Keep grass steps and corners snowy beside a higher snow-covered terrace.
+- Give exposed grass pieces a snow cap in cold areas where layers cannot settle.
 - Refresh grass-piece appearance and growth during normal random ticks.
 - Recognise snow pieces as snow cover alongside vanilla snow.
 

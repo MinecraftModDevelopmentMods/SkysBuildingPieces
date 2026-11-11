@@ -47,6 +47,8 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
@@ -461,6 +463,12 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
                         && readState(world, neighbourPos.above()).is(BlockTags.SNOW);
             }
 
+            if (!snowy && world instanceof LevelReader reader) {
+                snowy = reader.getBiome(position).value().coldEnoughToSnow(position)
+                        && reader.getHeight(Heightmap.Types.MOTION_BLOCKING, position.getX(), position.getZ())
+                                <= position.getY() + 1
+                        && reader.getBrightness(LightLayer.BLOCK, position.above()) < 10;
+            }
             state = state.setValue(SnowyDirtBlock.SNOWY, snowy);
         }
         if (state.hasProperty(CONNECTIONS)) {
