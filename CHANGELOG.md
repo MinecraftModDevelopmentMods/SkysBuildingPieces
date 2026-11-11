@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.10.121012
+
+- Keep grass steps and corners snowy beside a higher snow-covered terrace.
+- Refresh grass-piece appearance and growth during normal random ticks.
+- Recognise snow pieces as snow cover alongside vanilla snow.
+
 ## 0.3.9.121012
 
 - Give each material and shape its own block ID. Older worlds keep their pieces and their orientation.

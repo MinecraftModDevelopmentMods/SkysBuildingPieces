@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SnowyDirtBlock;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -451,13 +452,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     public BlockState getActualState(BlockState state, BlockGetter world, BlockPos position) {
         if (state.hasProperty(SnowyDirtBlock.SNOWY)) {
-            boolean snowy = false;
+            boolean snowy = readState(world, position.above()).is(BlockTags.SNOW);
 
-            for (Direction side : new Direction[] { Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH,
-                    Direction.WEST }) {
-                Block neighbour = readState(world, position.relative(side)).getBlock();
-
-                snowy |= neighbour == Blocks.SNOW_BLOCK || neighbour == Blocks.SNOW;
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                BlockPos neighbourPos = position.relative(side);
+                BlockState neighbour = readState(world, neighbourPos);
+                snowy |= neighbour.is(BlockTags.SNOW) || neighbour.isCollisionShapeFullBlock(world, neighbourPos)
+                        && readState(world, neighbourPos.above()).is(BlockTags.SNOW);
             }
 
             state = state.setValue(SnowyDirtBlock.SNOWY, snowy);
@@ -639,6 +640,11 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (actual != state) {
             world.setBlock(position, actual, 2);
         }
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerLevel world, BlockPos position, RandomSource random) {
+        tick(state, world, position, random);
     }
 
     @Override
