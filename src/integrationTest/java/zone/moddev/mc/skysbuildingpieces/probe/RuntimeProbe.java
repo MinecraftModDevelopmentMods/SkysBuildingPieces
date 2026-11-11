@@ -117,6 +117,9 @@ public final class RuntimeProbe {
             } else {
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
+                StandaloneLifecycleChecks.run(world);
+                SurvivalDropChecks.run(world);
+                FuelChecks.run();
                 GameplayChecks.run(world);
                 WaterloggingChecks.run(world);
                 PathChecks.run(world);

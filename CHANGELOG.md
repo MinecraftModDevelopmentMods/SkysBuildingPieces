@@ -2,6 +2,10 @@
 
 ## 0.3.10.121012
 
+- Let snow pieces drop themselves when broken by hand, as well as with a shovel.
+- Keep grass spreading within the world's current height limits, including below zero and above 255.
+- Make standalone grass decay under solid cover or water even in bright light.
+- Scale wooden pieces' furnace fuel to their size and the original wood's fuel value.
 - Keep grass steps and corners snowy beside a higher snow-covered terrace.
 - Give exposed grass pieces a snow cap in cold areas where layers cannot settle.
 - Refresh grass-piece appearance and growth during normal random ticks.

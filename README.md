@@ -38,6 +38,10 @@ Pieces support native waterlogging. Wet grass and path pieces turn into their
 matching dirt shapes, keeping the water and orientation. Drain them before
 using a shovel.
 
+Snow pieces drop themselves when dug by hand or with a shovel. Wooden slabs,
+steps and corners burn for the corresponding share of their original block's
+furnace fuel, so cutting wood does not create extra fuel.
+
 ## Crafting
 
 Recipes appear in the recipe book as you collect their ingredients. Crafting a

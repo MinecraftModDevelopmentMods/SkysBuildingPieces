@@ -284,6 +284,9 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos position, Player player) {
+        if (definition(state).type.equals("snow")) {
+            return true;
+        }
         BlockState full = Pieces.nativeState(definition(state), "full");
         return full.canHarvestBlock(world, position, player);
     }
@@ -294,6 +297,10 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         float hardness = materialDestroySpeed(state, world, position);
         if (hardness == -1.0F) {
             return 0.0F;
+        }
+        if (definition(state).type.equals("snow")) {
+            // Snow pieces keep their shape when dug by hand; a shovel still mines them faster.
+            return player.getDigSpeed(full, position) / hardness / 30;
         }
         // The full block may handle tool tiers per state. Keep its mining rules
         // and scale only the hardness when this piece declares a different value.
