@@ -2,8 +2,8 @@
 
 ## 0.3.10.121012
 
+- Cover exposed grass beneath snow pieces and snowy steps or corners, restoring its normal appearance when they are removed or thaw.
 - Unlock shared Grass Slabs recipes when crafting their ingredients, including pieces still held on the cursor.
-
 - Remove repeated recipe-book entries while keeping each cut and rebuilding pattern.
 - Keep dirt vertical slabs craftable back into dirt when Grass Slabs isn't installed.
 - Let snow pieces drop themselves when broken by hand, as well as with a shovel.

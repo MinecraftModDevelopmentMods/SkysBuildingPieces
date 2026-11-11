@@ -75,6 +75,7 @@ public final class ClientProbe extends ProbeProxy {
                     && !minecraft.getConnection().getRecipeManager().getRecipes().isEmpty()) {
                 RecipePreviewModels.check(minecraft);
                 colours(minecraft);
+                SnowCoverClientChecks.run(minecraft);
                 net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(minecraft.level.enabledFeatures(),
                         true, minecraft.level.registryAccess());
                 for (var entry : PiecesTab.entries().values()) {

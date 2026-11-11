@@ -42,6 +42,10 @@ Snow pieces drop themselves when dug by hand or with a shovel. Wooden slabs,
 steps and corners burn for the corresponding share of their original block's
 furnace fuel, so cutting wood does not create extra fuel.
 
+Snow pieces and snowy grass steps or corners cover the exposed top of a grass
+block beneath them. This is a visual covering: the grass stays intact and the
+walking surface keeps its height. Remove or thaw the piece to reveal the grass.
+
 ## Crafting
 
 Recipes appear in the recipe book as you collect their ingredients. Crafting a
