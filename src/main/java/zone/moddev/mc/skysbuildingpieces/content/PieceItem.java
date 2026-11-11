@@ -61,7 +61,9 @@ public final class PieceItem extends BlockItem {
     public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
         Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
         if (!definition.type.equals("wood")) {
-            return -1;
+            // NeoForge rejects negative burn times. Keep its normal data-map lookup
+            // so non-fuels return zero and modpacks can still configure other fuels.
+            return super.getBurnTime(stack, recipeType);
         }
         ItemStack full = Pieces.stack(Pieces.nativeState(definition, "full"), 1);
         int fullBurnTime = full == null ? 0 : Math.max(0, full.getBurnTime(recipeType));
