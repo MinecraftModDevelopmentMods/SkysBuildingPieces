@@ -2,6 +2,8 @@
 
 ## 0.3.10.121012
 
+- Remove repeated recipe-book entries while keeping each cut and rebuilding pattern.
+- Keep dirt vertical slabs craftable back into dirt when Grass Slabs isn't installed.
 - Let snow pieces drop themselves when broken by hand, as well as with a shovel.
 - Keep grass spreading within the world's current height limits, including below zero and above 255.
 - Make standalone grass decay under solid cover or water even in bright light.

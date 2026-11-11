@@ -1,0 +1,46 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "skysbuildingpieces:dirt_vertical_slab"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/dirt/vertical_slab_recombination_without_grass_slabs"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "skysbuildingpieces:minecraft/dirt/vertical_slab_recombination_without_grass_slabs"
+    ]
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "skysbuildingpieces:dirt_vertical_slab"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:item_exists",
+        "item": "skysgrassslabs:dirt_slab"
+      }
+    }
+  ]
+}
