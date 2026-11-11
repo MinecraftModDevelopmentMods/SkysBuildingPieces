@@ -73,6 +73,7 @@ public final class ClientProbe extends ProbeProxy {
             }
             if (startedWorld && ClientStatus.complete && minecraft.level != null && minecraft.getConnection() != null
                     && !minecraft.getConnection().getRecipeManager().getRecipes().isEmpty()) {
+                RecipeBookGroupChecks.run(minecraft);
                 RecipePreviewModels.check(minecraft);
                 colours(minecraft);
                 SnowCoverClientChecks.run(minecraft);
