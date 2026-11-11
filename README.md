@@ -52,6 +52,11 @@ Recipes appear in the recipe book as you collect their ingredients. Crafting a
 piece also reveals its next cuts and recombination recipes while the table is
 still open.
 
+Each button shows one result. Right-click it to choose between different ways
+of making that same piece. Different materials and shapes stay separate.
+For snow slabs, put two snow blocks diagonally in either crafting grid to make
+four slabs. Vanilla's three-block row still makes snow layers.
+
 Craft pieces from matching full blocks, slabs and steps. For example, three
 full blocks in a row make six slabs, and two matching slabs placed diagonally
 make four steps. Existing vanilla recipes stay available.

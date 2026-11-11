@@ -2,6 +2,7 @@
 
 ## 0.3.10.121012
 
+- Give each crafting result a stable recipe-book button, with alternative ways to make that item grouped together.
 - Cover exposed grass beneath snow pieces and snowy steps or corners, restoring its normal appearance when they are removed or thaw.
 - Unlock shared Grass Slabs recipes when crafting their ingredients, including pieces still held on the cursor.
 - Remove repeated recipe-book entries while keeping each cut and rebuilding pattern.

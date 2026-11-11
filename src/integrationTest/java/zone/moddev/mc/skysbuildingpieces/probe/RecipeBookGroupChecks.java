@@ -23,7 +23,7 @@ public final class RecipeBookGroupChecks {
             if (collection.getRecipes().stream().anyMatch(holder -> SKY.contains(holder.id().getNamespace()))) {
                 require(collection.hasSingleResultItem(),
                         "A Sky recipe-book button must not cycle between different output items: "
-                                + collection.getRecipes().stream().map(holder -> holder.id().toString()).toList());
+                                + collection.getRecipes().stream().limit(5).map(holder -> holder.id().toString()).toList());
                 checked++;
             }
         }

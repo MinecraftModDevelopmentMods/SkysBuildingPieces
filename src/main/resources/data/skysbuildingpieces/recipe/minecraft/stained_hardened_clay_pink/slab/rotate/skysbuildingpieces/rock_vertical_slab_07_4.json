@@ -1,6 +1,6 @@
 {
-  "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",  "type": "skysbuildingpieces:cutting",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_pink_slab",
   "pattern": ["X"],
   "key": {
     "X": {

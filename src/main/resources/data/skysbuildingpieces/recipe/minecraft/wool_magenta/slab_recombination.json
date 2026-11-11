@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/wool_magenta",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/minecraft/magenta_wool",
   "pattern": ["XX"],
   "key": {
     "X": {

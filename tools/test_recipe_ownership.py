@@ -16,6 +16,12 @@ class RecipeOwnershipTests(unittest.TestCase):
         for soil in ("dirt", "grass"):
             self.assertNotIn("minecraft/" + soil + "/slab_recombination", self.recipes)
 
+    def test_book_groups_are_named_for_the_result_not_the_source_namespace(self):
+        for identity, recipe in self.recipes.items():
+            if "result" in recipe:
+                self.assertEqual("skys/result/" + recipe["result"]["id"].replace(":", "/"),
+                                 recipe["group"], identity)
+
     def test_dirt_vertical_slabs_still_rebuild_without_grass_slabs(self):
         identity = "minecraft/dirt/vertical_slab_recombination_without_grass_slabs"
         recipe = self.recipes[identity]

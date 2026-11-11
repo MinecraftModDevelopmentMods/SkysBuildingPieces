@@ -83,6 +83,12 @@ public final class SnowCoverClientChecks {
             }
         }
 
+        view.above = Blocks.POWDER_SNOW.defaultBlockState();
+        BakedModel powderSupport = client.getBlockRenderer().getBlockModel(grass);
+        checkTop(powderSupport, grass, powderSupport.getModelData(view, position, grass, ModelData.EMPTY), true,
+                "powder snow covers the grass too");
+        checked++;
+
         BakedModel item = client.getItemRenderer().getModel(new net.minecraft.world.item.ItemStack(Blocks.GRASS_BLOCK),
                 client.level, client.player, 0);
         require(top(item, null, ModelData.EMPTY, null).stream().allMatch(SnowCoverClientChecks::grassTexture),

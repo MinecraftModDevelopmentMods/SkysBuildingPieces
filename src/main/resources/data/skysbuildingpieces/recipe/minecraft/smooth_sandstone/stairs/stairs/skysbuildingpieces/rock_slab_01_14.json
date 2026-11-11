@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/skysbuildingpieces/smooth_sandstone_stairs",
   "pattern": ["X  ", "XX ", "XXX"],
   "key": {
     "X": {

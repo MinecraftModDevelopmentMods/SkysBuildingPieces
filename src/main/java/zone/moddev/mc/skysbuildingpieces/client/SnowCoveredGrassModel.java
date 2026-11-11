@@ -21,6 +21,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowyDirtBlock;
+import net.minecraft.world.level.block.PowderSnowBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
@@ -49,14 +50,19 @@ public final class SnowCoveredGrassModel extends BakedModelWrapper<BakedModel> {
     @Override
     public ModelData getModelData(BlockAndTintGetter world, BlockPos position, BlockState state, ModelData data) {
         ModelData inherited = originalModel.getModelData(world, position, state, data);
-        boolean covered = restsOnGrass(world.getBlockState(position.above()));
+        boolean covered = restsOnGrass(world, position.above());
         if (covered) {
             inherited = snowyGrass.getModelData(world, position, SNOWY_GRASS, inherited);
         }
         return inherited.derive().with(COVERED, covered).build();
     }
 
-    private static boolean restsOnGrass(BlockState above) {
+    private static boolean restsOnGrass(BlockAndTintGetter world, BlockPos position) {
+        BlockState above = world.getBlockState(position);
+        if (above.getBlock() instanceof PowderSnowBlock) {
+            var outline = above.getShape(world, position);
+            return above.getFluidState().isEmpty() && !outline.isEmpty() && outline.bounds().minY == 0;
+        }
         if (!(above.getBlock() instanceof PieceBlock piece)
                 || above.getValue(BlockStateProperties.WATERLOGGED)
                 || piece.palette.shape == Shape.WALL || piece.palette.shape == Shape.PANE) {

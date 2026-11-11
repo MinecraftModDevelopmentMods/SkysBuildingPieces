@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/dirt",
+  "group": "skys/result/minecraft/dirt",
   "pattern": [
     "XX"
   ],

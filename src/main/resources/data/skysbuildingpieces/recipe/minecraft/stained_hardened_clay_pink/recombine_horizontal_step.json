@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_hardened_clay_pink",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_pink_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": {
