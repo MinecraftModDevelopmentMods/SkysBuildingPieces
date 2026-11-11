@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_silver",
+  "group": "skys/result/minecraft/light_gray_wool_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:wool_silver_horizontal_step"

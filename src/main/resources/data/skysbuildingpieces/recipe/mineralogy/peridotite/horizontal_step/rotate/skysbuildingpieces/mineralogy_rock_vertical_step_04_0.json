@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mineralogy_peridotite_horizontal_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_peridotite_vertical_step"

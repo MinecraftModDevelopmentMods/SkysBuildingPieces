@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/quartz_block_horizontal_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:quartz_block_vertical_step"

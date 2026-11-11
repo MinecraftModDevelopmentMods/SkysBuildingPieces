@@ -166,7 +166,8 @@ if __name__ == "__main__":
     parser.add_argument("--phase", required=True)
     parser.add_argument("--control", action="store_true")
     parser.add_argument("--server", action="store_true")
+    parser.add_argument("--offline-client", action="store_true")
     options = parser.parse_args()
     result = (audit_server(options.directory, options.phase) if options.server else
-              audit(options.directory, options.phase, options.control))
+              audit(options.directory, options.phase, options.control, options.offline_client))
     print("NATIVE_FORGE_LOG_AUDIT_PASS", json.dumps(result, sort_keys=True))

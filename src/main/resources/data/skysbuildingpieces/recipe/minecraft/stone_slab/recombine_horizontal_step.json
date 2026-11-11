@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stone_slab",
+  "category": "building",
+  "group": "skys/result/minecraft/smooth_stone_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:stone_slab_horizontal_step"

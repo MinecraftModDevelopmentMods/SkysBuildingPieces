@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_carved_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stonebrick_carved_vertical_slab"

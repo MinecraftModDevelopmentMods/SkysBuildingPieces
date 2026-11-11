@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/dolomite",
+  "category": "building",
+  "group": "skys/result/mineralogy/dolomite",
   "pattern": ["XX"],
   "key": {
     "X": "mineralogy:dolomite_slab"

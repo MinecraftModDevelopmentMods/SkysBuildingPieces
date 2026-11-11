@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_yellow",
+  "group": "skys/result/minecraft/yellow_wool_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:wool_yellow_vertical_step"

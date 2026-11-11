@@ -1,7 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
   "category": "building",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "group": "skys/result/skysbuildingpieces/wool_white_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:wool_white_horizontal_step"

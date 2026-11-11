@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/netherrack",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/netherrack_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:netherrack_horizontal_step"

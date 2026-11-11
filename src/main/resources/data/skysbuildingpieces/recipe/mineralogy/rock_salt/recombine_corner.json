@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/rock_salt",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mineralogy_rock_salt_horizontal_step",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_rock_salt_corner"

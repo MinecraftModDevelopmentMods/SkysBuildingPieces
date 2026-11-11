@@ -1,7 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
   "category": "building",
-  "group": "skysbuildingpieces/wool_white",
+  "group": "skys/result/minecraft/white_wool_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:wool_white_slab"

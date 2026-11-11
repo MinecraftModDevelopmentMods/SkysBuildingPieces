@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_pink",
+  "group": "skys/result/minecraft/pink_wool",
   "pattern": ["XX"],
   "key": {
     "X": "minecraft:pink_wool_slab"

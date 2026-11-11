@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_hardened_clay_light_blue",
+  "category": "building",
+  "group": "skys/result/minecraft/light_blue_terracotta",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:stained_hardened_clay_light_blue_slab"

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/end_stone_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:end_stone_vertical_slab"

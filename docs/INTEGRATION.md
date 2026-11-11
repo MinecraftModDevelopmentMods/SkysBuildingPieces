@@ -17,7 +17,7 @@ west; corners use those directions for NW, NE, SE and SW respectively.
 
 Sky's Terrain Smoother uses this lookup without depending on palette internals.
 Building Pieces never generates terrain itself. It optionally joins Grass
-Slabs' grass-form integration, using 1.2.0.2603001 or later on Minecraft 26.3.
+Slabs' grass-form integration, using 1.2.1.2603001 or later on Minecraft 26.3.
 It works without either Grass Slabs or Terrain Smoother installed.
 
 Mineralogy is supported directly. Its presence adds 35 fixed rock-piece

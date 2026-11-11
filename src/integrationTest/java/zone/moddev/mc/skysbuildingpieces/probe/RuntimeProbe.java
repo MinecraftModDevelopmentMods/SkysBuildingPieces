@@ -117,6 +117,9 @@ public final class RuntimeProbe {
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
                 GameplayChecks.run(world);
+                FuelChecks.run();
+                SurvivalDropChecks.run(world);
+                StandaloneLifecycleChecks.run(world);
                 WaterloggingChecks.run(world);
                 PathChecks.run(world);
                 SharedGrassChecks.run(world);

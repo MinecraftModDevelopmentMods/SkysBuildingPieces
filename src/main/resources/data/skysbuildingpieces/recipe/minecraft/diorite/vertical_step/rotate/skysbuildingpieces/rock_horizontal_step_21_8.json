@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/diorite_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:diorite_horizontal_step"

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/chiseled_sandstone_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:chiseled_sandstone_horizontal_step"

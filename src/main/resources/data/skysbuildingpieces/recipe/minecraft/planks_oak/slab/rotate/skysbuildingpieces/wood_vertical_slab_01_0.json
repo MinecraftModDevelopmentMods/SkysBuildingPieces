@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/oak_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:planks_oak_vertical_slab"

@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/nether_brick_corner",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:nether_brick_vertical_step"

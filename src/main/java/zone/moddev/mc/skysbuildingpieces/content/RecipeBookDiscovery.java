@@ -20,7 +20,7 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 
 /** Unlock the next cut even when a crafted piece is still on the table cursor. */
 public final class RecipeBookDiscovery {
-    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
+    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop", "skysgrassslabs",
             "skysterrainsmoother", "skysterrainsmootherbop"));
 
     private RecipeBookDiscovery() {

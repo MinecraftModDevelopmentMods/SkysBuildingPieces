@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/prismarine_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:prismarine_rough_vertical_slab"

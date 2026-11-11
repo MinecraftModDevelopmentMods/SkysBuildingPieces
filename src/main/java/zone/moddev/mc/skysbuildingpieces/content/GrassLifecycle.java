@@ -161,8 +161,12 @@ public final class GrassLifecycle {
     private static boolean canRemainGrass(Level world, BlockPos position) {
         BlockPos above = position.above();
 
-        return world.getMaxLocalRawBrightness(above) >= 4
-                || lightBlocked(world.getBlockState(above)) < 15;
+        BlockState cover = world.getBlockState(above);
+        if (cover.is(Blocks.SNOW) && cover.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) == 1) {
+            return true;
+        }
+        // Light does not keep grass alive beneath solid cover or a full fluid block.
+        return cover.getFluidState().getAmount() != 8 && lightBlocked(cover) < 15;
     }
 
     private static int lightBlocked(BlockState cover) {
@@ -171,7 +175,7 @@ public final class GrassLifecycle {
     }
 
     private static boolean viableTarget(Level world, BlockPos position) {
-        if (position.getY() < world.getMinY() || position.getY() > world.getMaxY() || !world.isLoaded(position)) {
+        if (world.isOutsideBuildHeight(position) || !world.isLoaded(position)) {
             return false;
         }
 

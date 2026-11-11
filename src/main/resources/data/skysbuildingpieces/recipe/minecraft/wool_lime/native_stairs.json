@@ -1,7 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
   "category": "building",
-  "group": "skysbuildingpieces/wool_lime",
+  "group": "skys/result/minecraft/lime_wool_stairs",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:wool_lime_stairs"

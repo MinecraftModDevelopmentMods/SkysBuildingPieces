@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/limestone",
+  "category": "building",
+  "group": "skys/result/mineralogy/limestone",
   "pattern": ["XX"],
   "key": {
     "X": "mineralogy:limestone_slab"

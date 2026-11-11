@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/smooth_stone_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stone_slab_vertical_slab"

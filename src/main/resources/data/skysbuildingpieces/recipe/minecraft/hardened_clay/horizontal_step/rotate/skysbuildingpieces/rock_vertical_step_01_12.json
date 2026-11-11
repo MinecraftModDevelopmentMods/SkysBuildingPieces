@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/hardened_clay_horizontal_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:hardened_clay_vertical_step"

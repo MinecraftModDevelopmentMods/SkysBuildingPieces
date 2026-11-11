@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.10.2603001
+
+- Let grass pieces spread and decay naturally, including beneath solid cover.
+- Improve snow caps and cover the exposed grass below snowy pieces.
+- Keep snow pieces when dug by hand and scale wooden-piece fuel to its size.
+- Separate different crafting results in the recipe book and retain their unlocks.
+
+
 ## 0.3.9.2603001
 
 - Removed duplicate grass and dirt slab recipes when Sky's Grass Slabs is installed.

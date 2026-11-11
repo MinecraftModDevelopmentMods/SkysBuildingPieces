@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_orange",
+  "group": "skys/result/minecraft/orange_wool",
   "pattern": ["XX"],
   "key": {
     "X": "minecraft:orange_wool_slab"

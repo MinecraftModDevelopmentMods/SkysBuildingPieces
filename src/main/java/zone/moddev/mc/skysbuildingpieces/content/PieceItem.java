@@ -67,7 +67,19 @@ public final class PieceItem extends BlockItem {
 
     @Override
     public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-        return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
+        Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
+        if (!definition.type.equals("wood")) {
+            return -1;
+        }
+        ItemStack full = Pieces.stack(Pieces.nativeState(definition, "full"), 1);
+        int fullBurnTime = full == null ? 0 : Math.max(0, full.getBurnTime(recipeType));
+        // Cutting a plank into smaller pieces must not create extra furnace fuel.
+        return switch (piece.palette.shape) {
+            case SLAB, VERTICAL_SLAB -> fullBurnTime / 2;
+            case HORIZONTAL_STEP, VERTICAL_STEP, STEP -> fullBurnTime / 4;
+            case CORNER -> fullBurnTime / 8;
+            default -> fullBurnTime;
+        };
     }
 
     @Override

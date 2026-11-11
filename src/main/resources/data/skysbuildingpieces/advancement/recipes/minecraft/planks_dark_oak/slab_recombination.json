@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:dark_oak_slab"
-            ]
+            "items": ["minecraft:dark_oak_slab"]
           }
         ]
       }
@@ -20,14 +18,9 @@
     }
   },
   "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
+    ["has_ingredient", "has_the_recipe"]
   ],
   "rewards": {
-    "recipes": [
-      "skysbuildingpieces:minecraft/planks_dark_oak/slab_recombination"
-    ]
+    "recipes": ["skysbuildingpieces:minecraft/planks_dark_oak/slab_recombination"]
   }
 }
