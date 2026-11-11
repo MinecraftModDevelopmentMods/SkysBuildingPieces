@@ -6,8 +6,8 @@ import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
 /** Cutting and recombining wood must not multiply its furnace fuel value. */
-final class FuelChecks {
-    static void run() {
+public final class FuelChecks {
+    public static void run() {
         int cases = 0;
         for (var block : Pieces.playableBlocks()) {
             var definition = block.definition(block.defaultBlockState());

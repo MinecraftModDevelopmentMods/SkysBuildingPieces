@@ -23,8 +23,8 @@ import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
 /** Breaks real blocks through survival mode, including the tool gate before loot is evaluated. */
-final class SurvivalDropChecks {
-    static void run(ServerLevel world) {
+public final class SurvivalDropChecks {
+    public static void run(ServerLevel world) {
         ServerPlayer player = FakePlayerFactory.get(world,
                 new GameProfile(UUID.fromString("7d233ad9-fb31-4cb4-b321-4c42d4127399"), "SurvivalDrops"));
         player.setGameMode(GameType.SURVIVAL);
