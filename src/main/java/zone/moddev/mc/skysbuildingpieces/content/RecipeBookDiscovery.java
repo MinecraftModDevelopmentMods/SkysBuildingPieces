@@ -24,7 +24,10 @@ import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 @EventBusSubscriber(
         modid = SkysBuildingPieces.ID)
 public final class RecipeBookDiscovery {
-    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList("skysbuildingpieces", "skysbuildingpiecesbop",
+    // Grass Slabs owns the shared slab recipes, including when a newly crafted
+    // slab is still on the cursor rather than in the player's inventory.
+    private static final Set<String> OWNERS = new HashSet<>(Arrays.asList(
+            "skysbuildingpieces", "skysbuildingpiecesbop", "skysgrassslabs",
             "skysterrainsmoother", "skysterrainsmootherbop"));
 
     private RecipeBookDiscovery() {

@@ -1,6 +1,6 @@
 {
-  "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",  "type": "skysbuildingpieces:cutting",
+  "group": "skys/result/skysbuildingpieces/mineralogy_slate_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": {

@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/rock_salt",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/mineralogy/rock_salt",
   "pattern": ["XX"],
   "key": {
     "X": {

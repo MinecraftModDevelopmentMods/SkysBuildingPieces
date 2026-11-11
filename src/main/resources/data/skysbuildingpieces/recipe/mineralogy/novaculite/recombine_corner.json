@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/novaculite",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/skysbuildingpieces/mineralogy_novaculite_horizontal_step",
   "pattern": ["X", "X"],
   "key": {
     "X": {

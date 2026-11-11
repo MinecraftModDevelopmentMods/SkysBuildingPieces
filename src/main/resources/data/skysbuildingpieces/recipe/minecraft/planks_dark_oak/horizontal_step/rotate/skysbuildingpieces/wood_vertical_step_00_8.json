@@ -1,6 +1,6 @@
 {
-  "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",  "type": "skysbuildingpieces:cutting",
+  "group": "skys/result/skysbuildingpieces/planks_dark_oak_horizontal_step",
   "pattern": ["X"],
   "key": {
     "X": {

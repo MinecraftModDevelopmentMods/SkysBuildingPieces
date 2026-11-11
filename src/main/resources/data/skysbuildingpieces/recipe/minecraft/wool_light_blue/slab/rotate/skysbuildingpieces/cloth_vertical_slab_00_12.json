@@ -1,6 +1,6 @@
 {
-  "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",  "type": "skysbuildingpieces:cutting",
+  "group": "skys/result/skysbuildingpieces/wool_light_blue_slab",
   "pattern": ["X"],
   "key": {
     "X": {

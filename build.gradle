@@ -572,3 +572,12 @@ def verifyEclipseConfiguration = tasks.register('verifyEclipseConfiguration') {
 apply from: 'gradle/native-unit-launcher.gradle'
 apply from: 'gradle/optional-runs.gradle'
 apply from: 'gradle/native-probes.gradle'
+
+apply from: 'gradle/recipe-resource-sync.gradle'
+
+tasks.register('verifyGeneratedRecipeOwnership', Exec) {
+    group = 'verification'
+    description = 'Checks standalone cuts and ownership of shared soil recipes.'
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'), 'tools/test_recipe_ownership.py'
+}
+tasks.named('check') { dependsOn tasks.named('verifyGeneratedRecipeOwnership') }

@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/smooth_sandstone",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/minecraft/cut_sandstone",
   "pattern": ["XX"],
   "key": {
     "X": {

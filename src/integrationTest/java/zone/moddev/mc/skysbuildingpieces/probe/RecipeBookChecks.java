@@ -32,6 +32,7 @@ public final class RecipeBookChecks {
             "skysgrassslabs", "skysterrainsmoother", "skysterrainsmootherbop"));
 
     public static void run(ServerLevel world) {
+        RecipeUniquenessChecks.run(world);
         SortedMap<String, JsonObject> entries = new TreeMap<>();
         List<RecipeHolder<?>> recipes = new ArrayList<>();
 
@@ -127,11 +128,7 @@ public final class RecipeBookChecks {
                 throw new IllegalStateException(failure);
             }
             for (RecipeHolder<?> holder : recipes) {
-                if (Boolean.getBoolean("skysbuildingpieces.checkAllSkyRecipes")
-                        || holder.id().getNamespace().equals("skysbuildingpieces")
-                        || holder.id().getNamespace().equals("skysbuildingpiecesbop")) {
-                    require(player.getRecipeBook().contains(holder), "Saved recipe book lost " + holder.id());
-                }
+                require(player.getRecipeBook().contains(holder), "Saved recipe book lost " + holder.id());
             }
         }
 
@@ -141,12 +138,6 @@ public final class RecipeBookChecks {
         for (RecipeHolder<?> holder : recipes) {
             ResourceLocation id = holder.id();
             Recipe<?> recipe = holder.value();
-
-            if (!Boolean.getBoolean("skysbuildingpieces.checkAllSkyRecipes")
-                    && !id.getNamespace().equals("skysbuildingpieces")
-                    && !id.getNamespace().equals("skysbuildingpiecesbop")) {
-                continue;
-            }
 
             verified.add(holder);
 

@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_hardened_clay_cyan",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/minecraft/cyan_terracotta",
   "pattern": ["XX"],
   "key": {
     "X": {

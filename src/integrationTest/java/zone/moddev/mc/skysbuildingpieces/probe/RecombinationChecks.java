@@ -53,11 +53,35 @@ public final class RecombinationChecks {
         void finish() {
             if (!legacyInstalled) {
                 require(!remaining.hasNext() && checks > 0, "the catalogue supplies recombination recipes");
+                checkSlabToBlock(world);
                 org.apache.logging.log4j.LogManager.getLogger().info(
                         "BUILDING_PIECES_SMALL_RECOMBINATION_PASS cases={} modules={}",
                         checks, Catalogue.INSTANCE.modules.size());
             }
         }
+    }
+
+    private static void checkSlabToBlock(ServerLevel world) {
+        checkSlabPair(world, new ItemStack(net.minecraft.world.item.Items.ANDESITE_SLAB),
+                new ItemStack(net.minecraft.world.item.Items.ANDESITE));
+        if (net.neoforged.fml.ModList.get().isLoaded("skysgrassslabs")) {
+            checkSlabPair(world, slab("minecraft:dirt"), new ItemStack(net.minecraft.world.item.Items.DIRT));
+            checkSlabPair(world, slab("minecraft:grass"), new ItemStack(net.minecraft.world.item.Items.GRASS_BLOCK));
+        } else {
+            ItemStack vertical = Pieces.stack(Pieces.state("minecraft:dirt", Shape.VERTICAL_SLAB, 0), 1);
+            checkSlabPair(world, vertical, new ItemStack(net.minecraft.world.item.Items.DIRT));
+        }
+    }
+
+    private static void checkSlabPair(ServerLevel world, ItemStack slab, ItemStack full) {
+        CraftingContainer input = grid(2);
+        input.setItem(0, slab.copy());
+        input.setItem(1, slab.copy());
+        var recipes = world.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, input.asCraftInput(), world);
+        require(recipes.size() == 1, "A slab pair has exactly one rebuilding recipe: " + slab + " / " + recipes);
+        require(ItemStack.matches(full, recipes.getFirst().value().assemble(input.asCraftInput(), world.registryAccess())),
+                "Slab rebuilding keeps its original full block: " + slab);
+        require(slab.getCount() == 1, "Recipe lookup leaves the original slab stack unchanged");
     }
 
     private static ItemStack slab(String material) {

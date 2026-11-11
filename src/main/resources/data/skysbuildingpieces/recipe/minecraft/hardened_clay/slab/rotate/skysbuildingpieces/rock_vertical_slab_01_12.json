@@ -1,6 +1,6 @@
 {
-  "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",  "type": "skysbuildingpieces:cutting",
+  "group": "skys/result/skysbuildingpieces/hardened_clay_slab",
   "pattern": ["X"],
   "key": {
     "X": {

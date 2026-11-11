@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stonebrick_carved",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/skysbuildingpieces/stonebrick_carved_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": {

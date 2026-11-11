@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/gabbro",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/mineralogy/gabbro_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": {

@@ -26,6 +26,7 @@ public final class ClientProxy {
         modBus.addListener(ClientProxy::itemColors);
         modBus.addListener(ClientProxy::renderLayers);
         modBus.addListener(new ContinuousGlassModel.BakeHandler()::bake);
+        modBus.addListener(SnowCoveredGrassModel::bake);
     }
 
     private static void renderLayers(FMLClientSetupEvent event) {

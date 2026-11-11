@@ -1,6 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/gabbro",
+  "category": "building",  "type": "minecraft:crafting_shaped",
+  "group": "skys/result/skysbuildingpieces/mineralogy_gabbro_horizontal_step",
   "pattern": ["X", "X"],
   "key": {
     "X": {

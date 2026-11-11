@@ -38,11 +38,24 @@ Pieces support native waterlogging. Wet grass and path pieces turn into their
 matching dirt shapes, keeping the water and orientation. Drain them before
 using a shovel.
 
+Snow pieces drop themselves when dug by hand or with a shovel. Wooden slabs,
+steps and corners burn for the corresponding share of their original block's
+furnace fuel, so cutting wood does not create extra fuel.
+
+Snow pieces and snowy grass steps or corners cover the exposed top of a grass
+block beneath them. This is a visual covering: the grass stays intact and the
+walking surface keeps its height. Remove or thaw the piece to reveal the grass.
+
 ## Crafting
 
 Recipes appear in the recipe book as you collect their ingredients. Crafting a
 piece also reveals its next cuts and recombination recipes while the table is
 still open.
+
+Each button shows one result. Right-click it to choose between different ways
+of making that same piece. Different materials and shapes stay separate.
+For snow slabs, put two snow blocks diagonally in either crafting grid to make
+four slabs. Vanilla's three-block row still makes snow layers.
 
 Craft pieces from matching full blocks, slabs and steps. For example, three
 full blocks in a row make six slabs, and two matching slabs placed diagonally
