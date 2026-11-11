@@ -63,4 +63,3 @@ def verifyRecipeResourceOutputs = tasks.register('verifyRecipeResourceOutputs') 
     }
 }
 tasks.named('check') { dependsOn verifyRecipeResourceOutputs }
-
