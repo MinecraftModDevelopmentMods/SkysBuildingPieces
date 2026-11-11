@@ -127,6 +127,10 @@ public final class RuntimeBootstrap {
             int recipes = 0;
             int stacks = 0;
 
+            if (pending == null && (phase.equals("fresh") || phase.equals("reload"))) {
+                FuelChecks.run();
+            }
+
             if (phase.equals("water")) {
                 WaterloggingChecks.run(world);
             } else if (phase.equals("staging")) {
