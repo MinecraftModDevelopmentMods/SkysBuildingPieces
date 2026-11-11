@@ -32,6 +32,7 @@ public final class RecipeBookChecks {
             "skysgrassslabs", "skysterrainsmoother", "skysterrainsmootherbop"));
 
     public static void run(ServerLevel world) {
+        RecipeUniquenessChecks.run(world);
         SortedMap<String, JsonObject> entries = new TreeMap<>();
         List<RecipeHolder<?>> recipes = new ArrayList<>();
 
