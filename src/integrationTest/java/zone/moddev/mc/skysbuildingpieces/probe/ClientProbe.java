@@ -75,6 +75,8 @@ public final class ClientProbe extends ProbeProxy {
                     && !minecraft.getConnection().getRecipeManager().getRecipes().isEmpty()) {
                 RecipeBookGroupChecks.run(minecraft);
                 RecipePreviewModels.check(minecraft);
+                FuelChecks.run();
+                org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CLIENT_FUEL_PASS context=with_world");
                 colours(minecraft);
                 SnowCoverClientChecks.run(minecraft);
                 net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(minecraft.level.enabledFeatures(),
@@ -99,6 +101,8 @@ public final class ClientProbe extends ProbeProxy {
             org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().getWindow());
 
             ConfigScreenChecks.run(minecraft);
+            FuelChecks.run();
+            org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_CLIENT_FUEL_PASS context=before_world");
             var availableCreative = PiecesTab.entries();
 
             for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {

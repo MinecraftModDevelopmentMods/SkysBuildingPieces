@@ -47,7 +47,7 @@ public final class RuntimeProbe {
         String phase = System.getProperty("skysbuildingpieces.integrationPhase", "");
         needsGameplay = !(phase.startsWith("sylvester") || phase.startsWith("retired-rocks-")
                 || phase.startsWith("bop-legacy-") || phase.equals("path-upgrade")
-                || phase.startsWith("recipe-book-") || phase.startsWith("legacy-"));
+                || phase.startsWith("recipe-book-") || phase.startsWith("legacy-") || phase.startsWith("fuel-"));
         if (needsGameplay) {
             GameplayChecks.prepare(server.getLevel(Level.OVERWORLD));
         }
@@ -111,6 +111,8 @@ public final class RuntimeProbe {
                 org.apache.logging.log4j.LogManager.getLogger().info("RECIPE_BOOK_PHASE_PASS " + phase);
             } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
+            } else if (phase.startsWith("fuel-")) {
+                FuelChecks.run();
             } else if (phase.equals("compat")) {
                 NativeLegacyChecks.run(world);
                 CompatibilityChecks.run(world);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.11.121012
+
+- Fix fuel checks for stone, soil and other non-wood pieces in recipe viewers. This also covers the BOP and Mineralogy pieces.
+- Keep datapack fuel settings working for non-wood pieces.
+
 ## 0.3.10.121012
 
 - Give each crafting result a stable recipe-book button, with alternative ways to make that item grouped together.
