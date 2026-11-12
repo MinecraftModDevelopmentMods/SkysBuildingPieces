@@ -4,9 +4,15 @@ import java.nio.file.Files
 // These are optional development mods, never compile or production dependencies.
 def runtimeLock = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { runtimeLock.load(it) }
+def retainedRuntimeJars = ['mineralogy', 'orespawn'].collectEntries { mod ->
+    File siblingJar = file(runtimeLock.getProperty(mod + '.path'))
+    String checksum = runtimeLock.getProperty(mod + '.sha256')
+    [(mod): file(".gradle/qualification-dependencies/${checksum}/${siblingJar.name}")]
+}
+
 def runtimeSources = ['mineralogy', 'orespawn'].collectEntries { mod ->
     File siblingJar = file(runtimeLock.getProperty(mod + '.path'))
-    File retainedJar = file('.gradle/qualification-dependencies/' + siblingJar.name)
+    File retainedJar = retainedRuntimeJars[mod]
     // Sibling builds can change during other work. A retained copy still has to
     // pass the same checksum check before it can enter a development profile.
     [(mod): file(providers.gradleProperty(mod + 'RuntimeJar')
@@ -57,6 +63,14 @@ def installRuntimeMods = {
         }
         if (name.contains('integration-test') || name.contains('-probe')) {
             throw new GradleException("The ordinary Mineralogy profile must not contain test mods: ${candidate}")
+        }
+    }
+    runtimeSources.each { mod, source ->
+        File retained = retainedRuntimeJars[mod]
+        if (source.canonicalFile != retained.canonicalFile) {
+            // Keep this verified build when another project rebuilds the sibling jar.
+            Files.createDirectories(retained.parentFile.toPath())
+            Files.copy(source.toPath(), retained.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
         }
     }
     // Copy only the declared jars. Never sync or clear a player's mods, config or saves.

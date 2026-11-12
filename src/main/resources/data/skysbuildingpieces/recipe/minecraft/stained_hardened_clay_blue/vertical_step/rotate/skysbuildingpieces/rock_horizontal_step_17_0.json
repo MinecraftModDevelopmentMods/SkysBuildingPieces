@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_blue_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stained_hardened_clay_blue_horizontal_step"

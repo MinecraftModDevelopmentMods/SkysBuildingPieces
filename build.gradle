@@ -873,3 +873,11 @@ apply from: 'gradle/forge-client-control.gradle'
 apply from: 'gradle/native-compatibility.gradle'
 apply from: 'gradle/forge-server-control.gradle'
 apply from: 'gradle/native-unit-launcher.gradle'
+
+apply from: 'gradle/recipe-resource-sync.gradle'
+
+tasks.register('verifyCraftingResources', Exec) {
+    group = 'verification'
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'), 'tools/test_recipe_ownership.py'
+}
+tasks.named('check') { dependsOn tasks.named('verifyCraftingResources') }

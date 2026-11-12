@@ -1,7 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
   "category": "building",
-  "group": "skysbuildingpieces/wool_pink",
+  "group": "skys/result/minecraft/pink_wool_stairs",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:wool_pink_stairs"

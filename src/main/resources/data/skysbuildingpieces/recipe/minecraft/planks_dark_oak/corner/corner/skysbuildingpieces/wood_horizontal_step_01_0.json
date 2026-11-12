@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/planks_dark_oak_corner",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:planks_dark_oak_horizontal_step"

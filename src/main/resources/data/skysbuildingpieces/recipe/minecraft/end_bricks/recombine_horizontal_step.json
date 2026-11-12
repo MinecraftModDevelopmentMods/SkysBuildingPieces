@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/end_bricks",
+  "category": "building",
+  "group": "skys/result/minecraft/end_stone_brick_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:end_bricks_horizontal_step"

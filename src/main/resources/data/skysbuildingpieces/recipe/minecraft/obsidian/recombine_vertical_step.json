@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/obsidian",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/obsidian_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:obsidian_vertical_step"

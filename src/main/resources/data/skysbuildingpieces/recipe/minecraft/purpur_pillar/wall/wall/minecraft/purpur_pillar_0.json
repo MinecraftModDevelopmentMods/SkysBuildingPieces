@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/purpur_pillar_wall",
   "pattern": ["XX", "XX", "XX"],
   "key": {
     "X": "minecraft:purpur_pillar"

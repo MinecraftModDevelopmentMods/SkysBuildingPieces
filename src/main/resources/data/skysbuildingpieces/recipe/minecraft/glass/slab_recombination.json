@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/glass",
+  "category": "building",
+  "group": "skys/result/minecraft/glass",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:glass_slab"

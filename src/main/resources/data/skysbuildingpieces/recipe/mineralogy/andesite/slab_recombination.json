@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/andesite",
+  "category": "building",
+  "group": "skys/result/mineralogy/andesite",
   "pattern": ["XX"],
   "key": {
     "X": "mineralogy:andesite_slab"

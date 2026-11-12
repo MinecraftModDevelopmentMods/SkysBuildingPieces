@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/andesite_corner",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:andesite_vertical_step"

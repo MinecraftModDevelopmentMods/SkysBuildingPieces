@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/schist",
+  "category": "building",
+  "group": "skys/result/mineralogy/schist_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_schist_vertical_step"

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/snow_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:snow_vertical_slab"

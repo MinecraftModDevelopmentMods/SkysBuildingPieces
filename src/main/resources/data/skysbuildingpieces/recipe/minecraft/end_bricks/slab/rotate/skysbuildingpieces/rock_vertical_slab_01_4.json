@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/end_stone_brick_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:end_bricks_vertical_slab"

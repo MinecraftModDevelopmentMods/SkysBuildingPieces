@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stonebrick_mossy",
+  "category": "building",
+  "group": "skys/result/minecraft/mossy_stone_brick_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:stonebrick_mossy_vertical_step"

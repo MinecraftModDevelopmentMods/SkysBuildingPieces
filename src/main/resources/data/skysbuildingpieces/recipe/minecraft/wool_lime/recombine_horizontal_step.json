@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_lime",
+  "group": "skys/result/minecraft/lime_wool_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:wool_lime_horizontal_step"

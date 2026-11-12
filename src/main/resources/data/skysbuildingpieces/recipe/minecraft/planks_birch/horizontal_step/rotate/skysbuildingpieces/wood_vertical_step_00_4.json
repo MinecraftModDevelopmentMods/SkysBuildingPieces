@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/planks_birch_horizontal_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:planks_birch_vertical_step"

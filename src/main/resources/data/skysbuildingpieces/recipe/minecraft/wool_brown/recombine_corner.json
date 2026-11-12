@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_brown",
+  "group": "skys/result/skysbuildingpieces/wool_brown_horizontal_step",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:wool_brown_corner"

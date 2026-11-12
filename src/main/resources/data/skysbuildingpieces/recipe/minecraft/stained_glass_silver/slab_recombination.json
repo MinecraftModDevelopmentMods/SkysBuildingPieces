@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_glass_silver",
+  "category": "building",
+  "group": "skys/result/minecraft/light_gray_stained_glass",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:stained_glass_silver_slab"

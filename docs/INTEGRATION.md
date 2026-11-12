@@ -6,6 +6,11 @@ mod construction, before registry events; permanent palette slots must never be 
 The JSON-array overload of `registerCatalogue` accepts resolved material and
 palette definitions. Use it when a native mod can disable some shapes, without
 changing the permanent piece palettes. A material can set
+`cookingFuel: false` when its wood cannot be used as furnace fuel, as with
+BOP hellbark. Fuel is separate from flammability. Other wooden materials use
+Minecraft's plank fuel rules, scaled to the piece's size.
+
+A material can set
 `fullBlockStepRecipe: true` to cut three diagonal full blocks into twelve
 steps instead of using the usual two-slab recipe.
 
@@ -17,7 +22,7 @@ west; corners use those directions for NW, NE, SE and SW respectively.
 
 Sky's Terrain Smoother uses this lookup without depending on palette internals.
 Building Pieces never generates terrain itself. It optionally joins Grass
-Slabs' grass-form integration, using 1.2.0.2603001 or later on Minecraft 26.3.
+Slabs' grass-form integration, using 1.2.1.2603001 or later on Minecraft 26.3.
 It works without either Grass Slabs or Terrain Smoother installed.
 
 Mineralogy is supported directly. Its presence adds 35 fixed rock-piece

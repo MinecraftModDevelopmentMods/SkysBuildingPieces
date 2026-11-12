@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_glass_silver_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stained_glass_silver_vertical_slab"

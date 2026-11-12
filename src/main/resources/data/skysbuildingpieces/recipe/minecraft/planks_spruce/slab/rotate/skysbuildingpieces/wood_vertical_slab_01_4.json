@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/spruce_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:planks_spruce_vertical_slab"

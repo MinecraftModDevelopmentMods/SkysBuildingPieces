@@ -70,4 +70,33 @@ class CatalogueExtensionTest {
                 () -> catalogue.registerModule("example", "examplepieces", materials(), repeated, 1));
         assertEquals(237, catalogue.palettes.size());
     }
+
+    @Test
+    void cookingFuelIsIndependentOfFireSpread() {
+        Catalogue catalogue = new Catalogue();
+        var module = catalogue.registerModule("example", "examplepieces", materials(), palettes(), 1);
+        var wood = module.materials.get("example:wood");
+        assertEquals(0, wood.flammability());
+        assertTrue(wood.cookingFuel(), "Fireproof wood is not necessarily excluded from furnace fuel");
+        assertFalse(catalogue.materials.get("minecraft:obsidian").cookingFuel());
+    }
+
+    @Test
+    void nativeNonFuelWoodCanOptOut() {
+        Catalogue catalogue = new Catalogue();
+        JsonArray definitions = materials();
+        definitions.get(0).getAsJsonObject().addProperty("cookingFuel", false);
+        var module = catalogue.registerModule("example", "examplepieces", definitions, palettes(), 1);
+        assertFalse(module.materials.get("example:wood").cookingFuel());
+    }
+
+    @Test
+    void invalidCookingFuelFlagsAreRejected() {
+        Catalogue catalogue = new Catalogue();
+        JsonArray definitions = materials();
+        definitions.get(0).getAsJsonObject().addProperty("cookingFuel", "false");
+        assertThrows(IllegalArgumentException.class,
+                () -> catalogue.registerModule("example", "examplepieces", definitions, palettes(), 1));
+        assertFalse(catalogue.modules.containsKey("example"));
+    }
 }

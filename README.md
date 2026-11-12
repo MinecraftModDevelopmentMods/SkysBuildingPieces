@@ -28,7 +28,9 @@ block above keeps a supporting post. Matching glass walls form a continuous
 run, with borders at posts, exposed ends and colour changes.
 
 Dirt and grass steps and corners are included too. Grass follows biome colours,
-spreads and decays much like vanilla grass. Plants need a complete upper face.
+spreads and decays much like vanilla grass. Plants need a complete upper face. Snowy steps and corners also cover the
+exposed grass below them; removing or thawing the piece restores its normal
+appearance.
 Use a shovel on an uncovered dirt or grass step or corner to turn it into a
 matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath
@@ -46,9 +48,17 @@ still open.
 
 Craft pieces from matching full blocks, slabs and steps. For example, three
 full blocks in a row make six slabs, and two matching slabs placed diagonally
-make four steps. Existing vanilla recipes stay available.
+make four steps. Existing vanilla recipes stay available. Each result has its own recipe-book
+button, with alternatives grouped only when they make the same item.
+
+For snow slabs, place two snow blocks diagonally to make four slabs. Three
+snow blocks in a row still make vanilla snow layers. Snow pieces can be
+recovered by hand; a shovel mines them faster.
 You can also rebuild larger pieces: stack two matching corners in the crafting
 grid for one step, or two matching steps for one slab.
+
+Wooden slabs, steps and corners can fuel a furnace. Smaller pieces burn for
+less time, so cutting a plank doesn't create extra fuel.
 
 The [recipe and placement guide](docs/GAMEPLAY.md) has the full patterns,
 quantities and exceptions, including the separate dirt vertical slab recipe
@@ -63,7 +73,7 @@ server.
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.2.0.2603001 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.1.2603001 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

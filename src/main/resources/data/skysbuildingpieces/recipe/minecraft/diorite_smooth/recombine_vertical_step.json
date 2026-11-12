@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/diorite_smooth",
+  "category": "building",
+  "group": "skys/result/minecraft/polished_diorite_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:diorite_smooth_vertical_step"

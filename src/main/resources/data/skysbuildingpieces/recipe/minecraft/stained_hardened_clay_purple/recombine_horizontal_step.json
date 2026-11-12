@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_hardened_clay_purple",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_purple_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:stained_hardened_clay_purple_horizontal_step"

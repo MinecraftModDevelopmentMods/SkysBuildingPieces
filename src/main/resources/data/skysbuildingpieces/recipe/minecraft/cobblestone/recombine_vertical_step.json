@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/cobblestone",
+  "category": "building",
+  "group": "skys/result/minecraft/cobblestone_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:cobblestone_vertical_step"

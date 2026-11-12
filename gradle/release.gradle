@@ -32,7 +32,7 @@ tasks.register('verifyReleaseBundleContract') {
     group = 'verification'
     dependsOn tasks.named('writeReleaseChecksums')
     doLast {
-        File bundle = layout.buildDirectory.dir('release-bundle-test').get().asFile
+        File bundle = layout.buildDirectory.dir("release-bundle-test/${project.version}").get().asFile
         List<String> filenames = releaseFiles.get().collect { it.toString() }
         copy {
             from layout.buildDirectory.dir('libs')

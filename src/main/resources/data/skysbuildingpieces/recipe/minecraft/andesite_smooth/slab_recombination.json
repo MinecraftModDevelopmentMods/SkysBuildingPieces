@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/andesite_smooth",
+  "category": "building",
+  "group": "skys/result/minecraft/polished_andesite",
   "pattern": ["XX"],
   "key": {
     "X": "minecraft:polished_andesite_slab"

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mossy_cobblestone_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:mossy_cobblestone_horizontal_step"

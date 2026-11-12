@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/purpur_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:purpur_block_vertical_slab"

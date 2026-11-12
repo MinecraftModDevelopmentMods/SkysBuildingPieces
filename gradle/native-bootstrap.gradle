@@ -15,10 +15,12 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PersistenceRegistrationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeProbeItems.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GameplayChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/FuelChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PathChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SharedGrassChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecombinationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeBookChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeUniquenessChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PresentationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GlassModelProbe.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientProbe.java')
@@ -26,6 +28,8 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientStatus.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ProbeProxy.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipePreviewModels.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeBookGroupChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SnowCoverClientChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/MineralogyChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeRecipeProbe.java')
@@ -257,12 +261,13 @@ def clientPhases = [:]
         dependsOn phase == 'client-fresh' ? prepareClient : clientPhases['client-fresh']
         workingDir clientDirectory
         systemProperty 'skysbuildingpieces.bootstrapPhase', phase
+        args '--accessToken', '0'
         project.ext.configureNativeBootstrapRun(delegate, 'runClient')
         doLast {
             logger.lifecycle(providers.exec {
                 commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
                         file('tools/native_client_log.py'), '--directory', clientDirectory.get().asFile,
-                        '--phase', phase
+                        '--phase', phase, '--offline-client'
             }.standardOutput.asText.get().trim())
         }
     }

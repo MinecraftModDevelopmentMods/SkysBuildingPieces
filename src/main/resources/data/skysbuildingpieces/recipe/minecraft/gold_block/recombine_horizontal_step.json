@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/gold_block",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/gold_block_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:gold_block_horizontal_step"

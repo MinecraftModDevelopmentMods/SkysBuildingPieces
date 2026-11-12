@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_red",
+  "group": "skys/result/minecraft/red_wool",
   "pattern": ["XX"],
   "key": {
     "X": "minecraft:red_wool_slab"

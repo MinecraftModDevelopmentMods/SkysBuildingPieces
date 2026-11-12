@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/prismarine_dark",
+  "category": "building",
+  "group": "skys/result/minecraft/dark_prismarine_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:prismarine_dark_vertical_step"

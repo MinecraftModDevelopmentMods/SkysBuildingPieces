@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_silver_wall",
   "pattern": ["XX", "XX", "XX"],
   "key": {
     "X": "minecraft:light_gray_terracotta"

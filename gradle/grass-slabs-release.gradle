@@ -8,9 +8,9 @@ def lock = new Properties()
 file('gradle/grass-slabs-release.properties').withInputStream { lock.load(it) }
 def configureVerification = project.ext.configureMineralogyVerificationRun
 if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.version}" ||
-        lock.kind != 'local-candidate' || !(lock.sha256 ==~ /[A-F0-9]{64}/) ||
+        !(lock.kind in ['local-candidate', 'release']) || !(lock.sha256 ==~ /[A-F0-9]{64}/) ||
         !(lock.getProperty('development.sha256') ==~ /[A-F0-9]{64}/)) {
-    throw new GradleException('The coordinated Grass Slabs dependency needs exact candidate checksums')
+    throw new GradleException('The Grass Slabs dependency needs a valid source kind and exact checksums')
 }
 
 def sibling = "../../SkysGrassSlabs263/SkysGrassSlabs"
@@ -23,7 +23,7 @@ def developmentJar = layout.projectDirectory.file(providers.gradleProperty('gras
 
 def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
     group = 'verification'
-    description = 'Checks both exact Grass Slabs candidate jars used by optional family tests.'
+    description = 'Checks both exact Grass Slabs jars used by optional family tests.'
     inputs.file pinnedJar
     inputs.file developmentJar
     inputs.file 'gradle/grass-slabs-release.properties'
@@ -33,7 +33,7 @@ def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
             String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
                     .encodeHex().toString().toUpperCase(Locale.ROOT)
             if (actual != entry[1]) {
-                throw new GradleException('Grass Slabs does not match its pinned candidate checksum: ' + source.name)
+                throw new GradleException('Grass Slabs does not match its pinned checksum: ' + source.name)
             }
             new ZipFile(source).withCloseable { archive ->
                 def descriptor = archive.getEntry('META-INF/mods.toml')
@@ -41,7 +41,7 @@ def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
                 String metadata = archive.getInputStream(descriptor).getText('UTF-8')
                 if (!(metadata =~ /(?m)^\s*modId\s*=\s*"skysgrassslabs"\s*$/) ||
                         !(metadata =~ /(?m)^\s*version\s*=\s*"${java.util.regex.Pattern.quote(lock.version)}"\s*$/)) {
-                    throw new GradleException('Grass Slabs has unexpected candidate metadata')
+                    throw new GradleException('Grass Slabs has unexpected version or mod metadata')
                 }
             }
         }
