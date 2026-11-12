@@ -73,10 +73,6 @@ public final class RuntimeProbe {
             ServerLevel world = server.getLevel(Level.OVERWORLD);
             String phase = System.getProperty("skysbuildingpieces.integrationPhase");
 
-            if (needsGameplay) {
-                FuelChecks.run(world);
-            }
-
             if (phase == null) {
                 throw new AssertionError("Unconfigured runtime probe");
             }
@@ -121,7 +117,7 @@ public final class RuntimeProbe {
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
                 GameplayChecks.run(world);
-                FuelChecks.run();
+                FuelChecks.run(world);
                 SurvivalDropChecks.run(world);
                 StandaloneLifecycleChecks.run(world);
                 WaterloggingChecks.run(world);
