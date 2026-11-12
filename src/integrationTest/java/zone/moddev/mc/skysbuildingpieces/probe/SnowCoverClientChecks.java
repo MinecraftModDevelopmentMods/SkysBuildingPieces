@@ -33,6 +33,23 @@ public final class SnowCoverClientChecks {
         for (boolean snowyState : new boolean[] {false, true}) {
             BlockState support = Blocks.GRASS_BLOCK.defaultBlockState().setValue(SnowyBlock.SNOWY, snowyState);
             BlockStateModel model = client.getModelManager().getBlockStateModelSet().get(support);
+            require(model.particleMaterial(null) != null, "Grass particles accept missing model data");
+            checkTop(model, null, false, "no model data");
+            // Exercise the same native particle paths as a breaking block and a sprinting entity.
+            var particlePosition = position.above(4);
+            require(client.level.getModelDataManager().getAt(particlePosition) == null,
+                    "The native particle regression must exercise genuinely absent model data");
+            client.level.addDestroyBlockEffect(particlePosition, support);
+            var particle = new net.minecraft.client.particle.TerrainParticle(client.level,
+                    particlePosition.getX(), particlePosition.getY(), particlePosition.getZ(), 0, 0, 0, support);
+            require(particle.updateSprite(support, particlePosition) != null,
+                    "Terrain particles work without a block entity at the source");
+            var options = new net.minecraft.core.particles.BlockParticleOption(
+                    net.minecraft.core.particles.ParticleTypes.BLOCK, support).setPos(particlePosition);
+            require(new net.minecraft.client.particle.TerrainParticle.Provider().createParticle(options, client.level,
+                    particlePosition.getX(), particlePosition.getY(), particlePosition.getZ(), 0, 0, 0,
+                    RandomSource.create(0)) != null, "The native sprint-particle provider accepts missing model data");
+            checked += 6;
             for (Shape shape : new Shape[] {Shape.SLAB, Shape.VERTICAL_SLAB,
                     Shape.HORIZONTAL_STEP, Shape.VERTICAL_STEP, Shape.CORNER, Shape.STAIRS}) {
                 for (int orientation = 0; orientation < shape.states; orientation++) {

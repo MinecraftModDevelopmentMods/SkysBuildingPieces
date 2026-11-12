@@ -44,7 +44,7 @@ public final class SnowCoveredGrassModel implements BlockStateModel {
 
     @Override
     public ModelData getModelData(BlockAndTintGetter world, BlockPos position, BlockState state, ModelData data) {
-        ModelData inherited = original.getModelData(world, position, state, data);
+        ModelData inherited = original.getModelData(world, position, state, data == null ? ModelData.EMPTY : data);
         boolean covered = restsOnGrass(world, position.above());
         if (covered) {
             inherited = snowyGrass.getModelData(world, position, SNOWY_GRASS, inherited);
@@ -76,6 +76,7 @@ public final class SnowCoveredGrassModel implements BlockStateModel {
 
     @Override
     public void collectParts(RandomSource random, List<BlockStateModelPart> parts, ModelData data) {
+        data = data == null ? ModelData.EMPTY : data;
         if (!Boolean.TRUE.equals(data.get(COVERED))) {
             original.collectParts(random, parts, data);
             return;
@@ -99,6 +100,8 @@ public final class SnowCoveredGrassModel implements BlockStateModel {
 
     @Override
     public Material.Baked particleMaterial(ModelData data) {
+        // Terrain particles can ask for a material without block-entity model data.
+        data = data == null ? ModelData.EMPTY : data;
         return Boolean.TRUE.equals(data.get(COVERED)) ? snowyGrass.particleMaterial(data) : original.particleMaterial(data);
     }
 

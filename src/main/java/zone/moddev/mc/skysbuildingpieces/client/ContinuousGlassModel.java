@@ -52,7 +52,8 @@ public final class ContinuousGlassModel implements BlockStateModel {
                 joins |= 1 << index;
             }
         }
-        return original.getModelData(world, position, state, existing).derive().with(JOINS, joins).build();
+        return original.getModelData(world, position, state, existing == null ? ModelData.EMPTY : existing)
+                .derive().with(JOINS, joins).build();
     }
 
     @Override
@@ -63,6 +64,7 @@ public final class ContinuousGlassModel implements BlockStateModel {
     @Override
     public void collectParts(RandomSource random, List<BlockStateModelPart> parts,
             ModelData data) {
+        data = data == null ? ModelData.EMPTY : data;
         int firstPart = parts.size();
         original.collectParts(random, parts, data);
         Integer joins = data.get(JOINS);
@@ -93,7 +95,7 @@ public final class ContinuousGlassModel implements BlockStateModel {
 
     @Override
     public Material.Baked particleMaterial(ModelData data) {
-        return original.particleMaterial(data);
+        return original.particleMaterial(data == null ? ModelData.EMPTY : data);
     }
 
     @Override
