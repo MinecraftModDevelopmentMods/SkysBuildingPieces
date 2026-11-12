@@ -22,6 +22,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -29,6 +31,10 @@ import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 
 /** One material and shape per inventory item. */
 public final class PieceItem extends BlockItem {
+    private static final ResourceKey<ContextIntProvider> WOOD_SLAB_FUEL = woodFuel("slab");
+    private static final ResourceKey<ContextIntProvider> WOOD_STEP_FUEL = woodFuel("step");
+    private static final ResourceKey<ContextIntProvider> WOOD_CORNER_FUEL = woodFuel("corner");
+
     public final PieceBlock piece;
     public final String material;
 
@@ -40,7 +46,23 @@ public final class PieceItem extends BlockItem {
 
     private static Item.Properties properties(PieceBlock block, String material) {
         Identifier id = Identifier.parse(PaletteItemIds.itemId(block.palette, material));
-        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+        var properties = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+        if (Catalogue.INSTANCE.materials.get(material).cookingFuel()) {
+            // Keep the vanilla furnace rules, including faster cooking and datapack fuel settings.
+            ResourceKey<ContextIntProvider> fuel = switch (block.palette.shape) {
+                case SLAB, VERTICAL_SLAB -> WOOD_SLAB_FUEL;
+                case STEP, HORIZONTAL_STEP, VERTICAL_STEP -> WOOD_STEP_FUEL;
+                case CORNER -> WOOD_CORNER_FUEL;
+                default -> ContextIntProviders.COOKING_TIME_WOOD_BLOCKS;
+            };
+            properties.cookingFuel(fuel);
+        }
+        return properties;
+    }
+
+    private static ResourceKey<ContextIntProvider> woodFuel(String shape) {
+        return ResourceKey.create(Registries.CONTEXT_INT_PROVIDER,
+                Identifier.fromNamespaceAndPath("skysbuildingpieces", "cooking/wood_" + shape));
     }
 
     boolean visibleInCreativeTab() {
@@ -63,23 +85,6 @@ public final class PieceItem extends BlockItem {
 
         return PieceNames.displayName(namespace, material,
                 piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), full.getHoverName());
-    }
-
-    @Override
-    public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-        Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
-        if (!definition.type.equals("wood")) {
-            return -1;
-        }
-        ItemStack full = Pieces.stack(Pieces.nativeState(definition, "full"), 1);
-        int fullBurnTime = full == null ? 0 : Math.max(0, full.getBurnTime(recipeType));
-        // Cutting a plank into smaller pieces must not create extra furnace fuel.
-        return switch (piece.palette.shape) {
-            case SLAB, VERTICAL_SLAB -> fullBurnTime / 2;
-            case HORIZONTAL_STEP, VERTICAL_STEP, STEP -> fullBurnTime / 4;
-            case CORNER -> fullBurnTime / 8;
-            default -> fullBurnTime;
-        };
     }
 
     @Override

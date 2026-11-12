@@ -206,6 +206,11 @@ public final class Catalogue {
             type = json.get("type").getAsString();
             blocks = json.getAsJsonObject("blocks");
 
+            if (json.has("cookingFuel") && (!json.get("cookingFuel").isJsonPrimitive()
+                    || !json.getAsJsonPrimitive("cookingFuel").isBoolean())) {
+                throw new IllegalArgumentException("cookingFuel must be true or false: " + id);
+            }
+
             if (!id.matches("[a-z0-9_]+:[a-z0-9_/]+") || !blocks.has("full") || !Float.isFinite(hardness())
                     || hardness() < 0 || !Float.isFinite(resistance())) {
                 throw new IllegalArgumentException("Invalid material: " + id);
@@ -245,6 +250,11 @@ public final class Catalogue {
 
         public int fireSpread() {
             return json.has("fireSpread") ? json.get("fireSpread").getAsInt() : -1;
+        }
+
+        /** Wood is fuel unless its native material explicitly opts out. */
+        public boolean cookingFuel() {
+            return type.equals("wood") && (!json.has("cookingFuel") || json.get("cookingFuel").getAsBoolean());
         }
 
         public boolean nativeProperties() {

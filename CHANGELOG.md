@@ -5,6 +5,7 @@
 - Let grass pieces spread and decay naturally, including beneath solid cover.
 - Improve snow caps and cover the exposed grass below snowy pieces.
 - Keep snow pieces when dug by hand and scale wooden-piece fuel to its size.
+- Make wooden pieces work as fuel in furnaces, smokers and blast furnaces.
 - Separate different crafting results in the recipe book and retain their unlocks.
 
 

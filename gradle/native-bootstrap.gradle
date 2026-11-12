@@ -15,6 +15,7 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PersistenceRegistrationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeProbeItems.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GameplayChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/FuelChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PathChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SharedGrassChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecombinationChecks.java')

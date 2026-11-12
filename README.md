@@ -57,6 +57,9 @@ recovered by hand; a shovel mines them faster.
 You can also rebuild larger pieces: stack two matching corners in the crafting
 grid for one step, or two matching steps for one slab.
 
+Wooden slabs, steps and corners can fuel a furnace. Smaller pieces burn for
+less time, so cutting a plank doesn't create extra fuel.
+
 The [recipe and placement guide](docs/GAMEPLAY.md) has the full patterns,
 quantities and exceptions, including the separate dirt vertical slab recipe
 when Grass Slabs isn't installed.

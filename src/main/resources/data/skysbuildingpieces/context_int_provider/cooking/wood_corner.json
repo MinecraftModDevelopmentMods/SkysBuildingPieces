@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:div",
+  "left": "minecraft:cooking/time_wood_blocks",
+  "right": 8
+}
