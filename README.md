@@ -30,6 +30,9 @@ run, with borders at posts, exposed ends and colour changes.
 
 Dirt and grass steps and corners are included too. Grass follows biome colours,
 spreads and decays much like vanilla grass. Plants need a complete upper face.
+Snow-covered pieces also give the exposed grass beneath them a snow cap. Snow
+appearance follows nearby snow and exposed cold ground, without changing saved
+piece orientations.
 Use a shovel on an uncovered dirt or grass step or corner to turn it into a
 matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath

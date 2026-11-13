@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.10.112021
+
+- Snow-covered steps and corners give the grass beneath them a matching snow cap.
+- Grass and dirt pieces pick up snow from higher terraces and exposed cold ground.
+- Recipes for different materials, shapes and quantities have separate recipe-book entries.
+- Native slab-to-block recipes take precedence when another mod already supplies the same recipe.
+
 ## 0.3.9.112021
 
 - Directional slab placement can be turned off from the Mods menu.

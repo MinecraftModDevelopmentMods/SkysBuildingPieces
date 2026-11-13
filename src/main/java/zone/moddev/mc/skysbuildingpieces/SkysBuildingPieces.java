@@ -18,7 +18,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.*;
         acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "after:skysgrassslabs@[1.1.1.112021,);after:basemetals;after:mineralogy;before:buildingbricks")
 public final class SkysBuildingPieces {
-    public static final String ID = "skysbuildingpieces", VERSION = "0.3.9.112021";
+    public static final String ID = "skysbuildingpieces", VERSION = "0.3.10.112021";
     public static boolean forceReplace;
     public static Block HOLDER;
     @SidedProxy(
@@ -52,6 +52,11 @@ public final class SkysBuildingPieces {
     @Mod.EventHandler
     public void beforeServer(FMLServerAboutToStartEvent event) {
         LegacyBridge.start(event.getServer());
+    }
+
+    @Mod.EventHandler
+    public void registryMappingsChanged(FMLModIdMappingEvent event) {
+        zone.moddev.mc.skysbuildingpieces.content.RecipeAliases.restore();
     }
 
     @Mod.EventHandler

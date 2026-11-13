@@ -33,6 +33,11 @@ tasks.register('verifyReleaseBundleContract') {
     dependsOn tasks.named('writeReleaseChecksums')
     doLast {
         File bundle = layout.buildDirectory.dir('release-bundle-test').get().asFile
+        if (bundle.canonicalFile.parentFile != layout.buildDirectory.get().asFile.canonicalFile) {
+            throw new GradleException('Release contract output must stay inside the build directory')
+        }
+        // A new version must not inherit files from an earlier contract test.
+        project.delete(bundle)
         List<String> filenames = releaseFiles.get().collect { it.toString() }
         copy {
             from layout.buildDirectory.dir('libs')

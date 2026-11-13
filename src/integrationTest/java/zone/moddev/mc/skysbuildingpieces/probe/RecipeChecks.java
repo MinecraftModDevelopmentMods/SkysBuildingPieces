@@ -20,6 +20,7 @@ import zone.moddev.mc.skysbuildingpieces.content.*;
 public final class RecipeChecks {
     public static void run(WorldServer world) {
         preflight(world);
+        verifyBookGroups();
         RecombinationChecks.run(world);
 
         int recombined = 0;
@@ -237,14 +238,35 @@ public final class RecipeChecks {
         require(ItemStack.areItemStacksEqual(expected, CraftingManager.findMatchingResult(grid, world)),
                 "crafting manager selects " + label);
 
+        int matches = 0;
         for (IRecipe candidate : net.minecraftforge.fml.common.registry.ForgeRegistries.RECIPES.getValuesCollection()) {
             if (candidate.matches(grid, world)) {
+                matches++;
                 ItemStack actual = candidate.getCraftingResult(grid);
 
                 require(ItemStack.areItemStacksEqual(expected, actual),
                         "conflicting recipe " + label + " / " + candidate.getClass().getName() + " / " + actual);
             }
         }
+        require(matches == 1, "duplicate recipes for " + label + ": " + matches);
+    }
+
+    private static void verifyBookGroups() {
+        java.util.Map<String, String> results = new java.util.HashMap<String, String>();
+        for (IRecipe recipe : CraftingManager.REGISTRY) {
+            if (recipe.getRegistryName() == null
+                    || !recipe.getRegistryName().getNamespace().equals("skysbuildingpieces")
+                    || recipe.getGroup().isEmpty()) {
+                continue;
+            }
+            ItemStack output = recipe.getRecipeOutput();
+            String identity = output.getItem().getRegistryName() + "/" + output.getMetadata() + "/" + output.getCount();
+            String previous = results.putIfAbsent(recipe.getGroup(), identity);
+            require(previous == null || previous.equals(identity),
+                    "recipe book groups unrelated results: " + recipe.getGroup());
+        }
+        require(!results.isEmpty(), "recipe book groups were checked");
+        System.out.println("BUILDING_PIECES_BOOK_GROUPS_PASS results=" + results.size());
     }
 
     private static void preflight(WorldServer world) {

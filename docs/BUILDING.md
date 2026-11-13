@@ -19,15 +19,19 @@ the launches after changing dependencies. The generated configuration uses
 processed resources and keeps test code out of ordinary game runs.
 
 - `runClient` and `runServer` run Building Pieces on its own.
-- `runGrassSlabsClient` and `runGrassSlabsServer` also load the released Grass
+- `runGrassSlabsClient` and `runGrassSlabsServer` also load the pinned Grass
   Slabs jar recorded in `gradle/grass-slabs-release.properties`.
 - `runMineralogyClient` and `runMineralogyServer` use the optional Mineralogy
   and OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
-Each profile has its own game folder. Grass Slabs is downloaded from its public
-release, checked against its SHA-256 and mapped to development names. There is
-no sibling source build to prepare. The published Grass Slabs jar remains
-unchanged, and none of its classes are bundled into Building Pieces.
+Each profile has its own game folder. Grass Slabs is checked against its SHA-256
+and mapped to development names. This candidate uses Grass Slabs 1.2.0 from the
+sibling 1.12 checkout: run `gradlew assemble` there first. Its source commit and
+jar checksum must match `gradle/grass-slabs-release.properties`. Use
+`-PgrassSlabsDirectory=<checkout>` for another location. CI builds that exact
+commit before running these checks. The source jar stays unchanged, and none
+of its classes are bundled into Building Pieces. The lock also supports a
+published Maven jar when `source.mode=release`.
 
 For the Mineralogy profile, supply the jars named in its lock file, or use
 `-PmineralogyRuntimeJar=<jar>` and `-PorespawnRuntimeJar=<jar>` to select matching
@@ -36,7 +40,7 @@ copies. They must pass the recorded checksums.
 ## Runtime checks
 
 `check` runs the unit suite and disposable server checks, both standalone and
-with the released Grass Slabs jar. `integrationGrassSlabsClientProcess` checks
+with the pinned Grass Slabs jar. `integrationGrassSlabsClientProcess` checks
 the combined client models. `integrationMineralogyTest` and
 `integrationMineralogyClientProcess` cover the optional rock pieces when the
 locked native jars are available.

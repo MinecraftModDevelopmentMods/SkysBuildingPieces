@@ -16,6 +16,7 @@ public final class ClientProxy extends CommonProxy {
     public void preInit() {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new WallHighlight());
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new ContinuousGlassModel.BakeHandler());
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new SnowCoveredGrassModel.BakeHandler());
     }
 
     @net.minecraftforge.fml.common.eventhandler.SubscribeEvent

@@ -113,9 +113,10 @@ class LoaderHooksTest {
     }
 
     @Test
-    void realForge112ClassesMatchAllFourHooks() throws Exception {
+    void realForge112ClassesMatchAllFiveHooks() throws Exception {
         for (String name : new String[] { "net.minecraft.item.ItemStack", "net.minecraft.item.ItemBlock",
-                "net.minecraft.item.ItemSlab", "net.minecraft.world.chunk.storage.AnvilChunkLoader" }) {
+                "net.minecraft.item.ItemSlab", "net.minecraft.world.chunk.storage.AnvilChunkLoader",
+                "net.minecraft.block.BlockGrass" }) {
             try (java.io.InputStream stream = getClass().getClassLoader()
                     .getResourceAsStream(name.replace('.', '/') + ".class")) {
                 assertNotNull(stream, name);
@@ -151,5 +152,15 @@ class LoaderHooksTest {
                 assertEquals(1, hooks, name);
             }
         }
+    }
+
+    @Test
+    void grassVisualHookRejectsMissingOrChangedMethods() {
+        String name = "net.minecraft.block.BlockGrass";
+        LoaderTransformer transformer = new LoaderTransformer();
+        assertThrows(IllegalStateException.class, () -> transformer.transform(name, name,
+                fixture(name.replace('.', '/'), "getActualState", "()Ljava/lang/Object;")));
+        assertThrows(IllegalStateException.class, () -> transformer.transform(name, name,
+                fixture(name.replace('.', '/'), "unexpectedMethod", "()V")));
     }
 }

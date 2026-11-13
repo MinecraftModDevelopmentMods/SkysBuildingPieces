@@ -39,6 +39,8 @@ jobs:
           echo "minecraft_version=$(value minecraft_version)" >> "$GITHUB_OUTPUT"
           echo "gradle_java_version=$(value gradle_java_version)" >> "$GITHUB_OUTPUT"
           echo "artifact_prefix=SkysBuildingPieces-$(value mod_version)" >> "$GITHUB_OUTPUT"
+          echo "grass_source_mode=$(sed -n 's/^source.mode=//p' gradle/grass-slabs-release.properties)" >> "$GITHUB_OUTPUT"
+          echo "grass_source_commit=$(sed -n 's/^source.commit=//p' gradle/grass-slabs-release.properties)" >> "$GITHUB_OUTPUT"
 
       - name: Install target Java toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -66,12 +68,30 @@ jobs:
       - name: Make the wrapper executable
         run: chmod +x ./gradlew
 
+      - name: Check out the pinned Grass Slabs source
+        if: steps.target.outputs.grass_source_mode == 'checkout'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: MinecraftModDevelopmentMods/SkysGrassSlabs
+          ref: ${{ steps.target.outputs.grass_source_commit }}
+          path: .gradle/content-sources/grass-slabs
+          persist-credentials: false
+
+      - name: Build the pinned Grass Slabs dependency
+        if: steps.target.outputs.grass_source_mode == 'checkout'
+        working-directory: .gradle/content-sources/grass-slabs
+        run: chmod +x ./gradlew && ./gradlew assemble --no-daemon --stacktrace
+
       - name: Build, test, and audit release artifacts
+        env:
+          ORG_GRADLE_PROJECT_grassSlabsDirectory: .gradle/content-sources/grass-slabs
         run: >-
           ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
           verifyEclipseProductionClasspath  --no-daemon --stacktrace
 
       - name: Replay artifact checks offline
+        env:
+          ORG_GRADLE_PROJECT_grassSlabsDirectory: .gradle/content-sources/grass-slabs
         run: >-
           ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
 

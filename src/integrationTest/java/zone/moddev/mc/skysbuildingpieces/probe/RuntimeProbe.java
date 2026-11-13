@@ -98,6 +98,10 @@ public final class RuntimeProbe {
                 server.initiateShutdown();
                 return;
             }
+            if (phase.equals("upgrade-existing")) {
+                new ExistingWorldChecks(world);
+                return;
+            }
             if (phase.startsWith("sylvester")) {
                 new WorldAuditProbe(world, phase.equals("sylvester-reload"));
                 return;
@@ -129,8 +133,10 @@ public final class RuntimeProbe {
             rawStoredInventory(world);
             GameplayChecks.run(world);
             PathChecks.run(world);
+            SnowChecks.run(world);
+            SnowHarvestChecks.run(world);
             SharedGrassChecks.run(world);
-            MineralogyChecks.run();
+            MineralogyChecks.run(world);
 
             if (!phase.startsWith("client")) {
                 DirtCoverageChecks.run(world);
