@@ -2,6 +2,8 @@
 
 ## 0.3.10.112021
 
+- Keep chunk recovery separate from queued saves when a chunk is unloaded and loaded again quickly.
+
 - Snow-covered steps and corners give the grass beneath them a matching snow cap.
 - Grass and dirt pieces pick up snow from higher terraces and exposed cold ground.
 - Recipes for different materials, shapes and quantities have separate recipe-book entries.

@@ -7,6 +7,21 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LoaderTransformer;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoaderHooksTest {
+    @Test
+    void chunkRecoveryNeverEditsThePendingSaveObject() {
+        net.minecraft.nbt.NBTTagCompound queued = new net.minecraft.nbt.NBTTagCompound();
+        net.minecraft.nbt.NBTTagCompound level = new net.minecraft.nbt.NBTTagCompound();
+        level.setString("unrelated", "keep");
+        queued.setTag("Level", level);
+        net.minecraft.nbt.NBTTagCompound before = queued.copy();
+        net.minecraft.nbt.NBTTagCompound loaded =
+                zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge.prepareChunkForRead(null, queued);
+        assertNotSame(queued, loaded);
+        assertNotSame(level, loaded.getCompoundTag("Level"));
+        loaded.getCompoundTag("Level").setInteger("new_coverage", 1);
+        assertEquals(before, queued, "the file thread retains its own immutable snapshot");
+    }
+
     private byte[] fixture(String name, String method, String descriptor) {
         ClassWriter w = new ClassWriter(0);
 

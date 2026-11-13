@@ -88,12 +88,15 @@ public final class LoaderTransformer implements IClassTransformer {
                 hook.add(new VarInsnNode(Opcodes.ALOAD, 1));
             }
 
-            descriptor = chunk ? "(" + args[0].getDescriptor() + args[3].getDescriptor() + ")V"
+            descriptor = chunk ? "(" + args[0].getDescriptor() + args[3].getDescriptor() + ")" + args[3].getDescriptor()
                     : "(" + args[0].getDescriptor() + ")V";
             descriptor = net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper.INSTANCE
                     .mapMethodDesc(descriptor);
-            hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, BRIDGE, chunk ? "prepareChunk" : "prepareStack",
+            hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, BRIDGE, chunk ? "prepareChunkForRead" : "prepareStack",
                     descriptor, false));
+            if (chunk) {
+                hook.add(new VarInsnNode(Opcodes.ASTORE, 4));
+            }
             method.instructions.insert(hook);
         }
         if (!placement && found != 1) {
