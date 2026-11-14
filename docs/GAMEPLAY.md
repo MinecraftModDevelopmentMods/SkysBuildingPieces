@@ -1,5 +1,10 @@
 # Pieces and recipes
 
+Snow layers need a complete supporting top at full-block height. Lower grass
+and dirt pieces use their snow-covered appearance instead. Floating layers left
+by an earlier build clear during normal soil ticks or block updates; the piece
+and its orientation stay in place.
+
 Mineralogy rock steps and corners are included automatically when Mineralogy
 is installed. Three matching full rocks diagonally across the crafting grid
 make twelve steps; two steps side by side make four corners. Vertical pairs

@@ -15,6 +15,18 @@ public final class SnowCover {
     private SnowCover() {
     }
 
+    static void removeUnsupportedLayer(World world, BlockPos position) {
+        BlockPos above = position.up();
+        if (world.isRemote || above.getY() > 255 || !world.isBlockLoaded(above)) {
+            return;
+        }
+        // Clear old floating layers through ordinary block updates, without a chunk scan or terrain retrogen.
+        if (world.getBlockState(above).getBlock() == Blocks.SNOW_LAYER
+                && !Blocks.SNOW_LAYER.canPlaceBlockAt(world, above)) {
+            world.setBlockToAir(above);
+        }
+    }
+
     public static IBlockState actualState(IBlockState vanilla, IBlockAccess world, BlockPos pos) {
         if (vanilla.getValue(BlockGrass.SNOWY) || pos.getY() >= 255) {
             return vanilla;

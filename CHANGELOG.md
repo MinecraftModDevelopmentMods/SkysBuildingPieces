@@ -2,6 +2,8 @@
 
 ## 0.3.10.112021
 
+- Stop snow layers hovering over bottom slabs, steps, corners and lowered paths.
+- Clear unsupported snow during ordinary soil ticks and block updates, keeping valid snow on full-height tops.
 - Keep chunk recovery separate from queued saves when a chunk is unloaded and loaded again quickly.
 
 - Snow-covered steps and corners give the grass beneath them a matching snow cap.

@@ -184,6 +184,19 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos position, EnumFacing face) {
+        if (palette.shape == Shape.WALL) {
+            return face.getAxis() == EnumFacing.Axis.Y ? BlockFaceShape.CENTER_BIG : BlockFaceShape.MIDDLE_POLE_THICK;
+        }
+        if (palette.shape == Shape.PANE) {
+            return face.getAxis() == EnumFacing.Axis.Y ? BlockFaceShape.CENTER_SMALL : BlockFaceShape.MIDDLE_POLE_THIN;
+        }
+        // Snow uses this separate vanilla check, so a recessed top must not claim full-height support.
+        IBlockState actual = palette.shape == Shape.STAIRS ? getActualState(state, world, position) : state;
+        return isSideSolid(actual, world, position, face) ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
+    }
+
+    @Override
     public boolean canPlaceTorchOnTop(IBlockState blockState, IBlockAccess blockAccess, BlockPos position) {
         return palette.shape == Shape.WALL || super.canPlaceTorchOnTop(blockState, blockAccess, position);
     }
@@ -581,10 +594,12 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     public void updateTick(World world, BlockPos position, IBlockState blockState, Random rand) {
+        SnowCover.removeUnsupportedLayer(world, position);
         GrassLifecycle.tick(world, position, blockState, rand);
     }
 
     public void onBlockAdded(World world, BlockPos position, IBlockState blockState) {
+        SnowCover.removeUnsupportedLayer(world, position);
         PathPieces.checkCover(world, position, blockState);
         GrassLifecycle.repairSupport(world, position, blockState);
     }
@@ -598,6 +613,7 @@ public final class PieceBlock extends Block implements IGrowable {
     @Override
     public void neighborChanged(IBlockState blockState, World world, BlockPos position, Block changed,
             BlockPos changedPos) {
+        SnowCover.removeUnsupportedLayer(world, position);
         PathPieces.checkCover(world, position, blockState);
         GrassLifecycle.repairSupport(world, position, blockState);
     }
