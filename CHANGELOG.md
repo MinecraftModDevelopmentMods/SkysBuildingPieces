@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.10.112021
+
+- Stop snow layers hovering over bottom slabs, steps, corners and lowered paths.
+- Clear old floating snow as the world updates, keeping valid snow on full-height tops.
+- Prevent a crash when chunks are unloaded and loaded again quickly.
+- Snow-covered steps and corners give the grass beneath them a matching snow cap.
+- Grass and dirt pieces pick up snow from higher terraces and exposed cold ground.
+- Recipes for different materials, shapes and quantities have separate recipe-book entries.
+- Native slab-to-block recipes take precedence when another mod already supplies the same recipe.
+
+## 0.3.9.112021
+
+- Directional slab placement can be turned off from the Mods menu.
+- Vanilla items stay in their usual creative tabs.
+
 ## 0.3.8.112021
 
 - Added the missing recipe-book unlocks for crafting and rebuilding pieces.

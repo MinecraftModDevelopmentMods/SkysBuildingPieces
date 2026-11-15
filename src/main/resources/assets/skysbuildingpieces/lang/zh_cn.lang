@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=绿色羊毛
 material.skysbuildingpieces.minecraft.wool_red=红色羊毛
 material.skysbuildingpieces.minecraft.wool_black=黑色羊毛
 material.skysbuildingpieces.minecraft.grass_path=土径
+config.skysbuildingpieces.directionalSlabPlacement=按方向放置台阶
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=允许通过点击方块的面或边缘竖直放置普通台阶。更改后请重启游戏。
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=替换旧版建筑部件
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=安装了原模组时，替换受支持的旧建筑部件。请先备份世界。

@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=grüner Wolle
 material.skysbuildingpieces.minecraft.wool_red=roter Wolle
 material.skysbuildingpieces.minecraft.wool_black=schwarzer Wolle
 material.skysbuildingpieces.minecraft.grass_path=Weg
+config.skysbuildingpieces.directionalSlabPlacement=Richtungsabhängige Stufenplatzierung
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=Erlaubt das senkrechte Platzieren von Stufen per Klick auf Flächen und Kanten. Änderung erfordert einen Neustart.
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=Alte Bauteile ersetzen
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=Ersetzt unterstützte alte Bauteile, wenn ihre ursprüngliche Mod installiert ist. Sichere vorher deine Welt.

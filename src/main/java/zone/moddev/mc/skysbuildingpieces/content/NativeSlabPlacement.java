@@ -70,7 +70,8 @@ public final class NativeSlabPlacement {
 
     public static EnumActionResult place(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand,
             EnumFacing face, float hitX, float hitY, float hitZ) {
-        if (instance == null || Loader.isModLoaded("buildingbricks")) {
+        if (instance == null || !zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig.directionalSlabPlacement()
+                || Loader.isModLoaded("buildingbricks")) {
             return null;
         }
 

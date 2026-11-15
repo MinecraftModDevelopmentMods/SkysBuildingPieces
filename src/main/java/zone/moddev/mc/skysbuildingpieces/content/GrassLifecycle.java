@@ -7,11 +7,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.Loader;
 
 /** Standalone grass rules, with a lazily linked optional Grass Slabs API bridge. */
 public final class GrassLifecycle {
     private static Method sharedGrass, sharedDirt;
+    private static Method sharedSnowAppearance;
 
     private GrassLifecycle() {
     }
@@ -42,10 +44,35 @@ public final class GrassLifecycle {
                     Random.class);
             sharedDirt = grassApiClass.getMethod("tickDirt", World.class, BlockPos.class, IBlockState.class,
                     Random.class);
+            try {
+                Method registerSnow = grassApiClass.getMethod("registerSnowForm", IBlockState.class);
+                sharedSnowAppearance = grassApiClass.getMethod("hasSnowAppearance", IBlockAccess.class, BlockPos.class);
+                for (PieceBlock block : Pieces.BLOCKS.values()) {
+                    if (block.palette.group.equals("snow")) {
+                        for (int orientation = 0; orientation < block.palette.shape.states; orientation++) {
+                            registerSnow.invoke(null, block.getStateFromMeta(orientation));
+                        }
+                    }
+                }
+            } catch (NoSuchMethodException olderGrassSlabs) {
+                // Older Grass Slabs versions still share the existing lifecycle rules.
+                sharedSnowAppearance = null;
+            }
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException("Install Sky's Grass Slabs 1.1.1.112021 or later for grass-piece integration",
                     failure);
         }
+    }
+
+    static boolean hasSnowAppearance(IBlockAccess world, BlockPos pos) {
+        if (sharedSnowAppearance != null) {
+            try {
+                return (Boolean) sharedSnowAppearance.invoke(null, world, pos);
+            } catch (ReflectiveOperationException failure) {
+                throw new IllegalStateException("Cannot read the shared grass snow appearance", failure);
+            }
+        }
+        return SnowAppearance.hasNearbySnow(world, pos);
     }
 
     public static boolean grass(IBlockState state) {

@@ -1,5 +1,10 @@
 # Pieces and recipes
 
+Snow layers need a complete supporting top at full-block height. Lower grass
+and dirt pieces use their snow-covered appearance instead. Floating layers left
+by an earlier build clear during normal soil ticks or block updates; the piece
+and its orientation stay in place.
+
 Mineralogy rock steps and corners are included automatically when Mineralogy
 is installed. Three matching full rocks diagonally across the crafting grid
 make twelve steps; two steps side by side make four corners. Vertical pairs
@@ -7,8 +12,8 @@ rebuild corners into steps and steps into Mineralogy's existing slabs.
 Disabled native slab types are not used by recipes or smoothing. The rock
 steps and corners remain craftable from full blocks.
 
-Find the pieces in the Sky's Building Pieces creative tab. It includes the
-vanilla pieces reused by the catalogue. Separate vertical slab items, old
+Find the new pieces in the Sky's Building Pieces creative tab. Reused vanilla
+blocks stay in their usual tabs. Separate vertical slab items, old
 templates and recovery holders stay hidden.
 
 All custom walls have lower connecting panels and raised posts.

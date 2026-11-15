@@ -1,7 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces;
 
 import net.minecraftforge.common.*;
-import net.minecraftforge.common.config.Configuration;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraft.block.Block;
@@ -14,10 +14,11 @@ import zone.moddev.mc.skysbuildingpieces.legacy.*;
         modid = SkysBuildingPieces.ID,
         name = "Sky's Building Pieces",
         version = SkysBuildingPieces.VERSION,
+        guiFactory = "zone.moddev.mc.skysbuildingpieces.client.BuildingPiecesGuiFactory",
         acceptedMinecraftVersions = "[1.12.2]",
         dependencies = "after:skysgrassslabs@[1.1.1.112021,);after:basemetals;after:mineralogy;before:buildingbricks")
 public final class SkysBuildingPieces {
-    public static final String ID = "skysbuildingpieces", VERSION = "0.3.8.112021";
+    public static final String ID = "skysbuildingpieces", VERSION = "0.3.10.112021";
     public static boolean forceReplace;
     public static Block HOLDER;
     @SidedProxy(
@@ -27,15 +28,7 @@ public final class SkysBuildingPieces {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
-
-        configuration.load();
-        forceReplace = configuration.getBoolean("forceReplaceBuildingBricksPieces", "compat", false,
-                "Replace supported BuildingBricks pieces as they load. Back up the world first. Requires restart.");
-
-        if (configuration.hasChanged()) {
-            configuration.save();
-        }
+        forceReplace = BuildingPiecesConfig.load(event.getSuggestedConfigurationFile());
 
         Pieces.register();
         zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.register();
@@ -59,6 +52,11 @@ public final class SkysBuildingPieces {
     @Mod.EventHandler
     public void beforeServer(FMLServerAboutToStartEvent event) {
         LegacyBridge.start(event.getServer());
+    }
+
+    @Mod.EventHandler
+    public void registryMappingsChanged(FMLModIdMappingEvent event) {
+        zone.moddev.mc.skysbuildingpieces.content.RecipeAliases.restore();
     }
 
     @Mod.EventHandler

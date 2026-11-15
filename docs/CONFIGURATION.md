@@ -1,7 +1,14 @@
 # Configuration
 
 Forge creates `config/skysbuildingpieces.cfg`. Stop the game or server before
-editing it, then restart.
+editing it, then restart. On the client, the same settings are in
+**Mods → Sky's Building Pieces → Config**.
+
+`gameplay.directionalSlabPlacement=true`
+
+Click the centre or edge of a face to choose which way a regular slab sits.
+Turn this off for normal horizontal placement, then restart. Existing pieces
+and separately crafted vertical slabs keep their shape and behaviour.
 
 `compat.forceReplaceBuildingBricksPieces=false`
 

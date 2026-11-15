@@ -12,18 +12,35 @@ if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.vers
     throw new GradleException('The released Grass Slabs dependency needs its public version and checksum')
 }
 
+boolean checkoutSource = lock.getProperty('source.mode', 'release') == 'checkout'
+def sourceDirectory = file(providers.gradleProperty('grassSlabsDirectory')
+        .getOrElse(lock.getProperty('source.directory', '../../SkysGrassSlabs112/SkysGrassSlabs')))
 configurations { grassSlabsPublishedRelease { transitive = false } }
-dependencies { grassSlabsPublishedRelease lock.coordinate }
-def publishedJar = providers.provider { configurations.grassSlabsPublishedRelease.singleFile }
+if (!checkoutSource) {
+    dependencies { grassSlabsPublishedRelease lock.coordinate }
+}
+def publishedJar = providers.provider {
+    checkoutSource ? new File(sourceDirectory, "build/libs/SkysGrassSlabs-${lock.version}.jar")
+            : configurations.grassSlabsPublishedRelease.singleFile
+}
 def developmentJar = layout.projectDirectory.file(
         ".gradle/released-content/SkysGrassSlabs-${lock.version}-deobf.jar")
 def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
     group = 'verification'
-    description = 'Checks the exact public Grass Slabs jar used by the optional development profile.'
+    description = 'Checks the exact Grass Slabs jar used by the optional development profile.'
     inputs.file publishedJar
     inputs.file 'gradle/grass-slabs-release.properties'
     doLast {
         File source = publishedJar.get()
+        if (checkoutSource) {
+            String commit = providers.exec {
+                workingDir sourceDirectory
+                commandLine 'git', 'rev-parse', 'HEAD'
+            }.standardOutput.asText.get().trim()
+            if (commit != lock.getProperty('source.commit')) {
+                throw new GradleException('The Grass Slabs source checkout does not match its pinned commit')
+            }
+        }
         String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
                 .encodeHex().toString().toUpperCase(Locale.ROOT)
         if (actual != lock.sha256) {

@@ -48,12 +48,40 @@ public final class SlabRecombinationRecipe extends IForgeRegistryEntry.Impl<IRec
                 continue;
             }
 
+            net.minecraft.util.ResourceLocation id = new net.minecraft.util.ResourceLocation("skysbuildingpieces",
+                    material.id.replace(':', '/') + "/slab_recombination");
+            IRecipe nativeRecipe = findNativeRecipe(registry, Pieces.stack(state, 1), full);
+            if (nativeRecipe != null) {
+                RecipeAliases.redirect(registry, id, nativeRecipe.getRegistryName());
+                continue;
+            }
             SlabRecombinationRecipe recipe = new SlabRecombinationRecipe(state, full);
 
-            recipe.setRegistryName("skysbuildingpieces", material.id.replace(':', '/') + "/slab_recombination");
+            recipe.setRegistryName(id);
             RECIPES.add(recipe);
             registry.register(recipe);
         }
+    }
+
+    private static IRecipe findNativeRecipe(IForgeRegistry<IRecipe> registry, ItemStack slab, ItemStack full) {
+        String owner = slab.getItem().getRegistryName().getNamespace();
+        for (IRecipe recipe : registry.getValuesCollection()) {
+            if (recipe.getRegistryName() == null || !recipe.getRegistryName().getNamespace().equals(owner)
+                    || !ItemStack.areItemStacksEqual(full, recipe.getRecipeOutput())
+                    || recipe.getIngredients().size() != 2) {
+                continue;
+            }
+            boolean shapeless = recipe instanceof net.minecraft.item.crafting.ShapelessRecipes
+                    || recipe instanceof net.minecraftforge.oredict.ShapelessOreRecipe;
+            boolean horizontal = recipe instanceof net.minecraftforge.common.crafting.IShapedRecipe
+                    && ((net.minecraftforge.common.crafting.IShapedRecipe) recipe).getRecipeWidth() == 2
+                    && ((net.minecraftforge.common.crafting.IShapedRecipe) recipe).getRecipeHeight() == 1;
+            if ((shapeless || horizontal) && recipe.getIngredients().get(0).apply(slab)
+                    && recipe.getIngredients().get(1).apply(slab)) {
+                return recipe;
+            }
+        }
+        return null;
     }
 
     private boolean same(ItemStack input) {
@@ -117,7 +145,7 @@ public final class SlabRecombinationRecipe extends IForgeRegistryEntry.Impl<IRec
 
     @Override
     public String getGroup() {
-        return "skysbuildingpieces/slab_recombination";
+        return RecipeGroups.result(full);
     }
 
     @Override

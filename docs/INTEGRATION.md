@@ -19,6 +19,9 @@ Sky's Terrain Smoother uses this lookup without depending on palette internals.
 Building Pieces never generates terrain itself. It optionally joins Grass
 Slabs' grass-form integration, using 1.1.1.112021 or later on Minecraft 1.12.2.
 It works without either Grass Slabs or Terrain Smoother installed.
+With Grass Slabs 1.2 or later, the mods also share physical snow-form recognition
+and calculated snow appearance. Older Grass Slabs versions retain their existing
+grass integration; Building Pieces uses its standalone snow rules with them.
 
 Mineralogy is supported directly. Its presence adds 35 fixed rock-piece
 palettes during pre-initialization; no add-on or compile-time Mineralogy

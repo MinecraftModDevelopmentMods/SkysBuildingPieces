@@ -13,7 +13,7 @@ final class MineralogyChecks {
     private MineralogyChecks() {
     }
 
-    static void run() {
+    static void run(net.minecraft.world.WorldServer world) {
         Catalogue.Module rocks = Catalogue.INSTANCE.modules.get("mineralogy");
         if (!Loader.isModLoaded("mineralogy")) {
             require(rocks == null, "Mineralogy pieces registered without Mineralogy");
@@ -39,6 +39,7 @@ final class MineralogyChecks {
             require(facing(bottom) == EnumFacing.UP && facing(top) == EnumFacing.DOWN,
                     "native slab orientation changed");
             require(Pieces.stack(bottom, 1).getItemDamage() == 0, "native slab item metadata changed");
+            nativeRecipe(world, material.id, bottom);
         }
         for (Catalogue.Palette palette : rocks.palettes) {
             for (String material : palette.materials) {
@@ -54,6 +55,38 @@ final class MineralogyChecks {
         require(states == 540, "not all rock states were checked");
         rawInventories();
         System.out.println("MINERALOGY_CORE_PASS palettes=" + registered + " states=" + states + " addon=false");
+    }
+
+    private static void nativeRecipe(net.minecraft.world.WorldServer world, String material, IBlockState slab) {
+        net.minecraft.util.ResourceLocation previousId = new net.minecraft.util.ResourceLocation(
+                "skysbuildingpieces", material.replace(':', '/') + "/slab_recombination");
+        net.minecraft.item.crafting.IRecipe previous = net.minecraft.item.crafting.CraftingManager.REGISTRY
+                .getObject(previousId);
+        require(previous != null && !previous.isDynamic(),
+                "old slab recipe ID remains craftable: " + previousId + " -> "
+                        + (previous == null ? "missing" : previous.getRegistryName()));
+        net.minecraft.inventory.InventoryCrafting grid = RecipeChecks.grid(2);
+        grid.setInventorySlotContents(0, Pieces.stack(slab, 1));
+        grid.setInventorySlotContents(1, Pieces.stack(slab, 1));
+        int matches = 0;
+        for (net.minecraft.item.crafting.IRecipe recipe : net.minecraft.item.crafting.CraftingManager.REGISTRY) {
+            if (recipe.matches(grid, world)) {
+                require(recipe == previous, "the old recipe ID resolves to the one active craft: " + previousId);
+                require(net.minecraft.item.ItemStack.areItemStacksEqual(
+                        previous.getRecipeOutput(), recipe.getCraftingResult(grid)), "native recombination output");
+                matches++;
+            }
+        }
+        require(matches == 1, "native slab crafting has one owner");
+        net.minecraft.nbt.NBTTagCompound saved = new net.minecraft.nbt.NBTTagCompound();
+        net.minecraft.nbt.NBTTagList recipes = new net.minecraft.nbt.NBTTagList();
+        recipes.appendTag(new net.minecraft.nbt.NBTTagString(previousId.toString()));
+        saved.setTag("recipes", recipes);
+        net.minecraft.stats.RecipeBookServer book = new net.minecraft.stats.RecipeBookServer();
+        book.read(saved);
+        require(book.isUnlocked(previous), "saved recipe book retains the historical Sky recipe ID");
+        require(((net.minecraftforge.registries.ForgeRegistry<?>) net.minecraftforge.fml.common.registry.ForgeRegistries.RECIPES)
+                .isLocked(), "recipe alias recovery preserves Forge's registry lock");
     }
 
     private static EnumFacing facing(IBlockState state) {

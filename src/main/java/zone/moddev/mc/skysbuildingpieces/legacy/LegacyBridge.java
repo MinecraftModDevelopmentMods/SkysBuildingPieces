@@ -219,6 +219,13 @@ public final class LegacyBridge {
         }
     }
 
+    /** Forge can return an NBT object that its file thread is still writing after an unload. */
+    public static NBTTagCompound prepareChunkForRead(World world, NBTTagCompound stored) {
+        NBTTagCompound snapshot = stored.copy();
+        prepareChunk(world, snapshot);
+        return snapshot;
+    }
+
     public static void prepareChunk(World world, NBTTagCompound root) {
         if (ready) {
             zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(root.getCompoundTag("Level"));

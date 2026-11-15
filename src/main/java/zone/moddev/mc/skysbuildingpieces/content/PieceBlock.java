@@ -184,6 +184,19 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos position, EnumFacing face) {
+        if (palette.shape == Shape.WALL) {
+            return face.getAxis() == EnumFacing.Axis.Y ? BlockFaceShape.CENTER_BIG : BlockFaceShape.MIDDLE_POLE_THICK;
+        }
+        if (palette.shape == Shape.PANE) {
+            return face.getAxis() == EnumFacing.Axis.Y ? BlockFaceShape.CENTER_SMALL : BlockFaceShape.MIDDLE_POLE_THIN;
+        }
+        // Snow uses this separate vanilla check, so a recessed top must not claim full-height support.
+        IBlockState actual = palette.shape == Shape.STAIRS ? getActualState(state, world, position) : state;
+        return isSideSolid(actual, world, position, face) ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
+    }
+
+    @Override
     public boolean canPlaceTorchOnTop(IBlockState blockState, IBlockAccess blockAccess, BlockPos position) {
         return palette.shape == Shape.WALL || super.canPlaceTorchOnTop(blockState, blockAccess, position);
     }
@@ -402,15 +415,6 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     public IBlockState getActualState(IBlockState blockState, IBlockAccess blockAccess, BlockPos position) {
-        boolean snow = false;
-
-        for (EnumFacing face : new EnumFacing[] { EnumFacing.UP, EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH,
-                EnumFacing.WEST }) {
-            Block block = blockAccess.getBlockState(position.offset(face)).getBlock();
-
-            snow |= block == Blocks.SNOW || block == Blocks.SNOW_LAYER;
-        }
-
         int connections = 0;
         int connectionBit = 1;
 
@@ -433,7 +437,8 @@ public final class PieceBlock extends Block implements IGrowable {
             blockState = blockState.withProperty(STAIR_SHAPE, stairsShape(blockState, blockAccess, position));
         }
         if (blockState.getPropertyKeys().contains(BlockGrass.SNOWY)) {
-            blockState = blockState.withProperty(BlockGrass.SNOWY, snow);
+            blockState = blockState.withProperty(BlockGrass.SNOWY,
+                    GrassLifecycle.hasSnowAppearance(blockAccess, position));
         }
         if (blockState.getPropertyKeys().contains(CONNECTIONS)) {
             blockState = blockState.withProperty(CONNECTIONS, connections);
@@ -589,10 +594,12 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     public void updateTick(World world, BlockPos position, IBlockState blockState, Random rand) {
+        SnowCover.removeUnsupportedLayer(world, position);
         GrassLifecycle.tick(world, position, blockState, rand);
     }
 
     public void onBlockAdded(World world, BlockPos position, IBlockState blockState) {
+        SnowCover.removeUnsupportedLayer(world, position);
         PathPieces.checkCover(world, position, blockState);
         GrassLifecycle.repairSupport(world, position, blockState);
     }
@@ -606,6 +613,7 @@ public final class PieceBlock extends Block implements IGrowable {
     @Override
     public void neighborChanged(IBlockState blockState, World world, BlockPos position, Block changed,
             BlockPos changedPos) {
+        SnowCover.removeUnsupportedLayer(world, position);
         PathPieces.checkCover(world, position, blockState);
         GrassLifecycle.repairSupport(world, position, blockState);
     }
