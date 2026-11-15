@@ -14,6 +14,8 @@ plugins {
     id 'net.minecraftforge.gradle' version '7.0.34'
 }
 
+apply from: 'gradle/legacy-tools.gradle'
+
 group = project.mod_group
 version = project.mod_version
 base.archivesName = 'SkysBuildingPieces'
@@ -34,6 +36,7 @@ ext.functional_version = versionParts[0..2].join('.')
 ext.display_version = project.mod_version
 ext.release_tag = project.mod_version
 def pinnedJava8 = providers.environmentVariable('SBP_JAVA8_HOME')
+        .orElse(providers.environmentVariable('JAVA_HOME_8_X64'))
 // Gradle 9.6.1's ordinary language-level selector prefers the newest cached
 // Java 8. This opt-in specific installation keeps local/CI qualification exact.
 def exactJava8Spec = pinnedJava8.isPresent() ?

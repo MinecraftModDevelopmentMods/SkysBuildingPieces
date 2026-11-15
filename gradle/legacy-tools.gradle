@@ -1,0 +1,58 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.security.MessageDigest
+import java.util.jar.JarFile
+
+// The old MCP download URL can return HTML. Use the identical, pinned tool from Maven Central.
+def toolSha256 = '9105207CC68FBBA768B314FA8584F7C63DE2CF664F1FD50AAAB4A386975A88BD'
+def toolSha1 = 'a70987737b33a1d828713fb7cec4622455618fd9'
+def toolUrl = 'https://repo.maven.apache.org/maven2/net/md-5/SpecialSource/1.8.3/SpecialSource-1.8.3-shaded.jar'
+def cacheRoot = providers.gradleProperty('legacyToolCacheRoot').map { file(it) }.getOrElse(
+        new File(gradle.gradleUserHomeDir, 'caches/minecraftforge/forgegradle/mavenizer'))
+def tool = new File(cacheRoot, 'caches/maven/mcp-tools/net/md-5/SpecialSource/1.8.3/SpecialSource-1.8.3-shaded.jar')
+def checksum = new File(tool.path + '.sha1')
+def digest = { byte[] bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString().toUpperCase() }
+
+tool.parentFile.mkdirs()
+new RandomAccessFile(new File(tool.parentFile, 'specialsource-bootstrap.lock'), 'rw').withCloseable { lockFile ->
+    def lock = lockFile.channel.lock()
+    try {
+        byte[] existing = tool.isFile() ? tool.bytes : null
+        if (existing == null || digest(existing) != toolSha256) {
+            if (gradle.startParameter.offline) {
+                throw new GradleException('The pinned legacy SpecialSource tool is missing or invalid. Run once online to restore it.')
+            }
+            def connection = new URL(toolUrl).openConnection()
+            connection.connectTimeout = 15000
+            connection.readTimeout = 30000
+            byte[] downloaded = connection.inputStream.withCloseable { it.bytes }
+            if (digest(downloaded) != toolSha256) {
+                throw new GradleException('The legacy SpecialSource download did not match its pinned SHA-256.')
+            }
+            // Preserve a rejected cache entry before replacing only this one tool.
+            if (existing != null) {
+                File rejected = new File(projectDir, '.gradle/legacy-tools/rejected/' + digest(existing) + '.jar')
+                rejected.parentFile.mkdirs()
+                if (!rejected.exists()) rejected.bytes = existing
+            }
+            def temporary = Files.createTempFile(tool.parentFile.toPath(), 'specialsource-', '.tmp')
+            try {
+                Files.write(temporary, downloaded)
+                new JarFile(temporary.toFile()).withCloseable { archive ->
+                    if (archive.manifest.mainAttributes.getValue('Main-Class') != 'net.md_5.specialsource.SpecialSource') {
+                        throw new GradleException('The legacy build tool has no expected entry point.')
+                    }
+                }
+                Files.move(temporary, tool.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            } finally {
+                Files.deleteIfExists(temporary)
+            }
+            logger.lifecycle('Restored the verified legacy SpecialSource build tool from Maven Central.')
+        }
+        if (!checksum.isFile() || checksum.getText('UTF-8').trim() != toolSha1) {
+            checksum.setText(toolSha1, 'UTF-8')
+        }
+    } finally {
+        lock.release()
+    }
+}

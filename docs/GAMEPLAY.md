@@ -12,8 +12,8 @@ rebuild corners into steps and steps into Mineralogy's existing slabs.
 Disabled native slab types are not used by recipes or smoothing. The rock
 steps and corners remain craftable from full blocks.
 
-Find the pieces in the Sky's Building Pieces creative tab. It includes the
-vanilla pieces reused by the catalogue. Separate vertical slab items, old
+Find the new pieces in the Sky's Building Pieces creative tab. Reused vanilla
+blocks stay in their usual tabs. Separate vertical slab items, old
 templates and recovery holders stay hidden.
 
 All custom walls have lower connecting panels and raised posts.

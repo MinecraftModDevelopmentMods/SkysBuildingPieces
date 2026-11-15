@@ -3,9 +3,8 @@
 ## 0.3.10.112021
 
 - Stop snow layers hovering over bottom slabs, steps, corners and lowered paths.
-- Clear unsupported snow during ordinary soil ticks and block updates, keeping valid snow on full-height tops.
-- Keep chunk recovery separate from queued saves when a chunk is unloaded and loaded again quickly.
-
+- Clear old floating snow as the world updates, keeping valid snow on full-height tops.
+- Prevent a crash when chunks are unloaded and loaded again quickly.
 - Snow-covered steps and corners give the grass beneath them a matching snow cap.
 - Grass and dirt pieces pick up snow from higher terraces and exposed cold ground.
 - Recipes for different materials, shapes and quantities have separate recipe-book entries.

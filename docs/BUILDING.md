@@ -3,6 +3,9 @@
 Run Gradle with Java 17. Production code and Minecraft use Java 8; the tested
 toolchain is Temurin 8.0.502+7. Use the included Gradle wrapper.
 
+The legacy Forge setup verifies its pinned SpecialSource tool from Maven Central.
+Run once online before using an empty build cache offline.
+
 ```text
 gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
 gradlew genEclipseRuns eclipse verifyEclipseProductionClasspath
