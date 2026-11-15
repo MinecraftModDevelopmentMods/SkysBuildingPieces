@@ -35,5 +35,9 @@ approval.
 CurseForge uploads have one attempt. A timeout can happen after a file has been
 accepted, so check the project files before attempting any recovery upload.
 
+If a build fails before tagging or publication, keep its failure log, correct
+the branch and run the release again. Confirm that no tag or upload was created
+before doing so.
+
 Content mods must be released before add-ons that require them. Keep dependency
 source pins up to date when preparing a coordinated release.

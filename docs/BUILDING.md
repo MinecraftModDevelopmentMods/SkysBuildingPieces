@@ -27,14 +27,16 @@ processed resources and keeps test code out of ordinary game runs.
 - `runMineralogyClient` and `runMineralogyServer` use the optional Mineralogy
   and OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
-Each profile has its own game folder. Grass Slabs is checked against its SHA-256
-and mapped to development names. This candidate uses Grass Slabs 1.2.0 from the
-sibling 1.12 checkout: run `gradlew assemble` there first. Its source commit and
-jar checksum must match `gradle/grass-slabs-release.properties`. Use
-`-PgrassSlabsDirectory=<checkout>` for another location. CI builds that exact
-commit before running these checks. The source jar stays unchanged, and none
-of its classes are bundled into Building Pieces. The lock also supports a
-published Maven jar when `source.mode=release`.
+Each profile has its own game folder. The build downloads Grass Slabs 1.2.0
+from its GitHub release, checks its SHA-256 and maps it to development names.
+The version and checksum are recorded in `gradle/grass-slabs-release.properties`.
+The downloaded jar stays unchanged, and none of its classes are bundled into
+Building Pieces.
+
+For an unreleased integration candidate, the lock also supports
+`source.mode=checkout`. Build the exact `source.commit` with `gradlew assemble`
+first, then pass `-PgrassSlabsDirectory=<checkout>`. CI follows the selected mode
+too; ordinary release builds use the published jar.
 
 For the Mineralogy profile, supply the jars named in its lock file, or use
 `-PmineralogyRuntimeJar=<jar>` and `-PorespawnRuntimeJar=<jar>` to select matching
