@@ -13,6 +13,7 @@ public final class ClientProxy extends CommonProxy {
     public void preInit() {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new WallHighlight());
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new ContinuousGlassModel.BakeHandler());
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new SnowCoveredGrassModel.BakeHandler());
         registerModels("skysbuildingpieces");
 
         for (java.util.Map.Entry<String, Item> entry : Pieces.RETIRED_TEMPLATES.entrySet()) {

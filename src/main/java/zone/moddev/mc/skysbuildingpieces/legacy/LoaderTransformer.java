@@ -9,6 +9,8 @@ public final class LoaderTransformer implements IClassTransformer {
     private static final String BRIDGE = "zone/moddev/mc/skysbuildingpieces/legacy/LegacyBridge";
     private static final String PLACEMENT = "zone/moddev/mc/skysbuildingpieces/content/NativeSlabPlacement";
 
+    private static final String SNOW = "zone/moddev/mc/skysbuildingpieces/content/SnowCover";
+
     public byte[] transform(String name, String transformedName, byte[] bytes) {
         if (bytes == null) {
             return null;
@@ -19,7 +21,9 @@ public final class LoaderTransformer implements IClassTransformer {
         boolean placement = transformedName.equals("net.minecraft.item.ItemSlab")
                 || transformedName.equals("net.minecraft.item.ItemBlock");
 
-        if (!chunk && !item && !placement) {
+        boolean grass = transformedName.equals("net.minecraft.block.BlockGrass");
+
+        if (!chunk && !item && !placement && !grass) {
             return bytes;
         }
 
@@ -33,6 +37,15 @@ public final class LoaderTransformer implements IClassTransformer {
         for (MethodNode method : node.methods) {
             String mappedName = net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper.INSTANCE
                     .mapMethodName(node.name, method.name, method.desc);
+
+            if (grass) {
+                if (method.name.equals("getActualState") || method.name.equals("func_176221_a")
+                        || mappedName.equals("func_176221_a")) {
+                    ++found;
+                    addSnowHook(method);
+                }
+                continue;
+            }
 
             if (placement && (method.name.equals("onItemUse") || method.name.equals("func_180614_a")
                     || mappedName.equals("func_180614_a"))) {
@@ -106,6 +119,33 @@ public final class LoaderTransformer implements IClassTransformer {
         }
 
         return false;
+    }
+
+    private static void addSnowHook(MethodNode method) {
+        String descriptor = net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper.INSTANCE
+                .mapMethodDesc(method.desc);
+        if ((method.access & Opcodes.ACC_STATIC) != 0 || !descriptor.equals(
+                "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;")) {
+            throw new IllegalStateException("Unexpected grass actual-state structure for snowy supports");
+        }
+        if (hasHook(method, SNOW)) {
+            return;
+        }
+        int returns = 0;
+        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+            if (instruction.getOpcode() == Opcodes.ARETURN) {
+                InsnList hook = new InsnList();
+                // Keep vanilla's result, adding only a calculated cap beneath a snowy partial piece.
+                hook.add(new VarInsnNode(Opcodes.ALOAD, 2));
+                hook.add(new VarInsnNode(Opcodes.ALOAD, 3));
+                hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, SNOW, "actualState", descriptor, false));
+                method.instructions.insertBefore(instruction, hook);
+                ++returns;
+            }
+        }
+        if (returns == 0) {
+            throw new IllegalStateException("Grass actual-state method has no return to wrap");
+        }
     }
 
     private static void addPlacementHook(MethodNode method) {

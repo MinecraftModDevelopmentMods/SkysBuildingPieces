@@ -35,6 +35,10 @@ matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath
 it into a path, using the same shovel action.
 
+Snow caps follow nearby snow, including snow on the next terrace up. Exposed
+ground in cold biomes also gets a cap, while roofs and strong block light block
+that weather effect. Piece orientations stay unchanged.
+
 ## Crafting
 
 Craft pieces from matching full blocks, slabs and steps. For example, three

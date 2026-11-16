@@ -19,7 +19,7 @@ import zone.moddev.mc.skysbuildingpieces.legacy.*;
         acceptedMinecraftVersions = "[1.10.2]",
         dependencies = "after:skysgrassslabs@[1.1.0.110021,);after:mineralogy;before:buildingbricks")
 public final class SkysBuildingPieces {
-    public static final String ID = "skysbuildingpieces", VERSION = "0.3.8.110021";
+    public static final String ID = "skysbuildingpieces", VERSION = "0.3.9.110021";
     public static boolean forceReplace;
     public static Block HOLDER;
     @SidedProxy(

@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.3.8.110021
+## 0.3.9.110021
+
+Grass steps and corners use the same snow appearance as grass slabs. Exposed grass beneath snowy pieces also gains a matching snowy side.
 
 - Directional slab placement can be turned off from the Mods menu.
 - Vanilla items stay in their usual creative tabs.

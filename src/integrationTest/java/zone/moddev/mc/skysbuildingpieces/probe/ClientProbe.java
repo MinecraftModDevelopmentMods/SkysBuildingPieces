@@ -95,6 +95,7 @@ public final class ClientProbe extends ProbeProxy {
         ran = true;
 
         try {
+            SnowVisualChecks.run(minecraft);
             for (net.minecraft.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
                 if (retired.getCreativeTab() != null) {
                     throw new AssertionError("Retired template appears in creative inventory");
