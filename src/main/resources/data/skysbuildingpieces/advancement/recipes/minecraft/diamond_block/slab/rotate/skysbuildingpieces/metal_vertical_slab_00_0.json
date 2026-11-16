@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:diamond_block_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:diamond_block_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:diamond_block_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:diamond_block_vertical_slab"
+        }
+      ]
     }
   ]
 }

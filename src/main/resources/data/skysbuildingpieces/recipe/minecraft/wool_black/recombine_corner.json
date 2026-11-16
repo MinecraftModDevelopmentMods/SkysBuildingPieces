@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_black",
+  "group": "skys/result/skysbuildingpieces/wool_black_horizontal_step",
   "pattern": [
     "X",
     "X"
@@ -15,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_black_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_black_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_black_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_black_horizontal_step"
+        }
+      ]
     }
   ]
 }

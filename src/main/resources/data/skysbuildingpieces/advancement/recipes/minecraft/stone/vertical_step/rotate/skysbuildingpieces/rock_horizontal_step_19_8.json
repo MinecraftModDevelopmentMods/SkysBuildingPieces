@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stone_horizontal_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stone_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_vertical_step"
+        }
+      ]
     }
   ]
 }

@@ -30,6 +30,7 @@ public final class ClientProxy {
         modBus.addListener(ClientProxy::mineralogyResources);
         modBus.addListener(ClientProxy::blockColors);
         modBus.addListener(ContinuousGlassModel::bake);
+        modBus.addListener(SnowCoveredGrassModel::bake);
     }
 
     private static void mineralogyResources(AddPackFindersEvent event) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.10.2603002
+
+- Snowy steps and corners cover the grass beneath them, and snow pieces can be dug by hand.
+- Grass pieces now decay under solid cover and receive normal random ticks.
+- Wooden pieces use fuel values that match their size.
+
 ## 0.3.9.2603002
 
 - Each material and shape now has its own block ID. Existing pieces keep their material, orientation and waterlogging.

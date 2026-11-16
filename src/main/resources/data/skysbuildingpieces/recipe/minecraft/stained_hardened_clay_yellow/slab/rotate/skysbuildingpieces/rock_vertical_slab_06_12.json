@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_yellow_slab",
   "pattern": [
     "X"
   ],
@@ -14,12 +15,19 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stained_hardened_clay_yellow_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stained_hardened_clay_yellow_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stained_hardened_clay_yellow_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stained_hardened_clay_yellow_vertical_slab"
+        }
+      ]
     }
   ]
 }

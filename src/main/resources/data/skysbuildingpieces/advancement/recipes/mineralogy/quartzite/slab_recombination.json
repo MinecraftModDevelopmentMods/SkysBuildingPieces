@@ -32,16 +32,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "mineralogy:quartzite"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "mineralogy:quartzite_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:quartzite"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:quartzite_slab"
+        }
+      ]
     }
   ]
 }

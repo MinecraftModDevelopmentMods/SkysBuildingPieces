@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_glass_green",
+  "category": "building",
+  "group": "skys/result/minecraft/green_stained_glass",
   "pattern": [
     "XX"
   ],
@@ -14,6 +15,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:stained_glass_green_slab"
     }
   ]

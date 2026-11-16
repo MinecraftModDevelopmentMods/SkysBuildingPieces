@@ -33,6 +33,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:stonebrick_mossy_vertical_step"
     }
   ]

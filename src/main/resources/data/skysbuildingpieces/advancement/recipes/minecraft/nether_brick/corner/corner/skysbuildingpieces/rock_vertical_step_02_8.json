@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:nether_brick_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:nether_brick_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:nether_brick_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:nether_brick_vertical_step"
+        }
+      ]
     }
   ]
 }

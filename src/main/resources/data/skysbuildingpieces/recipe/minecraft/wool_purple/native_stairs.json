@@ -1,7 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
   "category": "building",
-  "group": "skysbuildingpieces/wool_purple",
+  "group": "skys/result/minecraft/purple_wool_stairs",
   "pattern": [
     "X"
   ],
@@ -16,6 +16,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:wool_purple_stairs"
     }
   ]

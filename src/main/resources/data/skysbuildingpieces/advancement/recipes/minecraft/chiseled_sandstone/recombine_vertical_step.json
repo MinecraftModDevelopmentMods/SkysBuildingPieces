@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:chiseled_sandstone_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:chiseled_sandstone_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_sandstone_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_sandstone_vertical_step"
+        }
+      ]
     }
   ]
 }

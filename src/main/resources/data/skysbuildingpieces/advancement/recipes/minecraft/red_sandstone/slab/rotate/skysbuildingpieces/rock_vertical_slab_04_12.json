@@ -33,6 +33,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:red_sandstone_vertical_slab"
     }
   ]

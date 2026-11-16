@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:sandstone_horizontal_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:sandstone_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:sandstone_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:sandstone_vertical_slab"
+        }
+      ]
     }
   ]
 }

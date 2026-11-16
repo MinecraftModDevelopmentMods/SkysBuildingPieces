@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:grass_path_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysgrassslabs:path_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:grass_path_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysgrassslabs:path_slab"
+        }
+      ]
     }
   ]
 }

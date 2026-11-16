@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:purpur_pillar_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:purpur_pillar_stairs"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:purpur_pillar_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:purpur_pillar_stairs"
+        }
+      ]
     }
   ]
 }

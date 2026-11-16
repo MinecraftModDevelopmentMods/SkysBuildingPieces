@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stained_glass_light_blue_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stained_glass_light_blue_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stained_glass_light_blue_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stained_glass_light_blue_horizontal_step"
+        }
+      ]
     }
   ]
 }

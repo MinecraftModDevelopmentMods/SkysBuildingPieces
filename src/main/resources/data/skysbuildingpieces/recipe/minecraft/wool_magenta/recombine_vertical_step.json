@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_magenta",
+  "group": "skys/result/minecraft/magenta_wool_slab",
   "pattern": [
     "X",
     "X"
@@ -16,6 +16,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:wool_magenta_vertical_step"
     }
   ]

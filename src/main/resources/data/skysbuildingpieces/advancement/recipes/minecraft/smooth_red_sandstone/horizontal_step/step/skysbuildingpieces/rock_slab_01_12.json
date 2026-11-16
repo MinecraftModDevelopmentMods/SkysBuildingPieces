@@ -33,6 +33,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:smooth_red_sandstone_horizontal_step"
     }
   ]

@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/prismarine_bricks",
+  "category": "building",
+  "group": "skys/result/minecraft/prismarine_bricks",
   "pattern": [
     "XX"
   ],
@@ -14,6 +15,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:prismarine_bricks_slab"
     }
   ]

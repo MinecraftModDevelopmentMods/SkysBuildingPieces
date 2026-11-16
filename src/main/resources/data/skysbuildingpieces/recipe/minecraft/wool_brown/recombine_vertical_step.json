@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "skysbuildingpieces/wool_brown",
+  "group": "skys/result/minecraft/brown_wool_slab",
   "pattern": [
     "X",
     "X"
@@ -16,6 +16,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:wool_brown_vertical_step"
     }
   ]

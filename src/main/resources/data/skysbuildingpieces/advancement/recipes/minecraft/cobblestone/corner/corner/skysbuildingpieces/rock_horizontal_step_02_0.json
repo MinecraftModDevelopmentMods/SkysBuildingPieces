@@ -32,12 +32,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:cobblestone_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:cobblestone_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:cobblestone_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:cobblestone_horizontal_step"
+        }
+      ]
     }
   ]
 }

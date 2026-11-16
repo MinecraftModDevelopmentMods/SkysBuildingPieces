@@ -140,11 +140,15 @@ public final class RuntimeBootstrap {
                         return;
                     }
                     recipes = current.finish();
+                    RecipeUniquenessChecks.run(world);
                     stacks = legacyStacks();
                     rawPlayer();
                     rawRandomSequences();
                     NativeLegacyChecks.run(world);
                     GameplayChecks.run(world);
+                    FuelChecks.run(world);
+                    SurvivalDropChecks.run(world);
+                    StandaloneLifecycleChecks.run(world);
                     WaterloggingChecks.run(world);
                     PathChecks.run(world);
                     SharedGrassChecks.run(world);

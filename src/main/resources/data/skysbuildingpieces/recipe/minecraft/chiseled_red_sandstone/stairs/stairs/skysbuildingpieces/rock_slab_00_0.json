@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/chiseled_red_sandstone_stairs",
   "pattern": [
     "X  ",
     "XX ",
@@ -15,12 +16,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:chiseled_red_sandstone_stairs"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_red_sandstone_stairs"
+        }
+      ]
     }
   ]
 }

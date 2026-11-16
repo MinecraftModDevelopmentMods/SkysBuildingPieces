@@ -33,6 +33,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:prismarine_bricks_slab"
     }
   ]

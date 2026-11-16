@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/end_stone_vertical_step",
   "pattern": [
     "X"
   ],
@@ -14,12 +15,19 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:end_stone_horizontal_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:end_stone_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:end_stone_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:end_stone_vertical_step"
+        }
+      ]
     }
   ]
 }
