@@ -1,6 +1,7 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
 import net.minecraft.util.EnumFacing;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Face-local centre/edge selection, independent of any other mod's placement handlers. */
@@ -9,6 +10,12 @@ public final class SlabPlacement {
 
     /** The half of the destination block occupied by a slab. */
     public static EnumFacing side(EnumFacing face, float hitX, float hitY, float hitZ) {
+        if (!BuildingPiecesConfig.directionalSlabPlacement()) {
+            if (face == EnumFacing.DOWN || face.getAxis().isHorizontal() && hitY > 0.5f) {
+                return EnumFacing.UP;
+            }
+            return EnumFacing.DOWN;
+        }
         if (centre(face, hitX, hitY, hitZ)) {
             return face.getOpposite();
         }

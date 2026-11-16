@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=Green Wool
 material.skysbuildingpieces.minecraft.wool_red=Red Wool
 material.skysbuildingpieces.minecraft.wool_black=Black Wool
 material.skysbuildingpieces.minecraft.grass_path=Path
+config.skysbuildingpieces.directionalSlabPlacement=Directional slab placement
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=Allow regular slabs to be placed vertically using face and edge clicks. Restart after changing this.
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=Replace legacy pieces
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=Replace supported legacy pieces when their original mod is installed. Back up your world first.

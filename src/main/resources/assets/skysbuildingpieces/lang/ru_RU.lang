@@ -118,3 +118,7 @@ material.skysbuildingpieces.minecraft.wool_green=зелёной шерсти
 material.skysbuildingpieces.minecraft.wool_red=красной шерсти
 material.skysbuildingpieces.minecraft.wool_black=чёрной шерсти
 material.skysbuildingpieces.minecraft.grass_path=Тропа
+config.skysbuildingpieces.directionalSlabPlacement=Установка плит с выбором направления
+config.skysbuildingpieces.directionalSlabPlacement.tooltip=Позволяет ставить обычные плиты вертикально, нажимая на грани и края. После изменения перезапустите игру.
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces=Заменять старые детали
+config.skysbuildingpieces.forceReplaceBuildingBricksPieces.tooltip=Заменяет поддерживаемые старые детали, если установлен исходный мод. Сначала сделайте резервную копию мира.

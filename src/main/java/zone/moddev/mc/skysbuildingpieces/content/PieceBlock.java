@@ -401,15 +401,6 @@ public final class PieceBlock extends Block implements IGrowable {
     }
 
     public IBlockState getActualState(IBlockState blockState, IBlockAccess blockAccess, BlockPos position) {
-        boolean snow = false;
-
-        for (EnumFacing face : new EnumFacing[] { EnumFacing.UP, EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH,
-                EnumFacing.WEST }) {
-            Block block = blockAccess.getBlockState(position.offset(face)).getBlock();
-
-            snow |= block == Blocks.SNOW || block == Blocks.SNOW_LAYER;
-        }
-
         int connections = 0;
         int connectionBit = 1;
 
@@ -431,8 +422,8 @@ public final class PieceBlock extends Block implements IGrowable {
         if (palette.shape == Shape.STAIRS) {
             blockState = blockState.withProperty(STAIR_SHAPE, stairsShape(blockState, blockAccess, position));
         }
-        if (blockState.getPropertyKeys().contains(BlockGrass.SNOWY)) {
-            blockState = blockState.withProperty(BlockGrass.SNOWY, snow);
+        if (palette.group.equals("grass") || palette.group.equals("dirt")) {
+            blockState = blockState.withProperty(BlockGrass.SNOWY, GrassLifecycle.hasSnowAppearance(blockAccess, position));
         }
         if (blockState.getPropertyKeys().contains(CONNECTIONS)) {
             blockState = blockState.withProperty(CONNECTIONS, connections);

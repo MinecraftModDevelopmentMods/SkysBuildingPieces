@@ -98,6 +98,7 @@ public final class RuntimeProbe {
                 return;
             }
 
+            SnowChecks.run(world);
             GameplayChecks.run(world);
             PathChecks.run(world);
             MineralogyChecks.run();
