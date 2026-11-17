@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/scoria",
+  "category": "building",
+  "group": "skys/result/mineralogy/scoria_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_scoria_horizontal_step"

@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/slate",
+  "category": "building",
+  "group": "skys/result/mineralogy/slate_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_slate_vertical_step"

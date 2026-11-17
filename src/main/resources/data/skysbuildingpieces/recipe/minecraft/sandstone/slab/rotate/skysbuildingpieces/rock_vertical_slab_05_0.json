@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/sandstone_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:sandstone_vertical_slab"

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_black_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:wool_black_vertical_slab"

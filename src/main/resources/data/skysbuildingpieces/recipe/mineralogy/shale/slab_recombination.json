@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/shale",
+  "category": "building",
+  "group": "skys/result/mineralogy/shale",
   "pattern": ["XX"],
   "key": {
     "X": "mineralogy:shale_slab"

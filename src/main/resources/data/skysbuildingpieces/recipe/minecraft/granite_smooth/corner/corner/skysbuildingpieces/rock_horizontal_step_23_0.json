@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/granite_smooth_corner",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:granite_smooth_horizontal_step"

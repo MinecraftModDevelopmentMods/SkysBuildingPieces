@@ -414,6 +414,7 @@ level-type=minecraft:normal
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
+use-native-transport=false
 generate-structures=false
 spawn-animals=false
 spawn-monsters=false
@@ -873,3 +874,5 @@ apply from: 'gradle/forge-client-control.gradle'
 apply from: 'gradle/native-compatibility.gradle'
 apply from: 'gradle/forge-server-control.gradle'
 apply from: 'gradle/native-unit-launcher.gradle'
+
+apply from: 'gradle/recipe-resource-sync.gradle'

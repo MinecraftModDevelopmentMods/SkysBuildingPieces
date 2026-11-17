@@ -34,6 +34,12 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/WaterloggingChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/DirtCoverageChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/CoverageContributor.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/FuelChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SurvivalDropChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/StandaloneLifecycleChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeBookGroupChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeUniquenessChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SnowCoverClientChecks.java')
     source fileTree('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/legacy')
     classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
     destinationDirectory = bootstrapClasses
@@ -90,6 +96,7 @@ level-seed=4815162342
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
+use-native-transport=false
 generate-structures=false
 spawn-animals=false
 spawn-monsters=false
@@ -184,6 +191,7 @@ def prepareForward = tasks.register('prepareNativeForwardTest') {
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
+use-native-transport=false
 generate-structures=false
 spawn-animals=false
 spawn-monsters=false

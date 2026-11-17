@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/wool_magenta",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_magenta_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:wool_magenta_vertical_step"

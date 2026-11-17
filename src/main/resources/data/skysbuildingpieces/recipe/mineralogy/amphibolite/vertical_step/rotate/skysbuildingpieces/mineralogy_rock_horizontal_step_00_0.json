@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mineralogy_amphibolite_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"

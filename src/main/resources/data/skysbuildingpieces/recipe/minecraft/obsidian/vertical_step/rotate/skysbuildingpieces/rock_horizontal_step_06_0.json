@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/obsidian_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:obsidian_horizontal_step"

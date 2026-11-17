@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/emerald_block_horizontal_step",
   "pattern": ["X ", " X"],
   "key": {
     "X": "skysbuildingpieces:emerald_block_vertical_slab"

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.10.2602001
+
+- Improve snow on grass pieces and the grass beneath them.
+- Let snow pieces drop when dug by hand, with faster digging by shovel.
+- Match wooden fuel values to each piece's size.
+- Tidy recipe-book groups, remove duplicate cuts and keep standalone dirt-slab combining available.
+- Handle missing render data safely when other mods request a piece's model.
+
 ## 0.3.9.2602001
 
 - Removed duplicate grass and dirt slab recipes when Sky's Grass Slabs is installed.

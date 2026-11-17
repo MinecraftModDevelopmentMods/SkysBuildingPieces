@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_orange_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stained_hardened_clay_orange_vertical_slab"

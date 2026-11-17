@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stonebrick",
+  "category": "building",
+  "group": "skys/result/minecraft/stone_brick_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:stonebrick_vertical_step"

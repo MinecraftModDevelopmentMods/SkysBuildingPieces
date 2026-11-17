@@ -1,0 +1,65 @@
+// Keep removed recipes out of packaged resources and existing Eclipse outputs.
+def recipeOwners = project.mod_id == 'skysbuildingpiecesbop'
+        ? ['skysbuildingpieces', 'skysbuildingpiecesbop'] : [project.mod_id]
+def recipeFolders = recipeOwners.collectMany { owner ->
+    ["data/${owner}/recipe", "data/${owner}/advancement/recipes"]
+}
+
+def insideProject = { File directory ->
+    File resolved = directory.canonicalFile
+    if (!resolved.toPath().startsWith(projectDir.canonicalFile.toPath())
+            || resolved == projectDir.canonicalFile) {
+        throw new GradleException("Recipe output is outside this checkout: ${resolved}")
+    }
+    resolved
+}
+
+def recipeFiles = { File root ->
+    Set<String> files = new TreeSet<>()
+    recipeFolders.each { relative ->
+        File folder = new File(root, relative)
+        fileTree(folder) { include '**/*.json' }.files.each { path ->
+            files.add(relative + '/' + folder.toPath().relativize(path.toPath()).toString().replace('\\', '/'))
+        }
+    }
+    files
+}
+
+tasks.named('processResources') {
+    doFirst {
+        File output = insideProject(destinationDir)
+        recipeFolders.each { relative ->
+            project.delete(insideProject(new File(output, relative)))
+        }
+    }
+}
+
+tasks.named('prepareEclipseResources') {
+    doLast {
+        File eclipseOutput = insideProject(file('bin/main'))
+        recipeFolders.each { relative ->
+            project.sync {
+                from(layout.buildDirectory.dir("resources/main/${relative}"))
+                into(insideProject(new File(eclipseOutput, relative)))
+            }
+        }
+    }
+}
+
+def verifyRecipeResourceOutputs = tasks.register('verifyRecipeResourceOutputs') {
+    group = 'verification'
+    description = 'Checks that processed and Eclipse recipes match the current source resources.'
+    dependsOn tasks.named('processResources'), tasks.named('prepareEclipseResources')
+    doLast {
+        Set<String> expected = new TreeSet<>()
+        sourceSets.main.resources.srcDirs.each { root -> expected.addAll(recipeFiles(root)) }
+        [layout.buildDirectory.dir('resources/main').get().asFile, file('bin/main')].each { output ->
+            Set<String> actual = recipeFiles(output)
+            if (actual != expected) {
+                throw new GradleException("Recipe output mismatch in ${output}: "
+                        + "missing=${expected - actual}, stale=${actual - expected}")
+            }
+        }
+    }
+}
+tasks.named('check') { dependsOn verifyRecipeResourceOutputs }

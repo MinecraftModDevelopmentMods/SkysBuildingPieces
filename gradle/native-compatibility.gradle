@@ -40,6 +40,7 @@ level-seed=4815162342
 online-mode=false
 server-ip=127.0.0.1
 server-port=0
+use-native-transport=false
 generate-structures=false
 spawn-animals=false
 spawn-monsters=false
@@ -102,7 +103,7 @@ tasks.register('captureDisabledMineralogyControl', JavaExec) {
         ['banned-players.json', 'banned-ips.json', 'ops.json', 'whitelist.json'].each {
             new File(directory, it).text = '[]\n'
         }
-        new File(directory, 'server.properties').text = 'level-name=world\nonline-mode=false\nserver-ip=127.0.0.1\nserver-port=0\nspawn-animals=false\nspawn-monsters=false\n'
+        new File(directory, 'server.properties').text = 'level-name=world\nonline-mode=false\nserver-ip=127.0.0.1\nserver-port=0\nuse-native-transport=false\nspawn-animals=false\nspawn-monsters=false\n'
     }
     doLast {
         File directory = workingDir

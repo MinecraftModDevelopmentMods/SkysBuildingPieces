@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_glass_light_blue_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stained_glass_light_blue_horizontal_step"

@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/dirt_podzol",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_podzol_horizontal_step",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:dirt_podzol_corner"

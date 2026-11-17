@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/planks_oak",
+  "category": "building",
+  "group": "skys/result/minecraft/oak_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:planks_oak_horizontal_step"

@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/hornfels",
+  "category": "building",
+  "group": "skys/result/mineralogy/hornfels_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_hornfels_horizontal_step"

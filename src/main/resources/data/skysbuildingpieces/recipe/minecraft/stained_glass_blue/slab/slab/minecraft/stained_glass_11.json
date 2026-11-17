@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_glass_blue_slab",
   "pattern": ["XXX"],
   "key": {
     "X": "minecraft:blue_stained_glass"
