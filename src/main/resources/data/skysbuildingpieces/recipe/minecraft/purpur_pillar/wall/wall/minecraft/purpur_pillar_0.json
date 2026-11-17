@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XX", "XX", "XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/purpur_pillar_wall",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:purpur_pillar"
-    }
+    "X": "minecraft:purpur_pillar"
   },
   "result": {
     "id": "skysbuildingpieces:purpur_pillar_wall",
@@ -13,8 +16,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:purpur_pillar_wall"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:purpur_pillar_wall"
     }
   ]
 }

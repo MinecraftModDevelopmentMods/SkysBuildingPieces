@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stained_glass_blue",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/blue_stained_glass",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_glass_blue_slab"
-    }
+    "X": "skysbuildingpieces:stained_glass_blue_slab"
   },
   "result": {
     "id": "minecraft:blue_stained_glass",
@@ -13,8 +14,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_blue_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stained_glass_blue_slab"
     }
   ]
 }

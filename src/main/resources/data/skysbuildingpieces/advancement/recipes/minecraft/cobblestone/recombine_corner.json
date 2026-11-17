@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:cobblestone_corner"]
+            "items": [
+              "skysbuildingpieces:cobblestone_corner"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/cobblestone/recombine_corner"
+        "recipes": "skysbuildingpieces:minecraft/cobblestone/recombine_corner"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/cobblestone/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/cobblestone/recombine_corner"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:cobblestone_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:cobblestone_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:cobblestone_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:cobblestone_horizontal_step"
+        }
+      ]
     }
   ]
 }

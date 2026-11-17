@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/granite_smooth",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/minecraft/polished_granite_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:granite_smooth_vertical_step"
-    }
+    "X": "skysbuildingpieces:granite_smooth_vertical_step"
   },
   "result": {
     "id": "minecraft:polished_granite_slab",
@@ -13,8 +15,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:granite_smooth_vertical_step"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:granite_smooth_vertical_step"
     }
   ]
 }

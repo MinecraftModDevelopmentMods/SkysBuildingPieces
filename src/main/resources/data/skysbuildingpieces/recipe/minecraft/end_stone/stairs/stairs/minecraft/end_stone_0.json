@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/end_stone_stairs",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:end_stone"
-    }
+    "X": "minecraft:end_stone"
   },
   "result": {
     "id": "skysbuildingpieces:end_stone_stairs",
@@ -13,8 +16,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:end_stone_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:end_stone_stairs"
     }
   ]
 }

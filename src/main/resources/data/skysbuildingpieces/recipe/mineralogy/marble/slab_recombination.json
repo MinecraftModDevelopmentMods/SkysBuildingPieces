@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/marble",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/marble",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:marble_slab"
-    }
+    "X": "mineralogy:marble_slab"
   },
   "result": {
     "id": "mineralogy:marble",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:marble"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:marble_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:marble"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:marble_slab"
+        }
+      ]
     }
   ]
 }

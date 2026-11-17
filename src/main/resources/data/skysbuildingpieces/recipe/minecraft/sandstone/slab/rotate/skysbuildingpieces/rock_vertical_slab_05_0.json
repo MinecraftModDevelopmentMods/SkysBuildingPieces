@@ -1,11 +1,12 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "category": "building",
+  "group": "skys/result/minecraft/sandstone_slab",
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:sandstone_vertical_slab"
-    }
+    "X": "skysbuildingpieces:sandstone_vertical_slab"
   },
   "result": {
     "id": "minecraft:sandstone_slab",
@@ -14,8 +15,9 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:sandstone_vertical_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:sandstone_vertical_slab"
     }
   ]
 }

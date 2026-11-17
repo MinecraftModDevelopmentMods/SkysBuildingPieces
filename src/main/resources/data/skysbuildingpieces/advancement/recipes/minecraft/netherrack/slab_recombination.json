@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:netherrack_slab"]
+            "items": [
+              "skysbuildingpieces:netherrack_slab"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/netherrack/slab_recombination"
+        "recipes": "skysbuildingpieces:minecraft/netherrack/slab_recombination"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/netherrack/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/netherrack/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:netherrack_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:netherrack_slab"
     }
   ]
 }

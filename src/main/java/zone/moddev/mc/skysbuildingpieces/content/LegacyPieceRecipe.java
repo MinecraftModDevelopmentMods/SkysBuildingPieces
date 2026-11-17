@@ -5,13 +5,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -19,12 +18,8 @@ import zone.moddev.mc.skysbuildingpieces.legacy.LegacyMapping;
 
 /** Optional recovery for a legacy piece obtained while its original mod is installed. */
 public final class LegacyPieceRecipe extends CustomRecipe {
-    public static final SimpleCraftingRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(
-            LegacyPieceRecipe::new);
-
-    public LegacyPieceRecipe(CraftingBookCategory category) {
-        super(category);
-    }
+    public static final RecipeSerializer<LegacyPieceRecipe> SERIALIZER = new RecipeSerializer<>(
+            MapCodec.unit(LegacyPieceRecipe::new), StreamCodec.unit(new LegacyPieceRecipe()));
 
     private ItemStack result(CraftingInput inventory) {
         ItemStack source = ItemStack.EMPTY;
@@ -56,7 +51,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
                 return ItemStack.EMPTY;
             }
 
-            String material = LegacyMapping.material(data.copyTag().getString("material"));
+            String material = LegacyMapping.material(data.copyTag().getStringOr("material", ""));
             Shape shape = LegacyMapping.shape(identity, 0);
 
             if (shape == null || !Catalogue.INSTANCE.materials.containsKey(material)
@@ -84,17 +79,12 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput inventory) {
         return result(inventory);
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width >= 1 && height >= 1;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<LegacyPieceRecipe> getSerializer() {
         return SERIALIZER;
     }
 

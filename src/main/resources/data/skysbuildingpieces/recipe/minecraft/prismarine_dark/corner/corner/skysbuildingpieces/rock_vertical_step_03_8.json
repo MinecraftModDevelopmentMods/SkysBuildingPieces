@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_dark_corner",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:prismarine_dark_vertical_step"
-    }
+    "X": "skysbuildingpieces:prismarine_dark_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_dark_corner",
@@ -13,12 +14,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:prismarine_dark_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:prismarine_dark_vertical_step"
+        }
+      ]
     }
   ]
 }

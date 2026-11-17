@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/schist",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/mineralogy/schist_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_schist_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_schist_vertical_step"
   },
   "result": {
     "id": "mineralogy:schist_slab",
@@ -13,16 +15,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:schist_slab"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_schist_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:schist_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mineralogy_schist_vertical_step"
+        }
+      ]
     }
   ]
 }

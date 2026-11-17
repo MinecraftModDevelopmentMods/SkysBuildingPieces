@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/planks_jungle",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/minecraft/jungle_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:planks_jungle_vertical_step"
-    }
+    "X": "skysbuildingpieces:planks_jungle_vertical_step"
   },
   "result": {
     "id": "minecraft:jungle_slab",
@@ -13,8 +15,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:planks_jungle_vertical_step"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:planks_jungle_vertical_step"
     }
   ]
 }

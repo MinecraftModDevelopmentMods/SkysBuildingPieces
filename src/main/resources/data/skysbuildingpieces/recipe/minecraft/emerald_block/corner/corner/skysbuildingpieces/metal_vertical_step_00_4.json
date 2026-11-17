@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/emerald_block_corner",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:emerald_block_vertical_step"
-    }
+    "X": "skysbuildingpieces:emerald_block_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:emerald_block_corner",
@@ -13,12 +14,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:emerald_block_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:emerald_block_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:emerald_block_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:emerald_block_vertical_step"
+        }
+      ]
     }
   ]
 }

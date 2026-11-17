@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:polished_diorite"]
+            "items": [
+              "minecraft:polished_diorite"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/diorite_smooth/wall/wall/minecraft/stone_4"
+        "recipes": "skysbuildingpieces:minecraft/diorite_smooth/wall/wall/minecraft/stone_4"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/diorite_smooth/wall/wall/minecraft/stone_4"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/diorite_smooth/wall/wall/minecraft/stone_4"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diorite_smooth_wall"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:diorite_smooth_wall"
     }
   ]
 }

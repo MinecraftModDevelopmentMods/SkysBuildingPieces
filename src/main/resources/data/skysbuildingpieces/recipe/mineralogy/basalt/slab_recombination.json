@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/basalt",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/basalt",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:basalt_slab"
-    }
+    "X": "mineralogy:basalt_slab"
   },
   "result": {
     "id": "mineralogy:basalt",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basalt"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basalt_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:basalt"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:basalt_slab"
+        }
+      ]
     }
   ]
 }

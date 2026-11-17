@@ -1,11 +1,12 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/sandstone_horizontal_step",
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:sandstone_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:sandstone_horizontal_step",
@@ -14,12 +15,19 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:sandstone_horizontal_step"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:sandstone_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:sandstone_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:sandstone_vertical_step"
+        }
+      ]
     }
   ]
 }

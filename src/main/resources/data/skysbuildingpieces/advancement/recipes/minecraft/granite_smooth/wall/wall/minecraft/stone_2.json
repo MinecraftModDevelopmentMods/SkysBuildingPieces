@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:polished_granite"]
+            "items": [
+              "minecraft:polished_granite"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/granite_smooth/wall/wall/minecraft/stone_2"
+        "recipes": "skysbuildingpieces:minecraft/granite_smooth/wall/wall/minecraft/stone_2"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/granite_smooth/wall/wall/minecraft/stone_2"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/granite_smooth/wall/wall/minecraft/stone_2"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:granite_smooth_wall"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:granite_smooth_wall"
     }
   ]
 }

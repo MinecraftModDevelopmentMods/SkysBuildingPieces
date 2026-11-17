@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:quartz_slab"]
+            "items": [
+              "minecraft:quartz_slab"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/quartz_block/horizontal_step/step/minecraft/stone_slab_7"
+        "recipes": "skysbuildingpieces:minecraft/quartz_block/horizontal_step/step/minecraft/stone_slab_7"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/quartz_block/horizontal_step/step/minecraft/stone_slab_7"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/quartz_block/horizontal_step/step/minecraft/stone_slab_7"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:quartz_block_horizontal_step"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:quartz_block_horizontal_step"
     }
   ]
 }

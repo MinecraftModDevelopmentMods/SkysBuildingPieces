@@ -4,7 +4,7 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import zone.moddev.mc.skysbuildingpieces.legacy.LegacyRegistryAliases;
 
@@ -15,11 +15,11 @@ class LegacyRegistryAliasesTest {
     @Test
     void repeatsTheSameRenameWithoutReplacingAnotherEntry() {
         MinecraftTestBootstrap.registerVanilla();
-        var key = ResourceKey.<String>createRegistryKey(ResourceLocation.fromNamespaceAndPath("test", "pieces"));
+        var key = ResourceKey.<String>createRegistryKey(Identifier.fromNamespaceAndPath("test", "pieces"));
         var registry = new MappedRegistry<>(key, Lifecycle.stable());
-        var former = ResourceLocation.fromNamespaceAndPath("test", "former");
-        var replacement = ResourceLocation.fromNamespaceAndPath("test", "replacement");
-        var other = ResourceLocation.fromNamespaceAndPath("test", "other");
+        var former = Identifier.fromNamespaceAndPath("test", "former");
+        var replacement = Identifier.fromNamespaceAndPath("test", "replacement");
+        var other = Identifier.fromNamespaceAndPath("test", "other");
         Registry.register(registry, replacement, "replacement");
         Registry.register(registry, other, "other");
 
@@ -31,6 +31,6 @@ class LegacyRegistryAliasesTest {
                 () -> LegacyRegistryAliases.register(registry, former, other));
         assertThrows(IllegalStateException.class,
                 () -> LegacyRegistryAliases.register(registry, other, replacement));
-        assertEquals("other", registry.get(other));
+        assertEquals("other", registry.getValue(other));
     }
 }

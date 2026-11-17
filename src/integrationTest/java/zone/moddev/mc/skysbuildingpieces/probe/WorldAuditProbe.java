@@ -6,11 +6,13 @@ import java.util.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.bus.api.SubscribeEvent;
+import java.util.function.Consumer;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import zone.moddev.mc.skysbuildingpieces.legacy.*;
 
 /** Loads only indexed existing chunks in a disposable full-world copy. */
 public final class WorldAuditProbe {
+    private final Consumer<ServerTickEvent.Post> tickListener;
     private final net.minecraft.server.MinecraftServer server;
     private final List<int[]> chunks = new ArrayList<int[]>();
     private int next;
@@ -88,11 +90,11 @@ public final class WorldAuditProbe {
             }
         }
 
-        NeoForge.EVENT_BUS.register(this);
+        tickListener = this::tick;
+        NeoForge.EVENT_BUS.addListener(tickListener);
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_WORLD_AUDIT_INDEX " + chunks.size());
     }
 
-    @SubscribeEvent
     public void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
         try {
             for (int entryIndex = 0; entryIndex < batch && next < chunks.size(); entryIndex++) {
@@ -198,7 +200,7 @@ public final class WorldAuditProbe {
 
                 org.apache.logging.log4j.LogManager.getLogger().info(
                         "BUILDING_PIECES_WORLD_AUDIT_PASS blocks=" + blocks + " items=" + items + " reload=" + reload);
-                NeoForge.EVENT_BUS.unregister(this);
+                NeoForge.EVENT_BUS.unregister(tickListener);
                 server.halt(false);
             }
         } catch (Throwable failure) {

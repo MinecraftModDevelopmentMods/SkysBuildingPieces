@@ -2,9 +2,6 @@ package zone.moddev.mc.skysbuildingpieces;
 
 import net.minecraft.util.RandomSource;
 
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.resources.model.BakedModel;
 
 import com.google.gson.*;
 
@@ -12,16 +9,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import org.junit.jupiter.api.Test;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.resources.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import org.joml.Vector3f;
+import java.lang.reflect.Proxy;
+import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
+import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 import zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel;
 import zone.moddev.mc.skysbuildingpieces.content.GlassWallTexture;
+import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContinuousGlassTest {
@@ -92,94 +98,126 @@ class ContinuousGlassTest {
     }
 
     @Test
-    void bakedWrapperPreservesInventoryBordersAndQuadAttributesWithoutGraphics() {
+    void bakedWrapperKeepsTheFaceAndChangesOnlyTheJoinedTexture() {
+        MinecraftTestBootstrap.registerVanilla();
         JsonObject part = new JsonParser().parse("{\"from\":[5,0,0],\"to\":[5,13,16]}").getAsJsonObject();
-        int[] compact = quad(part, "west", 0);
-        int stride = DefaultVertexFormat.BLOCK.getVertexSize() / Integer.BYTES;
-        int[] data = new int[stride * 4];
-
-        for (int vertex = 0; vertex < 4; vertex++) {
-            System.arraycopy(compact, vertex * 7, data, vertex * stride, 7);
+        int[] vertices = quad(part, "west", 0);
+        Vector3f[] positions = new Vector3f[4];
+        long[] uv = new long[4];
+        for (int vertex = 0; vertex < positions.length; vertex++) {
+            int offset = vertex * 7;
+            positions[vertex] = new Vector3f(value(vertices, offset),
+                    value(vertices, offset + 1), value(vertices, offset + 2));
+            uv[vertex] = UVPair.pack(value(vertices, offset + 4), value(vertices, offset + 5));
         }
-
-        BakedQuad source = new BakedQuad(data, 3, Direction.WEST, null, false);
-        List<BakedQuad> original = Collections.singletonList(source);
-        BakedModel base = new BakedModel() {
-            public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
-                assertNull(state);
-                return original;
+        BakedQuad source = new BakedQuad(positions[0], positions[1], positions[2], positions[3],
+                uv[0], uv[1], uv[2], uv[3], Direction.WEST,
+                new BakedQuad.MaterialInfo(null, ChunkSectionLayer.TRANSLUCENT,
+                        null, null, null, 3, null, 4));
+        List<BakedQuad> original = List.of(source);
+        BlockStateModelPart basePart = new BlockStateModelPart() {
+            @Override
+            public List<BakedQuad> getQuads(Direction face) {
+                return face == Direction.WEST ? original : List.of();
             }
 
+            @Override
             public boolean useAmbientOcclusion() {
                 return false;
             }
 
-            public boolean isGui3d() {
-                return true;
-            }
-
-            public boolean usesBlockLight() {
-                return true;
-            }
-
-            public boolean isCustomRenderer() {
-                return false;
-            }
-
-            public TextureAtlasSprite getParticleIcon() {
+            @Override
+            public Material.Baked particleMaterial() {
                 return null;
             }
 
-            public ItemTransforms getTransforms() {
+            @Override
+            public int materialFlags() {
+                return BakedQuad.FLAG_TRANSLUCENT;
+            }
+        };
+        BlockStateModel base = new BlockStateModel() {
+            @Override
+            public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
+                parts.add(basePart);
+            }
+
+            @Override
+            public Material.Baked particleMaterial() {
                 return null;
             }
 
-            public ItemOverrides getOverrides() {
-                return ItemOverrides.EMPTY;
+            @Override
+            public int materialFlags() {
+                return basePart.materialFlags();
+            }
+
+            @Override
+            public Object createGeometryKey(BlockAndTintGetter world, BlockPos position,
+                    BlockState state, RandomSource random) {
+                return basePart;
             }
         };
         ContinuousGlassModel model = new ContinuousGlassModel(base);
+        BlockState wall = wall("stained_glass");
+        BlockState clear = wall("clear_glass");
+        BlockPos origin = BlockPos.ZERO;
+        BlockAndTintGetter separated = neighbours(Map.of(origin.north(), clear));
+        BlockAndTintGetter matching = neighbours(Map.of(origin.north(), wall, origin.south(), wall,
+                origin.west(), clear));
+        var parts = new java.util.ArrayList<BlockStateModelPart>();
+        model.collectParts(RandomSource.create(0), parts);
+        assertSame(basePart, parts.getFirst());
+        assertSame(basePart, worldPart(model, separated, origin, wall, 0));
+        BlockStateModelPart joined = worldPart(model, matching, origin, wall, 0);
+        assertNotEquals(model.createGeometryKey(separated, origin, wall, RandomSource.create(0)),
+                model.createGeometryKey(matching, origin, wall, RandomSource.create(0)));
+        assertEquals(model.createGeometryKey(matching, origin, wall, RandomSource.create(0)),
+                model.createGeometryKey(matching, origin, wall, RandomSource.create(123)));
+        assertSame(joined, worldPart(model, matching, origin, wall, 123));
+        assertEquals(BakedQuad.FLAG_TRANSLUCENT, joined.materialFlags());
+        assertFalse(joined.useAmbientOcclusion());
+        assertSame(basePart.particleMaterial(), joined.particleMaterial());
 
-        assertSame(original, model.getQuads(null, null, RandomSource.create(0)));
-        assertSame(original, model.getQuads(null, Direction.WEST, RandomSource.create(0), data(0), null));
-
-        List<BakedQuad> joined = model.getQuads(null, Direction.WEST, RandomSource.create(0), data(5), null);
-
-        assertSame(joined, model.getQuads(null, Direction.WEST, RandomSource.create(123), data(5), null));
-        assertThrows(UnsupportedOperationException.class, () -> joined.clear());
-
-        BakedQuad trimmed = joined.get(0);
-
+        List<BakedQuad> quads = joined.getQuads(Direction.WEST);
+        assertThrows(UnsupportedOperationException.class, quads::clear);
+        BakedQuad trimmed = quads.getFirst();
         assertNotSame(source, trimmed);
-        assertArrayEquals(GlassWallTexture.trim(data, stride, 0, 4, 5), trimmed.getVertices());
-        assertEquals(3, trimmed.getTintIndex());
-        assertEquals(Direction.WEST, trimmed.getDirection());
-        assertFalse(trimmed.isShade());
-        assertEquals(source.hasAmbientOcclusion(), trimmed.hasAmbientOcclusion());
-        assertSame(source.getSprite(), trimmed.getSprite());
-        assertEquals(stride * 4, trimmed.getVertices().length);
-        assertFalse(model.useAmbientOcclusion());
-        assertTrue(model.isGui3d());
-        assertTrue(model.usesBlockLight());
-        assertFalse(model.isCustomRenderer());
-        assertSame(base.getOverrides(), model.getOverrides());
-        assertSame(base.getParticleIcon(), model.getParticleIcon());
-        assertSame(base.getTransforms(), model.getTransforms());
+        int[] expected = GlassWallTexture.trim(vertices, 7, 0, 4, 5);
+        for (int vertex = 0; vertex < positions.length; vertex++) {
+            assertSame(source.position(vertex), trimmed.position(vertex));
+            int offset = vertex * 7;
+            assertEquals(UVPair.pack(value(expected, offset + 4), value(expected, offset + 5)),
+                    trimmed.packedUV(vertex));
+        }
+        assertEquals(source.direction(), trimmed.direction());
+        assertSame(source.materialInfo(), trimmed.materialInfo());
+        assertSame(source.bakedNormals(), trimmed.bakedNormals());
+        assertSame(source.bakedColors(), trimmed.bakedColors());
     }
 
-    private static ModelData data(int joins) {
-        try {
-            java.lang.reflect.Field field = ContinuousGlassModel.class.getDeclaredField("JOINS");
+    private static BlockStateModelPart worldPart(ContinuousGlassModel model,
+            BlockAndTintGetter world, BlockPos position, BlockState state, int seed) {
+        var parts = new java.util.ArrayList<BlockStateModelPart>();
+        model.collectParts(world, position, state, RandomSource.create(seed), parts);
+        return parts.getFirst();
+    }
 
-            field.setAccessible(true);
+    private static BlockState wall(String materialGroup) {
+        var palette = Catalogue.INSTANCE.palettes.stream()
+                .filter(entry -> entry.shape == Shape.WALL && entry.group.equals(materialGroup))
+                .findFirst().orElseThrow();
+        return new PieceBlock(palette).defaultBlockState();
+    }
 
-            @SuppressWarnings("unchecked")
-            ModelProperty<Integer> property = (ModelProperty<Integer>) field.get(null);
-
-            return ModelData.builder().with(property, joins).build();
-        } catch (ReflectiveOperationException failure) {
-            throw new AssertionError(failure);
-        }
+    private static BlockAndTintGetter neighbours(Map<BlockPos, BlockState> blocks) {
+        return (BlockAndTintGetter) Proxy.newProxyInstance(BlockAndTintGetter.class.getClassLoader(),
+                new Class<?>[] { BlockAndTintGetter.class }, (view, method, args) -> {
+                    if (method.getName().equals("getBlockState")) {
+                        return blocks.getOrDefault(args[0], Blocks.AIR.defaultBlockState());
+                    }
+                    throw new AssertionError("Unexpected world lookup: " + method.getName());
+                });
     }
 
     private static int[] quad(JsonObject part, String face, int rotation) {

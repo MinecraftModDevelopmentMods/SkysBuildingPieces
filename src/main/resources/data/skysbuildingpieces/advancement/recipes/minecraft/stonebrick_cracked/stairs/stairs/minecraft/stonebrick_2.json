@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:cracked_stone_bricks"]
+            "items": [
+              "minecraft:cracked_stone_bricks"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stonebrick_cracked/stairs/stairs/minecraft/stonebrick_2"
+        "recipes": "skysbuildingpieces:minecraft/stonebrick_cracked/stairs/stairs/minecraft/stonebrick_2"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stonebrick_cracked/stairs/stairs/minecraft/stonebrick_2"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stonebrick_cracked/stairs/stairs/minecraft/stonebrick_2"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_cracked_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stonebrick_cracked_stairs"
     }
   ]
 }

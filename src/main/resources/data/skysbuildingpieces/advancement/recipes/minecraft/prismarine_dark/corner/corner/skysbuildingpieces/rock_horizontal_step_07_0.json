@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:prismarine_dark_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:prismarine_dark_horizontal_step"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/prismarine_dark/corner/corner/skysbuildingpieces/rock_horizontal_step_07_0"
+        "recipes": "skysbuildingpieces:minecraft/prismarine_dark/corner/corner/skysbuildingpieces/rock_horizontal_step_07_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_dark/corner/corner/skysbuildingpieces/rock_horizontal_step_07_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_dark/corner/corner/skysbuildingpieces/rock_horizontal_step_07_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:prismarine_dark_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:prismarine_dark_horizontal_step"
+        }
+      ]
     }
   ]
 }

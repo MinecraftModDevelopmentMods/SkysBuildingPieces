@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_pink_corner",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_horizontal_step"
-    }
+    "X": "skysbuildingpieces:stained_hardened_clay_pink_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_pink_corner",
@@ -13,12 +14,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stained_hardened_clay_pink_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stained_hardened_clay_pink_horizontal_step"
+        }
+      ]
     }
   ]
 }

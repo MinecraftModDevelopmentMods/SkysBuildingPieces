@@ -10,6 +10,7 @@ import net.neoforged.fml.common.Mod;
 @Mod("neoforgeclientcontrol")
 public final class NeoForgeClientControl {
     private boolean started;
+    private boolean leaving;
     private int joinedTicks;
     private long worldStarted;
 
@@ -21,7 +22,14 @@ public final class NeoForgeClientControl {
 
         Minecraft client = Minecraft.getInstance();
 
-        org.lwjgl.glfw.GLFW.glfwHideWindow(client.getWindow().getWindow());
+        org.lwjgl.sdl.SDLVideo.SDL_HideWindow(client.getWindow().handle());
+
+        if (leaving) {
+            if (client.level == null && client.getSingleplayerServer() == null) {
+                client.stop();
+            }
+            return;
+        }
 
         if (started && client.level == null) {
             confirmDisposableWorld(client);
@@ -35,12 +43,12 @@ public final class NeoForgeClientControl {
         if (!started) {
             started = true;
             worldStarted = System.nanoTime();
-            LevelSettings settings = new LevelSettings("NeoForge Login Control", GameType.CREATIVE, false,
-                    net.minecraft.world.Difficulty.NORMAL, true, new net.minecraft.world.level.GameRules(),
+            LevelSettings settings = new LevelSettings("NeoForge Login Control", GameType.CREATIVE,
+                    LevelSettings.DifficultySettings.DEFAULT, true,
                     net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
             client.createWorldOpenFlows().createFreshLevel("control-world", settings,
                     new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.screen);
+                    net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, client.gui.screen());
         } else if (client.player != null && client.level != null && ++joinedTicks >= 40) {
             if (net.neoforged.fml.ModList.get().isLoaded("skysbuildingpieces")
                     || net.neoforged.fml.ModList.get().isLoaded("skysgrassslabs")) {
@@ -48,16 +56,14 @@ public final class NeoForgeClientControl {
             }
 
             org.apache.logging.log4j.LogManager.getLogger().info("NEOFORGE_CLIENT_CONTROL_PASS joined=true sky_mods=false");
-            client.level.disconnect();
-            client.disconnect(new net.minecraft.client.gui.screens.GenericMessageScreen(
-                    net.minecraft.network.chat.Component.translatable("menu.savingLevel")));
-            client.stop();
+            leaving = true;
+            client.disconnectFromWorld(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE);
         }
     }
     private static void confirmDisposableWorld(Minecraft minecraft) {
-        boolean backup = minecraft.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
-        boolean confirmation = minecraft.screen != null
-                && minecraft.screen.getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
+        boolean backup = minecraft.gui.screen() instanceof net.minecraft.client.gui.screens.BackupConfirmScreen;
+        boolean confirmation = minecraft.gui.screen() != null
+                && minecraft.gui.screen().getClass() == net.minecraft.client.gui.screens.ConfirmScreen.class;
         if (!backup && !confirmation) {
             return;
         }
@@ -68,19 +74,19 @@ public final class NeoForgeClientControl {
         }
         String experimentalTitle = net.minecraft.network.chat.Component
                 .translatable("selectWorld.backupQuestion.experimental").getString();
-        if (confirmation && !experimentalTitle.equals(minecraft.screen.getTitle().getString())) {
+        if (confirmation && !experimentalTitle.equals(minecraft.gui.screen().getTitle().getString())) {
             throw new IllegalStateException("Unexpected world-load confirmation: "
-                    + minecraft.screen.getTitle().getString());
+                    + minecraft.gui.screen().getTitle().getString());
         }
         String proceed = backup
                 ? net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString()
                 : net.minecraft.network.chat.CommonComponents.GUI_PROCEED.getString();
-        for (var child : minecraft.screen.children()) {
+        for (var child : minecraft.gui.screen().children()) {
             if (child instanceof net.minecraft.client.gui.components.Button button
                     && proceed.equals(button.getMessage().getString())) {
                 if (button.active) {
                     // Confirm the known load prompt for this generated fixture.
-                    button.onPress();
+                    button.onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.sdl.SDLKeycode.SDLK_RETURN, 0, 0));
                     System.out.println("NEOFORGE_CLIENT_CONTROL_PROMPT_CONFIRMED owned_world=true");
                 }
                 return;

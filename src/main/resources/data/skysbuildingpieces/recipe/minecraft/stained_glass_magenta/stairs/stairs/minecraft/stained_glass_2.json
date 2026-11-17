@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_glass_magenta_stairs",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:magenta_stained_glass"
-    }
+    "X": "minecraft:magenta_stained_glass"
   },
   "result": {
     "id": "skysbuildingpieces:stained_glass_magenta_stairs",
@@ -13,8 +16,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_magenta_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stained_glass_magenta_stairs"
     }
   ]
 }

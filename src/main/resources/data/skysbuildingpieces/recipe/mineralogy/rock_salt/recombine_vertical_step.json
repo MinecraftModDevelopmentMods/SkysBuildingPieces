@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/rock_salt",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/mineralogy/rock_salt_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:mineralogy_rock_salt_vertical_step"
-    }
+    "X": "skysbuildingpieces:mineralogy_rock_salt_vertical_step"
   },
   "result": {
     "id": "mineralogy:rock_salt_slab",
@@ -13,16 +15,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:rock_salt_slab"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mineralogy_rock_salt_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:rock_salt_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mineralogy_rock_salt_vertical_step"
+        }
+      ]
     }
   ]
 }

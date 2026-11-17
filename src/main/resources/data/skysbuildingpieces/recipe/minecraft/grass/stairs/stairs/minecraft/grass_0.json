@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/grass_stairs",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:grass_block"
-    }
+    "X": "minecraft:grass_block"
   },
   "result": {
     "id": "skysbuildingpieces:grass_stairs",
@@ -13,8 +16,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:grass_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:grass_stairs"
     }
   ]
 }

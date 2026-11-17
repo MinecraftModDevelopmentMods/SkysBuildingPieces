@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/ice",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/ice",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:ice_slab"
-    }
+    "X": "skysbuildingpieces:ice_slab"
   },
   "result": {
     "id": "minecraft:ice",
@@ -13,8 +14,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:ice_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:ice_slab"
     }
   ]
 }

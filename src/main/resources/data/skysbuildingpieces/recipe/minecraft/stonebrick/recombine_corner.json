@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stonebrick",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_horizontal_step",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stonebrick_corner"
-    }
+    "X": "skysbuildingpieces:stonebrick_corner"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_horizontal_step",
@@ -13,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stonebrick_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stonebrick_horizontal_step"
+        }
+      ]
     }
   ]
 }

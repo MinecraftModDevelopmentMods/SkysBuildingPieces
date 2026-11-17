@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/basaltic_glass",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/basaltic_glass",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:basaltic_glass_slab"
-    }
+    "X": "mineralogy:basaltic_glass_slab"
   },
   "result": {
     "id": "mineralogy:basaltic_glass",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basaltic_glass"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:basaltic_glass_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:basaltic_glass"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:basaltic_glass_slab"
+        }
+      ]
     }
   ]
 }

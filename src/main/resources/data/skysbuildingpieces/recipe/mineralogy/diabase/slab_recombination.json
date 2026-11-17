@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/diabase",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/diabase",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:diabase_slab"
-    }
+    "X": "mineralogy:diabase_slab"
   },
   "result": {
     "id": "mineralogy:diabase",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:diabase"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:diabase_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:diabase"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:diabase_slab"
+        }
+      ]
     }
   ]
 }

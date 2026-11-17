@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.3.10.2603002
+
+- Snowy steps and corners cover the grass beneath them, and snow pieces can be dug by hand.
+- Grass pieces now decay under solid cover and receive normal random ticks.
+- Wooden pieces use fuel values that match their size.
+
+## 0.3.9.2603002
+
+- Each material and shape now has its own block ID. Existing pieces keep their material, orientation and waterlogging.
+- Directional slab placement can be turned off from the Mods menu.
+- Vanilla items stay in their usual creative tabs.
+
+## 0.3.8.2603002
+
+- Updated for Minecraft 26.3 on NeoForge. Wool uses the new vanilla slabs and stairs for new builds.
+- Saved Building Pieces wool pieces and inventory items are still supported.
+
+## 0.3.8.2602002
+
+- Updated Building Pieces for Minecraft 26.2 on NeoForge.
+- Existing pieces, recipes and migration totals carry forward.
+- Fixed an upgrade crash when opening older Forge worlds with large registry snapshots.
+
+## 0.3.8.2601022 - Minecraft 26.1.2 (NeoForge)
+
+- Updated the pieces for Minecraft 26.1.2.
+- Kept saved pieces and migration totals when opening older worlds.
+
+## 0.3.8.121112
+
+- Bring Building Pieces to Minecraft 1.21.11 on NeoForge.
+- Keep existing pieces, recipes and supported world upgrades.
+- Grass Slabs and Mineralogy are still optional.
+
 ## 0.3.8.121012
 
 - Bring Building Pieces to Minecraft 1.21.1 on NeoForge.

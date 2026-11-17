@@ -6,10 +6,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.core.BlockPos;
@@ -18,23 +22,47 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 
-/** One material per inventory item; placement still uses the fixed block palette. */
-public final class PieceItem extends Item {
+/** One material and shape per inventory item. */
+public final class PieceItem extends BlockItem {
+    private static final ResourceKey<ContextIntProvider> WOOD_SLAB_FUEL = woodFuel("slab");
+    private static final ResourceKey<ContextIntProvider> WOOD_STEP_FUEL = woodFuel("step");
+    private static final ResourceKey<ContextIntProvider> WOOD_CORNER_FUEL = woodFuel("corner");
+
     public final PieceBlock piece;
     public final String material;
 
     public PieceItem(PieceBlock block, String material) {
-        super(properties(block, material));
+        super(block, properties(block, material));
         this.piece = block;
         this.material = material;
     }
 
     private static Item.Properties properties(PieceBlock block, String material) {
-        return new Item.Properties();
+        Identifier id = Identifier.parse(PaletteItemIds.itemId(block.palette, material));
+        var properties = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+        if (Catalogue.INSTANCE.materials.get(material).cookingFuel()) {
+            // Keep the vanilla furnace rules, including faster cooking and datapack fuel settings.
+            ResourceKey<ContextIntProvider> fuel = switch (block.palette.shape) {
+                case SLAB, VERTICAL_SLAB -> WOOD_SLAB_FUEL;
+                case STEP, HORIZONTAL_STEP, VERTICAL_STEP -> WOOD_STEP_FUEL;
+                case CORNER -> WOOD_CORNER_FUEL;
+                default -> ContextIntProviders.COOKING_TIME_WOOD_BLOCKS;
+            };
+            properties.cookingFuel(fuel);
+        }
+        return properties;
+    }
+
+    private static ResourceKey<ContextIntProvider> woodFuel(String shape) {
+        return ResourceKey.create(Registries.CONTEXT_INT_PROVIDER,
+                Identifier.fromNamespaceAndPath("skysbuildingpieces", "cooking/wood_" + shape));
     }
 
     boolean visibleInCreativeTab() {
@@ -57,11 +85,6 @@ public final class PieceItem extends Item {
 
         return PieceNames.displayName(namespace, material,
                 piece.palette.shape.name().toLowerCase(java.util.Locale.ROOT), full.getHoverName());
-    }
-
-    @Override
-    public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-        return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
     }
 
     @Override
@@ -125,7 +148,8 @@ public final class PieceItem extends Item {
 
         switch (shape) {
             case SLAB:
-                Direction slabSide = SlabPlacement.side(face, hitX, hitY, hitZ);
+                Direction slabSide = BuildingPiecesConfig.directionalSlabPlacement()
+                        ? SlabPlacement.side(face, hitX, hitY, hitZ) : SlabPlacement.horizontalSide(face, hitY);
                 placedShape = SlabPlacement.shape(slabSide);
                 orientation = SlabPlacement.orientation(slabSide);
                 break;
@@ -226,14 +250,25 @@ public final class PieceItem extends Item {
                 | (hitY + face.getStepY() * epsilon >= .5f ? 4 : 0);
         BlockState combinedState = null;
         boolean isSlab = shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB;
-        Shape[] additions = isSlab ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
+        boolean directionalSlabs = isSlab && BuildingPiecesConfig.directionalSlabPlacement();
+        if (isSlab && !directionalSlabs && Geometry.orientationFor(shape, existingCells) < 0) {
+            return false;
+        }
+        boolean horizontalJoin = shape == Shape.SLAB && !directionalSlabs;
+        if (horizontalJoin
+                && (existingCells == 15 ? face == Direction.DOWN || face.getAxis().isHorizontal() && hitY <= .5f
+                        : face == Direction.UP || face.getAxis().isHorizontal() && hitY > .5f)) {
+            return false;
+        }
+        Shape[] additions = directionalSlabs ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
 
         search:
         for (Shape addition : additions) {
             for (int orientation = 0; orientation < addition.states; orientation++) {
                 int addedCells = Geometry.mask(addition, orientation);
 
-                if ((addedCells & 1 << clickedCell) == 0 || (addedCells & existingCells) != 0) {
+                if ((!horizontalJoin && (addedCells & 1 << clickedCell) == 0)
+                        || (addedCells & existingCells) != 0) {
                     continue;
                 }
 

@@ -1,7 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.legacy;
 
 import com.mojang.serialization.Dynamic;
-import java.lang.reflect.Field;
 import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,7 +8,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.util.datafix.fixes.BlockStateData;
+import net.minecraft.nbt.NbtOps;
+import zone.moddev.mc.skysbuildingpieces.mixin.BlockStateDataAccessor;
 import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
@@ -54,8 +54,8 @@ final class NumericStateBridge {
             }
         }
         for (int index = 0; index < savedStaging.size(); index++) {
-            CompoundTag entry = savedStaging.getCompound(index);
-            int encoded = entry.getInt("encoded");
+            CompoundTag entry = savedStaging.getCompoundOrEmpty(index);
+            int encoded = entry.getIntOr("encoded", 0);
             int blockId = encoded >>> 4;
 
             if (encoded < 0 || encoded >= 65536 || snapshot.containsKey(blockId) || blockId < 256
@@ -66,22 +66,23 @@ final class NumericStateBridge {
             // Staging survives later ports too. Let an installed catalogue recover a retired native target first.
             CompoundTag wrapped = new CompoundTag();
 
-            wrapped.put("BlockState", entry.getCompound("state"));
+            wrapped.put("BlockState", entry.getCompoundOrEmpty("state"));
 
-            CompoundTag target = HistoricalItems.prepareCopy(wrapped).getCompound("BlockState").copy();
+            CompoundTag target = HistoricalItems.prepareCopy(wrapped).getCompoundOrEmpty("BlockState").copy();
 
             // Sidecars can retain a target chosen before vanilla renamed grass paths.
             // The staging number stays fixed for chunks which have not been opened yet.
-            if (target.getString("Name").equals("minecraft:grass_path")) {
-                target.putString("Name", "minecraft:dirt_path");
+            String nameKey = target.contains("Name") ? "Name" : "id";
+            if (target.getStringOr(nameKey, "").equals("minecraft:grass_path")) {
+                target.putString(nameKey, "minecraft:dirt_path");
             }
 
-            BlockState state = NbtUtils.readBlockState(
-                    net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), target);
+            BlockState state = readSavedState(target);
 
             if (state.isAir() || state.hasBlockEntity()) {
                 throw new LegacyBridge.RecoveryAbort("A saved migration target is no longer available: " + entry, null);
             }
+            state = Pieces.canonicalState(state);
 
             occupied.set(blockId);
             stagingIds.set(blockId);
@@ -144,7 +145,7 @@ final class NumericStateBridge {
             CompoundTag saved = new CompoundTag();
 
             saved.putInt("encoded", entry.getKey());
-            saved.put("state", NbtUtils.writeBlockState(entry.getValue()));
+            saved.put("state", writeSavedState(entry.getValue()));
             result.add(saved);
         }
 
@@ -166,9 +167,9 @@ final class NumericStateBridge {
             previous.put(encoded, table[encoded]);
         }
 
-        CompoundTag flattened = NbtUtils.writeBlockState(state);
+        CompoundTag flattened = writeSavedState(state);
         preserveNativeName(flattened);
-        String name = flattened.getString("Name");
+        String name = flattened.getStringOr("Name", "");
 
         if (name.equals("minecraft:kelp")) {
             // The later vanilla rename turns kelp_top into today's growing tip; passing today's kelp name here would
@@ -178,12 +179,12 @@ final class NumericStateBridge {
         if (name.matches("minecraft:(oak|spruce|birch|jungle|acacia|dark_oak)_leaves")) {
             // Vanilla's next leaves fixer still reads the old decayable flag. Supply it during numeric flattening so
             // placed leaves stay persistent.
-            CompoundTag properties = flattened.getCompound("Properties");
+            CompoundTag properties = flattened.getCompoundOrEmpty("Properties");
 
-            properties.putString("decayable", Boolean.toString(!properties.getString("persistent").equals("true")));
+            properties.putString("decayable", Boolean.toString(!properties.getStringOr("persistent", "").equals("true")));
         }
 
-        Dynamic<?> value = BlockStateData.parse(flattened.toString());
+        Dynamic<?> value = new Dynamic<>(NbtOps.INSTANCE, flattened);
 
         table[encoded] = value;
         installed.put(encoded, value);
@@ -191,7 +192,7 @@ final class NumericStateBridge {
     }
 
     static synchronized void preserveNativeName(CompoundTag state) {
-        if (state.getString("Name").equals("minecraft:stone_slab")) {
+        if (state.getStringOr("Name", "").equals("minecraft:stone_slab")) {
             // This rough-stone slab was added in 1.14. Vanilla still renames the old use of its ID to smooth stone.
             state.putString(NATIVE_STATE_ID, "minecraft:stone_slab");
             nativeNames = true;
@@ -200,6 +201,26 @@ final class NumericStateBridge {
 
     static synchronized boolean needsNativeNames() {
         return nativeNames;
+    }
+
+    static BlockState readSavedState(CompoundTag saved) {
+        CompoundTag state = saved;
+        if (saved.contains("Name")) {
+            CompoundTag current = new CompoundTag();
+            current.putString("id", saved.getStringOr("Name", ""));
+            saved.getCompound("Properties").ifPresent(properties -> current.put("properties", properties));
+            state = current;
+        }
+        return NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK, state);
+    }
+
+    static CompoundTag writeSavedState(BlockState state) {
+        // Keep the sidecar and numeric flattening table in their original format.
+        CompoundTag current = NbtUtils.writeBlockState(state);
+        CompoundTag saved = new CompoundTag();
+        saved.putString("Name", current.getString("id").orElseThrow());
+        current.getCompound("properties").ifPresent(properties -> saved.put("Properties", properties));
+        return saved;
     }
 
     static synchronized void reset() {
@@ -225,28 +246,10 @@ final class NumericStateBridge {
     }
 
     private static Dynamic<?>[] table() {
-        try {
-            Dynamic<?>[] expanded = null;
-            for (Field field : BlockStateData.class.getDeclaredFields()) {
-                if (field.getType() != Dynamic[].class) {
-                    continue;
-                }
-                field.setAccessible(true);
-                Dynamic<?>[] values = (Dynamic<?>[]) field.get(null);
-                if (values.length == 65536) {
-                    if (expanded != null) {
-                        throw new LegacyBridge.RecoveryAbort("The legacy block-state tables are ambiguous", null);
-                    }
-                    expanded = values;
-                }
-            }
-            if (expanded == null) {
-                throw new LegacyBridge.RecoveryAbort(
-                        "The legacy block-state table was not expanded before initialization", null);
-            }
-            return expanded;
-        } catch (ReflectiveOperationException failure) {
-            throw new LegacyBridge.RecoveryAbort("Cannot prepare the legacy block-state table", failure);
+        Dynamic<?>[] table = BlockStateDataAccessor.skysbuildingpieces$getLegacyStateMap();
+        if (table.length < 65_536) {
+            throw new LegacyBridge.RecoveryAbort("The legacy block-state table was not expanded", null);
         }
+        return table;
     }
 }

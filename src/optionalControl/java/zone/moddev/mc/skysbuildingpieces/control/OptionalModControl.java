@@ -9,7 +9,7 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 @Mod("optionalmodcontrol")
 public final class OptionalModControl {
     public OptionalModControl() {
-        NeoForge.EVENT_BUS.addListener(this::started);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(this::started);
     }
 
     private void started(ServerStartedEvent event) {

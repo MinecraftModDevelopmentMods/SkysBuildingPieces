@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:light_blue_terracotta"]
+            "items": [
+              "minecraft:light_blue_terracotta"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_light_blue/stairs/stairs/minecraft/stained_hardened_clay_3"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_light_blue/stairs/stairs/minecraft/stained_hardened_clay_3"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_light_blue/stairs/stairs/minecraft/stained_hardened_clay_3"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_light_blue/stairs/stairs/minecraft/stained_hardened_clay_3"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_light_blue_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stained_hardened_clay_light_blue_stairs"
     }
   ]
 }

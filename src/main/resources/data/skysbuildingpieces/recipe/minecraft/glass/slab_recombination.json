@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/glass",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/glass",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:glass_slab"
-    }
+    "X": "skysbuildingpieces:glass_slab"
   },
   "result": {
     "id": "minecraft:glass",
@@ -13,8 +14,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:glass_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:glass_slab"
     }
   ]
 }

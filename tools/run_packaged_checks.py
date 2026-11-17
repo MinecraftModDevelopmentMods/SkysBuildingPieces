@@ -12,6 +12,7 @@ import subprocess
 import zipfile
 from native_client_log import audit as audit_client, audit_server
 from native_registry_notices import audit_text, profile_for
+from native_runtime_notices import windows_counter_notice
 
 
 def digest(path, algorithm="sha256"):
@@ -85,15 +86,15 @@ def probe_property(options):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.21.1/1.21.1.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/26.3/26.3.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("neoforge-21.1.247",)]
+                for name in ("neoforge-26.3.0.99",)]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no NeoForge 21.1.247 profile")
+        raise ValueError("The installed client has no NeoForge 26.3.0.99 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.21.1" or forge["inheritsFrom"] != "1.21.1":
-        raise ValueError("This launcher requires the verified NeoForge 21.1 client metadata")
+    if base["id"] != "26.3" or forge["inheritsFrom"] != "26.3":
+        raise ValueError("This launcher requires the verified NeoForge 26.3 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -115,22 +116,18 @@ def client_command(options, directory):
         classpath.append(path)
         if classifier == "natives-windows":
             native_artifacts.append(path)
-    # NeoForge discovers these installer outputs under library_directory itself.
+    # NeoForge locates the patched game and universal jar through the library directory.
     installed_libraries = {
-        "net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-srg.jar":
-            "A649BD3CE77F122D0F83AE1B37B4B303E662470F928B9BEE5FBC76580805FFD4",
-        "net/minecraft/client/1.21.1-20240808.144430/client-1.21.1-20240808.144430-extra.jar":
-            "FD02F80F4EEC9DFAA1714CB62595D013CBAC03D52D19DD0623D1922B999C40B7",
-        "net/neoforged/neoforge/21.1.247/neoforge-21.1.247-client.jar":
-            "8E3563A078289F0F07EE6F87F1C8651294387639C8355983EE207CB753F08B7F",
-        "net/neoforged/neoforge/21.1.247/neoforge-21.1.247-universal.jar":
-            "B55D3551E9B0D9B68FA4C47A2122DEAF4019B549D8DF3C74D9A27B2E43C9718A",
+        "net/neoforged/minecraft-client-patched/26.3.0.99/minecraft-client-patched-26.3.0.99.jar":
+            "59724A91C97404F45FE517BED6EFBF744731D182E03583131EB283AA9D6488DC",
+        "net/neoforged/neoforge/26.3.0.99/neoforge-26.3.0.99-universal.jar":
+            "1C41DC00C92E87CD874788EE51720E3217E238423B853AC13B8242CF1973A13E",
     }
     for name, expected in installed_libraries.items():
         path = runtime / "libraries" / name
         if digest(path) != expected:
             raise ValueError("NeoForge installer output checksum changed: " + name)
-    client = runtime / "versions/1.21.1/1.21.1.jar"
+    client = runtime / "versions/26.3/26.3.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -161,6 +158,12 @@ def client_command(options, directory):
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Djava.library.path=" + str(natives),
                  probe_property(options)]
+    # The loader profile inherits these Java 25 options from Mojang's profile.
+    inherited_options = ["-XX:StackShadowPages=32", "--enable-native-access=ALL-UNNAMED",
+                         "--add-exports", "java.base/jdk.internal.misc=ALL-UNNAMED"]
+    if not all(option in base["arguments"]["jvm"] for option in inherited_options):
+        raise ValueError("The Minecraft Java 25 startup flags changed")
+    arguments.extend(inherited_options)
     for argument in forge["arguments"]["jvm"]:
         for key, value in substitutions.items():
             argument = argument.replace("${" + key + "}", value)
@@ -180,10 +183,10 @@ def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
     libraries = runtime / "libraries"
-    source = libraries / "net/neoforged/neoforge/21.1.247" / filename
+    source = libraries / "net/neoforged/neoforge/26.3.0.99" / filename
     launch = shlex.split(source.read_text(encoding="utf-8"))
-    if "cpw.mods.bootstraplauncher.BootstrapLauncher" not in launch or "21.1.247" not in launch:
-        raise ValueError("Expected the official NeoForge 21.1.247 server arguments")
+    if "net.neoforged.fml.startup.Server" not in launch or "26.3.0.99" not in launch:
+        raise ValueError("Expected the official NeoForge 26.3.0.99 server arguments")
     local_libraries = directory / "libraries"
     if not local_libraries.exists():
         if os.name == "nt":
@@ -193,8 +196,11 @@ def server_command(options, directory):
             local_libraries.symlink_to(libraries, target_is_directory=True)
     if local_libraries.resolve() != libraries.resolve():
         raise ValueError("The disposable server is not using the selected NeoForge installation")
+    # The plain layout keeps diagnostics without loading unsupported native Netty classes
+    # just to attach code-source names to Windows platform-probe stack frames.
+    log_config = Path(__file__).resolve().parents[1] / "src/bootstrapTest/log4j2-server.xml"
     arguments = ["-Xmx3g", probe_property(options),
-                 *launch, "nogui"]
+                 "-Dlog4j.configurationFile=" + log_config.as_uri(), *launch, "nogui"]
     return argument_file(options.java, directory, options.phase, arguments)
 
 
@@ -220,16 +226,30 @@ def prepare(options, directory):
         (directory / name).write_text("[]\n", encoding="utf-8")
     (directory / "server.properties").write_text(
         "level-name=world\nlevel-seed=4815162342\nonline-mode=false\nserver-ip=127.0.0.1\n"
-        "server-port=0\ngenerate-structures=false\nspawn-animals=false\nspawn-monsters=false\n"
+        "server-port=0\nuse-native-transport=false\ngenerate-structures=false\n"
+        "spawn-animals=false\nspawn-monsters=false\n"
         "max-tick-time=120000\n", encoding="utf-8")
     (directory / "options.txt").write_text("lang:en_us\nfullscreen:false\nrenderDistance:2\npauseOnLostFocus:false\n", encoding="utf-8")
     shutil.copytree("src/bootstrapTest/defaultconfigs", directory, dirs_exist_ok=True)
+    no_early_display = getattr(options, "no_early_display", False)
+    if no_early_display:
+        fml = directory / "config/fml.toml"
+        original = fml.read_text(encoding="utf-8")
+        setting = "earlyWindowControl = true"
+        if original.count(setting) != 1:
+            raise ValueError("Cannot identify the NeoForge early display setting")
+        fml.write_text(original.replace(setting, "earlyWindowControl = false"), encoding="utf-8")
     if options.mineralogy_slabs_disabled:
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
+    if getattr(options, "directional_slabs_off", False):
+        configuration = directory / "config/skysbuildingpieces-common.toml"
+        configuration.parent.mkdir(exist_ok=True)
+        configuration.write_text("[gameplay]\ndirectionalSlabPlacement=false\n", encoding="utf-8")
     profile = {"probe_kind": getattr(options, "probe_kind", "bootstrap"),
                "persistence_order": options.persistence_order,
+               "no_early_display": no_early_display,
                "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
     (directory / "qualification-options.json").write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
     if options.fixture:
@@ -249,20 +269,24 @@ def prepare(options, directory):
         shutil.copyfile(directory / "world/level.dat", directory / "source-level.dat")
 
 
-def audit_console(directory, phase):
+def audit_console(directory, phase, packaged_offline=False):
     """Include loader diagnostics that can happen before Minecraft opens its logs."""
     path = directory / (phase + "-console.log")
     console = path.read_text(encoding="utf-8")
     status_error = re.search(r"(?m)^(?:ERROR|FATAL) Status(?:Console)?Listener\b.*", console)
     if status_error:
         raise ValueError("Unexpected loader logging failure: " + status_error[0])
+    console = windows_counter_notice(console)
+    if packaged_offline:
+        from native_client_log import offline_client_notices
+        console, _ = offline_client_notices(console)
     audit_text(console, profile_for(directory))
 
 
-def audit(directory, phase, mode, probe_kind="bootstrap"):
-    audit_console(directory, phase)
+def audit(directory, phase, mode, probe_kind="bootstrap", packaged_offline=False, no_early_display=False):
+    audit_console(directory, phase, packaged_offline)
     if mode == "client":
-        audit_client(directory, phase)
+        audit_client(directory, phase, packaged_offline=packaged_offline, no_early_display=no_early_display)
     else:
         log = (directory / "logs/latest.log").read_text(encoding="utf-8")
         audit_server(directory, phase)
@@ -284,14 +308,19 @@ def main():
     parser.add_argument("--mode", choices=("server", "client"), required=True)
     parser.add_argument("--probe-kind", choices=("bootstrap", "integration"), default="bootstrap")
     parser.add_argument("--phase", required=True)
+    parser.add_argument("--directional-slabs-off", action="store_true")
     parser.add_argument("--assets", type=Path)
     parser.add_argument("--natives", type=Path)
     parser.add_argument("--fixture", type=Path)
     parser.add_argument("--extra-mod", type=Path, action="append", default=[])
     parser.add_argument("--fresh", action="store_true")
+    parser.add_argument("--no-early-display", action="store_true",
+                        help="Disable the NeoForge splash in this disposable client only")
     parser.add_argument("--persistence-order", choices=("forward", "reverse"))
     parser.add_argument("--mineralogy-slabs-disabled", action="store_true")
     options = parser.parse_args()
+    if options.no_early_display and options.mode != "client":
+        parser.error("--no-early-display requires a client launch")
     directory = options.directory.resolve()
     if not directory.is_relative_to(Path("build").resolve()) or directory == Path("build").resolve():
         raise ValueError("Packaged checks must stay inside this checkout's build directory")
@@ -300,9 +329,11 @@ def main():
     else:
         profile = {"probe_kind": options.probe_kind,
                    "persistence_order": options.persistence_order,
+                   "no_early_display": options.no_early_display,
                    "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
         saved_profile = json.loads((directory / "qualification-options.json").read_text(encoding="utf-8"))
         saved_profile.setdefault("probe_kind", "bootstrap")
+        saved_profile.setdefault("no_early_display", False)
         if saved_profile != profile:
             raise ValueError("Qualification options changed between loads")
         expected = json.loads((directory / "artifact-inputs.json").read_text(encoding="utf-8"))
@@ -328,7 +359,8 @@ def main():
     with (directory / (options.phase + "-console.log")).open("x", encoding="utf-8") as output:
         subprocess.run(command, cwd=directory, env=environment, stdout=output,
                        stderr=subprocess.STDOUT, check=True, timeout=600)
-    audit(directory, options.phase, options.mode, options.probe_kind)
+    audit(directory, options.phase, options.mode, options.probe_kind,
+          packaged_offline=options.mode == "client", no_early_display=options.no_early_display)
     print("PACKAGED_CHECK_PASS", options.mode, options.phase, directory.name)
 
 

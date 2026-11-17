@@ -25,14 +25,14 @@ class RegistryPersistenceTest {
         for (boolean coreFirst : new boolean[] {true, false}) {
             CompoundTag input = new CompoundTag();
             input.put("FML", expected.copy());
-            CompoundTag independentRead = input.getCompound("FML").copy();
+            CompoundTag independentRead = input.getCompoundOrEmpty("FML").copy();
             LegacyBridge.captureLegacyLevelData(input, directory);
-            input.getCompound("FML").putString("changed_after_read", "Must not leak into the snapshot");
+            input.getCompoundOrEmpty("FML").putString("changed_after_read", "Must not leak into the snapshot");
             CompoundTag output = new CompoundTag();
             if (coreFirst) LegacyBridge.writeLegacyLevelData(output);
             output.put("FML", independentRead.copy());
             if (!coreFirst) LegacyBridge.writeLegacyLevelData(output);
-            assertEquals(expected, output.getCompound("FML"));
+            assertEquals(expected, output.getCompoundOrEmpty("FML"));
             assertEquals(expected, independentRead);
         }
     }
@@ -47,11 +47,25 @@ class RegistryPersistenceTest {
         LegacyBridge.stop();
         CompoundTag stopped = new CompoundTag();
         LegacyBridge.writeLegacyLevelData(stopped);
-        assertTrue(stopped.getCompound("FML").isEmpty());
+        assertTrue(stopped.getCompoundOrEmpty("FML").isEmpty());
         LegacyBridge.captureLegacyLevelData(new CompoundTag(), second);
         CompoundTag fresh = new CompoundTag();
         LegacyBridge.writeLegacyLevelData(fresh);
-        assertTrue(fresh.getCompound("FML").isEmpty());
+        assertTrue(fresh.getCompoundOrEmpty("FML").isEmpty());
+    }
+
+    @Test
+    void relocatedLevelReadDoesNotEraseTheOriginalRegistry() throws Exception {
+        Path directory = java.nio.file.Files.createDirectories(temporary.resolve("relocated"));
+        CompoundTag expected = snapshot();
+        CompoundTag original = new CompoundTag();
+        original.put("FML", expected);
+        LegacyBridge.captureLegacyLevelData(original, directory);
+        LegacyBridge.captureLegacyLevelData(new CompoundTag(), directory);
+
+        CompoundTag output = new CompoundTag();
+        LegacyBridge.writeLegacyLevelData(output);
+        assertEquals(expected, output.getCompoundOrEmpty("FML"));
     }
 
     private CompoundTag snapshot() {

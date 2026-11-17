@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:stone_slab_corner"]
+            "items": [
+              "skysbuildingpieces:stone_slab_corner"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stone_slab/recombine_corner"
+        "recipes": "skysbuildingpieces:minecraft/stone_slab/recombine_corner"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stone_slab/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stone_slab/recombine_corner"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stone_slab_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stone_slab_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_slab_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_slab_horizontal_step"
+        }
+      ]
     }
   ]
 }

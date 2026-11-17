@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:prismarine_rough_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:prismarine_rough_vertical_slab"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/prismarine_rough/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_12"
+        "recipes": "skysbuildingpieces:minecraft/prismarine_rough/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_12"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_rough/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_12"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_rough/slab/rotate/skysbuildingpieces/rock_vertical_slab_03_12"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:prismarine_rough_vertical_slab"
     }
   ]
 }

@@ -26,7 +26,7 @@ public final class LegacyTestScope implements AutoCloseable {
         this.world = world;
         LegacyBridge.report(world);
         totals = PiecesWorldState.get(world);
-        originalTotals = totals.save(new CompoundTag(), world.registryAccess());
+        originalTotals = totals.saveTag(new CompoundTag());
 
         Map<Integer, String> ids = (Map<Integer, String>) field("savedIds").get(null);
 
@@ -43,11 +43,22 @@ public final class LegacyTestScope implements AutoCloseable {
     }
 
     public static BlockState staged(CompoundTag section, int index) {
-        int number = section.getByteArray("Blocks")[index] & 255
-                | LegacyBridge.nibble(section.getByteArray("Add"), index) << 8;
-        int encoded = number << 4 | LegacyBridge.nibble(section.getByteArray("Data"), index);
+        int number = section.getByteArray("Blocks").orElseGet(() -> new byte[0])[index] & 255
+                | LegacyBridge.nibble(section.getByteArray("Add").orElseGet(() -> new byte[0]), index) << 8;
+        int encoded = number << 4 | LegacyBridge.nibble(section.getByteArray("Data").orElseGet(() -> new byte[0]), index);
 
         return NumericStateBridge.stagedState(encoded);
+    }
+
+    /** Compare the saved identity and properties using the current NBT keys. */
+    public static CompoundTag nativeStateTag(CompoundTag saved) {
+        if (!saved.contains("Name")) {
+            return saved;
+        }
+        CompoundTag current = new CompoundTag();
+        current.putString("id", saved.getString("Name").orElseThrow());
+        saved.getCompound("Properties").ifPresent(properties -> current.put("properties", properties));
+        return current;
     }
 
     private static Field field(String name) throws Exception {

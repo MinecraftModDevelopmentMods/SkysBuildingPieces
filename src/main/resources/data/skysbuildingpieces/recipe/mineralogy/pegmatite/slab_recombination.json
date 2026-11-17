@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/pegmatite",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/pegmatite",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:pegmatite_slab"
-    }
+    "X": "mineralogy:pegmatite_slab"
   },
   "result": {
     "id": "mineralogy:pegmatite",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:pegmatite"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:pegmatite_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:pegmatite"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:pegmatite_slab"
+        }
+      ]
     }
   ]
 }

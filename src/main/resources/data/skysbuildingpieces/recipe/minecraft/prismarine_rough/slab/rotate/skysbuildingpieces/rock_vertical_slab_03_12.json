@@ -1,11 +1,12 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "category": "building",
+  "group": "skys/result/minecraft/prismarine_slab",
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
-    }
+    "X": "skysbuildingpieces:prismarine_rough_vertical_slab"
   },
   "result": {
     "id": "minecraft:prismarine_slab",
@@ -14,8 +15,9 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_rough_vertical_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:prismarine_rough_vertical_slab"
     }
   ]
 }

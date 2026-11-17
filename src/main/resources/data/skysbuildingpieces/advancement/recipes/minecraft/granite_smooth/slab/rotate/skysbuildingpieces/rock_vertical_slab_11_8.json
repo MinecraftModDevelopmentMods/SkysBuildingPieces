@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:granite_smooth_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:granite_smooth_vertical_slab"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/granite_smooth/slab/rotate/skysbuildingpieces/rock_vertical_slab_11_8"
+        "recipes": "skysbuildingpieces:minecraft/granite_smooth/slab/rotate/skysbuildingpieces/rock_vertical_slab_11_8"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/granite_smooth/slab/rotate/skysbuildingpieces/rock_vertical_slab_11_8"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/granite_smooth/slab/rotate/skysbuildingpieces/rock_vertical_slab_11_8"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:granite_smooth_vertical_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:granite_smooth_vertical_slab"
     }
   ]
 }

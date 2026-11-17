@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stonebrick_carved",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_carved_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:stonebrick_carved_vertical_step"
-    }
+    "X": "skysbuildingpieces:stonebrick_carved_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_carved_slab",
@@ -13,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_slab"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stonebrick_carved_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stonebrick_carved_vertical_step"
+        }
+      ]
     }
   ]
 }

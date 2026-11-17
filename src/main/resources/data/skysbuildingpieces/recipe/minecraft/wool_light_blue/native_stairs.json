@@ -1,0 +1,23 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/minecraft/light_blue_wool_stairs",
+  "pattern": [
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:wool_light_blue_stairs"
+  },
+  "result": {
+    "id": "minecraft:light_blue_wool_stairs",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:wool_light_blue_stairs"
+    }
+  ]
+}

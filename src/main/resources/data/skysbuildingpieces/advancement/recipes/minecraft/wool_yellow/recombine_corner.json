@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_yellow_corner"]
+            "items": [
+              "skysbuildingpieces:wool_yellow_corner"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_yellow/recombine_corner"
+        "recipes": "skysbuildingpieces:minecraft/wool_yellow/recombine_corner"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_yellow/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_yellow/recombine_corner"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_yellow_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_yellow_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_yellow_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_yellow_horizontal_step"
+        }
+      ]
     }
   ]
 }

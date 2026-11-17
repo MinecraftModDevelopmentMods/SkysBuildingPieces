@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/diamond_block",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/diamond_block_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:diamond_block_vertical_step"
-    }
+    "X": "skysbuildingpieces:diamond_block_vertical_step"
   },
   "result": {
     "id": "skysbuildingpieces:diamond_block_slab",
@@ -13,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diamond_block_slab"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diamond_block_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:diamond_block_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:diamond_block_vertical_step"
+        }
+      ]
     }
   ]
 }

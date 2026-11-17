@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:chiseled_stone_bricks"]
+            "items": [
+              "minecraft:chiseled_stone_bricks"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stonebrick_carved/wall/wall/minecraft/stonebrick_3"
+        "recipes": "skysbuildingpieces:minecraft/stonebrick_carved/wall/wall/minecraft/stonebrick_3"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stonebrick_carved/wall/wall/minecraft/stonebrick_3"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stonebrick_carved/wall/wall/minecraft/stonebrick_3"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_wall"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stonebrick_carved_wall"
     }
   ]
 }

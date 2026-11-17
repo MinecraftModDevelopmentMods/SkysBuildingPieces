@@ -1,4 +1,4 @@
-// Unit tests need the same pre-initialization array patch as a Forge process.
+// Unit tests need the same numeric state array sizes as the running game.
 // This launcher is absent from production jars and ordinary development runs.
 def compileLauncher = tasks.register('compileNativeUnitLauncher', JavaCompile) {
     source fileTree('src/testLauncher/java')

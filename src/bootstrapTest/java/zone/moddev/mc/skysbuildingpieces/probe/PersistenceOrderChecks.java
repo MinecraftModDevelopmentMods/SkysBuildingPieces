@@ -12,8 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 
@@ -58,8 +56,8 @@ final class PersistenceOrderChecks {
         if (!original.isFile() || System.getProperty("skysbuildingpieces.persistenceOrder", "").isEmpty()) {
             return;
         }
-        CompoundTag raw = read(original);
-        CompoundTag expected = raw.getCompound("FML").copy();
+        CompoundTag input = read(original);
+        CompoundTag expected = input.getCompoundOrEmpty("FML");
         if (expected.isEmpty()) {
             return; // Named source fixtures do not need a pre-flattening registry snapshot.
         }
@@ -68,48 +66,49 @@ final class PersistenceOrderChecks {
         int writers = 0;
         // Each order gets its own original input, with no sidecars from the running world.
         Path scratch = Files.createTempDirectory(Path.of("."), "callback-order-");
-        LevelStorageSource storage = LevelStorageSource.createDefault(scratch);
-        try (LevelStorageAccess access = storage.createAccess("source")) {
-            Path source = scratch.resolve("source");
-            Files.copy(original.toPath(), source.resolve("level.dat"));
-            for (Class<?> owner : callbacks) {
-                owner.getMethod("captureLegacyLevelData", CompoundTag.class, LevelDirectory.class)
-                        .invoke(null, raw, new LevelDirectory(source));
-                Method writer;
-                try {
-                    writer = owner.getMethod("writeLegacyLevelData", CompoundTag.class);
-                } catch (NoSuchMethodException captureOnly) {
-                    require(owner.getName().contains(".mineralogy."), "An expected write callback is missing");
-                    continue;
-                }
-                writer.invoke(null, combined);
-                require(combined.getCompound("FML").equals(expected), "A callback overwrote the shared snapshot");
-                writers++;
+        Path source = Files.createDirectory(scratch.resolve("source"));
+        Files.copy(original.toPath(), source.resolve("level.dat"));
+        for (Class<?> owner : callbacks) {
+            owner.getMethod("captureLegacyLevelData", CompoundTag.class, LevelDirectory.class)
+                    .invoke(null, input.copy(), new LevelDirectory(source));
+            Method writer;
+            try {
+                writer = owner.getMethod("writeLegacyLevelData", CompoundTag.class);
+            } catch (NoSuchMethodException captureOnly) {
+                require(owner.getName().contains(".mineralogy."), "An expected write callback is missing");
+                continue;
             }
-            // Building Pieces writes its sidecar after the server preflight.
-            // The other two callbacks write theirs during early capture.
-            verifyEarlySidecars(source.toFile(), expected);
+            writer.invoke(null, combined);
+            require(combined.getCompoundOrEmpty("FML").equals(expected), "A callback overwrote the shared snapshot");
+            writers++;
+        }
+        // Building Pieces writes its sidecar after the server preflight.
+        // The other two callbacks write theirs during early capture.
+        verifyEarlySidecars(source.toFile(), expected);
+        for (Class<?> owner : callbacks) {
+            owner.getMethod("captureLegacyLevelData", CompoundTag.class, LevelDirectory.class)
+                    .invoke(null, input.copy(), new LevelDirectory(directory.toPath()));
         }
         require(writers == 2, "The two native write wrappers must both preserve the snapshot");
         world.getServer().saveAllChunks(true, true, true);
-        CompoundTag saved = read(new File(directory, "level.dat")).getCompound("FML");
+        CompoundTag saved = read(new File(directory, "level.dat")).getCompoundOrEmpty("FML");
         require(saved.equals(expected), "The complete uppercase registry snapshot changed");
         int blockIds = verifyEarlySidecars(directory, expected);
         CompoundTag core = read(new File(directory, "data/skysbuildingpieces_legacy_registry.dat"));
-        require(core.getCompound("FML").equals(expected), "Building Pieces lost its complete sidecar");
+        require(core.getCompoundOrEmpty("FML").equals(expected), "Building Pieces lost its complete sidecar");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PERSISTENCE_ORDER_PASS "
                 + System.getProperty("skysbuildingpieces.persistenceOrder") + " actual_hooks=3 sidecars=3 ids="
                 + blockIds + " complete_uppercase_snapshot=true");
     }
 
     private static int verifyEarlySidecars(File directory, CompoundTag expected) throws Exception {
-        CompoundTag blocks = expected.getCompound("Registries").getCompound("minecraft:blocks");
+        CompoundTag blocks = expected.getCompoundOrEmpty("Registries").getCompoundOrEmpty("minecraft:blocks");
         require(!blocks.isEmpty(), "The source must contain a real numeric registry");
         for (String name : new String[] { "mineralogy", "skysgrassslabs" }) {
             CompoundTag sidecar = read(new File(directory, "data/" + name + "_legacy_registry.dat"));
-            require(sidecar.getCompound("Blocks").equals(blocks), name + " lost its independent sidecar");
+            require(sidecar.getCompoundOrEmpty("Blocks").equals(blocks), name + " lost its independent sidecar");
         }
-        return blocks.getList("ids", 10).size();
+        return blocks.getListOrEmpty("ids").size();
     }
 
     private static CompoundTag read(File file) throws Exception {

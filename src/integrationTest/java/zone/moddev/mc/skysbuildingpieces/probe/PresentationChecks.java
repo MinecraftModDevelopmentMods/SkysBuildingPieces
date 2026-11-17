@@ -37,7 +37,7 @@ public final class PresentationChecks {
 
         Set<String> coveredMaterials = new HashSet<String>();
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape != Shape.WALL) {
                 continue;
             }
@@ -179,7 +179,7 @@ public final class PresentationChecks {
 
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             for (String material : block.palette.materials) {
                 String previous = null;
 
@@ -215,7 +215,7 @@ public final class PresentationChecks {
         Direction[] sides = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
         List<BlockState> materials = new ArrayList<BlockState>();
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.WALL && block.palette.group.contains("glass")) {
                 for (int slot = 0; slot < block.palette.materials.size(); slot++) {
                     materials.add(block.getStateFromMeta(slot));
@@ -255,7 +255,7 @@ public final class PresentationChecks {
                     }
 
                     BlockState actual = block.getActualState(wall, world, pos);
-                    int joined = joins(world, pos, actual);
+                    int joined = GlassModelProbe.joins(world, pos, actual);
 
                     require(joined == matching, "only identical glass materials lose their border");
                     require(actual.getValue(PieceBlock.CONNECTIONS) == connections,
@@ -282,7 +282,7 @@ public final class PresentationChecks {
                     PieceBlock block = (PieceBlock) wall.getBlock();
                     PieceBlock other = (PieceBlock) neighbour.getBlock();
 
-                    int joined = joins(world, pos, block.getActualState(wall, world, pos));
+                    int joined = GlassModelProbe.joins(world, pos, block.getActualState(wall, world, pos));
                     int expected = block.definition(wall).id.equals(other.definition(neighbour).id) ? 1 << side : 0;
 
                     require(joined == expected, "all clear/stained colour pairs keep the correct boundary");
@@ -310,7 +310,7 @@ public final class PresentationChecks {
 
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape != Shape.WALL) {
                 continue;
             }
@@ -338,13 +338,13 @@ public final class PresentationChecks {
                         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
                         require(stack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
                                 new BlockHitResult(new Vec3(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
-                                        Direction.UP, pos, false))) == InteractionResult.CONSUME,
+                                        Direction.UP, pos, false))).consumesAction(),
                                 "torch places on wall");
 
                         BlockState placed = world.getBlockState(pos.above());
 
                         require(placed.getBlock() == torch && stack.getCount() == 1, "upright torch consumes one item");
-                        placed.handleNeighborChanged(world, pos.above(), block, pos, false);
+                        placed.handleNeighborChanged(world, pos.above(), block, null, false);
                         require(world.getBlockState(pos.above()).getBlock() == torch, "torch survives a neighbour update");
 
                         if (wall.hasProperty(WallBlock.UP)) {
@@ -392,28 +392,6 @@ public final class PresentationChecks {
         return block.getActualState(state, world, position).getShape(world, position).clip(start, end, position);
     }
 
-    @SuppressWarnings("unchecked")
-    private static int joins(ServerLevel world, BlockPos position, BlockState state) {
-        try {
-            Class<?> type = zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel.class;
-            java.lang.reflect.Field field = type.getDeclaredField("JOINS");
-
-            field.setAccessible(true);
-
-            net.neoforged.neoforge.client.model.data.ModelProperty<Integer> property = (net.neoforged.neoforge.client.model.data.ModelProperty<Integer>) field
-                    .get(null);
-            zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel model = new zone.moddev.mc.skysbuildingpieces.client.ContinuousGlassModel(
-                    null);
-            net.neoforged.neoforge.client.model.data.ModelData data = model.getModelData(world, position, state,
-                    net.neoforged.neoforge.client.model.data.ModelData.EMPTY);
-
-            require(data.has(property), "glass joins are present in render-only model data");
-            return data.get(property);
-        } catch (ReflectiveOperationException failure) {
-            throw new AssertionError("Cannot inspect the native glass model data", failure);
-        }
-    }
-
     private static void require(boolean value, String message) {
         if (!value) {
             throw new AssertionError(message);
@@ -421,8 +399,9 @@ public final class PresentationChecks {
     }
 
     public static void gallery(ServerLevel world) {
-        world.setDayTime(6000);
-        world.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DAYLIGHT).set(false, world.getServer());
+        world.getServer().clockManager().setTotalTicks(
+                world.dimensionTypeRegistration().value().defaultClock().orElseThrow(), 6000);
+        world.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.ADVANCE_TIME, false, world.getServer());
 
         for (int blockX = 0; blockX <= 12; blockX++) {
             for (int blockZ = 0; blockZ <= 11; blockZ++) {

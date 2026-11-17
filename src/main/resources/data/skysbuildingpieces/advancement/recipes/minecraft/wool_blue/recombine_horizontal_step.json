@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_blue_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:wool_blue_horizontal_step"
+            ]
           }
         ]
       }
@@ -13,24 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_blue/recombine_horizontal_step"
+        "recipes": "skysbuildingpieces:minecraft/wool_blue/recombine_horizontal_step"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_blue/recombine_horizontal_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_blue/recombine_horizontal_step"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_blue_horizontal_step"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_blue_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:wool_blue_horizontal_step"
     }
   ]
 }

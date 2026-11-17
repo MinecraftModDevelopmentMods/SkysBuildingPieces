@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XXX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_pink_slab",
+  "pattern": [
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:pink_terracotta"
-    }
+    "X": "minecraft:pink_terracotta"
   },
   "result": {
     "id": "skysbuildingpieces:stained_hardened_clay_pink_slab",
@@ -13,8 +14,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_pink_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stained_hardened_clay_pink_slab"
     }
   ]
 }

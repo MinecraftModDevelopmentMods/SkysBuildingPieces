@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/netherrack",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/netherrack",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:netherrack_slab"
-    }
+    "X": "skysbuildingpieces:netherrack_slab"
   },
   "result": {
     "id": "minecraft:netherrack",
@@ -13,8 +14,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:netherrack_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:netherrack_slab"
     }
   ]
 }

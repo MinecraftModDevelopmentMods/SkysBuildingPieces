@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/shale",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/shale",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:shale_slab"
-    }
+    "X": "mineralogy:shale_slab"
   },
   "result": {
     "id": "mineralogy:shale",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:shale"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:shale_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:shale"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:shale_slab"
+        }
+      ]
     }
   ]
 }

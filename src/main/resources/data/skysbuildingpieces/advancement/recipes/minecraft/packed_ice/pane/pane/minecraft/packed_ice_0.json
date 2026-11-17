@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:packed_ice"]
+            "items": [
+              "minecraft:packed_ice"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/packed_ice/pane/pane/minecraft/packed_ice_0"
+        "recipes": "skysbuildingpieces:minecraft/packed_ice/pane/pane/minecraft/packed_ice_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/packed_ice/pane/pane/minecraft/packed_ice_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/packed_ice/pane/pane/minecraft/packed_ice_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:packed_ice_pane"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:packed_ice_pane"
     }
   ]
 }

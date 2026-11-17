@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/gabbro",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/gabbro",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:gabbro_slab"
-    }
+    "X": "mineralogy:gabbro_slab"
   },
   "result": {
     "id": "mineralogy:gabbro",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gabbro"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:gabbro_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:gabbro"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:gabbro_slab"
+        }
+      ]
     }
   ]
 }

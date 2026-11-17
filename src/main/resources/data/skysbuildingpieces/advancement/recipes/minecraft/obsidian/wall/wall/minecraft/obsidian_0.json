@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:obsidian"]
+            "items": [
+              "minecraft:obsidian"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/obsidian/wall/wall/minecraft/obsidian_0"
+        "recipes": "skysbuildingpieces:minecraft/obsidian/wall/wall/minecraft/obsidian_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/obsidian/wall/wall/minecraft/obsidian_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/obsidian/wall/wall/minecraft/obsidian_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:obsidian_wall"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:obsidian_wall"
     }
   ]
 }

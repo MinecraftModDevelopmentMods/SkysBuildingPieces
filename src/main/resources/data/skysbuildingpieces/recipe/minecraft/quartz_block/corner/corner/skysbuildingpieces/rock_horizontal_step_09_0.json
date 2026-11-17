@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/quartz_block_corner",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:quartz_block_horizontal_step"
-    }
+    "X": "skysbuildingpieces:quartz_block_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:quartz_block_corner",
@@ -13,12 +14,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:quartz_block_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:quartz_block_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:quartz_block_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:quartz_block_horizontal_step"
+        }
+      ]
     }
   ]
 }

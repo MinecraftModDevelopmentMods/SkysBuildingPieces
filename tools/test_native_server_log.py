@@ -170,7 +170,7 @@ class NativeServerFilesTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
-        self.config = self.directory / 'config/neoforge-server.toml'
+        self.config = self.directory / 'config/neoforge-synced.toml'
         defaults = Path(__file__).resolve().parent.parent / 'src/bootstrapTest/defaultconfigs'
         shutil.copytree(defaults / 'config', self.directory / 'config')
         logs = self.directory / 'logs'
@@ -202,8 +202,8 @@ class NativeServerFilesTest(unittest.TestCase):
 
     def test_changed_defaults_fail(self):
         original = self.config.read_text()
-        changed = original.replace('advertiseDedicatedServerToLan = true',
-                                   'advertiseDedicatedServerToLan = false')
+        changed = original.replace('advertiseDedicatedServerToLan = false',
+                                   'advertiseDedicatedServerToLan = true')
         self.assertNotEqual(original, changed, "The negative control must alter a native setting")
         self.config.write_text(changed)
         with self.assertRaises(ValueError):

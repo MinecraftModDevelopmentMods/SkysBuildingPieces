@@ -1,10 +1,11 @@
 # Building and running the mod
 
-This branch uses Minecraft 1.21.1, NeoForge 21.1.247 and Temurin Java 21.0.7+6.
+This branch uses Minecraft 26.3, NeoForge 26.3.0.99 and Temurin Java 25.0.3+9.
 Use the Gradle 9.2.1 wrapper included in the checkout.
 
 ```text
-gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
+gradlew clean
+gradlew check build javadoc verifyReleaseArtifacts writeReleaseChecksums
 gradlew eclipse verifyEclipseConfiguration -Declipse.application=org.eclipse.ui.ide.workbench
 ```
 
@@ -45,3 +46,6 @@ disposable worlds and the logs for both fresh starts and reloads under
 The test fixture for installed-mod replacement checks the replacement policy.
 It isn't a BuildingBricks port. Historical world fixtures test recovery of
 actual saved pieces before Minecraft loads their chunks and inventories.
+
+Disposable servers use Java networking (`use-native-transport=false`). This
+avoids host-specific Netty availability probes during log auditing.

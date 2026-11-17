@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:mossy_cobblestone_vertical_step"]
+            "items": [
+              "skysbuildingpieces:mossy_cobblestone_vertical_step"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/mossy_cobblestone/recombine_vertical_step"
+        "recipes": "skysbuildingpieces:minecraft/mossy_cobblestone/recombine_vertical_step"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/mossy_cobblestone/recombine_vertical_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/mossy_cobblestone/recombine_vertical_step"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:mossy_cobblestone_vertical_step"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:mossy_cobblestone_vertical_step"
     }
   ]
 }

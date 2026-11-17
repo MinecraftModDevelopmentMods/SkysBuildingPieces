@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:chiseled_red_sandstone_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/rotate/skysbuildingpieces/rock_vertical_slab_00_4"
+        "recipes": "skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/rotate/skysbuildingpieces/rock_vertical_slab_00_4"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/rotate/skysbuildingpieces/rock_vertical_slab_00_4"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/chiseled_red_sandstone/slab/rotate/skysbuildingpieces/rock_vertical_slab_00_4"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_red_sandstone_vertical_slab"
+        }
+      ]
     }
   ]
 }

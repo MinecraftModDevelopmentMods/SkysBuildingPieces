@@ -1,18 +1,18 @@
-name: Sky's Building Pieces 1.21.1 NeoForge CI
+name: Sky's Building Pieces 26.3 NeoForge CI
 
 on:
   push:
     branches:
-      - master-1.21.1-neo
+      - master-26.3-neo
   pull_request:
     branches:
-      - master-1.21.1-neo
+      - master-26.3-neo
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.21.1-neo-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-26.3-neo-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
           echo "java_setup_version=$(sed -n 's/^java_setup_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
           echo "gradle_java_version=$(sed -n 's/^gradle_java_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
 
-      - name: Install pinned Java 21 runtime and toolchain
+      - name: Install pinned Java 25 runtime and toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -55,13 +55,13 @@ jobs:
           mkdir -p "$GRADLE_USER_HOME"
           chmod +x ./gradlew
           gradle_args=(
-            classes test
             --no-daemon --no-build-cache --stacktrace --max-workers=2
             -Dorg.gradle.java.installations.paths="$JAVA_HOME"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
-          ./gradlew "${gradle_args[@]}"
+          ./gradlew clean "${gradle_args[@]}"
+          ./gradlew classes test "${gradle_args[@]}"
 
       - name: Verify same-cache bootstrap offline
         shell: bash
@@ -70,13 +70,13 @@ jobs:
         run: |
           set -euo pipefail
           gradle_args=(
-            classes test
-            --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
+            --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
             -Dorg.gradle.java.installations.paths="$JAVA_HOME"
             -Dorg.gradle.java.installations.auto-detect=false
             -Dorg.gradle.java.installations.auto-download=false
           )
-          ./gradlew "${gradle_args[@]}"
+          ./gradlew clean "${gradle_args[@]}"
+          ./gradlew classes test --rerun-tasks "${gradle_args[@]}"
 
   build:
     name: Build, test, and audit
@@ -95,7 +95,7 @@ jobs:
           echo "java_setup_version=$(sed -n 's/^java_setup_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
           echo "gradle_java_version=$(sed -n 's/^gradle_java_version=//p' gradle.properties)" >> "$GITHUB_OUTPUT"
 
-      - name: Install pinned Java 21 runtime and toolchain
+      - name: Install pinned Java 25 runtime and toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -113,13 +113,19 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build, test, and audit release artifacts
-        run: >-
-          ./gradlew clean check build javadoc verifyReleaseArtifacts writeReleaseChecksums
-          preparePackagedRuntimeProbes eclipse verifyEclipseConfiguration --no-daemon --stacktrace
-          -Declipse.application=org.eclipse.ui.ide.workbench
-          -Dorg.gradle.java.installations.paths="$JAVA_HOME"
-          -Dorg.gradle.java.installations.auto-detect=false
-          -Dorg.gradle.java.installations.auto-download=false
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle_args=(
+            --no-daemon --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew clean "${gradle_args[@]}"
+          ./gradlew check build javadoc verifyReleaseArtifacts writeReleaseChecksums \
+            preparePackagedRuntimeProbes eclipse verifyEclipseConfiguration \
+            -Declipse.application=org.eclipse.ui.ide.workbench "${gradle_args[@]}"
 
       - name: Test native fresh and reload servers
         run: |
@@ -133,13 +139,13 @@ jobs:
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.21.1-${{ github.sha }}
+          name: SkysBuildingPieces-26.3-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.8.121012.jar
-            build/libs/SkysBuildingPieces-0.3.8.121012-sources.jar
-            build/libs/SkysBuildingPieces-0.3.8.121012-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.10.2603002.jar
+            build/libs/SkysBuildingPieces-0.3.10.2603002-sources.jar
+            build/libs/SkysBuildingPieces-0.3.10.2603002-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
 
@@ -147,7 +153,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.21.1-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-26.3-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |

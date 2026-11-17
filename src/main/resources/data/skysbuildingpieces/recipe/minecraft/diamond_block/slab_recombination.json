@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/diamond_block",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/diamond_block",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:diamond_block_slab"
-    }
+    "X": "skysbuildingpieces:diamond_block_slab"
   },
   "result": {
     "id": "minecraft:diamond_block",
@@ -13,8 +14,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:diamond_block_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:diamond_block_slab"
     }
   ]
 }

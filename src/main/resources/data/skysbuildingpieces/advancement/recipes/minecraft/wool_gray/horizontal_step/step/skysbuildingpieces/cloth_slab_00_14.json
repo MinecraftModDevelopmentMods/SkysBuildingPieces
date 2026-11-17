@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_gray_slab"]
+            "items": [
+              "minecraft:gray_wool_slab"
+            ]
           }
         ]
       }
@@ -13,24 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_gray/horizontal_step/step/skysbuildingpieces/cloth_slab_00_14"
+        "recipes": "skysbuildingpieces:minecraft/wool_gray/horizontal_step/step/skysbuildingpieces/cloth_slab_00_14"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_gray/horizontal_step/step/skysbuildingpieces/cloth_slab_00_14"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_gray/horizontal_step/step/skysbuildingpieces/cloth_slab_00_14"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_gray_horizontal_step"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_gray_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:wool_gray_horizontal_step"
     }
   ]
 }

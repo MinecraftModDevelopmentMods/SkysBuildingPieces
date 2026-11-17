@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X", "X", "X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_vertical_slab",
+  "pattern": [
+    "X",
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:dirt"
-    }
+    "X": "minecraft:dirt"
   },
   "result": {
     "id": "skysbuildingpieces:dirt_vertical_slab",
@@ -13,15 +16,22 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:not",
-      "value": {
-        "type": "neoforge:item_exists",
-        "item": "skysgrassslabs:dirt_slab"
-      }
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:registered",
+            "registry": "minecraft:item",
+            "value": "skysgrassslabs:dirt_slab"
+          }
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:dirt_vertical_slab"
+        }
+      ]
     }
   ]
 }

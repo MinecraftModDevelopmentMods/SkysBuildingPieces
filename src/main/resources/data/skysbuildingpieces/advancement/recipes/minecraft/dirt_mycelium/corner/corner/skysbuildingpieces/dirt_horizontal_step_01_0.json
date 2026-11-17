@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:dirt_mycelium_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:dirt_mycelium_horizontal_step"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/dirt_mycelium/corner/corner/skysbuildingpieces/dirt_horizontal_step_01_0"
+        "recipes": "skysbuildingpieces:minecraft/dirt_mycelium/corner/corner/skysbuildingpieces/dirt_horizontal_step_01_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/dirt_mycelium/corner/corner/skysbuildingpieces/dirt_horizontal_step_01_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/dirt_mycelium/corner/corner/skysbuildingpieces/dirt_horizontal_step_01_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_mycelium_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:dirt_mycelium_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:dirt_mycelium_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:dirt_mycelium_horizontal_step"
+        }
+      ]
     }
   ]
 }

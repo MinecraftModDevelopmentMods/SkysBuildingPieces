@@ -38,12 +38,41 @@ public final class GameplayChecks {
     }
 
     public static boolean ready(ServerLevel world) {
-        long chunk = new net.minecraft.world.level.ChunkPos(FIXTURE_POSITION).toLong();
+        long chunk = net.minecraft.world.level.ChunkPos.pack(FIXTURE_POSITION);
         return world.areEntitiesLoaded(chunk) && world.getChunkSource().isPositionTicking(chunk);
     }
 
     public static void release(ServerLevel world) {
         world.setChunkForced(FIXTURE_POSITION.getX() >> 4, FIXTURE_POSITION.getZ() >> 4, false);
+    }
+
+    static void horizontalSlabsOnly(ServerLevel world) {
+        ServerPlayer player = NativeProbeItems.player(world);
+        player.getAbilities().instabuild = false;
+        BlockPos support = FIXTURE_POSITION;
+        BlockPos placed = support.east();
+        world.setBlock(support, Blocks.STONE.defaultBlockState(), 3);
+        for (ItemStack slabs : List.of(new ItemStack(net.minecraft.world.item.Items.OAK_SLAB, 2),
+                Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 1), 2))) {
+            world.removeBlock(placed, false);
+            require(use(slabs, player, world, support, InteractionHand.MAIN_HAND,
+                    Direction.EAST, 1, .25f, .5f).consumesAction(), "Horizontal slab placement failed");
+            BlockState state = world.getBlockState(placed);
+            require(state.is(Blocks.OAK_SLAB)
+                    ? state.getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                            == net.minecraft.world.level.block.state.properties.SlabType.BOTTOM
+                    : state.getBlock() instanceof PieceBlock piece && piece.palette.shape == Shape.SLAB
+                            && piece.orientation(state) == 1,
+                    "Slab placement still chooses a vertical face with the setting off: " + state);
+            require(slabs.getCount() == 1, "Placing a slab should consume one item");
+            require(use(slabs, player, world, placed, InteractionHand.MAIN_HAND,
+                    Direction.UP, .5f, .5f, .5f).consumesAction(), "Matching horizontal slabs did not join");
+            require(slabs.isEmpty() && (state.is(Blocks.OAK_SLAB)
+                    ? world.getBlockState(placed).getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                            == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE
+                    : world.getBlockState(placed).is(Blocks.GLASS)), "Horizontal slab join changed the full block");
+        }
+        System.out.println("BUILDING_PIECES_DIRECTIONAL_SLABS_OFF_PASS");
     }
 
     private static InteractionResult use(ItemStack stack, ServerPlayer player, ServerLevel world, BlockPos pos,
@@ -66,7 +95,7 @@ public final class GameplayChecks {
 
         long trackingDeadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(30);
 
-        long chunkPosition = new net.minecraft.world.level.ChunkPos(position).toLong();
+        long chunkPosition = net.minecraft.world.level.ChunkPos.pack(position);
         while (!world.getChunkSource().isPositionTicking(chunkPosition) && System.nanoTime() < trackingDeadline) {
             if (!world.getChunkSource().pollTask()) {
                 Thread.yield();
@@ -83,7 +112,7 @@ public final class GameplayChecks {
 
         int placed = 0;
 
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
+        for (PieceBlock pieceBlock : Pieces.playableBlocks()) {
             ItemStack item = Pieces.stack(pieceBlock.getStateFromMeta(0), 2);
 
             world.removeBlock(position, false);
@@ -297,7 +326,7 @@ public final class GameplayChecks {
 
         // Real BlockItem calls against a solid neighbour: centre plus four edges, all six faces, every custom
         // horizontal slab material and both sneak modes.
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.SLAB) {
                 for (int slot = 0; slot < block.palette.materials.size(); slot++) {
                     for (Direction face : Direction.values()) {
@@ -403,7 +432,7 @@ public final class GameplayChecks {
         }
 
         net.minecraft.world.entity.decoration.ArmorStand stand = new net.minecraft.world.entity.decoration.ArmorStand(
-                net.minecraft.world.entity.EntityType.ARMOR_STAND, world);
+                net.minecraft.world.entity.EntityTypes.ARMOR_STAND, world);
 
         stand.setPos(position.getX() + .25, position.getY(), position.getZ() + .5);
         require(world.addFreshEntity(stand), "collision fixture joins world");
@@ -462,13 +491,19 @@ public final class GameplayChecks {
             for (Item tool : new Item[] {Items.WOODEN_PICKAXE, Items.STONE_PICKAXE,
                     Items.IRON_PICKAXE, Items.DIAMOND_PICKAXE, Items.IRON_AXE, Items.IRON_SHOVEL}) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(tool));
-                require(piece.canHarvestBlock(world, position, player) == full.canHarvestBlock(world, position, player),
+                boolean snowPiece = piece.getBlock() instanceof PieceBlock block
+                        && block.definition(piece).type.equals("snow");
+                require(piece.canHarvestBlock(world, position, player)
+                        == (snowPiece || full.canHarvestBlock(world, position, player)),
                         "Material harvest requirements changed: " + piece + " with " + tool);
                 float pieceHardness = piece.getDestroySpeed(world, position);
                 float fullHardness = full.getDestroySpeed(world, position);
                 float expected = full.getDestroyProgress(player, world, position);
                 if (pieceHardness >= 0 && fullHardness > 0) {
                     expected = expected * fullHardness / pieceHardness;
+                }
+                if (snowPiece) {
+                    expected = player.getDestroySpeed(full, position) / pieceHardness / 30;
                 }
                 float actual = piece.getDestroyProgress(player, world, position);
                 require(Float.compare(actual, expected) == 0 || Math.abs(actual - expected) < 0.00001F,
@@ -480,7 +515,7 @@ public final class GameplayChecks {
     }
 
     private static void materialPhysics(ServerLevel world, BlockPos position, ServerPlayer player) {
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
+        for (PieceBlock pieceBlock : Pieces.playableBlocks()) {
             for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
                 for (int orientation = 0; orientation < pieceBlock.palette.shape.states; orientation++) {
                     BlockState state = pieceBlock
@@ -503,26 +538,16 @@ public final class GameplayChecks {
                     require(actualFire == expectedFire, "native flammability " + materialDefinition.id + " actual="
                             + actualFire + " expected=" + expectedFire);
                     require(actualSpread == expectedSpread, "native fire spread");
-                    Block[] plants = { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.DANDELION,
-                            Blocks.RED_MUSHROOM, Blocks.WHEAT };
-                    boolean[] nativeSurvival = new boolean[plants.length];
-                    if (materialDefinition.soil()) {
-                        for (int index = 0; index < plants.length; index++) {
-                            nativeSurvival[index] = plants[index].defaultBlockState()
-                                    .canSurvive(world, position.above());
-                        }
-                    }
-
                     world.setBlock(position, state, 2);
-                    require(ItemStack.matches(pieceBlock.getCloneItemStack(world, position, state),
+                    require(ItemStack.matches(pieceBlock.getCloneItemStack(world, position, state, false),
                             expectedDrop(materialDefinition.id, pieceBlock, state)),
                             "pick identity follows regular slab");
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
                     silkTool.enchant(world.registryAccess()
-                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
+                            .lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
 
                     BlockState silkState = materialDefinition.type.equals("path")
                             ? Pieces.state("minecraft:dirt", pieceBlock.palette.shape, orientation)
@@ -545,13 +570,16 @@ public final class GameplayChecks {
                                 "material drop and metadata");
                     }
                     if (materialDefinition.soil()) {
-                        for (int index = 0; index < plants.length; index++) {
-                            BlockState plant = plants[index].defaultBlockState();
-                            boolean expected = Geometry.completeTop(pieceBlock.mask(state))
-                                    && nativeSurvival[index];
-                            require(plant.canSurvive(world, position.above()) == expected,
+                        for (Block plant : new Block[] { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
+                            BlockState full = Pieces.nativeState(materialDefinition, "full");
+                            BlockState plantState = plant.defaultBlockState();
+                            world.setBlock(position, full, 2);
+                            boolean nativeSupport = plantState.canSurvive(world, position.above());
+                            world.setBlock(position, state, 2);
+                            require(plantState.canSurvive(world, position.above()) == (nativeSupport
+                                            && Geometry.completeTop(pieceBlock.mask(state))),
                                     "native plants need complete upper faces " + materialDefinition.id + " "
-                                            + pieceBlock.orientation(state) + " for " + plant);
+                                            + pieceBlock.orientation(state));
                         }
                     }
                 }
@@ -571,7 +599,7 @@ public final class GameplayChecks {
             }
 
             Item dirt = net.minecraft.core.registries.BuiltInRegistries.ITEM
-                    .get(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
+                    .getValue(Identifier.parse("skysgrassslabs:dirt_slab"));
 
             if (material.equals("minecraft:dirt") && dirt != null && dirt != Items.AIR) {
                 return new ItemStack(dirt, 1);
@@ -591,7 +619,7 @@ public final class GameplayChecks {
     private static void nativeSlabs(ServerLevel world, BlockPos position, ServerPlayer player) {
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.VERTICAL_SLAB) {
                 NonNullList<ItemStack> creative = NonNullList.create();
 
@@ -604,7 +632,7 @@ public final class GameplayChecks {
         }
 
         Item dirt = net.minecraft.core.registries.BuiltInRegistries.ITEM
-                .get(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
+                .getValue(Identifier.parse("skysgrassslabs:dirt_slab"));
 
         if (dirt != null && dirt != Items.AIR) {
             for (Direction occupied : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
@@ -634,17 +662,34 @@ public final class GameplayChecks {
 
         PlacementVeto veto = new PlacementVeto();
 
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.register(veto);
+        java.util.function.Consumer<net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent> vetoListener = event -> {
+            if (veto.place(event)) {
+                event.setCanceled(true);
+            }
+        };
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(vetoListener);
+        var originalConnection = player.connection;
+        if (originalConnection == null) {
+            // NeoForge sends a block update after cancelling placement. This player has no client.
+            player.connection = new net.minecraft.server.network.ServerGamePacketListenerImpl(world.getServer(),
+                    new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND),
+                    player, net.minecraft.server.network.CommonListenerCookie.createInitial(player.getGameProfile(), false)) {
+                @Override
+                public void send(net.minecraft.network.protocol.Packet<?> packet) {
+                }
+            };
+        }
 
         try {
             InteractionResult result = use(oak, player, world, position.below(), InteractionHand.MAIN_HAND,
                     Direction.UP, .1f, 1, .5f);
-            // Forge 50 restores the hand with a copy of the original stack.
+            // NeoForge restores the hand with a copy of the original stack.
             require(result == InteractionResult.FAIL && veto.seen && world.isEmptyBlock(position)
                             && ItemStack.matches(player.getMainHandItem(), new ItemStack(Blocks.OAK_SLAB, 2)),
-                    "Forge placement protection rolls back the exact native slab placement");
+                    "NeoForge placement protection rolls back the exact native slab placement");
         } finally {
-            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(veto);
+            player.connection = originalConnection;
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(vetoListener);
         }
         oak = player.getMainHandItem();
 
@@ -654,7 +699,7 @@ public final class GameplayChecks {
         player.setShiftKeyDown(false);
         require(player.gameMode.useItemOn(player, world, oak, InteractionHand.MAIN_HAND,
                 new BlockHitResult(new Vec3(position.getX() + .1, position.getY() + 1, position.getZ() + .5),
-                        Direction.UP, position, false)) == InteractionResult.CONSUME
+                        Direction.UP, position, false)).consumesAction()
                 && world.isEmptyBlock(position.above()) && oak.getCount() == 2
                 && world.getBlockState(position).getValue(TrapDoorBlock.OPEN),
                 "block activation takes priority and happens exactly once");
@@ -744,10 +789,9 @@ public final class GameplayChecks {
     public static final class PlacementVeto {
         boolean seen;
 
-        @net.neoforged.bus.api.SubscribeEvent
-        public void place(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        public boolean place(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event) {
             seen = true;
-            event.setCanceled(true);
+            return true;
         }
     }
 

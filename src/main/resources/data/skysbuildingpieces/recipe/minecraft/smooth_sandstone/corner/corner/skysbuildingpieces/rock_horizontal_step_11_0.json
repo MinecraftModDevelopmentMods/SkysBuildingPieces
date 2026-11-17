@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/smooth_sandstone_corner",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
-    }
+    "X": "skysbuildingpieces:smooth_sandstone_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:smooth_sandstone_corner",
@@ -13,12 +14,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:smooth_sandstone_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+        }
+      ]
     }
   ]
 }

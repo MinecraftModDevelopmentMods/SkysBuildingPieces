@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "skysbuildingpieces:snow_slab",
+    "skysbuildingpieces:snow_vertical_slab",
+    "skysbuildingpieces:snow_step",
+    "skysbuildingpieces:snow_corner",
+    "skysbuildingpieces:snow_stairs"
+  ]
+}

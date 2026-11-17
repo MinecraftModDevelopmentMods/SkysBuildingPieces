@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:smooth_sandstone_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:smooth_sandstone_horizontal_step"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/smooth_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_11_0"
+        "recipes": "skysbuildingpieces:minecraft/smooth_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_11_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/smooth_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_11_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/smooth_sandstone/corner/corner/skysbuildingpieces/rock_horizontal_step_11_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_corner"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:smooth_sandstone_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:smooth_sandstone_horizontal_step"
+        }
+      ]
     }
   ]
 }

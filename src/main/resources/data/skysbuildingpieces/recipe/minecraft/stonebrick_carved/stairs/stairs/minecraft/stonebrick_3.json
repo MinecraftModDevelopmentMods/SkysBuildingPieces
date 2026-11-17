@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["X  ", "XX ", "XXX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_carved_stairs",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:chiseled_stone_bricks"
-    }
+    "X": "minecraft:chiseled_stone_bricks"
   },
   "result": {
     "id": "skysbuildingpieces:stonebrick_carved_stairs",
@@ -13,8 +16,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stonebrick_carved_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stonebrick_carved_stairs"
     }
   ]
 }

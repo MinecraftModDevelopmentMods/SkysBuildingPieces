@@ -23,7 +23,7 @@ public final class DirtCoverageChecks {
 
         for (int orientation = 0; orientation < 4; orientation++) {
             CompoundTag raw = NativeLegacyChecks.chunk(LegacyTestScope.DIRT_ID, orientation, "minecraft:dirt");
-            CompoundTag level = raw.getCompound("Level");
+            CompoundTag level = raw.getCompoundOrEmpty("Level");
             CompoundTag coverage = new CompoundTag();
 
             coverage.putInt("vanilla", 1);
@@ -32,28 +32,25 @@ public final class DirtCoverageChecks {
             level.put("skysbuildingpieces_coverage", coverage);
             LegacyBridge.prepareChunk(world, raw);
 
-            BlockState actual = LegacyTestScope.staged(level.getList("Sections", 10).getCompound(0), 0);
+            BlockState actual = LegacyTestScope.staged(level.getListOrEmpty("Sections").getCompoundOrEmpty(0), 0);
 
             NativeLegacyChecks.require(actual.equals(Pieces.state("minecraft:dirt", Shape.VERTICAL_SLAB, orientation)),
                     "Vertical dirt geometry " + orientation);
             NativeLegacyChecks.require(
-                    coverage.getInt("vanilla") == 1 && coverage.getInt("biomesoplenty") == 1
-                            && coverage.getInt("future_module") == 7 && coverage.getInt("dirt_vertical_slabs") == 1,
+                    coverage.getIntOr("vanilla", 0) == 1 && coverage.getIntOr("biomesoplenty", 0) == 1
+                            && coverage.getIntOr("future_module", 0) == 7 && coverage.getIntOr("dirt_vertical_slabs", 0) == 1,
                     "Independent module coverage");
             NativeLegacyChecks.require(
                     !raw.contains("skysbuildingpieces_delta")
-                            && raw.getLong("skysbuildingpieces_additional_vanilla_delta") == 1,
+                            && raw.getLongOr("skysbuildingpieces_additional_vanilla_delta", 0L) == 1,
                     "New coverage counts only its own conversions");
             NativeLegacyChecks.require(
-                    level.getList("TileEntities", 10).isEmpty() && coverage.getList("retained_tiles", 10).getCompound(0)
-                            .getString("custom").equals("Retain complete tile data"),
+                    level.getListOrEmpty("TileEntities").isEmpty() && coverage.getListOrEmpty("retained_tiles").getCompoundOrEmpty(0)
+                            .getStringOr("custom", "").equals("Retain complete tile data"),
                     "Original material tile retained after conversion");
 
-            MigrationEvents events = new MigrationEvents();
-
             LegacyBridge.finalizeLegacyChunk(raw);
-            events.load(
-                    new ChunkDataEvent.Load(testChunk, level, net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
+            MigrationEvents.loadSerializedChunk(world, testChunk, MigrationEvents.copyMigrationData(level));
             NativeLegacyChecks.require(totals.blocks == blocks + orientation + 1 && totals.chunks == chunks,
                     "New dirt coverage must not count the chunk twice");
 
@@ -68,12 +65,12 @@ public final class DirtCoverageChecks {
         item.putString("id", "buildingbricks:dirt_vertical_slab");
         item.putShort("Damage", (short) 30000);
 
-        CompoundTag custom = item.getCompound("tag").copy();
+        CompoundTag custom = item.getCompoundOrEmpty("tag").copy();
 
         LegacyBridge.prepareStack(item);
         NativeLegacyChecks.require(
-                item.getString("id").equals("skysbuildingpieces:dirt_vertical_slab") && item.getByte("Count") == 9
-                        && item.getCompound("tag").equals(custom),
+                item.getStringOr("id", "").equals("skysbuildingpieces:dirt_vertical_slab") && item.getByteOr("Count", (byte) 0) == 9
+                        && item.getCompoundOrEmpty("tag").equals(custom),
                 "Vertical dirt inventory identity, count and complete custom data");
 
         CompoundTag once = item.copy();

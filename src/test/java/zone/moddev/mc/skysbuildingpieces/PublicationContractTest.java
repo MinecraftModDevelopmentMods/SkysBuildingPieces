@@ -50,6 +50,9 @@ class PublicationContractTest {
         assertTrue(workflow.contains("value java_toolchain_version"));
         assertTrue(ci.contains("steps.target.outputs.java_setup_version"));
         assertTrue(ci.contains("steps.target.outputs.gradle_java_version"));
+        assertTrue(ci.contains("sed -n 's/^java_setup_version=//p' gradle.properties"));
+        assertTrue(ci.contains("sed -n 's/^gradle_java_version=//p' gradle.properties"));
+        assertTrue(text("gradle.properties").contains("java_setup_version=25.0.3+9.0.LTS"));
         assertTrue(tags.contains("s/^minecraft_version=//p"));
         assertTrue(tags.contains("s/^loader_code=//p"));
         assertFalse(tags.contains("\\.112021$"));

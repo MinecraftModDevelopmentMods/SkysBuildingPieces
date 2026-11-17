@@ -31,17 +31,17 @@ final class LegacyRegistrySources {
 
     private static Map<Integer, String> read(CompoundTag registry) {
         Map<Integer, String> result = new LinkedHashMap<>();
-        ListTag ids = registry.getCompound("Registries").getCompound("minecraft:blocks").getList("ids", 10);
+        ListTag ids = registry.getCompoundOrEmpty("Registries").getCompoundOrEmpty("minecraft:blocks").getListOrEmpty("ids");
 
         for (int index = 0; index < ids.size(); index++) {
-            CompoundTag entry = ids.getCompound(index);
+            CompoundTag entry = ids.getCompoundOrEmpty(index);
 
-            if (!entry.contains("V", 99) || !entry.contains("K", 8)) {
+            if (!entry.getInt("V").isPresent() || !entry.getString("K").isPresent()) {
                 throw new LegacyBridge.RecoveryAbort("Malformed saved registry entry: " + entry, null);
             }
 
-            int number = entry.getInt("V");
-            String name = entry.getString("K");
+            int number = entry.getIntOr("V", 0);
+            String name = entry.getStringOr("K", "");
             String duplicate = result.put(number, name);
 
             if (number < 0 || number >= 4096 || name.isEmpty() || duplicate != null && !duplicate.equals(name)) {

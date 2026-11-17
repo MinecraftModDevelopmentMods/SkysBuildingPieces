@@ -1,11 +1,12 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_dark_vertical_step",
+  "pattern": [
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
-    }
+    "X": "skysbuildingpieces:prismarine_dark_horizontal_step"
   },
   "result": {
     "id": "skysbuildingpieces:prismarine_dark_vertical_step",
@@ -14,12 +15,19 @@
   "preserve_tag": true,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_horizontal_step"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:prismarine_dark_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:prismarine_dark_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:prismarine_dark_vertical_step"
+        }
+      ]
     }
   ]
 }

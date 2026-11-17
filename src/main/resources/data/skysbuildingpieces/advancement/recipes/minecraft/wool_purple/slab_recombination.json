@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_purple_slab"]
+            "items": [
+              "minecraft:purple_wool_slab"
+            ]
           }
         ]
       }
@@ -13,20 +15,19 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/wool_purple/slab_recombination"
+        "recipes": "skysbuildingpieces:minecraft/wool_purple/slab_recombination"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_purple/slab_recombination"]
-  },
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_purple_slab"
-    }
-  ]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_purple/slab_recombination"
+    ]
+  }
 }

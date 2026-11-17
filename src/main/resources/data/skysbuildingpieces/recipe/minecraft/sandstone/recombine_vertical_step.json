@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/sandstone",
-  "pattern": ["X", "X"],
+  "category": "building",
+  "group": "skys/result/minecraft/sandstone_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:sandstone_vertical_step"
-    }
+    "X": "skysbuildingpieces:sandstone_vertical_step"
   },
   "result": {
     "id": "minecraft:sandstone_slab",
@@ -13,8 +15,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:sandstone_vertical_step"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:sandstone_vertical_step"
     }
   ]
 }

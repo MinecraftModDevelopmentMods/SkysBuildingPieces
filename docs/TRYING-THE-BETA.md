@@ -6,8 +6,8 @@ The generated `runMineralogyClient` Eclipse profile loads the native mods in
 a separate development folder. Check rock textures, all step and corner
 orientations, cutting recipes and rebuilding to the native slab.
 
-Install the main jar in a Minecraft 1.21.1 NeoForge 21.1.247 instance using
-Java 21. The sources and Javadoc jars are not game mods. Start with a new
+Install the main jar in a Minecraft 26.2 NeoForge 26.2.0.45-beta instance using
+Java 25. The sources and Javadoc jars are not game mods. Start with a new
 creative world; use a separate copy when trying an existing world.
 
 Before relying on the beta in a modpack, check:
@@ -17,8 +17,11 @@ Before relying on the beta in a modpack, check:
 - Check gold, packed ice and the other wall materials in straight runs, corners
   and junctions. The panels should be lower than the posts. Add and remove a
   block or torch above the middle of a run, then check selection and collision.
-- Open the Sky's Building Pieces creative tab. Reused vanilla pieces such as
-  oak slabs should appear once, without separate vertical slabs or old templates.
+- Open the Sky's Building Pieces creative tab. Look for pieces such as Gold
+  Wall and Oak Step. Oak slabs should still be in the vanilla creative tabs.
+- In **Mods → Sky's Building Pieces → Config → Gameplay**, check that
+  **Directional slab placement** starts on. Turn it off, reopen the world,
+  then place and join an oak slab and a glass slab as ordinary horizontal slabs.
 - Build clear and stained glass walls in straight runs, corners and junctions.
   Matching panels should look continuous; exposed ends, posts and colour changes
   should keep their borders. Add and remove a block above a straight run to check

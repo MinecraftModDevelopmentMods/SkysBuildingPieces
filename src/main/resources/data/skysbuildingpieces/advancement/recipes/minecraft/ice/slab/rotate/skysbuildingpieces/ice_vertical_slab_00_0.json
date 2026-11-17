@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:ice_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:ice_vertical_slab"
+            ]
           }
         ]
       }
@@ -13,24 +15,36 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/ice/slab/rotate/skysbuildingpieces/ice_vertical_slab_00_0"
+        "recipes": "skysbuildingpieces:minecraft/ice/slab/rotate/skysbuildingpieces/ice_vertical_slab_00_0"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/ice/slab/rotate/skysbuildingpieces/ice_vertical_slab_00_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/ice/slab/rotate/skysbuildingpieces/ice_vertical_slab_00_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:ice_slab"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:ice_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:ice_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:ice_vertical_slab"
+        }
+      ]
     }
   ]
 }

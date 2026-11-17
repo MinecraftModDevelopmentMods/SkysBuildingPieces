@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/planks_jungle",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/jungle_planks",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:jungle_slab"
-    }
+    "X": "minecraft:jungle_slab"
   },
   "result": {
     "id": "minecraft:jungle_planks",

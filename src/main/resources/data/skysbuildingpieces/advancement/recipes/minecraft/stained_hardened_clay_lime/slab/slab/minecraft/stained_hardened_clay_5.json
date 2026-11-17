@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:lime_terracotta"]
+            "items": [
+              "minecraft:lime_terracotta"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_hardened_clay_lime/slab/slab/minecraft/stained_hardened_clay_5"
+        "recipes": "skysbuildingpieces:minecraft/stained_hardened_clay_lime/slab/slab/minecraft/stained_hardened_clay_5"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_lime/slab/slab/minecraft/stained_hardened_clay_5"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_lime/slab/slab/minecraft/stained_hardened_clay_5"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_hardened_clay_lime_slab"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stained_hardened_clay_lime_slab"
     }
   ]
 }

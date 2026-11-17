@@ -1,21 +1,25 @@
 package zone.moddev.mc.skysbuildingpieces.compatprobe;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
 /** A build-only installed-mod policy fixture; this is not a BuildingBricks port. */
@@ -26,33 +30,35 @@ public final class LegacyPolicyMod {
     private static final Block[] BLOCKS = new Block[NAMES.length];
     private static BlockEntityType<MaterialTile> materialType;
 
-    public LegacyPolicyMod(net.neoforged.bus.api.IEventBus modBus) {
+    public LegacyPolicyMod(IEventBus modBus) {
         modBus.addListener(this::register);
     }
 
     private void register(RegisterEvent event) {
         if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.BLOCK)) {
             for (int index = 0; index < NAMES.length; index++) {
-                BLOCKS[index] = new LegacyBlock();
-                net.minecraft.core.Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath("buildingbricks", NAMES[index]), BLOCKS[index]);
+                Identifier id = Identifier.fromNamespaceAndPath("buildingbricks", NAMES[index]);
+                BLOCKS[index] = new LegacyBlock(id);
+                Registry.register(BuiltInRegistries.BLOCK, id, BLOCKS[index]);
             }
         } else if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.ITEM)) {
             for (Block block : BLOCKS) {
-                net.minecraft.core.Registry.register(BuiltInRegistries.ITEM, BuiltInRegistries.BLOCK.getKey(block),
-                        new BlockItem(block, new Item.Properties()));
+                Identifier id = BuiltInRegistries.BLOCK.getKey(block);
+                Registry.register(BuiltInRegistries.ITEM, id,
+                        new BlockItem(block, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
             }
         } else if (event.getRegistryKey().equals(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE)) {
-            materialType = BlockEntityType.Builder.of(MaterialTile::new, BLOCKS).build(null);
-            net.minecraft.core.Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                    ResourceLocation.fromNamespaceAndPath("buildingbricks", "material"), materialType);
+            materialType = new BlockEntityType<>(MaterialTile::new, java.util.Set.of(BLOCKS));
+            Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
+                    Identifier.fromNamespaceAndPath("buildingbricks", "material"), materialType);
         }
     }
 
     public static final class LegacyBlock extends Block implements EntityBlock {
         private static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
-        LegacyBlock() {
-            super(Block.Properties.of().mapColor(MapColor.STONE));
+        LegacyBlock(Identifier id) {
+            super(Block.Properties.of().mapColor(MapColor.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
             registerDefaultState(stateDefinition.any().setValue(META, 0));
         }
 
@@ -68,22 +74,26 @@ public final class LegacyPolicyMod {
     }
 
     public static final class MaterialTile extends BlockEntity {
-        private CompoundTag retained = new CompoundTag();
+        private static final String[] FIELDS = {"material", "custom", "fixture_note"};
+        private final java.util.Map<String, String> retained = new java.util.HashMap<>();
 
         public MaterialTile(BlockPos position, BlockState state) {
             super(materialType, position, state);
         }
 
         @Override
-        protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-            super.loadAdditional(tag, registries);
-            retained = tag.copy();
+        protected void loadAdditional(ValueInput input) {
+            super.loadAdditional(input);
+            retained.clear();
+            for (String key : FIELDS) {
+                input.getString(key).ifPresent(value -> retained.put(key, value));
+            }
         }
 
         @Override
-        protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-            tag.merge(retained);
-            super.saveAdditional(tag, registries);
+        protected void saveAdditional(ValueOutput output) {
+            super.saveAdditional(output);
+            retained.forEach(output::putString);
         }
     }
 }

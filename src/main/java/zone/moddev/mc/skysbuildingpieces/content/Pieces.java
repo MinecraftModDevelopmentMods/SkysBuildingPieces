@@ -2,6 +2,8 @@ package zone.moddev.mc.skysbuildingpieces.content;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -9,7 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,22 +18,38 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Fixed placed palettes and separate material items for the native recipe book. */
+/** Registers individual pieces and keeps the old palette identities for recovery. */
 public final class Pieces {
     public static final Map<String, PieceBlock> BLOCKS = new LinkedHashMap<>();
+    private static final Map<PieceKey, PieceBlock> PLAYABLE_BLOCKS = new LinkedHashMap<>();
     public static final Map<String, Item> RETIRED_TEMPLATES = new LinkedHashMap<>();
     private static final Map<String, PieceItem> ITEMS = new LinkedHashMap<>();
     private static final Map<Block, java.util.function.Function<BlockState, Item>> STATE_ITEMS = new java.util.concurrent.ConcurrentHashMap<>();
     public static boolean initialized;
 
     private Pieces() {
+    }
+
+    private record PieceKey(String material, Shape shape) {
+    }
+
+    public static Collection<PieceBlock> playableBlocks() {
+        return java.util.Collections.unmodifiableCollection(PLAYABLE_BLOCKS.values());
+    }
+
+    public static Collection<PieceBlock> registeredBlocks() {
+        var blocks = new ArrayList<>(BLOCKS.values());
+        blocks.addAll(PLAYABLE_BLOCKS.values());
+        return blocks;
     }
 
     public static PieceItem pieceItem(String identifier) {
@@ -58,8 +75,15 @@ public final class Pieces {
 
             PieceBlock block = new PieceBlock(palette);
 
-            Registry.register(registry, ResourceLocation.parse(palette.registryId()), block);
+            Registry.register(registry, Identifier.parse(palette.registryId()), block);
             BLOCKS.put(palette.module.equals("vanilla") ? palette.id : palette.registryId(), block);
+
+            for (String material : palette.materials) {
+                Identifier id = Identifier.parse(PaletteItemIds.itemId(palette, material));
+                PieceBlock piece = new PieceBlock(palette.forMaterial(id.getPath(), material), false);
+                Registry.register(registry, id, piece);
+                PLAYABLE_BLOCKS.put(new PieceKey(material, palette.shape), piece);
+            }
         }
     }
 
@@ -68,9 +92,10 @@ public final class Pieces {
         // Retain old item identities, creating their intrusive holders only
         // while Forge has opened the item registry.
         for (String name : new String[] { "slab", "vertical_slab", "step", "corner", "stairs", "wall", "pane" }) {
-            Item item = new Item(new Item.Properties().stacksTo(1));
+            Identifier id = Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name);
+            Item item = new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).stacksTo(1));
             RETIRED_TEMPLATES.put(name, item);
-            Registry.register(registry, ResourceLocation.fromNamespaceAndPath(SkysBuildingPieces.ID, "template_" + name), item);
+            Registry.register(registry, id, item);
         }
     }
 
@@ -82,9 +107,11 @@ public final class Pieces {
 
             // Keep the old item identity available for mixed and unopened saves. Normal drops, recipes and creative
             // entries use the flat items below.
-            BlockItem carrier = new BlockItem(block, new Item.Properties());
+            Identifier blockId = Identifier.parse(block.palette.registryId());
+            Item carrier = new Item(new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, blockId)));
 
-            Registry.register(registry, ResourceLocation.parse(block.palette.registryId()), carrier);
+            Registry.register(registry, blockId, carrier);
 
             for (String material : block.palette.materials) {
                 String identifier = PaletteItemIds.itemId(block.palette, material);
@@ -93,9 +120,9 @@ public final class Pieces {
                     throw new IllegalStateException("Duplicate piece item: " + identifier);
                 }
 
-                PieceItem item = new PieceItem(block, material);
+                PieceItem item = new PieceItem(PLAYABLE_BLOCKS.get(new PieceKey(material, block.palette.shape)), material);
 
-                Registry.register(registry, ResourceLocation.parse(identifier), item);
+                Registry.register(registry, Identifier.parse(identifier), item);
                 ITEMS.put(identifier, item);
             }
         }
@@ -131,7 +158,7 @@ public final class Pieces {
     private static BlockState nativeState(JsonElement value) {
         JsonObject definition = value.isJsonObject() ? value.getAsJsonObject() : null;
         String identifier = definition == null ? value.getAsString() : definition.get("id").getAsString();
-        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(identifier));
+        Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(identifier));
 
         if (block == null || block == Blocks.AIR) {
             if (definition != null && definition.has("fallback")) {
@@ -211,25 +238,28 @@ public final class Pieces {
         if (!Catalogue.supportsShape(definition, shape)) {
             return null;
         }
-        for (PieceBlock block : BLOCKS.values()) {
-            Shape stored = block.palette.shape;
-            int mapped = orientation;
-
-            if (stored == Shape.STEP && (shape == Shape.HORIZONTAL_STEP || shape == Shape.VERTICAL_STEP)) {
-                mapped = (shape == Shape.VERTICAL_STEP ? 8 : 0) + orientation;
-            } else if (stored != shape) {
-                continue;
-            }
-            if (block.palette.materials.contains(material)) {
-                return block.getStateFromMeta(block.palette.meta(material, mapped));
+        PieceBlock block = PLAYABLE_BLOCKS.get(new PieceKey(material, shape));
+        if (block == null && (shape == Shape.HORIZONTAL_STEP || shape == Shape.VERTICAL_STEP)) {
+            block = PLAYABLE_BLOCKS.get(new PieceKey(material, Shape.STEP));
+            if (shape == Shape.VERTICAL_STEP) {
+                orientation += 8;
             }
         }
 
-        return null;
+        return block == null ? null : block.getStateFromMeta(orientation);
     }
 
     /** Recover retired materials and newly native equivalents without changing the saved geometry. */
     public static BlockState canonicalState(BlockState state) {
+        return canonicalState(state, false);
+    }
+
+    /** Named Sky wool pieces keep their own identity when vanilla gains an equivalent. */
+    public static BlockState canonicalNamedState(BlockState state) {
+        return canonicalState(state, true);
+    }
+
+    private static BlockState canonicalState(BlockState state, boolean namedSave) {
         if (!(state.getBlock() instanceof PieceBlock)) {
             return state;
         }
@@ -237,27 +267,35 @@ public final class Pieces {
         PieceBlock source = (PieceBlock) state.getBlock();
         Catalogue.MaterialDef material = source.definition(state);
 
-        if (material.replacement() == null
+        if (!source.isLegacyPalette() && material.replacement() == null
                 && material.block(source.palette.shape.name().toLowerCase(Locale.ROOT)) == null) {
             return state;
         }
 
-        int orientation = source.getMetaFromState(state) % source.palette.shape.states;
-        BlockState result = state(material.id, source.palette.shape, orientation);
+        Shape shape = source.palette.shape;
+        int orientation = source.orientation(state);
+        BlockState result;
+        if (namedSave && source.isLegacyPalette() && source.palette.group.equals("cloth")
+                && (shape == Shape.SLAB || shape == Shape.STAIRS)) {
+            PieceBlock woolPiece = PLAYABLE_BLOCKS.get(new PieceKey(material.id, shape));
+            result = woolPiece == null ? null : woolPiece.getStateFromMeta(orientation);
+        } else {
+            result = state(material.id, shape, orientation);
+        }
 
         if (result == null || result.hasBlockEntity()) {
             throw new IllegalStateException("No safe replacement geometry for " + material.id);
         }
-        for (Map.Entry<Property<?>, Comparable<?>> property : state.getValues().entrySet()) {
-            if (property.getKey().getName().equals("meta")) {
+        for (Property.Value<?> property : state.getValues().toList()) {
+            if (property.property().getName().equals("meta") || property.property().getName().equals("orientation")) {
                 continue;
             }
 
-            Property<?> target = result.getBlock().getStateDefinition().getProperty(property.getKey().getName());
+            Property<?> target = result.getBlock().getStateDefinition().getProperty(property.property().getName());
 
             if (target != null) {
-                result = withProperty(result, target, property.getValue().toString().toLowerCase(Locale.ROOT));
-            } else if (property.getKey().getName().equals("waterlogged") && Boolean.TRUE.equals(property.getValue())) {
+                result = withProperty(result, target, property.valueName());
+            } else if (property.property().getName().equals("waterlogged") && Boolean.TRUE.equals(property.value())) {
                 throw new IllegalStateException("Material replacement would lose water: " + material.id);
             }
         }
@@ -272,6 +310,11 @@ public final class Pieces {
     }
 
     public static ItemStack stack(BlockState state, int count) {
+        Item item = item(state);
+        return item == null ? null : new ItemStack(item, count);
+    }
+
+    static Item item(BlockState state) {
         if (state == null) {
             return null;
         }
@@ -295,7 +338,7 @@ public final class Pieces {
             item = lookup == null ? state.getBlock().asItem() : lookup.apply(state);
         }
 
-        return item == null || item == Items.AIR ? null : new ItemStack(item, count);
+        return item == Items.AIR ? null : item;
     }
 
     /** Resolve the old palette item while retaining unrelated stack NBT elsewhere. */

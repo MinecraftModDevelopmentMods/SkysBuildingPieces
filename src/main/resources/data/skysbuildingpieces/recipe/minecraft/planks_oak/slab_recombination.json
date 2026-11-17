@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/planks_oak",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/minecraft/oak_planks",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:oak_slab"
-    }
+    "X": "minecraft:oak_slab"
   },
   "result": {
     "id": "minecraft:oak_planks",

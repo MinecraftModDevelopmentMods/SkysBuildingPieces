@@ -1,11 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
-  "pattern": ["X ", " X"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_yellow_horizontal_step",
+  "pattern": [
+    "X ",
+    " X"
+  ],
   "key": {
-    "X": {
-      "item": "skysbuildingpieces:wool_yellow_vertical_slab"
-    }
+    "X": "skysbuildingpieces:wool_yellow_vertical_slab"
   },
   "result": {
     "id": "skysbuildingpieces:wool_yellow_horizontal_step",
@@ -13,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_yellow_horizontal_step"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:wool_yellow_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_yellow_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_yellow_vertical_slab"
+        }
+      ]
     }
   ]
 }

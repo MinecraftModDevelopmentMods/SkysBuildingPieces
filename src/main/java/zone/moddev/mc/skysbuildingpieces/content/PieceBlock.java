@@ -10,11 +10,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.SnowyDirtBlock;
+import net.minecraft.world.level.block.SnowyBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -33,7 +34,10 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.AABB;
@@ -51,44 +55,55 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.neoforged.neoforge.common.util.TriState;
+import net.minecraft.util.TriState;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
-/** Permanent palettes with native states and collision shapes; no material tile entities. */
+/** Placed pieces store geometry and water in block states. Old palette blocks are recovery carriers. */
 public final class PieceBlock extends Block implements BonemealableBlock, SimpleWaterloggedBlock {
     public static final IntegerProperty CONNECTIONS = IntegerProperty.create("connections", 0, 15);
     public static final BooleanProperty LOWERED_SUPPORT = BooleanProperty.create("lowered_support");
     public static final EnumProperty<StairsShape> STAIR_SHAPE = StairBlock.SHAPE;
     private static final ThreadLocal<Construction> CONSTRUCTING = new ThreadLocal<>();
     public final Catalogue.Palette palette;
+    private final boolean legacyPalette;
     private final IntegerProperty metadataProperty;
+    private final EnumProperty<PieceOrientation> orientationProperty;
+    private final List<PieceOrientation> orientations;
     private final Map<Integer, VoxelShape> outlines = new ConcurrentHashMap<>();
     private final Map<Integer, VoxelShape> collisions = new ConcurrentHashMap<>();
 
     private static final class Construction {
         final Catalogue.Palette palette;
         final IntegerProperty metadata;
+        final EnumProperty<PieceOrientation> orientation;
+        final List<PieceOrientation> orientations;
 
-        Construction(Catalogue.Palette palette) {
+        Construction(Catalogue.Palette palette, boolean legacyPalette) {
             this.palette = palette;
-
             int assigned = palette.materials.size() * palette.shape.states;
-
-            // A single-material wall or pane needs no material selector. Native integer properties require at least two
-            // distinct values.
-            metadata = assigned == 1 ? null : IntegerProperty.create("meta", 0, assigned - 1);
+            metadata = legacyPalette && assigned > 1 ? IntegerProperty.create("meta", 0, assigned - 1) : null;
+            orientations = legacyPalette ? List.of() : PieceOrientation.forShape(palette.shape);
+            orientation = orientations.isEmpty() ? null
+                    : EnumProperty.create("orientation", PieceOrientation.class, orientations);
         }
     }
 
     public PieceBlock(Catalogue.Palette palette) {
-        super(properties(palette));
+        this(palette, true);
+    }
+
+    PieceBlock(Catalogue.Palette palette, boolean legacyPalette) {
+        super(properties(palette, legacyPalette));
 
         Construction construction = CONSTRUCTING.get();
 
         this.palette = palette;
+        this.legacyPalette = legacyPalette;
         metadataProperty = construction.metadata;
+        orientationProperty = construction.orientation;
+        orientations = construction.orientations;
         CONSTRUCTING.remove();
 
         BlockState initial = stateDefinition.any().setValue(SlabBlock.WATERLOGGED, false);
@@ -96,8 +111,11 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (metadataProperty != null) {
             initial = initial.setValue(metadataProperty, 0);
         }
-        if (initial.hasProperty(SnowyDirtBlock.SNOWY)) {
-            initial = initial.setValue(SnowyDirtBlock.SNOWY, false);
+        if (orientationProperty != null) {
+            initial = initial.setValue(orientationProperty, orientations.getFirst());
+        }
+        if (initial.hasProperty(SnowyBlock.SNOWY)) {
+            initial = initial.setValue(SnowyBlock.SNOWY, false);
         }
         if (initial.hasProperty(CONNECTIONS)) {
             initial = initial.setValue(CONNECTIONS, 0);
@@ -115,8 +133,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         registerDefaultState(initial);
     }
 
-    private static Block.Properties properties(Catalogue.Palette palette) {
-        CONSTRUCTING.set(new Construction(palette));
+    private static Block.Properties properties(Catalogue.Palette palette, boolean legacyPalette) {
+        CONSTRUCTING.set(new Construction(palette, legacyPalette));
 
         MapColor color = switch (palette.group) {
             case "metal" -> MapColor.METAL;
@@ -131,7 +149,8 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         };
 
         Block.Properties properties = Block.Properties.of().mapColor(color).strength(1).sound(SoundType.STONE)
-                .dynamicShape().noOcclusion();
+                .dynamicShape().noOcclusion()
+                .setId(ResourceKey.create(Registries.BLOCK, Identifier.parse(palette.registryId())));
 
         // Keep the old solidity rules for covered paths and other pieces.
         if (palette.group.equals("path")) {
@@ -162,11 +181,14 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (construction.metadata != null) {
             builder.add(construction.metadata);
         }
+        if (construction.orientation != null) {
+            builder.add(construction.orientation);
+        }
 
         builder.add(SlabBlock.WATERLOGGED);
 
         if (palette.group.equals("grass") || palette.group.equals("dirt")) {
-            builder.add(SnowyDirtBlock.SNOWY);
+            builder.add(SnowyBlock.SNOWY);
         }
         if (palette.group.equals("path")) {
             builder.add(LOWERED_SUPPORT);
@@ -183,17 +205,23 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     public BlockState getStateFromMeta(int metadata) {
-        palette.material(metadata);
-
         if (metadata < 0 || metadata >= palette.materials.size() * palette.shape.states) {
             throw new IllegalArgumentException("Unassigned palette metadata: " + palette.registryId() + ":" + metadata);
         }
 
-        return metadataProperty == null ? defaultBlockState() : defaultBlockState().setValue(metadataProperty, metadata);
+        if (metadataProperty != null) {
+            return defaultBlockState().setValue(metadataProperty, metadata);
+        }
+        return orientationProperty == null ? defaultBlockState()
+                : defaultBlockState().setValue(orientationProperty, orientations.get(metadata));
     }
 
     public int getMetaFromState(BlockState state) {
-        return metadataProperty == null ? 0 : state.getValue(metadataProperty);
+        return legacyPalette ? metadataProperty == null ? 0 : state.getValue(metadataProperty) : orientation(state);
+    }
+
+    public boolean isLegacyPalette() {
+        return legacyPalette;
     }
 
     public Catalogue.MaterialDef definition(BlockState state) {
@@ -201,7 +229,10 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     public int orientation(BlockState state) {
-        return getMetaFromState(state) % palette.shape.states;
+        if (legacyPalette) {
+            return getMetaFromState(state) % palette.shape.states;
+        }
+        return orientationProperty == null ? 0 : orientations.indexOf(state.getValue(orientationProperty));
     }
 
     public int canonicalMeta(BlockState state) {
@@ -211,11 +242,6 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     public int mask(BlockState state) {
         return palette.shape == Shape.STAIRS ? Geometry.stairs(orientation(state), state.getValue(STAIR_SHAPE).getSerializedName())
                 : Geometry.mask(palette.shape, orientation(state));
-    }
-
-    @Override
-    public int getLightBlock(BlockState state, BlockGetter world, BlockPos position) {
-        return 0;
     }
 
     @Override
@@ -255,6 +281,9 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos position, Player player) {
+        if (definition(state).type.equals("snow")) {
+            return true;
+        }
         BlockState full = Pieces.nativeState(definition(state), "full");
         return full.canHarvestBlock(world, position, player);
     }
@@ -266,6 +295,10 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (hardness == -1.0F) {
             return 0.0F;
         }
+        if (definition(state).type.equals("snow")) {
+            // Snow pieces keep their shape when dug by hand; a shovel is still faster.
+            return player.getDestroySpeed(full, position) / hardness / 30;
+        }
         // The full block may handle tool tiers per state. Keep its mining rules
         // and scale only the hardness when this piece declares a different value.
         float fullHardness = full.getDestroySpeed(world, position);
@@ -273,7 +306,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
             return full.getDestroyProgress(player, world, position) * fullHardness / hardness;
         }
         int divisor = full.canHarvestBlock(world, position, player) ? 30 : 100;
-        return player.getDigSpeed(full, position) / hardness / divisor;
+        return player.getDestroySpeed(full, position) / hardness / divisor;
     }
 
     @Override
@@ -424,17 +457,23 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     public BlockState getActualState(BlockState state, BlockGetter world, BlockPos position) {
-        if (state.hasProperty(SnowyDirtBlock.SNOWY)) {
-            boolean snowy = false;
-
-            for (Direction side : new Direction[] { Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH,
-                    Direction.WEST }) {
-                Block neighbour = readState(world, position.relative(side)).getBlock();
-
-                snowy |= neighbour == Blocks.SNOW_BLOCK || neighbour == Blocks.SNOW;
+        if (state.hasProperty(SnowyBlock.SNOWY)) {
+            boolean snowy = readState(world, position.above()).is(net.minecraft.tags.BlockTags.SNOW);
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                BlockPos neighbourPos = position.relative(side);
+                BlockState neighbour = readState(world, neighbourPos);
+                snowy |= neighbour.is(net.minecraft.tags.BlockTags.SNOW)
+                        || neighbour.isCollisionShapeFullBlock(world, neighbourPos)
+                        && readState(world, neighbourPos.above()).is(net.minecraft.tags.BlockTags.SNOW);
+            }
+            if (!snowy && world instanceof LevelReader reader) {
+                snowy = reader.getBiome(position).value().coldEnoughToSnow(position, reader.getSeaLevel())
+                        && reader.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                                position.getX(), position.getZ()) <= position.getY() + 1
+                        && reader.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, position.above()) < 10;
             }
 
-            state = state.setValue(SnowyDirtBlock.SNOWY, snowy);
+            state = state.setValue(SnowyBlock.SNOWY, snowy);
         }
         if (state.hasProperty(CONNECTIONS)) {
             int connections = 0;
@@ -549,11 +588,11 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder context) {
-        ItemStack tool = context.getOptionalParameter(LootContextParams.TOOL);
+        var tool = context.getOptionalParameter(LootContextParams.TOOL);
 
         if (!palette.group.equals("path") && tool != null
                 && EnchantmentHelper.getItemEnchantmentLevel(context.getLevel().registryAccess()
-                        .registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), tool) > 0) {
+                        .lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH), tool) > 0) {
             return Collections.singletonList(getSilkTouchDrop(state));
         }
 
@@ -580,13 +619,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos position, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos position, BlockState state, boolean includeData) {
         return palette.shape == Shape.VERTICAL_SLAB ? Pieces.slabDrop(definition(state).id, state)
                 : Pieces.stack(Pieces.state(definition(state).id, palette.shape, orientation(state)), 1);
     }
 
     @Override
-    public boolean canPlaceLiquid(Player player, BlockGetter world, BlockPos position, BlockState state,
+    public boolean canPlaceLiquid(net.minecraft.world.entity.LivingEntity player, BlockGetter world, BlockPos position, BlockState state,
             net.minecraft.world.level.material.Fluid fluid) {
         // Keep an already filled piece from accepting another bucket action.
         return fluid == Fluids.WATER && !state.getValue(SlabBlock.WATERLOGGED);
@@ -598,10 +637,10 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction side, BlockState neighbour, LevelAccessor world,
-            BlockPos position, BlockPos neighbourPos) {
+    public BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess ticks,
+            BlockPos position, Direction side, BlockPos neighbourPos, BlockState neighbour, RandomSource random) {
         if (state.getValue(SlabBlock.WATERLOGGED)) {
-            world.scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            ticks.scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         }
 
         return getActualState(state, world, position);
@@ -616,8 +655,13 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
+    public void randomTick(BlockState state, ServerLevel world, BlockPos position, RandomSource random) {
+        tick(state, world, position, random);
+    }
+
+    @Override
     public void tick(BlockState state, ServerLevel world, BlockPos position, RandomSource random) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return;
         }
 
@@ -628,7 +672,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos position, BlockState oldState, boolean moving) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return;
         }
 
@@ -638,17 +682,17 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos position,
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos position,
             Player player, InteractionHand hand, BlockHitResult hit) {
         return PathPieces.activate(world, position, player, stack, hit.getDirection(), hand)
-                ? ItemInteractionResult.sidedSuccess(world.isClientSide)
-                : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                ? InteractionResult.SUCCESS
+                : InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos position, Block changed, BlockPos changedPos,
-            boolean moving) {
-        if (world.isClientSide) {
+    public void neighborChanged(BlockState state, Level world, BlockPos position, Block changed,
+            net.minecraft.world.level.redstone.Orientation orientation, boolean moving) {
+        if (world.isClientSide()) {
             return;
         }
 
@@ -658,19 +702,23 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     }
 
     @Override
-    public boolean isValidBonemealTarget(net.minecraft.world.level.LevelReader world, BlockPos position, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader world, BlockPos position, BlockState state,
+            BonemealSource source) {
         return GrassLifecycle.grass(state) && completeTop(state) && !state.getValue(SlabBlock.WATERLOGGED);
     }
 
     @Override
-    public boolean isBonemealSuccess(Level world, RandomSource random, BlockPos position, BlockState state) {
-        return isValidBonemealTarget(world, position, state);
+    public boolean isBonemealSuccess(Level world, RandomSource random, BlockPos position,
+            BlockState state, BonemealSource source) {
+        return isValidBonemealTarget(world, position, state, source);
     }
 
     @Override
-    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos position, BlockState state) {
-        if (isValidBonemealTarget(world, position, state)) {
-            ((BonemealableBlock) Blocks.GRASS_BLOCK).performBonemeal(world, random, position, Blocks.GRASS_BLOCK.defaultBlockState());
+    public void performBonemeal(ServerLevel world, RandomSource random, BlockPos position,
+            BlockState state, BonemealSource source) {
+        if (isValidBonemealTarget(world, position, state, source)) {
+            ((BonemealableBlock) Blocks.GRASS_BLOCK).performBonemeal(
+                    world, random, position, Blocks.GRASS_BLOCK.defaultBlockState(), source);
         }
     }
 }

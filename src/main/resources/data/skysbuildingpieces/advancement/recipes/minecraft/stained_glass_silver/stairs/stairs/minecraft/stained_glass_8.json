@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:light_gray_stained_glass"]
+            "items": [
+              "minecraft:light_gray_stained_glass"
+            ]
           }
         ]
       }
@@ -13,20 +15,26 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "skysbuildingpieces:minecraft/stained_glass_silver/stairs/stairs/minecraft/stained_glass_8"
+        "recipes": "skysbuildingpieces:minecraft/stained_glass_silver/stairs/stairs/minecraft/stained_glass_8"
       }
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_silver/stairs/stairs/minecraft/stained_glass_8"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_silver/stairs/stairs/minecraft/stained_glass_8"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:stained_glass_silver_stairs"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stained_glass_silver_stairs"
     }
   ]
 }

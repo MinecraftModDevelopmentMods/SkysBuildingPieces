@@ -11,6 +11,9 @@ displayURL="https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces"
 authors="SkyBlade1978"
 description='''Extra building shapes for familiar materials, with built-in Mineralogy support when installed. No world generation.'''
 
+[[mixins]]
+config="skysbuildingpieces.mixins.json"
+
 [[dependencies.skysbuildingpieces]]
 modId="neoforge"
 type="required"
@@ -28,7 +31,7 @@ side="BOTH"
 [[dependencies.skysbuildingpieces]]
 modId="skysgrassslabs"
 type="optional"
-versionRange="[1.2.0.121012,)"
+versionRange="[1.2.1.2603002,)"
 ordering="AFTER"
 side="BOTH"
 

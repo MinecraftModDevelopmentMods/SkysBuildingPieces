@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
-  "pattern": ["XX", "XX", "XX"],
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/hardened_clay_wall",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "minecraft:terracotta"
-    }
+    "X": "minecraft:terracotta"
   },
   "result": {
     "id": "skysbuildingpieces:hardened_clay_wall",
@@ -13,8 +16,9 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "skysbuildingpieces:hardened_clay_wall"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:hardened_clay_wall"
     }
   ]
 }

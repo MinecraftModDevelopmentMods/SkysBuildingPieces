@@ -58,7 +58,7 @@ public final class PersistenceRegistrationChecks {
                         "Mineralogy's capture API must be static");
                 require(java.lang.reflect.Modifier.isStatic(fallback.getModifiers()),
                         "Mineralogy's server fallback must be static");
-                // Mineralogy installs its level reader through a coremod.
+                // Mineralogy installs its level reader through a mixin.
                 // The packaged migration checks exercise that reader and its sidecar.
                 return 1;
             }

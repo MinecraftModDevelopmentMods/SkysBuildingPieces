@@ -1,11 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/scoria",
-  "pattern": ["XX"],
+  "category": "building",
+  "group": "skys/result/mineralogy/scoria",
+  "pattern": [
+    "XX"
+  ],
   "key": {
-    "X": {
-      "item": "mineralogy:scoria_slab"
-    }
+    "X": "mineralogy:scoria_slab"
   },
   "result": {
     "id": "mineralogy:scoria",
@@ -13,16 +14,23 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:scoria"
-    },
-    {
-      "type": "neoforge:item_exists",
-      "item": "mineralogy:scoria_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:scoria"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:scoria_slab"
+        }
+      ]
     }
   ]
 }

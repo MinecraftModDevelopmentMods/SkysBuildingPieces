@@ -51,7 +51,7 @@ class LegacyRegistrySourcesTest {
 
         CompoundTag malformed = registry(601, "older_mod:stone");
 
-        malformed.getCompound("Registries").getCompound("minecraft:blocks").getList("ids", 10).getCompound(0)
+        malformed.getCompoundOrEmpty("Registries").getCompoundOrEmpty("minecraft:blocks").getListOrEmpty("ids").getCompoundOrEmpty(0)
                 .putString("V", "not a block number");
         assertThrows(LegacyBridge.RecoveryAbort.class, () -> LegacyRegistrySources.merge(malformed, new CompoundTag()));
     }
@@ -73,6 +73,6 @@ class LegacyRegistrySourcesTest {
 
         entry.putInt("V", number);
         entry.putString("K", name);
-        root.getCompound("Registries").getCompound("minecraft:blocks").getList("ids", 10).add(entry);
+        root.getCompoundOrEmpty("Registries").getCompoundOrEmpty("minecraft:blocks").getListOrEmpty("ids").add(entry);
     }
 }

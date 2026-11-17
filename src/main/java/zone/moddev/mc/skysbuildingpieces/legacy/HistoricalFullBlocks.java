@@ -138,13 +138,13 @@ public final class HistoricalFullBlocks {
             return;
         }
 
-        CompoundTag level = root.getCompound("Level");
-        CompoundTag coverage = level.getCompound("skysbuildingpieces_coverage");
+        CompoundTag level = root.getCompoundOrEmpty("Level");
+        CompoundTag coverage = level.getCompoundOrEmpty("skysbuildingpieces_coverage");
 
         Set<String> pending = new LinkedHashSet<>();
 
         for (String name : savedIds.values()) {
-            if (historical(name) && coverage.getInt(module(name)) < 1) {
+            if (historical(name) && coverage.getIntOr(module(name), 0) < 1) {
                 pending.add(module(name));
             }
         }
@@ -153,13 +153,13 @@ public final class HistoricalFullBlocks {
         }
 
         List<Change> changes = new ArrayList<>();
-        ListTag sections = level.getList("Sections", 10);
+        ListTag sections = level.getListOrEmpty("Sections");
 
         for (int s = 0; s < sections.size(); s++) {
-            CompoundTag section = sections.getCompound(s);
-            byte[] blockIdLowBytes = section.getByteArray("Blocks");
-            byte[] high = section.getByteArray("Add");
-            byte[] meta = section.getByteArray("Data");
+            CompoundTag section = sections.getCompoundOrEmpty(s);
+            byte[] blockIdLowBytes = section.getByteArray("Blocks").orElseGet(() -> new byte[0]);
+            byte[] high = section.getByteArray("Add").orElseGet(() -> new byte[0]);
+            byte[] meta = section.getByteArray("Data").orElseGet(() -> new byte[0]);
 
             if (blockIdLowBytes.length != 4096 || meta.length != 2048 || high.length != 0 && high.length != 2048) {
                 throw new LegacyBridge.RecoveryAbort("Malformed retired-rock section", null);
@@ -183,9 +183,9 @@ public final class HistoricalFullBlocks {
         for (Change change : changes) {
             int encoded = NumericStateBridge.encode(change.state);
             int blockId = encoded >>> 4;
-            byte[] blockIdLowBytes = change.section.getByteArray("Blocks");
-            byte[] high = change.section.getByteArray("Add");
-            byte[] meta = change.section.getByteArray("Data");
+            byte[] blockIdLowBytes = change.section.getByteArray("Blocks").orElseGet(() -> new byte[0]);
+            byte[] high = change.section.getByteArray("Add").orElseGet(() -> new byte[0]);
+            byte[] meta = change.section.getByteArray("Data").orElseGet(() -> new byte[0]);
 
             blockIdLowBytes[change.index] = (byte) blockId;
 
@@ -209,13 +209,13 @@ public final class HistoricalFullBlocks {
             deltas.putLong(module, 0);
         }
         for (Change change : changes) {
-            deltas.putLong(change.module, deltas.getLong(change.module) + 1);
+            deltas.putLong(change.module, deltas.getLongOr(change.module, 0L) + 1);
         }
 
         level.put("skysbuildingpieces_coverage", coverage);
 
         if (pending.contains(MODULE)) {
-            root.putLong("skysbuildingpieces_retired_delta", deltas.getLong(MODULE));
+            root.putLong("skysbuildingpieces_retired_delta", deltas.getLongOr(MODULE, 0L));
             deltas.remove(MODULE);
         }
         if (!deltas.isEmpty()) {

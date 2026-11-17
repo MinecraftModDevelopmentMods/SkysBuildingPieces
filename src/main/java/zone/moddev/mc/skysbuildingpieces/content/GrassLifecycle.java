@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.core.BlockPos;
 import net.neoforged.fml.ModList;
 
@@ -29,13 +31,13 @@ public final class GrassLifecycle {
             Method register = api.getMethod("registerGrassForm", BlockState.class, BlockState.class);
             Set<BlockState> registered = new HashSet<>();
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.playableBlocks()) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     if (!grass(state) || !block.definition(state).id.equals("minecraft:grass")) {
                         continue;
                     }
 
-                    BlockState canonical = state.setValue(net.minecraft.world.level.block.SnowyDirtBlock.SNOWY, false);
+                    BlockState canonical = state.setValue(net.minecraft.world.level.block.SnowyBlock.SNOWY, false);
                     BlockState dirt = counterpart(canonical, false);
 
                     if (dirt != null && registered.add(canonical)) {
@@ -83,7 +85,7 @@ public final class GrassLifecycle {
     }
 
     public static void repairSupport(Level world, BlockPos position, BlockState state) {
-        if (!world.isClientSide && grass(state) && coversSupport(state) && world.isLoaded(position.below())
+        if (!world.isClientSide() && grass(state) && coversSupport(state) && world.isLoaded(position.below())
                 && world.getBlockState(position.below()).getBlock() == Blocks.GRASS_BLOCK) {
             world.setBlock(position.below(), Blocks.DIRT.defaultBlockState(), 2);
         }
@@ -97,7 +99,7 @@ public final class GrassLifecycle {
     }
 
     public static void tick(Level world, BlockPos position, BlockState state, RandomSource random) {
-        if (world.isClientSide || !(state.getBlock() instanceof PieceBlock)) {
+        if (world.isClientSide() || !(state.getBlock() instanceof PieceBlock)) {
             return;
         }
 
@@ -159,12 +161,21 @@ public final class GrassLifecycle {
     private static boolean canRemainGrass(Level world, BlockPos position) {
         BlockPos above = position.above();
 
-        return world.getMaxLocalRawBrightness(above) >= 4
-                || world.getBlockState(above).getLightBlock(world, above) < world.getMaxLightLevel();
+        BlockState cover = world.getBlockState(above);
+        if (cover.is(Blocks.SNOW) && cover.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) == 1) {
+            return true;
+        }
+        // Light does not keep grass alive beneath solid cover or a full fluid block.
+        return cover.getFluidState().getAmount() != 8 && lightBlocked(cover) < 15;
+    }
+
+    private static int lightBlocked(BlockState cover) {
+        return LightEngine.getLightDampeningInto(Blocks.AIR.defaultBlockState(), cover,
+                Direction.UP, cover.getLightDampening());
     }
 
     private static boolean viableTarget(Level world, BlockPos position) {
-        if (position.getY() < 0 || position.getY() >= 256 || !world.isLoaded(position)) {
+        if (world.isOutsideBuildHeight(position) || !world.isLoaded(position)) {
             return false;
         }
 
@@ -184,7 +195,7 @@ public final class GrassLifecycle {
             return false;
         }
 
-        return world.getMaxLocalRawBrightness(above) >= 4 && cover.getLightBlock(world, above) < world.getMaxLightLevel()
+        return world.getMaxLocalRawBrightness(above) >= 4 && lightBlocked(cover) < 15
                 && world.getFluidState(above).isEmpty();
     }
 }

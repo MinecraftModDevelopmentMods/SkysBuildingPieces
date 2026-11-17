@@ -15,14 +15,15 @@ public final class NativeTestLauncher {
             @Override
             public byte[] transform(ClassLoader loader, String name, Class<?> redefining,
                     ProtectionDomain domain, byte[] bytes) throws IllegalClassFormatException {
-                if (!"net/minecraft/util/datafix/fixes/BlockStateData".equals(name)) {
+                if (!"net/minecraft/util/datafix/fixes/BlockStateData".equals(name)
+                        && !"zone/moddev/mc/skysbuildingpieces/mixin/BlockStateDataAccessor".equals(name)) {
                     return null;
                 }
                 try {
-                    // The test worker supplies ASM and the script engine through its own loader.
+                    // The test worker supplies ASM through its own loader.
                     Class<?> transformer = Class.forName(
                             "zone.moddev.mc.skysbuildingpieces.LegacyArrayTestTransformer", true, loader);
-                    return (byte[]) transformer.getMethod("transform", byte[].class).invoke(null, (Object) bytes);
+                    return (byte[]) transformer.getMethod("transform", String.class, byte[].class).invoke(null, name, bytes);
                 } catch (ReflectiveOperationException failure) {
                     IllegalClassFormatException error = new IllegalClassFormatException(
                             "Could not apply the production legacy-table patch in the unit JVM");
