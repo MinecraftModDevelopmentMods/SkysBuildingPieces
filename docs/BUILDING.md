@@ -46,3 +46,6 @@ disposable worlds and the logs for both fresh starts and reloads under
 The test fixture for installed-mod replacement checks the replacement policy.
 It isn't a BuildingBricks port. Historical world fixtures test recovery of
 actual saved pieces before Minecraft loads their chunks and inventories.
+
+Disposable servers use Java networking (`use-native-transport=false`). This
+avoids host-specific Netty availability probes during log auditing.
