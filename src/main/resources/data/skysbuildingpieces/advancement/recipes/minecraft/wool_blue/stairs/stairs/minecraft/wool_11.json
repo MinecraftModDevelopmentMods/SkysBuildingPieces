@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:blue_wool"]
+            "items": [
+              "minecraft:blue_wool"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_blue/stairs/stairs/minecraft/wool_11"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_blue/stairs/stairs/minecraft/wool_11"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:wool_blue_stairs"
     }
   ]

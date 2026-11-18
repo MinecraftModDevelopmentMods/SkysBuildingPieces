@@ -93,7 +93,8 @@ public final class WaterloggingChecks {
                                     .mask(expected),
                             "Wet grass and paths decay to matching waterlogged dirt: " + dry + " became " + actual
                                     + ", expected " + expected);
-                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(world, position, actual),
+                    require(!((PieceBlock) actual.getBlock()).isValidBonemealTarget(
+                            world, position, actual),
                             "Wet dirt cannot grow grass through bonemeal");
                     decays++;
                 }

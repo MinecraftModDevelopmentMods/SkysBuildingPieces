@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:smooth_red_sandstone_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:smooth_red_sandstone_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,19 +20,31 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/smooth_red_sandstone/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_05_4"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/smooth_red_sandstone/horizontal_step/step/skysbuildingpieces/rock_vertical_slab_05_4"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:smooth_red_sandstone_horizontal_step"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:smooth_red_sandstone_vertical_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:smooth_red_sandstone_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:smooth_red_sandstone_vertical_slab"
+        }
+      ]
     }
   ]
 }

@@ -66,8 +66,8 @@ class NativeClientLogTest(unittest.TestCase):
             '[00:00:00] [Download-2/ERROR]: Failed to fetch user properties',
             'com.mojang.authlib.exceptions.InvalidCredentialsException: Status: 401',
             'at com.mojang.authlib.exceptions.MinecraftClientHttpException.toAuthenticationException(MinecraftClientHttpException.java:70)',
-            'at com.mojang.authlib.yggdrasil.YggdrasilUserApiService.fetchProperties(YggdrasilUserApiService.java:173)',
-            'at TRANSFORMER/minecraft@26.2/net.minecraft.client.Minecraft.lambda$new$1(Minecraft.java:409)',
+            'at com.mojang.authlib.services.MinecraftServicesUserApiService.fetchProperties(MinecraftServicesUserApiService.java:168)',
+            'at TRANSFORMER/minecraft@26.2/net.minecraft.client.Minecraft.lambda$new$1(Minecraft.java:419)',
             'at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1789)',
             'at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)',
             'at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)',
@@ -77,7 +77,7 @@ class NativeClientLogTest(unittest.TestCase):
             'at com.mojang.authlib.minecraft.client.MinecraftClient.readServiceResponse(MinecraftClient.java:147)',
             'at com.mojang.authlib.minecraft.client.MinecraftClient.getWithEtag(MinecraftClient.java:81)',
             'at com.mojang.authlib.minecraft.client.MinecraftClient.get(MinecraftClient.java:65)',
-            'at com.mojang.authlib.yggdrasil.YggdrasilUserApiService.fetchProperties(YggdrasilUserApiService.java:123)',
+            'at com.mojang.authlib.services.MinecraftServicesUserApiService.fetchProperties(MinecraftServicesUserApiService.java:118)',
             '... 5 more',
         ))
         log = "\n".join((auth, START, LOGIN))
@@ -140,7 +140,7 @@ class NativeClientFilesTest(unittest.TestCase):
         self.assertFalse(receipt["early_display"])
 
     def test_missing_server_config_stops_the_check(self):
-        (self.server / "neoforge-server.toml").unlink()
+        (self.server / "neoforge-synced.toml").unlink()
         with self.assertRaises(ValueError):
             audit(self.directory, "control", True)
 

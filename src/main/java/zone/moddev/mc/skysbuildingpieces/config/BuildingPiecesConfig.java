@@ -8,12 +8,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLPaths;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 
 /** Building and recovery settings shared by the client and server. */
 public final class BuildingPiecesConfig {
+    private static final String FILE_NAME = SkysBuildingPieces.ID + "-common.toml";
     private static final ModConfigSpec SPEC;
     private static final ModConfigSpec.BooleanValue FORCE_REPLACEMENT;
     private static final ModConfigSpec.BooleanValue DIRECTIONAL_SLAB_PLACEMENT;
@@ -43,7 +43,7 @@ public final class BuildingPiecesConfig {
 
     public static void register(ModContainer container) {
         migrateLegacyConfig();
-        container.registerConfig(ModConfig.Type.COMMON, SPEC);
+        container.registerConfig(NeoForgeConfigType.local(), SPEC, FILE_NAME);
     }
 
     public static boolean forceReplacement() {
@@ -56,7 +56,7 @@ public final class BuildingPiecesConfig {
 
     private static void migrateLegacyConfig() {
         Path directory = FMLPaths.CONFIGDIR.get();
-        Path current = directory.resolve(SkysBuildingPieces.ID + "-common.toml");
+        Path current = directory.resolve(FILE_NAME);
         Path legacy = directory.resolve(SkysBuildingPieces.ID + ".cfg");
 
         if (Files.exists(current) || !Files.isRegularFile(legacy)) {

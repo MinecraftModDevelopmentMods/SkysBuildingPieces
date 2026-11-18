@@ -7,10 +7,16 @@ file('gradle/grass-slabs-release.properties').withInputStream { grass.load(it) }
 def rocks = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { rocks.load(it) }
 
-def grassJar = providers.gradleProperty('grassSlabsMainJar').orElse(
-        "../../SkysGrassSlabs262NEO/SkysGrassSlabs/build/libs/SkysGrassSlabs-${grass.version}.jar")
-def oreJar = providers.gradleProperty('oreSpawnMainJar').orElse(rocks.getProperty('orespawn.path'))
-def rockJar = providers.gradleProperty('mineralogyMainJar').orElse(rocks.getProperty('mineralogy.path'))
+def pinnedJar = { String property, String path, String checksum ->
+    File sibling = file(path)
+    File retained = file(".gradle/qualification-dependencies/${checksum}/${sibling.name}")
+    providers.gradleProperty(property).orElse((retained.isFile() ? retained : sibling).path)
+}
+
+def grassJar = pinnedJar('grassSlabsMainJar',
+        "../../SkysGrassSlabs262NEO/SkysGrassSlabs/build/libs/SkysGrassSlabs-${grass.version}.jar", grass.sha256)
+def oreJar = pinnedJar('oreSpawnMainJar', rocks.getProperty('orespawn.path'), rocks.getProperty('orespawn.sha256'))
+def rockJar = pinnedJar('mineralogyMainJar', rocks.getProperty('mineralogy.path'), rocks.getProperty('mineralogy.sha256'))
 
 def inputsFor = [
         grassSlabs: [[grassJar, grass.sha256, 'skysgrassslabs', grass.version]],
@@ -42,7 +48,13 @@ def verifyCompanion = { row ->
             throw new GradleException("Unexpected companion metadata: ${source.name}")
         }
     }
-    source
+    File retained = file(".gradle/qualification-dependencies/${row[1]}/${source.name}")
+    if (source.canonicalFile != retained.canonicalFile) {
+        retained.parentFile.mkdirs()
+        java.nio.file.Files.copy(source.toPath(), retained.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+    }
+    retained
 }
 
 inputsFor.each { profile, companionSet ->

@@ -22,7 +22,6 @@ import net.minecraft.network.*;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.resources.Identifier;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.stats.ServerRecipeBook;
 import static zone.moddev.mc.skysbuildingpieces.probe.NativeRecipeProbe.*;

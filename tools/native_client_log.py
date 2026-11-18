@@ -78,7 +78,7 @@ def audit(directory, phase, control=False, packaged_offline=False, no_early_disp
     directory = Path(directory)
     log = (directory / "logs/latest.log").read_text(encoding="utf-8")
     unchanged = unchanged_native_settings(directory, (
-        "fml.toml", "neoforge-client.toml", "neoforge-common.toml", "neoforge-server.toml"), no_early_display)
+        "fml.toml", "neoforge-client.toml", "neoforge-local.toml", "neoforge-synced.toml"), no_early_display)
     if not unchanged:
         raise ValueError("NeoForge settings differ from the controlled defaults")
     if no_early_display:
@@ -89,9 +89,13 @@ def audit(directory, phase, control=False, packaged_offline=False, no_early_disp
     required = (("NEOFORGE_CLIENT_CONTROL_PASS joined=true sky_mods=false",) if control else
                 ("BUILDING_PIECES_CLIENT_WORLD_ACCEPTED", "SKY_RECIPE_PREVIEW_MODELS_PASS",
                  "BUILDING_PIECES_CONTINUOUS_GLASS_PASS", "BUILDING_PIECES_COLOURS_PASS",
-                 "BUILDING_PIECES_CLIENT_DISCONNECT_PASS", "All dimensions are saved"))
+                 "BUILDING_PIECES_CLIENT_DISCONNECT_PASS", "Stopping server", "Saving worlds"))
     if any(marker not in log for marker in required):
         raise ValueError("Native client completion checks are missing")
+    if not control:
+        for dimension in ("overworld", "the_nether", "the_end"):
+            if not re.search(r"(?m)Saving chunks for level '[^\r\n]+'/minecraft:" + dimension + r"$", log):
+                raise ValueError("The integrated client did not save " + dimension)
     if control and receipt["empty_handshakes"] != 0:
         raise ValueError("The NeoForge-only control must complete without handshake errors")
     if list((directory / "crash-reports").glob("*")):
@@ -122,7 +126,7 @@ def classify_server(log, debug, unchanged_defaults, profile=None):
 
 def audit_server(directory, phase):
     directory = Path(directory)
-    unchanged = unchanged_native_settings(directory, ("fml.toml", "neoforge-common.toml", "neoforge-server.toml"))
+    unchanged = unchanged_native_settings(directory, ("fml.toml", "neoforge-local.toml", "neoforge-synced.toml"))
     receipt = classify_server((directory / 'logs/latest.log').read_text(encoding='utf-8'),
                               (directory / 'logs/debug.log').read_text(encoding='utf-8'), unchanged, profile_for(directory))
     if list((directory / 'crash-reports').glob('*')):

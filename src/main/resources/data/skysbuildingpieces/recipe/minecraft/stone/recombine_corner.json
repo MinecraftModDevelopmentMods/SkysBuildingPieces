@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stone",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stone_horizontal_step",
   "pattern": [
     "X",
     "X"
@@ -14,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stone_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stone_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_horizontal_step"
+        }
+      ]
     }
   ]
 }

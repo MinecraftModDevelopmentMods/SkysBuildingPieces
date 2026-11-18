@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:prismarine_bricks_slab"]
+            "items": [
+              "skysbuildingpieces:prismarine_bricks_slab"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/prismarine_bricks/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/prismarine_bricks/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:prismarine_bricks_slab"
     }
   ]

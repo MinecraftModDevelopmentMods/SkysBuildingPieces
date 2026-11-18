@@ -30,7 +30,9 @@ Build the matching companion jars before starting an optional profile. You can
 point the profiles at exact jars with `-PgrassSlabsMainJar=<jar>`,
 `-PmineralogyMainJar=<jar>` and `-PoreSpawnMainJar=<jar>`. Each profile checks
 the version and checksum before copying the jars into its own run directory.
-The normal game does not need any of these mods.
+The profiles retain a checksum-verified copy of each companion, so cleaning a
+sibling build does not break an already prepared launch. The normal game does
+not need any of these mods.
 
 ## Runtime checks
 
@@ -46,3 +48,6 @@ disposable worlds and the logs for both fresh starts and reloads under
 The test fixture for installed-mod replacement checks the replacement policy.
 It isn't a BuildingBricks port. Historical world fixtures test recovery of
 actual saved pieces before Minecraft loads their chunks and inventories.
+
+Disposable servers use Java networking (`use-native-transport=false`). This
+avoids host-specific Netty availability probes during log auditing.

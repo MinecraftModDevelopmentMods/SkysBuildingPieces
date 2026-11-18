@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:mineralogy_amphibolite_horizontal_step"]
+            "items": [
+              "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
+            ]
           }
         ]
       }
@@ -18,23 +20,35 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/amphibolite/corner/corner/skysbuildingpieces/mineralogy_rock_horizontal_step_00_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/amphibolite/corner/corner/skysbuildingpieces/mineralogy_rock_horizontal_step_00_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:mineralogy_amphibolite_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mineralogy_amphibolite_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mineralogy_amphibolite_horizontal_step"
+        }
+      ]
     }
   ]
 }

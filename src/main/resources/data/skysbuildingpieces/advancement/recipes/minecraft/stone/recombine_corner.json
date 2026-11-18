@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:stone_corner"]
+            "items": [
+              "skysbuildingpieces:stone_corner"
+            ]
           }
         ]
       }
@@ -18,19 +20,31 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stone/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stone/recombine_corner"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stone_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:stone_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:stone_horizontal_step"
+        }
+      ]
     }
   ]
 }

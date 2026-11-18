@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:glass"]
+            "items": [
+              "minecraft:glass"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/glass/stairs/stairs/minecraft/glass_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/glass/stairs/stairs/minecraft/glass_0"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:glass_stairs"
     }
   ]

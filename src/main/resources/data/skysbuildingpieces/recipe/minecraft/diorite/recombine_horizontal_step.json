@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/diorite",
+  "category": "building",
+  "group": "skys/result/minecraft/diorite_slab",
   "pattern": [
     "X",
     "X"
@@ -15,6 +16,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:diorite_horizontal_step"
     }
   ]

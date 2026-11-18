@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:shale"]
+            "items": [
+              "mineralogy:shale"
+            ]
           }
         ]
       }
@@ -18,23 +20,35 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/shale/horizontal_step/rock_step/mineralogy/shale_0"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/shale/horizontal_step/rock_step/mineralogy/shale_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "mineralogy:shale"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:mineralogy_shale_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:shale"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mineralogy_shale_horizontal_step"
+        }
+      ]
     }
   ]
 }
