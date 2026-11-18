@@ -1,4 +1,5 @@
 import os
+import hashlib
 from pathlib import Path
 import shutil
 import subprocess
@@ -9,8 +10,8 @@ import unittest
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def workflow_step(name):
-    workflow = (PROJECT_ROOT / '.github/workflows/deploy-release.yml').read_text(encoding='utf-8')
+def workflow_step(name, relative='.github/workflows/deploy-release.yml'):
+    workflow = (PROJECT_ROOT / relative).read_text(encoding='utf-8')
     marker = '      - name: ' + name + '\n'
     if marker not in workflow:
         raise AssertionError('The release build must prepare its pinned Grass Slabs dependency: ' + name)
@@ -61,7 +62,8 @@ class GrassSlabsReleaseWorkflowTest(unittest.TestCase):
             commit = '0123456789abcdef0123456789abcdef01234567'
             version = '1.2.1.2602001'
             (workspace / 'gradle/grass-slabs-release.properties').write_text(
-                'source.commit=' + commit + '\nversion=' + version + '\n', encoding='utf-8', newline='\n')
+                'source.commit=' + commit + '\nversion=' + version + '\nkind=local-candidate\n',
+                encoding='utf-8', newline='\n')
             dependency = workspace / '.gradle/qualification-sources/grass-slabs'
             dependency.mkdir(parents=True)
             (dependency / 'gradlew').write_text(
@@ -82,6 +84,59 @@ class GrassSlabsReleaseWorkflowTest(unittest.TestCase):
             expected_jar = (dependency / ('build/libs/SkysGrassSlabs-' + version + '.jar')).as_posix()
             self.assertEqual('ORG_GRADLE_PROJECT_grassSlabsMainJar=' + expected_jar,
                              (workspace / 'environment').read_text().strip())
+
+    def test_a_release_uses_the_verified_public_jar(self):
+        self.check_public_jar(corrupt=False)
+
+    def test_a_changed_public_jar_is_rejected_before_exporting_its_path(self):
+        self.check_public_jar(corrupt=True)
+
+    def check_public_jar(self, corrupt):
+        for workflow in ['.github/workflows/ci.yml', '.github/workflows/deploy-release.yml']:
+            with self.subTest(workflow=workflow), tempfile.TemporaryDirectory() as temporary:
+                workspace = Path(temporary)
+                (workspace / 'gradle').mkdir()
+                version = '1.2.1.2602001'
+                published = b'checksum-bound public Grass Slabs fixture'
+                checksum = hashlib.sha256(published).hexdigest()
+                (workspace / 'gradle/grass-slabs-release.properties').write_text(
+                    'source.commit=' + '0' * 40 + '\nversion=' + version + '\nkind=release\nsha256=' + checksum + '\n',
+                    encoding='utf-8', newline='\n')
+                fixture = workspace / 'published.jar'
+                fixture.write_bytes(b'changed bytes' if corrupt else published)
+                environment = dict(os.environ, GITHUB_WORKSPACE=workspace.as_posix(),
+                                   GITHUB_ENV=(workspace / 'environment').as_posix(),
+                                   CAPTURE_FILE=(workspace / 'arguments').as_posix(),
+                                   PUBLISHED_FIXTURE=fixture.as_posix())
+                # Model GitHub's download command; its arguments choose the actual destination.
+                download = '''gh() {
+    printf '%s\\n' "$@" > "$CAPTURE_FILE"
+    local destination='' filename=''
+    while (( $# > 0 )); do
+        case "$1" in
+            --dir) destination="$2"; shift 2 ;;
+            --pattern) filename="$2"; shift 2 ;;
+            *) shift ;;
+        esac
+    done
+    cp "$PUBLISHED_FIXTURE" "$destination/$filename"
+}
+'''
+                build = shell_body(workflow_step('Build pinned optional Grass Slabs dependency', workflow))
+                result = subprocess.run([bash_executable(), '-c', download + build], cwd=workspace,
+                                        env=environment, capture_output=True, text=True)
+                if corrupt:
+                    self.assertNotEqual(0, result.returncode)
+                    self.assertFalse((workspace / 'environment').exists())
+                else:
+                    self.assertEqual(0, result.returncode, result.stderr)
+                    arguments = (workspace / 'arguments').read_text().splitlines()
+                    self.assertEqual(['release', 'download', version], arguments[:3])
+                    self.assertIn('MinecraftModDevelopmentMods/SkysGrassSlabs', arguments)
+                    jar = workspace / '.gradle/qualification-sources/grass-slabs/build/libs' / ('SkysGrassSlabs-' + version + '.jar')
+                    self.assertEqual(published, jar.read_bytes())
+                    self.assertEqual('ORG_GRADLE_PROJECT_grassSlabsMainJar=' + jar.as_posix(),
+                                     (workspace / 'environment').read_text().strip())
 
     def test_invalid_source_commit_is_rejected(self):
         read_pin = shell_body(workflow_step('Read coordinated Grass Slabs source pin'))

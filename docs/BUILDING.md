@@ -30,7 +30,8 @@ the packaged jar, so save recovery works in development runs.
 The optional Grass Slabs integration uses the release recorded in the lock
 file. Build its exact source commit in the sibling checkout, or pass
 `-PgrassSlabsMainJar=<jar>` with that released jar. The checksum must match.
-CI and release builds prepare the pinned source before running these checks.
+CI and release builds download and checksum-check the public jar for a release
+pin. Unreleased candidates are built from their pinned source instead.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
 Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each
