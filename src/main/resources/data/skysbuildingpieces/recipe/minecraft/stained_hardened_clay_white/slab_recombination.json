@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/white_terracotta",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stained_hardened_clay_white_slab"
+  },
+  "result": {
+    "id": "minecraft:white_terracotta",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_white_slab"
+  }
+}

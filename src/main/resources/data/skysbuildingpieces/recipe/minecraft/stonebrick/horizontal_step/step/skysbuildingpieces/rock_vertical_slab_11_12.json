@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "skysbuildingpieces:stonebrick_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_horizontal_step",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_vertical_slab"
+      }
+    ]
+  }
+}

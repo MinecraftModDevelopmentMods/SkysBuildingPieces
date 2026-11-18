@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/cobblestone_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:cobblestone_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:cobblestone_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:cobblestone_horizontal_step"
+  }
+}

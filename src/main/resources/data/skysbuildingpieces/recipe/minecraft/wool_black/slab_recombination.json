@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/black_wool",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:wool_black_slab"
+  },
+  "result": {
+    "id": "minecraft:black_wool",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_black_slab"
+  }
+}

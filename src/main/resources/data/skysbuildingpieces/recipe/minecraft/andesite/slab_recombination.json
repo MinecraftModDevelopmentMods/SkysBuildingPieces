@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/andesite",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:andesite_slab"
+  },
+  "result": {
+    "id": "minecraft:andesite",
+    "count": 1
+  }
+}

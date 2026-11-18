@@ -1,0 +1,27 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/iron_block_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:iron_block_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:iron_block_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:iron_block_vertical_slab"
+      }
+    ]
+  }
+}

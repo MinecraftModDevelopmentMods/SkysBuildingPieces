@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/obsidian_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:obsidian_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:obsidian_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:obsidian_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:obsidian_vertical_step"
+      }
+    ]
+  }
+}

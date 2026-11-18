@@ -2521,5 +2521,23 @@
     "materials": [
       "minecraft:dirt"
     ]
+  },
+  {
+    "id": "path_step_00",
+    "group": "path",
+    "shape": "step",
+    "states": 12,
+    "materials": [
+      "minecraft:grass_path"
+    ]
+  },
+  {
+    "id": "path_corner_00",
+    "group": "path",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "minecraft:grass_path"
+    ]
   }
 ]

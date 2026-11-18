@@ -1,0 +1,27 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/chiseled_sandstone_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:chiseled_sandstone_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:chiseled_sandstone_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_vertical_slab"
+      }
+    ]
+  }
+}

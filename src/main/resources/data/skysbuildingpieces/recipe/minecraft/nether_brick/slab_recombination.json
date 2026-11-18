@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/nether_bricks",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:nether_brick_slab"
+  },
+  "result": {
+    "id": "minecraft:nether_bricks",
+    "count": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/end_stone_bricks",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:end_stone_brick_slab"
+  },
+  "result": {
+    "id": "minecraft:end_stone_bricks",
+    "count": 1
+  }
+}

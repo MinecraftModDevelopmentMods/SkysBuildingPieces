@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/black_terracotta",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stained_hardened_clay_black_slab"
+  },
+  "result": {
+    "id": "minecraft:black_terracotta",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_black_slab"
+  }
+}

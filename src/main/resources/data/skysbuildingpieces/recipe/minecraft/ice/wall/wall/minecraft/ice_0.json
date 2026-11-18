@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/ice_wall",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": "minecraft:ice"
+  },
+  "result": {
+    "id": "skysbuildingpieces:ice_wall",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:ice_wall"
+  }
+}

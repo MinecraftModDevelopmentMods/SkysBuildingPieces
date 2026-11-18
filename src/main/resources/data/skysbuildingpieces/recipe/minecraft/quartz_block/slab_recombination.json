@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/quartz_block",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:quartz_slab"
+  },
+  "result": {
+    "id": "minecraft:quartz_block",
+    "count": 1
+  }
+}

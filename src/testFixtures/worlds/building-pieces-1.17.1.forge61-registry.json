@@ -1,0 +1,214 @@
+{
+  "source_world_sha256": "E7EC1B7CD05A744B241C135AA47211326B218FD30F32D0A818748B5B03C89A67",
+  "snapshot_entries": {
+    "minecraft:block": {
+      "minecraft:chain": 242,
+      "minecraft:grass": 95
+    },
+    "minecraft:entity_type": {
+      "minecraft:boat": 6,
+      "minecraft:potion": 87
+    },
+    "minecraft:item": {
+      "minecraft:chain": 248,
+      "minecraft:grass": 89,
+      "minecraft:scute": 571
+    },
+    "minecraft:point_of_interest_type": {
+      "minecraft:nitwit": 11,
+      "minecraft:unemployed": 0
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:entity.leash_knot.break": 415,
+      "minecraft:entity.leash_knot.place": 416,
+      "minecraft:entity.puffer_fish.ambient": 666,
+      "minecraft:entity.wolf.howl": 939
+    },
+    "minecraft:worldgen/biome": {
+      "minecraft:badlands": 37,
+      "minecraft:badlands_plateau": 39,
+      "minecraft:bamboo_jungle": 168,
+      "minecraft:bamboo_jungle_hills": 169,
+      "minecraft:basalt_deltas": 173,
+      "minecraft:beach": 16,
+      "minecraft:birch_forest": 27,
+      "minecraft:birch_forest_hills": 28,
+      "minecraft:cold_ocean": 46,
+      "minecraft:crimson_forest": 171,
+      "minecraft:dark_forest": 29,
+      "minecraft:dark_forest_hills": 157,
+      "minecraft:deep_cold_ocean": 49,
+      "minecraft:deep_frozen_ocean": 50,
+      "minecraft:deep_lukewarm_ocean": 48,
+      "minecraft:deep_ocean": 24,
+      "minecraft:deep_warm_ocean": 47,
+      "minecraft:desert": 2,
+      "minecraft:desert_hills": 17,
+      "minecraft:desert_lakes": 130,
+      "minecraft:dripstone_caves": 174,
+      "minecraft:end_barrens": 43,
+      "minecraft:end_highlands": 42,
+      "minecraft:end_midlands": 41,
+      "minecraft:eroded_badlands": 165,
+      "minecraft:flower_forest": 132,
+      "minecraft:forest": 4,
+      "minecraft:frozen_ocean": 10,
+      "minecraft:frozen_river": 11,
+      "minecraft:giant_spruce_taiga": 160,
+      "minecraft:giant_spruce_taiga_hills": 161,
+      "minecraft:giant_tree_taiga": 32,
+      "minecraft:giant_tree_taiga_hills": 33,
+      "minecraft:gravelly_mountains": 131,
+      "minecraft:ice_spikes": 140,
+      "minecraft:jungle": 21,
+      "minecraft:jungle_edge": 23,
+      "minecraft:jungle_hills": 22,
+      "minecraft:lukewarm_ocean": 45,
+      "minecraft:lush_caves": 175,
+      "minecraft:modified_badlands_plateau": 167,
+      "minecraft:modified_gravelly_mountains": 162,
+      "minecraft:modified_jungle": 149,
+      "minecraft:modified_jungle_edge": 151,
+      "minecraft:modified_wooded_badlands_plateau": 166,
+      "minecraft:mountain_edge": 20,
+      "minecraft:mountains": 3,
+      "minecraft:mushroom_field_shore": 15,
+      "minecraft:mushroom_fields": 14,
+      "minecraft:nether_wastes": 8,
+      "minecraft:ocean": 0,
+      "minecraft:plains": 1,
+      "minecraft:river": 7,
+      "minecraft:savanna": 35,
+      "minecraft:savanna_plateau": 36,
+      "minecraft:shattered_savanna": 163,
+      "minecraft:shattered_savanna_plateau": 164,
+      "minecraft:small_end_islands": 40,
+      "minecraft:snowy_beach": 26,
+      "minecraft:snowy_mountains": 13,
+      "minecraft:snowy_taiga": 30,
+      "minecraft:snowy_taiga_hills": 31,
+      "minecraft:snowy_taiga_mountains": 158,
+      "minecraft:snowy_tundra": 12,
+      "minecraft:soul_sand_valley": 170,
+      "minecraft:stone_shore": 25,
+      "minecraft:sunflower_plains": 129,
+      "minecraft:swamp": 6,
+      "minecraft:swamp_hills": 134,
+      "minecraft:taiga": 5,
+      "minecraft:taiga_hills": 19,
+      "minecraft:taiga_mountains": 133,
+      "minecraft:tall_birch_forest": 155,
+      "minecraft:tall_birch_hills": 156,
+      "minecraft:the_end": 9,
+      "minecraft:the_void": 127,
+      "minecraft:warm_ocean": 44,
+      "minecraft:warped_forest": 172,
+      "minecraft:wooded_badlands_plateau": 38,
+      "minecraft:wooded_hills": 18,
+      "minecraft:wooded_mountains": 34
+    }
+  },
+  "inspected_nbt_records": 5782,
+  "typed_uses": {
+    "minecraft:grass": {
+      "kind": "vanilla_block_rename",
+      "positions": 23326
+    },
+    "minecraft:beach": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:birch_forest": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:cold_ocean": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:deep_frozen_ocean": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:desert": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:dripstone_caves": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:forest": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:frozen_ocean": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:lush_caves": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:ocean": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:plains": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:river": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:sunflower_plains": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:swamp": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:taiga": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    },
+    "minecraft:the_end": {
+      "kind": "vanilla_biome_conversion",
+      "cells": 982016,
+      "renamed": 18240
+    }
+  },
+  "empty_capabilities": {
+    "original": {
+      "DIM-1/data/capabilities.dat": "8084A41EEABE6A0B9AD084F5072D44090AB6B39FC6F69E1042AC3A9A355F816A",
+      "DIM1/data/capabilities.dat": "8084A41EEABE6A0B9AD084F5072D44090AB6B39FC6F69E1042AC3A9A355F816A",
+      "data/capabilities.dat": "8084A41EEABE6A0B9AD084F5072D44090AB6B39FC6F69E1042AC3A9A355F816A"
+    },
+    "rewritten": {
+      "DIM-1/data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9",
+      "DIM1/data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9",
+      "data/capabilities.dat": "509CB67192AED4E5BAC9D8DCCF1C5DE98D20F0E84E36F47244183E75BA72B1A9"
+    },
+    "control_log_sha256": "902EBF8AF40259E0496E22D43D4B39BA10D14CCC1791E48DB866F538CB106D55"
+  }
+}

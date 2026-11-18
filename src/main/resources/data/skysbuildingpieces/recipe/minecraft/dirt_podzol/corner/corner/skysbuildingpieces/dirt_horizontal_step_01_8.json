@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_podzol_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:dirt_podzol_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:dirt_podzol_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_podzol_horizontal_step"
+      }
+    ]
+  }
+}

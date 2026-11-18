@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/purpur_block_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:purpur_block_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:purpur_block_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:purpur_block_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:purpur_block_horizontal_step"
+      }
+    ]
+  }
+}

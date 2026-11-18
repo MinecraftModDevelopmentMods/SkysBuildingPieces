@@ -1,0 +1,27 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_silver_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": "skysbuildingpieces:stained_hardened_clay_silver_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stained_hardened_clay_silver_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_silver_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stained_hardened_clay_silver_vertical_slab"
+      }
+    ]
+  }
+}

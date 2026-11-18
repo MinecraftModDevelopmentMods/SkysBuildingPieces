@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/nether_brick_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "skysbuildingpieces:nether_brick_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:nether_brick_horizontal_step",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:nether_brick_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:nether_brick_vertical_slab"
+      }
+    ]
+  }
+}

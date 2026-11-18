@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_mossy_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": "skysbuildingpieces:stonebrick_mossy_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_mossy_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_mossy_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_mossy_vertical_step"
+      }
+    ]
+  }
+}
