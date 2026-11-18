@@ -78,7 +78,7 @@ def audit(directory, phase, control=False, packaged_offline=False, no_early_disp
     directory = Path(directory)
     log = (directory / "logs/latest.log").read_text(encoding="utf-8")
     unchanged = unchanged_native_settings(directory, (
-        "fml.toml", "neoforge-client.toml", "neoforge-local.toml", "neoforge-synced.toml"), no_early_display)
+        "fml.toml", "neoforge-client.toml", "neoforge-common.toml", "neoforge-server.toml"), no_early_display)
     if not unchanged:
         raise ValueError("NeoForge settings differ from the controlled defaults")
     if no_early_display:
@@ -126,7 +126,7 @@ def classify_server(log, debug, unchanged_defaults, profile=None):
 
 def audit_server(directory, phase):
     directory = Path(directory)
-    unchanged = unchanged_native_settings(directory, ("fml.toml", "neoforge-local.toml", "neoforge-synced.toml"))
+    unchanged = unchanged_native_settings(directory, ("fml.toml", "neoforge-common.toml", "neoforge-server.toml"))
     receipt = classify_server((directory / 'logs/latest.log').read_text(encoding='utf-8'),
                               (directory / 'logs/debug.log').read_text(encoding='utf-8'), unchanged, profile_for(directory))
     if list((directory / 'crash-reports').glob('*')):
