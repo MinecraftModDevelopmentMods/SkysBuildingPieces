@@ -27,10 +27,10 @@ the packaged jar, so save recovery works in development runs.
 - `runMineralogyClient` and `runMineralogyServer` add the optional Mineralogy and
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
-The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs262/SkysGrassSlabs` checkout,
-or pass `-PgrassSlabsMainJar=<jar>`. The jar must match its pinned hash. CI builds the pinned commit before testing the optional
-integration; it can run after that commit is available in the upstream repository.
+The optional Grass Slabs integration uses the release recorded in the lock
+file. Build its exact source commit in the sibling checkout, or pass
+`-PgrassSlabsMainJar=<jar>` with that released jar. The checksum must match.
+CI and release builds prepare the pinned source before running these checks.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
 Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each

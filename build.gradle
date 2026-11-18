@@ -876,3 +876,12 @@ apply from: 'gradle/forge-server-control.gradle'
 apply from: 'gradle/native-unit-launcher.gradle'
 
 apply from: 'gradle/recipe-resource-sync.gradle'
+
+// Exercise the release dependency commands without starting Minecraft.
+tasks.register('releaseGrassDependencyWorkflowTest', Exec) {
+    group = 'verification'
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+            '-m', 'unittest', 'discover', '-s', 'tools', '-p', 'test_release_grass_dependency.py'
+}
+
+tasks.named('check') { dependsOn tasks.named('releaseGrassDependencyWorkflowTest') }
