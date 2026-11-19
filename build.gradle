@@ -12,6 +12,55 @@ plugins {
     id 'net.neoforged.gradle.userdev' version '7.1.38'
 }
 
+
+// Give each Minecraft asset index its own name while keeping shared objects intact.
+def clientAssetDownloadType = net.neoforged.gradle.common.runtime.tasks.DownloadAssets
+def clientAssetDownloadMethods = ['downloadAssetIndex', 'downloadAssets'].collect { methodName ->
+    def method = clientAssetDownloadType.getDeclaredMethod(methodName)
+    method.accessible = true
+    method
+}
+def clientAssetMatches = { File assetFile, String expectedHash ->
+    if (!assetFile.isFile()) return false
+    def digest = java.security.MessageDigest.getInstance('SHA-1')
+    assetFile.withInputStream { stream ->
+        byte[] buffer = new byte[8192]
+        for (int bytesRead = stream.read(buffer); bytesRead >= 0; bytesRead = stream.read(buffer)) {
+            if (bytesRead > 0) digest.update(buffer, 0, bytesRead)
+        }
+    }
+    digest.digest().encodeHex().toString().equalsIgnoreCase(expectedHash)
+}
+tasks.withType(clientAssetDownloadType).configureEach { assetTask ->
+    assetIndex.set(versionJson.map { metadata ->
+        "minecraft-${metadata.id}-${metadata.assetIndex.sha1}"
+    })
+    // NeoGradle 7.1.38 snapshots and clears the shared object directory. Its own
+    // verified download workers can fill missing files without clearing that store.
+    actions.clear()
+    doLast {
+        clientAssetDownloadMethods.each { method ->
+            try {
+                method.invoke(assetTask)
+            } catch (java.lang.reflect.InvocationTargetException failure) {
+                throw failure.targetException
+            }
+        }
+    }
+    outputs.cacheIf { false }
+    outputs.upToDateWhen {
+        File index = assetIndexFile.get().asFile
+        if (!clientAssetMatches(index, versionJson.get().assetIndex.sha1)) return false
+        File objects = clientAssetDownloadType.getAssetsDirectory(project).get().dir('objects').asFile
+        def entries = new groovy.json.JsonSlurper().parse(index).objects.values()
+        entries.every { entry ->
+            File asset = new File(objects, entry.hash.substring(0, 2) + '/' + entry.hash)
+            asset.length() == entry.size && clientAssetMatches(asset, entry.hash)
+        }
+    }
+}
+
+
 def sha256Of = { File inputFile ->
     MessageDigest digest = MessageDigest.getInstance('SHA-256')
     inputFile.withInputStream { input ->
