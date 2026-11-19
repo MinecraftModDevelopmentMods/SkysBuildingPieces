@@ -1,0 +1,41 @@
+{
+  "source_world_sha256": "D4D261CC385C4E2C7249F1D72FE6C4479D9D98B0208EFC93A1FDBAB78EFBC209",
+  "snapshot_entries": {
+    "minecraft:block": {
+      "minecraft:grass": 94
+    },
+    "minecraft:entity_type": {
+      "minecraft:zombie_pigman": 56
+    },
+    "minecraft:item": {
+      "minecraft:grass": 76,
+      "minecraft:scute": 519,
+      "minecraft:zombie_pigman_spawn_egg": 753
+    },
+    "minecraft:memory_module_type": {
+      "minecraft:golem_last_seen_time": 24,
+      "minecraft:opened_doors": 16
+    },
+    "minecraft:point_of_interest_type": {
+      "minecraft:nitwit": 11,
+      "minecraft:unemployed": 0
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    },
+    "minecraft:sound_event": {
+      "minecraft:entity.parrot.imitate.enderman": 446,
+      "minecraft:entity.parrot.imitate.panda": 454,
+      "minecraft:entity.parrot.imitate.polar_bear": 457,
+      "minecraft:entity.parrot.imitate.wolf": 470,
+      "minecraft:entity.parrot.imitate.zombie_pigman": 472,
+      "minecraft:entity.zombie_pigman.ambient": 784,
+      "minecraft:entity.zombie_pigman.angry": 785,
+      "minecraft:entity.zombie_pigman.death": 786,
+      "minecraft:entity.zombie_pigman.hurt": 787,
+      "minecraft:music.nether": 400
+    }
+  },
+  "inspected_nbt_records": 5013,
+  "typed_uses": {}
+}

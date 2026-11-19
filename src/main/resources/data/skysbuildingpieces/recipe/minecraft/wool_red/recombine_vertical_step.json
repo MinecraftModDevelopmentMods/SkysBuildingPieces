@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_red_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": "skysbuildingpieces:wool_red_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_red_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_red_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_red_vertical_step"
+      }
+    ]
+  }
+}

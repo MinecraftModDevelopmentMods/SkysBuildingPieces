@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/prismarine",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:prismarine_slab"
+  },
+  "result": {
+    "id": "minecraft:prismarine",
+    "count": 1
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "source_world_sha256": "1B81301B16F4D1191B00581056AF6A05AA9237D5FCE0657324E5D135BC671095",
+  "snapshot_entries": {
+    "minecraft:item": {
+      "minecraft:pottery_shard_archer": 2115,
+      "minecraft:pottery_shard_arms_up": 2117,
+      "minecraft:pottery_shard_prize": 2116,
+      "minecraft:pottery_shard_skull": 2118
+    },
+    "minecraft:sound_event": {
+      "minecraft:item.brush.brush_sand_completed": 1226,
+      "minecraft:item.brush.brushing": 1225,
+      "minecraft:music.overworld.jungle_and_forest": 1363
+    }
+  },
+  "saved_uses": {
+    "minecraft:pottery_shard_archer": 0,
+    "minecraft:pottery_shard_arms_up": 0,
+    "minecraft:pottery_shard_prize": 0,
+    "minecraft:pottery_shard_skull": 0,
+    "minecraft:item.brush.brush_sand_completed": 0,
+    "minecraft:item.brush.brushing": 0,
+    "minecraft:music.overworld.jungle_and_forest": 0
+  },
+  "inspected_nbt_values": 224042,
+  "inspected_records": {
+    "nbt_files": 8,
+    "nbt_values": 224042,
+    "region_files": 6,
+    "region_records": 345
+  }
+}

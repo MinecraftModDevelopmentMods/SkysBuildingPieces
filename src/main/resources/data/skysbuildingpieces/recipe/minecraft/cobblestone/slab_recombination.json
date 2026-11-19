@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/cobblestone",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:cobblestone_slab"
+  },
+  "result": {
+    "id": "minecraft:cobblestone",
+    "count": 1
+  }
+}

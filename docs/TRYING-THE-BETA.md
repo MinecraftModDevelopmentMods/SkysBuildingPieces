@@ -1,11 +1,34 @@
 # Trying the beta
 
-Install the main jar in a Minecraft 1.10.2 Forge 12.18.3.2511 instance using
-Java 8. The sources and Javadoc jars are not game mods. Start with a new
+For Mineralogy, use the core jar with Mineralogy and its OreSpawn dependency.
+Do not install the separate Mineralogy piece add-on from the earlier tests.
+The generated `runMineralogyClient` Eclipse profile loads the native mods in
+a separate development folder. Check rock textures, all step and corner
+orientations, cutting recipes and rebuilding to the native slab.
+
+Install the main jar in a Minecraft 26.1.2 Forge 64.0.9 instance using
+Java 25. The sources and Javadoc jars are not game mods. Start with a new
 creative world; use a separate copy when trying an existing world.
 
 Before relying on the beta in a modpack, check:
 
+- Check names such as Gold Wall, Gold Stairs and Oak Step. Switch the game
+  language and check translated piece names too. Renamed items keep their custom names.
+- Check gold, packed ice and the other wall materials in straight runs, corners
+  and junctions. The panels should be lower than the posts. Add and remove a
+  block or torch above the middle of a run, then check selection and collision.
+- Open the Sky's Building Pieces creative tab. Look for pieces such as Gold
+  Wall and Oak Step. Oak slabs should still be in the vanilla creative tabs.
+- In **Mods → Sky's Building Pieces → Config**, check that
+  **Directional slab placement** starts on. Turn it off, restart Minecraft,
+  then place and join an oak slab and a glass slab as ordinary horizontal slabs.
+- Build clear and stained glass walls in straight runs, corners and junctions.
+  Matching panels should look continuous; exposed ends, posts and colour changes
+  should keep their borders. Add and remove a block above a straight run to check
+  that its supporting post appears and disappears.
+- Aim at the lower glass panels and taller posts. Selection should follow their
+  shape. Place ordinary and redstone torches on the walls, then remove the wall
+  beneath them to check that the torches drop.
 - Place slabs, steps and corners in every direction, including upside down
   and vertical placements. Sneaking turns steps vertically.
 - With a slab such as oak, glass or wool, click the centre and edges of each
@@ -23,10 +46,14 @@ Before relying on the beta in a modpack, check:
   templates should not appear in creative inventory or crafting results.
 - Check grass colours in several biomes, nearby snow, covered grass becoming
   dirt, plant support, breaking drops and Silk Touch.
+- Use a shovel on a grass step or corner above ordinary grass. Both should
+  become paths, with one durability point used. Check after saving and reloading.
 - Check wall and pane connections and stair corners, including their collision.
-- With BuildingBricks present, first leave replacement disabled. On a second
-  backup enable it, restart, and check converted blocks, containers and item
-  entities. Save and reload, then inspect the migration report.
+- On an upgrade copy, check old blocks, containers and item entities. Save and
+  reload, then inspect the migration report. Check joined stairs, wall ends,
+  snow caps and path supports as well as each piece's material and orientation.
+- Fill pieces with water, drain them, and check that wet grass and path pieces
+  become matching dirt. Wet pieces should reject shovel flattening.
 
 Check ordinary dirt vertical slabs in all four directions and combine matching
 halves into dirt. When testing removal of BuildingBricks, use a fresh backup

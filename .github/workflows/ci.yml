@@ -1,22 +1,76 @@
-name: Sky's Building Pieces 1.10 CI
+name: Sky's Building Pieces 26.1.2 CI
 
 on:
   push:
     branches:
-      - master-1.10.2
+      - master-26.1.2
       - 'feature/**'
   pull_request:
     branches:
-      - master-1.10.2
+      - master-26.1.2
 
 permissions:
   contents: read
 
 concurrency:
-  group: skysbuildingpieces-1.10-${{ github.workflow }}-${{ github.ref }}
+  group: skysbuildingpieces-26.1.2-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  cold-forge-bootstrap:
+    name: Cold Forge bootstrap
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install pinned Java 25 runtime and toolchain
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '25.0.3+9.0.LTS'
+
+      - name: Pin production Java
+        run: |
+          echo "SBP_JAVA25_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+
+      - name: Bootstrap Forge from an empty cache
+        shell: bash
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/skysbuildingpieces-cold-gradle
+        run: |
+          set -euo pipefail
+          test ! -e .gradle
+          test ! -e "$GRADLE_USER_HOME"
+          mkdir -p "$GRADLE_USER_HOME"
+          chmod +x ./gradlew
+          gradle_args=(
+            classes test
+            --no-daemon --no-build-cache --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+
+      - name: Verify same-cache bootstrap offline
+        shell: bash
+        env:
+          ORESPAWN_MAVENIZER_OFFLINE: 'true'
+          GRADLE_USER_HOME: ${{ runner.temp }}/skysbuildingpieces-cold-gradle
+        run: |
+          set -euo pipefail
+          gradle_args=(
+            classes test
+            --rerun-tasks --offline --no-daemon --no-build-cache --stacktrace --max-workers=2
+            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+            -Dorg.gradle.java.installations.auto-detect=false
+            -Dorg.gradle.java.installations.auto-download=false
+          )
+          ./gradlew "${gradle_args[@]}"
+
   build:
     name: Build, test, and audit
     runs-on: ubuntu-latest
@@ -26,58 +80,126 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Install Java 8 toolchain
+      - name: Read target Java metadata
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          value() { sed -n "s/^$1=//p" gradle.properties; }
+          test "$(value java_toolchain_version)" = "$(value gradle_java_toolchain_version)"
+          echo "java_setup_version=$(value java_setup_version)" >> "$GITHUB_OUTPUT"
+
+      - name: Install pinned Java 25 runtime and toolchain
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
-          java-version: '8.0.502+7'
+          java-version: ${{ steps.target.outputs.java_setup_version }}
 
-      - name: Pin production Java
+      - name: Pin production Java for coordinated builds
+        shell: bash
         run: |
-          echo "SGS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-          echo "SBP_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-          echo "STS_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-
-      - name: Install Java 17 for Gradle
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: microsoft
-          java-version: '17'
+          set -euo pipefail
+          for prefix in SGS SBP STS; do
+            echo "${prefix}_JAVA25_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          done
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
-
       - name: Make the wrapper executable
         run: chmod +x ./gradlew
+
+      - name: Read coordinated Grass Slabs source pin
+        id: grass
+        shell: bash
+        run: |
+          set -euo pipefail
+          commit="$(sed -n 's/^source.commit=//p' gradle/grass-slabs-release.properties)"
+          [[ "$commit" =~ ^[0-9a-f]{40}$ ]]
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+
+      - name: Check out pinned Grass Slabs source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: MinecraftModDevelopmentMods/SkysGrassSlabs
+          ref: ${{ steps.grass.outputs.commit }}
+          path: .gradle/qualification-sources/grass-slabs
+
+      - name: Build pinned optional Grass Slabs dependency
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dependency="$GITHUB_WORKSPACE/.gradle/qualification-sources/grass-slabs"
+          version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
+          kind="$(sed -n 's/^kind=//p' gradle/grass-slabs-release.properties)"
+          if [[ "$kind" == 'release' ]]; then
+            # Test the same immutable jar that players install.
+            jar="SkysGrassSlabs-$version.jar"
+            mkdir -p "$dependency/build/libs"
+            gh release download "$version" --repo MinecraftModDevelopmentMods/SkysGrassSlabs \
+              --pattern "$jar" --dir "$dependency/build/libs"
+            checksum="$(sed -n 's/^sha256=//p' gradle/grass-slabs-release.properties)"
+            [[ "$checksum" =~ ^[0-9A-Fa-f]{64}$ ]]
+            printf '%s  %s\n' "$checksum" "$dependency/build/libs/$jar" | sha256sum --check -
+          elif [[ "$kind" == 'local-candidate' ]]; then
+            bash "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
+              -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+          else
+            echo 'Grass Slabs needs a release or local-candidate pin' >&2
+            exit 1
+          fi
+          echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
 
       - name: Build, test, and audit release artifacts
         run: >-
           ./gradlew clean check integrationTest build javadoc verifyReleaseArtifacts writeReleaseChecksums
-          verifyEclipseProductionClasspath  --no-daemon --stacktrace
+          verifyEclipseProductionClasspath --no-daemon --stacktrace
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+          -Dorg.gradle.java.installations.auto-detect=false
+          -Dorg.gradle.java.installations.auto-download=false
 
       - name: Replay artifact checks offline
+        env:
+          ORESPAWN_MAVENIZER_OFFLINE: 'true'
         run: >-
           ./gradlew assemble verifyReleaseArtifacts writeReleaseChecksums --offline --no-daemon --stacktrace
+          -Dorg.gradle.java.installations.paths="$JAVA_HOME"
 
       - name: Upload audited release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.10.2-${{ github.sha }}
+          name: SkysBuildingPieces-26.1.2-${{ github.sha }}
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.0.110021.jar
-            build/libs/SkysBuildingPieces-0.3.0.110021-sources.jar
-            build/libs/SkysBuildingPieces-0.3.0.110021-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.10.2601021.jar
+            build/libs/SkysBuildingPieces-0.3.10.2601021-sources.jar
+            build/libs/SkysBuildingPieces-0.3.10.2601021-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
+
+      - name: Retain decompiler diagnostics after a failure
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination=build/mavenizer-diagnostics
+          mkdir -p "$destination"
+          count=0
+          for log in "${GRADLE_USER_HOME:-$HOME/.gradle}"/caches/minecraftforge/forgegradle/mavenizer/caches/forge/.global/mcp/*/forge/*/decompile/log.txt; do
+            [[ -f "$log" ]] || continue
+            count=$((count + 1))
+            cp "$log" "$destination/decompile-$count.log"
+            printf '%s\t%s\n' "decompile-$count.log" "$log" >> "$destination/paths.txt"
+          done
 
       - name: Upload diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: SkysBuildingPieces-1.10.2-diagnostics-${{ github.sha }}
+          name: SkysBuildingPieces-26.1.2-diagnostics-${{ github.sha }}
           if-no-files-found: ignore
           retention-days: 14
           path: |
@@ -86,3 +208,4 @@ jobs:
             build/*-run/logs/**
             build/*-run/**/*.properties
             build/problems/**
+            build/mavenizer-diagnostics/**

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/bricks",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:brick_slab"
+  },
+  "result": {
+    "id": "minecraft:bricks",
+    "count": 1
+  }
+}

@@ -1,0 +1,5 @@
+
+# Forge 61 client defaults used by the isolated launch checks.
+[client]
+showLoadWarnings = true
+allowMipmapLowering = false

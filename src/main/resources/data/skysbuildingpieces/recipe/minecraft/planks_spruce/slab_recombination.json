@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/spruce_planks",
+  "pattern": ["XX"],
+  "key": {
+    "X": "minecraft:spruce_slab"
+  },
+  "result": {
+    "id": "minecraft:spruce_planks",
+    "count": 1
+  }
+}

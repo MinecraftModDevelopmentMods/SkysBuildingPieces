@@ -1,0 +1,21 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "zone.moddev.mc.skysbuildingpieces.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "mixins": [
+        "BlockStateDataAccessor",
+        "BlockStateDataMixin",
+        "DataFixTypesMixin",
+        "FileFixerUpperMixin",
+        "ForgeHooksMixin",
+        "NativeSlabPlacementMixin",
+        "PieceHardnessMixin",
+        "SerializableChunkDataMixin",
+        "SimpleRegionStorageMixin",
+        "SparseBiomePaletteMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

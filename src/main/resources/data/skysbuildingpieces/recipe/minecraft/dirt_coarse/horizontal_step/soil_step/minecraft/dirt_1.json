@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_coarse_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": "minecraft:coarse_dirt"
+  },
+  "result": {
+    "id": "skysbuildingpieces:dirt_coarse_horizontal_step",
+    "count": 8
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:dirt_coarse_horizontal_step"
+  }
+}

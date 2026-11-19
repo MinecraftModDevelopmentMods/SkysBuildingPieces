@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/rhyolite",
+  "pattern": ["XX"],
+  "key": {
+    "X": "mineralogy:rhyolite_slab"
+  },
+  "result": {
+    "id": "mineralogy:rhyolite",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:rhyolite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:rhyolite_slab"
+      }
+    ]
+  }
+}

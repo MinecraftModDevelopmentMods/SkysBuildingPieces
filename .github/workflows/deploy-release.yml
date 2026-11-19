@@ -297,6 +297,52 @@ jobs:
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
 
+      - name: Read coordinated Grass Slabs source pin
+        if: needs.preflight.outputs.target_branch == 'master-26.1.2'
+        id: grass
+        shell: bash
+        run: |
+          set -euo pipefail
+          commit="$(sed -n 's/^source.commit=//p' gradle/grass-slabs-release.properties)"
+          [[ "$commit" =~ ^[0-9a-f]{40}$ ]]
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+
+      - name: Check out pinned Grass Slabs source
+        if: needs.preflight.outputs.target_branch == 'master-26.1.2'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: MinecraftModDevelopmentMods/SkysGrassSlabs
+          ref: ${{ steps.grass.outputs.commit }}
+          path: .gradle/qualification-sources/grass-slabs
+
+      - name: Build pinned optional Grass Slabs dependency
+        if: needs.preflight.outputs.target_branch == 'master-26.1.2'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dependency="$GITHUB_WORKSPACE/.gradle/qualification-sources/grass-slabs"
+          version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
+          kind="$(sed -n 's/^kind=//p' gradle/grass-slabs-release.properties)"
+          if [[ "$kind" == 'release' ]]; then
+            # Test the same immutable jar that players install.
+            jar="SkysGrassSlabs-$version.jar"
+            mkdir -p "$dependency/build/libs"
+            gh release download "$version" --repo MinecraftModDevelopmentMods/SkysGrassSlabs \
+              --pattern "$jar" --dir "$dependency/build/libs"
+            checksum="$(sed -n 's/^sha256=//p' gradle/grass-slabs-release.properties)"
+            [[ "$checksum" =~ ^[0-9A-Fa-f]{64}$ ]]
+            printf '%s  %s\n' "$checksum" "$dependency/build/libs/$jar" | sha256sum --check -
+          elif [[ "$kind" == 'local-candidate' ]]; then
+            bash "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
+              -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+          else
+            echo 'Grass Slabs needs a release or local-candidate pin' >&2
+            exit 1
+          fi
+          echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
+
       - name: Build, test, and audit once
         env:
           LOADER_NAME: ${{ needs.preflight.outputs.loader_name }}
@@ -532,6 +578,8 @@ jobs:
         with:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           curseforge-id: ${{ needs.preflight.outputs.curseforge_project_id }}
+          # A timeout or HTTP 500 can follow an accepted upload. Check the file before retrying.
+          curseforge-retry-attempts: 1
           name: Sky's Building Pieces ${{ needs.preflight.outputs.release_version }} for Minecraft ${{ needs.preflight.outputs.minecraft_version }} (${{ needs.preflight.outputs.loader_display }})
           version: ${{ needs.preflight.outputs.release_version }}
           version-type: ${{ inputs.curseforge_release_level }}
