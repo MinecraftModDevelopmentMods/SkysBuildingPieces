@@ -72,7 +72,7 @@ final class NamedPieceStates {
                     state = withProperty(state, property, properties.getStringOr(name, ""));
                 }
             }
-            return Pieces.canonicalState(state);
+            return Pieces.canonicalNamedState(state);
         } catch (RuntimeException failure) {
             throw new LegacyBridge.RecoveryAbort("Cannot recover " + saved.getStringOr("Name", "") + ": "
                     + failure.getMessage(), failure);

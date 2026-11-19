@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.10.2601021
+
+Improves snowy pieces, crafting, wooden fuel, slab placement and inventory compatibility.
+
 ## 0.3.9.2601021
 
 - Each material and shape now has its own block ID. Existing pieces keep their shapes and orientation.

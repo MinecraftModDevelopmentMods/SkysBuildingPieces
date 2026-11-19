@@ -34,6 +34,7 @@ public final class ClientProxy {
         context.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory(BuildingPiecesConfigScreen::new));
         ModelEvent.ModifyBakingResult.BUS.addListener(ContinuousGlassModel::bake);
+        ModelEvent.ModifyBakingResult.BUS.addListener(SnowCoveredGrassModel::bake);
     }
 
     @SubscribeEvent

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/mossy_stone_brick_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stonebrick_mossy_vertical_slab"

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mineralogy_dolomite_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_dolomite_horizontal_step"

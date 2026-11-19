@@ -127,13 +127,29 @@ jobs:
 
       - name: Build pinned optional Grass Slabs dependency
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           dependency="$GITHUB_WORKSPACE/.gradle/qualification-sources/grass-slabs"
-          chmod +x "$dependency/gradlew"
-          "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
-            -Dorg.gradle.java.installations.paths="$JAVA_HOME"
           version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
+          kind="$(sed -n 's/^kind=//p' gradle/grass-slabs-release.properties)"
+          if [[ "$kind" == 'release' ]]; then
+            # Test the same immutable jar that players install.
+            jar="SkysGrassSlabs-$version.jar"
+            mkdir -p "$dependency/build/libs"
+            gh release download "$version" --repo MinecraftModDevelopmentMods/SkysGrassSlabs \
+              --pattern "$jar" --dir "$dependency/build/libs"
+            checksum="$(sed -n 's/^sha256=//p' gradle/grass-slabs-release.properties)"
+            [[ "$checksum" =~ ^[0-9A-Fa-f]{64}$ ]]
+            printf '%s  %s\n' "$checksum" "$dependency/build/libs/$jar" | sha256sum --check -
+          elif [[ "$kind" == 'local-candidate' ]]; then
+            bash "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
+              -Dorg.gradle.java.installations.paths="$JAVA_HOME"
+          else
+            echo 'Grass Slabs needs a release or local-candidate pin' >&2
+            exit 1
+          fi
           echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
 
       - name: Build, test, and audit release artifacts
@@ -158,11 +174,26 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           path: |
-            build/libs/SkysBuildingPieces-0.3.9.2601021.jar
-            build/libs/SkysBuildingPieces-0.3.9.2601021-sources.jar
-            build/libs/SkysBuildingPieces-0.3.9.2601021-javadoc.jar
+            build/libs/SkysBuildingPieces-0.3.10.2601021.jar
+            build/libs/SkysBuildingPieces-0.3.10.2601021-sources.jar
+            build/libs/SkysBuildingPieces-0.3.10.2601021-javadoc.jar
             build/release/SHA256SUMS
             CHANGELOG.md
+
+      - name: Retain decompiler diagnostics after a failure
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination=build/mavenizer-diagnostics
+          mkdir -p "$destination"
+          count=0
+          for log in "${GRADLE_USER_HOME:-$HOME/.gradle}"/caches/minecraftforge/forgegradle/mavenizer/caches/forge/.global/mcp/*/forge/*/decompile/log.txt; do
+            [[ -f "$log" ]] || continue
+            count=$((count + 1))
+            cp "$log" "$destination/decompile-$count.log"
+            printf '%s\t%s\n' "decompile-$count.log" "$log" >> "$destination/paths.txt"
+          done
 
       - name: Upload diagnostics on failure
         if: failure()
@@ -177,3 +208,4 @@ jobs:
             build/*-run/logs/**
             build/*-run/**/*.properties
             build/problems/**
+            build/mavenizer-diagnostics/**

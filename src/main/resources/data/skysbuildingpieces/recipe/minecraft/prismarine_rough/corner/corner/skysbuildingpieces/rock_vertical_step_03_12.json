@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_rough_corner",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:prismarine_rough_vertical_step"

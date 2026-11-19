@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/phyllite",
+  "category": "building",
+  "group": "skys/result/mineralogy/phyllite_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_phyllite_vertical_step"

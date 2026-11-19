@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/rhyolite",
+  "category": "building",
+  "group": "skys/result/mineralogy/rhyolite_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:mineralogy_rhyolite_horizontal_step"

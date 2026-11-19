@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/quartzite",
+  "category": "building",
+  "group": "skys/result/mineralogy/quartzite",
   "pattern": ["XX"],
   "key": {
     "X": "mineralogy:quartzite_slab"

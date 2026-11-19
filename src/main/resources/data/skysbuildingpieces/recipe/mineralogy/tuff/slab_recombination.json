@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/tuff",
+  "category": "building",
+  "group": "skys/result/mineralogy/tuff",
   "pattern": ["XX"],
   "key": {
     "X": "mineralogy:tuff_slab"

@@ -491,13 +491,19 @@ public final class GameplayChecks {
             for (Item tool : new Item[] {Items.WOODEN_PICKAXE, Items.STONE_PICKAXE,
                     Items.IRON_PICKAXE, Items.DIAMOND_PICKAXE, Items.IRON_AXE, Items.IRON_SHOVEL}) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(tool));
-                require(piece.canHarvestBlock(world, position, player) == full.canHarvestBlock(world, position, player),
+                boolean snowPiece = piece.getBlock() instanceof PieceBlock block
+                        && block.definition(piece).type.equals("snow");
+                require(piece.canHarvestBlock(world, position, player)
+                        == (snowPiece || full.canHarvestBlock(world, position, player)),
                         "Material harvest requirements changed: " + piece + " with " + tool);
                 float pieceHardness = piece.getDestroySpeed(world, position);
                 float fullHardness = full.getDestroySpeed(world, position);
                 float expected = full.getDestroyProgress(player, world, position);
                 if (pieceHardness >= 0 && fullHardness > 0) {
                     expected = expected * fullHardness / pieceHardness;
+                }
+                if (snowPiece) {
+                    expected = player.getDestroySpeed(full, position) / pieceHardness / 30;
                 }
                 float actual = piece.getDestroyProgress(player, world, position);
                 require(Float.compare(actual, expected) == 0 || Math.abs(actual - expected) < 0.00001F,

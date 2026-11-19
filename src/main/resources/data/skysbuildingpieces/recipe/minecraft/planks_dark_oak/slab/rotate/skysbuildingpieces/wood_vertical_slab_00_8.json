@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/dark_oak_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:planks_dark_oak_vertical_slab"

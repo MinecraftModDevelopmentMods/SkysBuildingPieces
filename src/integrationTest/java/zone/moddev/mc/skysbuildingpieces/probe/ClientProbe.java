@@ -71,6 +71,8 @@ public final class ClientProbe extends ProbeProxy {
                     return;
                 }
                 RecipePreviewModels.check(minecraft, expectedRecipes);
+                RecipeBookGroupChecks.run(minecraft, expectedRecipes);
+                SnowCoverClientChecks.run(minecraft);
                 // Item components are bound when the world is ready, after the first menu bake.
                 checkCreativeEntries();
                 colours(minecraft);

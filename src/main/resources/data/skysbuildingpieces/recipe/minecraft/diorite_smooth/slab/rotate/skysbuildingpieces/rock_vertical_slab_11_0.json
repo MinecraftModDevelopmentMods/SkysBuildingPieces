@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/minecraft/polished_diorite_slab",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:diorite_smooth_vertical_slab"

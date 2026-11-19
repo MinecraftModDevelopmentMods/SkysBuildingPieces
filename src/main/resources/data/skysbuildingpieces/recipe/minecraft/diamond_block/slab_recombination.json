@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/diamond_block",
+  "category": "building",
+  "group": "skys/result/minecraft/diamond_block",
   "pattern": ["XX"],
   "key": {
     "X": "skysbuildingpieces:diamond_block_slab"

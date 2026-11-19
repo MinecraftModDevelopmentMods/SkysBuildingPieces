@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/granite",
+  "category": "building",
+  "group": "skys/result/minecraft/granite_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:granite_horizontal_step"

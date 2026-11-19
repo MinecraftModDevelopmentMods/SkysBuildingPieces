@@ -46,7 +46,8 @@ still open.
 
 Craft pieces from matching full blocks, slabs and steps. For example, three
 full blocks in a row make six slabs, and two matching slabs placed diagonally
-make four steps. Existing vanilla recipes stay available.
+make four steps. Existing vanilla recipes stay available. Wooden pieces also keep the appropriate
+share of a full block’s furnace fuel.
 You can also rebuild larger pieces: stack two matching corners in the crafting
 grid for one step, or two matching steps for one slab.
 
@@ -63,7 +64,7 @@ server.
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.2.0.2601021 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.1.2601021 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/gold_block_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:gold_block_horizontal_step"

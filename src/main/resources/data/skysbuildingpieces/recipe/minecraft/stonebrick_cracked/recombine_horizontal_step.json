@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/stonebrick_cracked",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_cracked_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:stonebrick_cracked_horizontal_step"

@@ -55,8 +55,14 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
             tag = value['tag']
             if tag in visited:
                 raise ValueError('Circular native ingredient tag: ' + tag)
-            return any(accepts({'tag': entry[1:]} if entry.startswith('#') else {'item': entry},
-                               visited | {tag}) for entry in tags.get(tag, []))
+            for entry in tags.get(tag, []):
+                identity = entry.get('id') if isinstance(entry, dict) else entry
+                if not isinstance(identity, str):
+                    raise ValueError('Malformed native ingredient tag: ' + tag)
+                nested = {'tag': identity[1:]} if identity.startswith('#') else {'item': identity}
+                if accepts(nested, visited | {tag}):
+                    return True
+            return False
         return False
     pattern, width = canonical_pattern(rows)
     reflected = tuple(sorted((width - column, row) for column, row in pattern))
@@ -140,7 +146,7 @@ def prepare(resources, native_recipes=(), tags=None):
                     conditions.append(exists(identity))
             body = {'type': 'skysbuildingpieces:cutting' if preserve else 'minecraft:crafting_shaped',
                     'category': 'building',
-                    'group': 'skysbuildingpieces/' + path.split('/')[-2],
+                    'group': 'skys/result/' + output.replace(':', '/'),
                     'pattern': rows, 'key': {'X': ingredient},
                     'result': {'id': output, 'count': count}}
             if preserve:
@@ -172,6 +178,8 @@ def prepare(resources, native_recipes=(), tags=None):
                 add(base + '/recombine_corner', ['X', 'X'], piece(material, 'corner'),
                     piece(material, 'horizontal_step'), 1)
                 for shape in ('horizontal_step', 'vertical_step'):
+                    if shape == 'vertical_step' and piece(material, shape) == piece(material, 'horizontal_step'):
+                        continue
                     add(base + '/recombine_' + shape, ['X', 'X'], piece(material, shape),
                         piece(material, 'slab'), 1)
                 continue
@@ -240,13 +248,24 @@ def prepare(resources, native_recipes=(), tags=None):
             for shape in ('stairs', 'wall', 'pane'):
                 if shape not in material['blocks']:
                     cut(shape, shape, full)
+            if identity.startswith('minecraft:wool_'):
+                # Exchange older Sky wool pieces without placing them first.
+                for shape in ('slab', 'stairs'):
+                    if shape in material['blocks'] and (identity, shape) in legacy_palettes:
+                        old_item = 'skysbuildingpieces:' + identity.split(':', 1)[1] + '_' + shape
+                        add(base + '/native_' + shape, ['X'], old_item, piece(material, shape), 1, preserve=True)
             if slab is not None and vertical is not None:
                 cut('slab', 'rotate', vertical)
             if slab is not None and not half_input:
                 add(base + '/slab_recombination', ['XX'], slab, full, 1)
             if corner is not None and step is not None:
                 add(base + '/recombine_corner', ['X', 'X'], corner, step, 1)
+            if identity == 'minecraft:dirt' and slab is not None and vertical is not None:
+                add(base + '/vertical_slab_recombination_without_grass_slabs', ['XX'], vertical, full, 1,
+                    [{'type': 'forge:not', 'value': exists(slab)}])
             for shape, source in [('horizontal_step', step), ('vertical_step', upright_step)]:
+                if shape == 'vertical_step' and source == step:
+                    continue
                 output = slab if slab is not None else vertical
                 add(base + '/recombine_' + shape, ['X', 'X'], source, output, 1)
                 # Ordinary dirt still has its vertical slab when Grass Slabs is absent.

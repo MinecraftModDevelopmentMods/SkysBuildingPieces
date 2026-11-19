@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/dirt",
+  "category": "building",
+  "group": "skys/result/skysgrassslabs/dirt_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:dirt_vertical_step"

@@ -24,6 +24,13 @@ class ContinuousGlassBakeTest {
     }
 
     @Test
+    void missingModelDataLeavesAnOrdinaryGlassModelUsable() {
+        var model = new ContinuousGlassModel(new EmptyModel());
+        assertDoesNotThrow(() -> model.collectParts(RandomSource.create(0), new java.util.ArrayList<>(), null));
+        assertDoesNotThrow(() -> model.particleMaterial(null));
+    }
+
+    @Test
     void onlyGlassWallBlockStatesAreWrappedAndAliasesStayShared() {
         Map<BlockState, BlockStateModel> models = new LinkedHashMap<>();
         BlockStateModel base = new EmptyModel();

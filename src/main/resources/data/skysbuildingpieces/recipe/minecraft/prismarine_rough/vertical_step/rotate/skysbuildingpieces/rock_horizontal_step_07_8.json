@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_rough_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:prismarine_rough_horizontal_step"

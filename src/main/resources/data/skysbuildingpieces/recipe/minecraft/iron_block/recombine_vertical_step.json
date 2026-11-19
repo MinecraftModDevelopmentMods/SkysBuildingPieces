@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/iron_block",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/iron_block_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": "skysbuildingpieces:iron_block_vertical_step"

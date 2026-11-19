@@ -1,6 +1,7 @@
 {
   "type": "skysbuildingpieces:cutting",
-  "group": "skysbuildingpieces/skysbuildingpieces",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_vertical_step",
   "pattern": ["X"],
   "key": {
     "X": "skysbuildingpieces:stonebrick_horizontal_step"
