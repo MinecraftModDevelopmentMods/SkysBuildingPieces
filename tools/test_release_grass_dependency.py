@@ -60,7 +60,7 @@ class GrassSlabsReleaseWorkflowTest(unittest.TestCase):
             workspace = Path(temporary)
             (workspace / 'gradle').mkdir()
             commit = '0123456789abcdef0123456789abcdef01234567'
-            version = '1.2.1.2601021'
+            version = '1.2.1.2602001'
             (workspace / 'gradle/grass-slabs-release.properties').write_text(
                 'source.commit=' + commit + '\nversion=' + version + '\nkind=local-candidate\n',
                 encoding='utf-8', newline='\n')
@@ -96,7 +96,7 @@ class GrassSlabsReleaseWorkflowTest(unittest.TestCase):
             with self.subTest(workflow=workflow), tempfile.TemporaryDirectory() as temporary:
                 workspace = Path(temporary)
                 (workspace / 'gradle').mkdir()
-                version = '1.2.1.2601021'
+                version = '1.2.1.2602001'
                 published = b'checksum-bound public Grass Slabs fixture'
                 checksum = hashlib.sha256(published).hexdigest()
                 (workspace / 'gradle/grass-slabs-release.properties').write_text(
@@ -144,7 +144,7 @@ class GrassSlabsReleaseWorkflowTest(unittest.TestCase):
             workspace = Path(temporary)
             (workspace / 'gradle').mkdir()
             (workspace / 'gradle/grass-slabs-release.properties').write_text(
-                'source.commit=not-a-commit\nversion=1.2.1.2601021\n', encoding='utf-8', newline='\n')
+                'source.commit=not-a-commit\nversion=1.2.1.2602001\n', encoding='utf-8', newline='\n')
             environment = dict(os.environ, GITHUB_OUTPUT=(workspace / 'outputs').as_posix())
             result = subprocess.run([bash_executable(), '-c', read_pin], cwd=workspace,
                                     env=environment, capture_output=True, text=True)
