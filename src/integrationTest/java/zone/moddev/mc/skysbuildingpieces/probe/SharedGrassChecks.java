@@ -67,7 +67,11 @@ public final class SharedGrassChecks {
                 require(world.getBlockState(position.below())
                         .getBlock() == (fullFootprint ? Blocks.DIRT : Blocks.GRASS_BLOCK),
                         "shared grass support " + block.palette.shape + "/" + orientation);
-                require(world.getBlockState(position).equals(grass), "shared tick retains orientation");
+                // Snow is calculated from this world's biome and neighbours during the tick.
+                BlockState expected = block.getActualState(grass, world, position);
+                require(world.getBlockState(position).equals(expected),
+                        "shared tick retains material and orientation with calculated snow: expected "
+                                + expected + ", got " + world.getBlockState(position));
                 checked++;
             }
         }

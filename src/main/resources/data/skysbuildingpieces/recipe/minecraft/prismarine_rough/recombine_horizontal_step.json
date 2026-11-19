@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/prismarine_rough",
+  "category": "building",
+  "group": "skys/result/minecraft/prismarine_slab",
   "pattern": [
     "X",
     "X"
@@ -15,6 +16,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:prismarine_rough_horizontal_step"
     }
   ]

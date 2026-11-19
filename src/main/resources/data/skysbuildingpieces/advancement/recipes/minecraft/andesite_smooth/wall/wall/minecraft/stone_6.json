@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:polished_andesite"]
+            "items": [
+              "minecraft:polished_andesite"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/andesite_smooth/wall/wall/minecraft/stone_6"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/andesite_smooth/wall/wall/minecraft/stone_6"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:andesite_smooth_wall"
     }
   ]

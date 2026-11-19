@@ -1,5 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
+import net.neoforged.neoforge.common.ItemAbilities;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
@@ -10,7 +11,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.minecraft.util.TriState;
 import net.minecraft.world.entity.EquipmentSlot;

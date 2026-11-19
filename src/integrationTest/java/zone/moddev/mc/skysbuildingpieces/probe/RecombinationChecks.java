@@ -1,11 +1,14 @@
 package zone.moddev.mc.skysbuildingpieces.probe;
 
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.ModList;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
@@ -58,6 +61,33 @@ public final class RecombinationChecks {
                         checks, Catalogue.INSTANCE.modules.size());
             }
         }
+    }
+
+    private static void checkSlabToBlock(ServerLevel world) {
+        checkSlabPair(world, new ItemStack(Items.ANDESITE_SLAB), Items.ANDESITE,
+                "skysbuildingpieces:minecraft/andesite/slab_recombination");
+
+        boolean grassSlabsInstalled = ModList.get().isLoaded("skysgrassslabs");
+        if (grassSlabsInstalled) {
+            checkSlabPair(world, slab("minecraft:dirt"), Items.DIRT, "skysgrassslabs:dirt_from_slabs");
+            checkSlabPair(world, slab("minecraft:grass"), Items.GRASS_BLOCK, "skysgrassslabs:grass_from_slabs");
+        }
+        org.apache.logging.log4j.LogManager.getLogger().info(
+                "BUILDING_PIECES_SLAB_RECIPE_OWNERSHIP_PASS grassSlabs={}", grassSlabsInstalled);
+    }
+
+    private static void checkSlabPair(ServerLevel world, ItemStack slab, Item block, String recipeId) {
+        CraftingContainer grid = grid(2);
+        grid.setItem(0, slab.copy());
+        grid.setItem(1, slab.copy());
+
+        var matches = NativeRecipeProbe.matching(grid.asCraftInput(), world);
+        require(matches.size() == 1, "Expected one recipe for " + slab + ", got " + matches);
+        var match = matches.getFirst();
+        Identifier id = Identifier.parse(recipeId);
+        require(match.id().identifier().equals(id), "Expected " + id + ", got " + match.id());
+        require(ItemStack.matches(new ItemStack(block), match.value().assemble(grid.asCraftInput())),
+                "Two " + slab + " should craft one " + block);
     }
 
     private static ItemStack slab(String material) {

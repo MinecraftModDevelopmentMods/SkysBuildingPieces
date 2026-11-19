@@ -17,7 +17,7 @@ import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
 import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 import zone.moddev.mc.skysbuildingpieces.legacy.PiecesWorldState;
 
-/** Loads saved source chunks through the normal Forge chunk upgrader. */
+/** Loads saved source chunks through the normal chunk upgrader. */
 final class NativeForwardChecks {
     private static final java.util.Set<net.minecraft.world.level.ChunkPos> WARMUP_CHUNKS = new java.util.LinkedHashSet<>();
     private static final java.util.Set<java.util.UUID> WARMUP_ENTITIES = new java.util.LinkedHashSet<>();

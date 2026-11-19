@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/iron_block",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/iron_block_slab",
   "pattern": [
     "X",
     "X"
@@ -14,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:iron_block_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:iron_block_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:iron_block_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:iron_block_vertical_step"
+        }
+      ]
     }
   ]
 }

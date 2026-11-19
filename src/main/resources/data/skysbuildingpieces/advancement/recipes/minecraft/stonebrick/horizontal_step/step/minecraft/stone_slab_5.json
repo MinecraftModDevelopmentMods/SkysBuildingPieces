@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:stone_brick_slab"]
+            "items": [
+              "minecraft:stone_brick_slab"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stonebrick/horizontal_step/step/minecraft/stone_slab_5"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stonebrick/horizontal_step/step/minecraft/stone_slab_5"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:stonebrick_horizontal_step"
     }
   ]

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.10.2601022
+
+Adds the current snow, powder-snow and gravel pieces, with corrected fuel values, recipes and inventory handling.
+
+Existing terrain, saved content and configuration choices are retained.
+
 ## 0.3.9.2601022
 
 - Each material and shape now has its own block ID. Existing pieces keep their material, orientation and waterlogging.

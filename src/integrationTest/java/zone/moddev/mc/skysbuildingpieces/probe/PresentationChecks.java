@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.*;
 import net.minecraft.core.*;
 import net.minecraft.resources.*;
-import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
 
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;

@@ -20,6 +20,25 @@ DETAILS = '\n'.join((DEBUG, START, 'Done (1.0s)!'))
 
 
 class NativeServerLogTest(unittest.TestCase):
+    def test_active_common_and_server_files_cannot_be_hidden_by_unused_aliases(self):
+        defaults = Path(__file__).resolve().parent.parent / "src/bootstrapTest/defaultconfigs/config"
+        for changed in ("neoforge-common.toml", "neoforge-server.toml"):
+            with self.subTest(changed=changed), tempfile.TemporaryDirectory() as work:
+                directory = Path(work)
+                shutil.copytree(defaults, directory / "config")
+                # Later loader filenames must not substitute for the files this loader reads.
+                (directory / "config/neoforge-local.toml").write_text("unused = true\n")
+                (directory / "config/neoforge-synced.toml").write_text("unused = true\n")
+                (directory / "logs").mkdir()
+                (directory / "logs/latest.log").write_text(LOG)
+                (directory / "logs/debug.log").write_text(DETAILS)
+                audit_server(directory, "first")
+                with (directory / "config" / changed).open("a") as output:
+                    output.write("\nchangedNativeSetting = true\n")
+                with self.assertRaisesRegex(ValueError, "defaults"):
+                    audit_server(directory, "changed")
+
+
     def test_clean_native_startup_is_accepted(self):
         receipt = classify_server(LOG, DETAILS, True)
         self.assertEqual(receipt['native_server_config_notices'], 0)

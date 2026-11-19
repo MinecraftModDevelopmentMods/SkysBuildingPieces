@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:dirt_mycelium_corner"]
+            "items": [
+              "skysbuildingpieces:dirt_mycelium_corner"
+            ]
           }
         ]
       }
@@ -18,19 +20,31 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/dirt_mycelium/recombine_corner"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/dirt_mycelium/recombine_corner"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:dirt_mycelium_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:dirt_mycelium_horizontal_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:dirt_mycelium_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:dirt_mycelium_horizontal_step"
+        }
+      ]
     }
   ]
 }

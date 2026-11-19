@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:chiseled_red_sandstone_slab"]
+            "items": [
+              "skysbuildingpieces:chiseled_red_sandstone_slab"
+            ]
           }
         ]
       }
@@ -18,19 +20,31 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/chiseled_red_sandstone/stairs/stairs/skysbuildingpieces/rock_slab_00_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/chiseled_red_sandstone/stairs/stairs/skysbuildingpieces/rock_slab_00_0"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:chiseled_red_sandstone_stairs"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:chiseled_red_sandstone_stairs"
+        }
+      ]
     }
   ]
 }

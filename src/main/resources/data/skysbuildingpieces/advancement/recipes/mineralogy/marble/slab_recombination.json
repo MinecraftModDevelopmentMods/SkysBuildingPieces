@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["mineralogy:marble_slab"]
+            "items": [
+              "mineralogy:marble_slab"
+            ]
           }
         ]
       }
@@ -18,23 +20,35 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:mineralogy/marble/slab_recombination"]
+    "recipes": [
+      "skysbuildingpieces:mineralogy/marble/slab_recombination"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "mineralogy"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "mineralogy:marble"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "mineralogy:marble_slab"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:marble"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:marble_slab"
+        }
+      ]
     }
   ]
 }

@@ -1,5 +1,8 @@
 # Existing worlds
 
+The first load converts old shared palettes to individual block IDs. The
+material, orientation and water in each saved piece carry across.
+
 The separate Mineralogy piece add-on from the earlier local tests is no longer
 needed. Use Building Pieces with Mineralogy instead. Its test-save piece IDs
 are recovered automatically, including item stacks in chunks opened after the
@@ -15,12 +18,13 @@ temporary material index.
 
 There is no supported BuildingBricks release for Minecraft 26.1.2. Recovery
 from an older save is automatic and does not require the replacement setting.
-Each material and shape now has its own block ID. Saved pieces from older
-numeric and named worlds are converted as their chunks load. The conversion
-keeps the material, orientation and any saved water. Old numeric pieces start
-dry. Walls, stairs, snow and path supports still refresh as the chunk loads.
-Where Minecraft now has an equivalent piece, the save uses the native block.
-The old palette IDs are kept for reading older saves.
+The permanent Sky palette IDs and orientation values are unchanged. The first 26.1.2 load copies existing migration totals into Minecraft’s namespaced data folder, keeping the old file as a backup. The 1.14
+loader turns old numeric states into named states, preserving the material and
+orientation. Old pieces start dry. Wall connections, joined stairs, snow and
+path supports are refreshed through Minecraft's normal chunk post-processing.
+When Minecraft now has an equivalent piece, recovery uses that native block,
+keeping its material and orientation. The old Sky palette remains registered
+so its saved identity can still be read.
 
 Old palette inventory items are converted to their matching material items,
 keeping counts, names and custom data. A registry sidecar in the world's `data`
@@ -68,7 +72,7 @@ counting the earlier chunk visits again.
 This release is not a universal replacement for BuildingBricks. Removing it
 requires a complete audit of the particular world, matching material add-ons,
 and a tested backup. Uncovered materials, shapes and tools may still need it.
-Never confirm Forge's missing-content warning for an entry that still has saved
+Never confirm NeoForge's missing-content warning for an entry that still has saved
 blocks or items without a proven recovery path.
 
 Sky's Grass Slabs remains responsible for its own content. This mod does not

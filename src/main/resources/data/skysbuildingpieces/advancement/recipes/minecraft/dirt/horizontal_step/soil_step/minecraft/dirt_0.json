@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:dirt"]
+            "items": [
+              "minecraft:dirt"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/dirt/horizontal_step/soil_step/minecraft/dirt_0"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/dirt/horizontal_step/soil_step/minecraft/dirt_0"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:dirt_horizontal_step"
     }
   ]

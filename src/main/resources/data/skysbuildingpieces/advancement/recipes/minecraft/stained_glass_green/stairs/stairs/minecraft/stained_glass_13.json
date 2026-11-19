@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:green_stained_glass"]
+            "items": [
+              "minecraft:green_stained_glass"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_green/stairs/stairs/minecraft/stained_glass_13"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_green/stairs/stairs/minecraft/stained_glass_13"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:stained_glass_green_stairs"
     }
   ]

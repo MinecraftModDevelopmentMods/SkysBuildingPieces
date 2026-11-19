@@ -109,8 +109,9 @@ do not combine. Some unions have no supported shape and cannot combine.
 Grass shapes use biome colours and spread to ordinary dirt and matching dirt
 pieces. Covered or dark grass becomes the matching dirt shape, retaining its
 orientation. Steps and corners leave exposed ground grassy; pieces covering
-the whole footprint keep dirt underneath. With Grass
-Slabs 1.2.0.118021 or later installed, spreading also works across its slabs and turf.
+the whole footprint keep dirt underneath. With the matching Minecraft 26.1.2
+version of Sky's Grass Slabs installed, spreading also works across its slabs
+and turf.
 Plants and bonemeal need a complete upper supporting face. Nearby snow gives
 soil and grass pieces a visual snow cap without changing their collision.
 

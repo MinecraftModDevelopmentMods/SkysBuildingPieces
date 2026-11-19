@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/purpur_pillar",
+  "category": "building",
+  "group": "skys/result/minecraft/purpur_pillar",
   "pattern": [
     "XX"
   ],
@@ -14,6 +15,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:purpur_pillar_slab"
     }
   ]

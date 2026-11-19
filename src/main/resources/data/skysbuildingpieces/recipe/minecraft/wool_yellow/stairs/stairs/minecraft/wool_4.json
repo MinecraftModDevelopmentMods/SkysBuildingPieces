@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/minecraft",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_yellow_stairs",
   "pattern": [
     "X  ",
     "XX ",
@@ -16,6 +17,7 @@
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:wool_yellow_stairs"
     }
   ]

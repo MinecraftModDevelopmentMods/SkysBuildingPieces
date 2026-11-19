@@ -251,6 +251,15 @@ public final class Pieces {
 
     /** Recover retired materials and newly native equivalents without changing the saved geometry. */
     public static BlockState canonicalState(BlockState state) {
+        return canonicalState(state, false);
+    }
+
+    /** Named Sky wool pieces keep their own identity when vanilla gains an equivalent. */
+    public static BlockState canonicalNamedState(BlockState state) {
+        return canonicalState(state, true);
+    }
+
+    private static BlockState canonicalState(BlockState state, boolean namedSave) {
         if (!(state.getBlock() instanceof PieceBlock)) {
             return state;
         }
@@ -263,8 +272,16 @@ public final class Pieces {
             return state;
         }
 
+        Shape shape = source.palette.shape;
         int orientation = source.orientation(state);
-        BlockState result = state(material.id, source.palette.shape, orientation);
+        BlockState result;
+        if (namedSave && source.isLegacyPalette() && source.palette.group.equals("cloth")
+                && (shape == Shape.SLAB || shape == Shape.STAIRS)) {
+            PieceBlock woolPiece = PLAYABLE_BLOCKS.get(new PieceKey(material.id, shape));
+            result = woolPiece == null ? null : woolPiece.getStateFromMeta(orientation);
+        } else {
+            result = state(material.id, shape, orientation);
+        }
 
         if (result == null || result.hasBlockEntity()) {
             throw new IllegalStateException("No safe replacement geometry for " + material.id);

@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:end_bricks_vertical_slab"]
+            "items": [
+              "skysbuildingpieces:end_bricks_vertical_slab"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/end_bricks/slab/rotate/skysbuildingpieces/rock_vertical_slab_01_4"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/end_bricks/slab/rotate/skysbuildingpieces/rock_vertical_slab_01_4"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:end_bricks_vertical_slab"
     }
   ]

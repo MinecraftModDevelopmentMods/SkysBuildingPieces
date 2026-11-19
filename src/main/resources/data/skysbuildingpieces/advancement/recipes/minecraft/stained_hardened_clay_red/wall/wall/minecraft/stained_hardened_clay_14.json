@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:red_terracotta"]
+            "items": [
+              "minecraft:red_terracotta"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_hardened_clay_red/wall/wall/minecraft/stained_hardened_clay_14"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_hardened_clay_red/wall/wall/minecraft/stained_hardened_clay_14"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:stained_hardened_clay_red_wall"
     }
   ]

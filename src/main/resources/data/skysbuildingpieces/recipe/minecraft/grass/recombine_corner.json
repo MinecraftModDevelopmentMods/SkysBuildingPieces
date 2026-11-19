@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/grass",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/grass_step",
   "pattern": [
     "X",
     "X"
@@ -14,12 +15,19 @@
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:grass_corner"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:grass_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:grass_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:grass_step"
+        }
+      ]
     }
   ]
 }

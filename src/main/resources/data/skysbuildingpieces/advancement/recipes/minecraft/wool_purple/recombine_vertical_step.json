@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["skysbuildingpieces:wool_purple_vertical_step"]
+            "items": [
+              "skysbuildingpieces:wool_purple_vertical_step"
+            ]
           }
         ]
       }
@@ -18,19 +20,31 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/wool_purple/recombine_vertical_step"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/wool_purple/recombine_vertical_step"
+    ]
   },
   "neoforge:conditions": [
     {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_purple_slab"
-    },
-    {
-      "type": "neoforge:registered",
-      "value": "skysbuildingpieces:wool_purple_vertical_step"
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_purple_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_purple_vertical_step"
+        }
+      ]
     }
   ]
 }

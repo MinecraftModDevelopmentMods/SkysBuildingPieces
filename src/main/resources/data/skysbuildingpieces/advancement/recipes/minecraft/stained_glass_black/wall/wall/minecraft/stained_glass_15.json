@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:black_stained_glass"]
+            "items": [
+              "minecraft:black_stained_glass"
+            ]
           }
         ]
       }
@@ -18,14 +20,20 @@
     }
   },
   "requirements": [
-    ["has_ingredient", "has_the_recipe"]
+    [
+      "has_ingredient",
+      "has_the_recipe"
+    ]
   ],
   "rewards": {
-    "recipes": ["skysbuildingpieces:minecraft/stained_glass_black/wall/wall/minecraft/stained_glass_15"]
+    "recipes": [
+      "skysbuildingpieces:minecraft/stained_glass_black/wall/wall/minecraft/stained_glass_15"
+    ]
   },
   "neoforge:conditions": [
     {
       "type": "neoforge:registered",
+      "registry": "minecraft:item",
       "value": "skysbuildingpieces:stained_glass_black_wall"
     }
   ]

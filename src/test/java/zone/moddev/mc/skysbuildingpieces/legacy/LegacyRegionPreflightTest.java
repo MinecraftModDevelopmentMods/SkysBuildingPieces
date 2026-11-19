@@ -7,7 +7,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import zone.moddev.mc.skysbuildingpieces.MinecraftTestBootstrap;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LegacyRegionPreflightTest {
@@ -16,7 +15,6 @@ class LegacyRegionPreflightTest {
 
     @Test
     void anUntouchedNativeRegionContainsNoChunksAndNeedsNoHeader() throws Exception {
-        MinecraftTestBootstrap.registerVanilla();
         Path directory = Files.createDirectories(world.resolve("region"));
         Path file = directory.resolve("r.0.0.mca");
 
