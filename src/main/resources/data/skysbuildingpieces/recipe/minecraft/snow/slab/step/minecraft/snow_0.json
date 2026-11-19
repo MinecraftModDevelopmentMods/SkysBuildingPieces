@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/snow_slab",
+  "pattern": [
+    "X ",
+    " X"
+  ],
+  "key": {
+    "X": "minecraft:snow_block"
+  },
+  "result": {
+    "id": "skysbuildingpieces:snow_slab",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:snow_slab"
+    }
+  ]
+}

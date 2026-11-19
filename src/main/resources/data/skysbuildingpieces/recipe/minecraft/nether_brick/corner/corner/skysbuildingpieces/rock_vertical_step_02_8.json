@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/nether_brick_corner",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:nether_brick_vertical_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:nether_brick_corner",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:nether_brick_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:nether_brick_vertical_step"
+        }
+      ]
+    }
+  ]
+}

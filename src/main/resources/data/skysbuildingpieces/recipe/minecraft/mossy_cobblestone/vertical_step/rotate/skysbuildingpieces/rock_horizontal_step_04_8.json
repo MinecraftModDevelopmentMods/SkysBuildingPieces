@@ -1,0 +1,33 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mossy_cobblestone_vertical_step",
+  "pattern": [
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:mossy_cobblestone_vertical_step",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:mossy_cobblestone_vertical_step"
+        }
+      ]
+    }
+  ]
+}

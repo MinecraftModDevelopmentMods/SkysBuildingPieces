@@ -1,39 +1,52 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.*;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.model.ModelLoader;
-import zone.moddev.mc.skysbuildingpieces.CommonProxy;
-import zone.moddev.mc.skysbuildingpieces.content.*;
+import java.util.List;
+import net.minecraft.client.color.block.BlockTintSources;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.fml.ModList;
+import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
+import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
-public final class ClientProxy extends CommonProxy {
-    public void preInit() {
-        registerModels("skysbuildingpieces");
-        for(java.util.Map.Entry<String,Item> e:Pieces.RETIRED_TEMPLATES.entrySet())ModelLoader.setCustomModelResourceLocation(e.getValue(),0,new ModelResourceLocation("skysbuildingpieces:template_"+e.getKey(),"inventory"));
+/** Keeps model and colour code out of dedicated servers. */
+public final class ClientProxy {
+    private ClientProxy() {
     }
-    public void registerModels(String namespace) {
-        for(PieceBlock b:Pieces.BLOCKS.values()) {
-            if(!b.palette.namespace.equals(namespace))continue;
-            net.minecraft.client.renderer.block.statemap.StateMap.Builder map=new net.minecraft.client.renderer.block.statemap.StateMap.Builder();
-            if(b.palette.shape!=zone.moddev.mc.skysbuildingpieces.catalogue.Shape.WALL && b.palette.shape!=zone.moddev.mc.skysbuildingpieces.catalogue.Shape.PANE)map.ignore(PieceBlock.CONNECTIONS);
-            if(b.palette.shape!=zone.moddev.mc.skysbuildingpieces.catalogue.Shape.STAIRS)map.ignore(PieceBlock.STAIR_SHAPE);
-            if(!b.palette.group.equals("grass")&&!b.palette.group.equals("dirt"))map.ignore(net.minecraft.block.BlockGrass.SNOWY);
-            ModelLoader.setCustomStateMapper(b,map.build());
-        }
-        for(PieceBlock b:Pieces.BLOCKS.values())for(int slot=0;slot<b.palette.materials.size();slot++) {
-            if(!b.palette.namespace.equals(namespace))continue;
-            int meta=slot*b.palette.shape.states;
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(b),meta,new ModelResourceLocation(namespace+":"+new net.minecraft.util.ResourceLocation(b.palette.materials.get(slot)).getResourcePath()+"_"+b.palette.shape.name().toLowerCase(java.util.Locale.ROOT),"inventory"));
-        }
+
+    public static void register(IEventBus modBus, ModContainer container) {
+        IConfigScreenFactory factory = ConfigurationScreen::new;
+        container.registerExtensionPoint(IConfigScreenFactory.class, factory);
+        modBus.addListener(ClientProxy::mineralogyResources);
+        modBus.addListener(ClientProxy::blockColors);
+        modBus.addListener(ContinuousGlassModel::bake);
+        modBus.addListener(SnowCoveredGrassModel::bake);
     }
-    public void init() {
-        final BlockColors colors=Minecraft.getMinecraft().getBlockColors();
-        for(final PieceBlock b:Pieces.BLOCKS.values())if(b.palette.group.equals("grass")) {
-            colors.registerBlockColorHandler((state,world,pos,tint)->tint==0 ? colors.colorMultiplier(Blocks.GRASS.getDefaultState(),world,pos,0) : -1,b);
-            Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack,tint)->tint==0 ? 0x7CBD6B : -1,Item.getItemFromBlock(b));
+
+    private static void mineralogyResources(AddPackFindersEvent event) {
+        if (event.getPackType() != PackType.CLIENT_RESOURCES || !ModList.get().isLoaded("mineralogy")) {
+            return;
+        }
+        event.addPackFinders(Identifier.fromNamespaceAndPath(SkysBuildingPieces.ID, "optional/mineralogy"),
+                PackType.CLIENT_RESOURCES, Component.literal("Sky's Building Pieces: Mineralogy models"),
+                PackSource.BUILT_IN, true, Pack.Position.BOTTOM);
+    }
+
+    private static void blockColors(RegisterColorHandlersEvent.BlockTintSources event) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
+            if (block.palette.group.equals("grass")) {
+                event.register(List.of(BlockTintSources.grassBlock()), block);
+            }
         }
     }
 }

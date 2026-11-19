@@ -1,0 +1,244 @@
+{
+  "variants": {
+    "orientation=bottom_east,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_straight"
+    },
+    "orientation=bottom_east,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_straight"
+    },
+    "orientation=bottom_east,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_inner_left"
+    },
+    "orientation=bottom_east,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_inner_left"
+    },
+    "orientation=bottom_east,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_inner_right"
+    },
+    "orientation=bottom_east,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_inner_right"
+    },
+    "orientation=bottom_east,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_outer_left"
+    },
+    "orientation=bottom_east,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_outer_left"
+    },
+    "orientation=bottom_east,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_outer_right"
+    },
+    "orientation=bottom_east,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_0_outer_right"
+    },
+    "orientation=bottom_west,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_straight"
+    },
+    "orientation=bottom_west,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_straight"
+    },
+    "orientation=bottom_west,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_inner_left"
+    },
+    "orientation=bottom_west,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_inner_left"
+    },
+    "orientation=bottom_west,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_inner_right"
+    },
+    "orientation=bottom_west,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_inner_right"
+    },
+    "orientation=bottom_west,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_outer_left"
+    },
+    "orientation=bottom_west,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_outer_left"
+    },
+    "orientation=bottom_west,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_outer_right"
+    },
+    "orientation=bottom_west,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_1_outer_right"
+    },
+    "orientation=bottom_south,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_straight"
+    },
+    "orientation=bottom_south,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_straight"
+    },
+    "orientation=bottom_south,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_inner_left"
+    },
+    "orientation=bottom_south,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_inner_left"
+    },
+    "orientation=bottom_south,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_inner_right"
+    },
+    "orientation=bottom_south,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_inner_right"
+    },
+    "orientation=bottom_south,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_outer_left"
+    },
+    "orientation=bottom_south,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_outer_left"
+    },
+    "orientation=bottom_south,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_outer_right"
+    },
+    "orientation=bottom_south,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_2_outer_right"
+    },
+    "orientation=bottom_north,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_straight"
+    },
+    "orientation=bottom_north,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_straight"
+    },
+    "orientation=bottom_north,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_inner_left"
+    },
+    "orientation=bottom_north,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_inner_left"
+    },
+    "orientation=bottom_north,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_inner_right"
+    },
+    "orientation=bottom_north,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_inner_right"
+    },
+    "orientation=bottom_north,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_outer_left"
+    },
+    "orientation=bottom_north,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_outer_left"
+    },
+    "orientation=bottom_north,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_outer_right"
+    },
+    "orientation=bottom_north,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_3_outer_right"
+    },
+    "orientation=top_east,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_straight"
+    },
+    "orientation=top_east,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_straight"
+    },
+    "orientation=top_east,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_inner_left"
+    },
+    "orientation=top_east,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_inner_left"
+    },
+    "orientation=top_east,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_inner_right"
+    },
+    "orientation=top_east,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_inner_right"
+    },
+    "orientation=top_east,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_outer_left"
+    },
+    "orientation=top_east,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_outer_left"
+    },
+    "orientation=top_east,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_outer_right"
+    },
+    "orientation=top_east,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_4_outer_right"
+    },
+    "orientation=top_west,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_straight"
+    },
+    "orientation=top_west,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_straight"
+    },
+    "orientation=top_west,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_inner_left"
+    },
+    "orientation=top_west,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_inner_left"
+    },
+    "orientation=top_west,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_inner_right"
+    },
+    "orientation=top_west,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_inner_right"
+    },
+    "orientation=top_west,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_outer_left"
+    },
+    "orientation=top_west,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_outer_left"
+    },
+    "orientation=top_west,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_outer_right"
+    },
+    "orientation=top_west,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_5_outer_right"
+    },
+    "orientation=top_south,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_straight"
+    },
+    "orientation=top_south,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_straight"
+    },
+    "orientation=top_south,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_inner_left"
+    },
+    "orientation=top_south,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_inner_left"
+    },
+    "orientation=top_south,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_inner_right"
+    },
+    "orientation=top_south,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_inner_right"
+    },
+    "orientation=top_south,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_outer_left"
+    },
+    "orientation=top_south,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_outer_left"
+    },
+    "orientation=top_south,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_outer_right"
+    },
+    "orientation=top_south,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_6_outer_right"
+    },
+    "orientation=top_north,shape=straight,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_straight"
+    },
+    "orientation=top_north,shape=straight,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_straight"
+    },
+    "orientation=top_north,shape=inner_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_inner_left"
+    },
+    "orientation=top_north,shape=inner_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_inner_left"
+    },
+    "orientation=top_north,shape=inner_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_inner_right"
+    },
+    "orientation=top_north,shape=inner_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_inner_right"
+    },
+    "orientation=top_north,shape=outer_left,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_outer_left"
+    },
+    "orientation=top_north,shape=outer_left,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_outer_left"
+    },
+    "orientation=top_north,shape=outer_right,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_outer_right"
+    },
+    "orientation=top_north,shape=outer_right,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_stairs_7_outer_right"
+    }
+  }
+}

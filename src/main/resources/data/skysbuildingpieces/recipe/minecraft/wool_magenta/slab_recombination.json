@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/magenta_wool",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:wool_magenta_slab"
+  },
+  "result": {
+    "id": "minecraft:magenta_wool",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:wool_magenta_slab"
+    }
+  ]
+}

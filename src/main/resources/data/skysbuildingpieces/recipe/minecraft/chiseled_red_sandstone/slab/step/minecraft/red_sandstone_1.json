@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/chiseled_red_sandstone_slab",
+  "pattern": [
+    "X ",
+    " X"
+  ],
+  "key": {
+    "X": "minecraft:chiseled_red_sandstone"
+  },
+  "result": {
+    "id": "skysbuildingpieces:chiseled_red_sandstone_slab",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:chiseled_red_sandstone_slab"
+    }
+  ]
+}

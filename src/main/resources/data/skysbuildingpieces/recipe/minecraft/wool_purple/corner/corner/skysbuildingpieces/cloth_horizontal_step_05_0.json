@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_purple_corner",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:wool_purple_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_purple_corner",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_purple_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_purple_horizontal_step"
+        }
+      ]
+    }
+  ]
+}

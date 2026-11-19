@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/planks_dark_oak_corner",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:planks_dark_oak_horizontal_step"
+  },
+  "result": {
+    "id": "skysbuildingpieces:planks_dark_oak_corner",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:planks_dark_oak_corner"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:planks_dark_oak_horizontal_step"
+        }
+      ]
+    }
+  ]
+}

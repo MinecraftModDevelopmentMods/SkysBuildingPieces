@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_white_horizontal_step",
+  "pattern": [
+    "X ",
+    " X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:wool_white_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_white_horizontal_step",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_white_horizontal_step"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_white_slab"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/andesite_smooth_horizontal_step",
+  "pattern": [
+    "X ",
+    " X"
+  ],
+  "key": {
+    "X": "minecraft:polished_andesite_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:andesite_smooth_horizontal_step",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:andesite_smooth_horizontal_step"
+    }
+  ]
+}

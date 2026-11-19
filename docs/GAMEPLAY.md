@@ -1,5 +1,23 @@
 # Pieces and recipes
 
+Mineralogy rock steps and corners are included automatically when Mineralogy
+is installed. Three matching full rocks diagonally across the crafting grid
+make twelve steps; two steps side by side make four corners. Vertical pairs
+rebuild corners into steps and steps into Mineralogy's existing slabs.
+Disabled native slab types are not used by recipes or smoothing. The rock
+steps and corners remain craftable from full blocks.
+
+Find the mod's pieces in the Sky's Building Pieces creative tab. Vanilla
+pieces stay in their usual tabs. Separate vertical slab items, old templates
+and recovery holders stay hidden.
+
+All custom walls have lower connecting panels and raised posts.
+Straight runs do not need a post in every block; ends, corners, junctions and
+blocks above keep their supporting posts. Matching glass panels look continuous,
+with borders at posts, exposed ends and colour changes. Selection outlines follow
+the visible glass, while wall collision still prevents jumping over it.
+Ordinary and redstone torches can be placed on walls.
+
 Use matching full blocks to craft building pieces. No template or tool is
 needed. Existing Minecraft pieces keep their native items and recipes; the
 BOP add-on follows the same patterns for its materials.
@@ -33,8 +51,19 @@ slabs one for one, retaining custom item data.
 
 Two matching regular slabs side by side make their matching full block. This
 also applies to supported BOP materials. A vertical pair keeps any existing
-native decorative-block recipe. Smooth stone has no obtainable full block item
-in this Minecraft version and therefore has no recombination recipe.
+native decorative-block recipe. Minecraft 1.14 provides an obtainable smooth stone block, so its slabs can
+also be rebuilt into that block.
+
+To rebuild larger pieces, put two matching corners one above the other to make
+one step. Two matching steps in a column make one slab. This works in either
+crafting grid and also covers the Building Pieces BOP add-on's materials.
+Keep each pair the same material and item type; saved placement orientations
+do not matter. Side-by-side steps still make four corners, and diagonal slabs
+still make four steps.
+
+Dirt and grass steps return the matching Grass Slabs item when that mod is
+installed. Without it, ordinary dirt steps return the existing dirt vertical
+slab. No new slabs are added for soil materials without a matching slab.
 
 For raw stone, snow, decorative sandstone and mossy/cracked/chiseled stone brick
 slabs, use two full blocks diagonally to make four slabs. Their full-block rows
@@ -48,10 +77,9 @@ Horizontal and vertical step items can also be rotated one for one. Either
 kind can be cut into corners. Soil steps use full dirt, coarse dirt, podzol,
 mycelium or grass blocks because their horizontal slabs are outside this mod.
 
-Smooth stone has no obtainable full block item in Minecraft 1.10.2. Use
-vanilla smooth stone slabs for its stairs and walls; the output
-is half the normal full-block quantity. Its steps and corners follow the
-normal slab and step recipes.
+Use full smooth stone blocks for its missing building shapes. Its steps and
+corners follow the normal slab and step recipes. Native 1.14 slabs, stairs and
+walls take precedence wherever Minecraft already supplies the matching shape.
 
 Put a supported old BuildingBricks piece in the grid by itself to convert one
 item into its equivalent. The material and custom item data are preserved.
@@ -66,8 +94,11 @@ top or bottom edge of a side face can hold a horizontal slab. Sneaking does not
 change slab placement. Old vertical slab items follow these same rules when
 their regular slab exists.
 
-Supported vanilla and BOP slab items use these placement rules too. While
-BuildingBricks is installed, it continues handling its native slab placement.
+Supported vanilla slab items use these placement rules too. Matching add-ons
+can extend the same placement rules to their native slab items. Set
+`gameplay.directionalSlabPlacement=false` and restart if you prefer
+ordinary slab placement. Dedicated vertical pieces such as vertical dirt
+slabs still place vertically.
 Vertical slab items are hidden from creative inventory. Breaking, Silk Touch
 and pick-block return the regular slab, with the material's usual drop rules.
 
@@ -77,10 +108,22 @@ do not combine. Some unions have no supported shape and cannot combine.
 
 Grass shapes use biome colours and spread to ordinary dirt and matching dirt
 pieces. Covered or dark grass becomes the matching dirt shape, retaining its
-orientation. Grass pieces keep their grass-block support as dirt. With Grass
-Slabs 1.1 installed, spreading also works across its slabs and turf.
+orientation. Steps and corners leave exposed ground grassy; pieces covering
+the whole footprint keep dirt underneath. With the matching Minecraft 26.2
+version of Sky's Grass Slabs installed, spreading also works across its slabs
+and turf.
 Plants and bonemeal need a complete upper supporting face. Nearby snow gives
 soil and grass pieces a visual snow cap without changing their collision.
+
+Use a compatible shovel on an uncovered ordinary dirt or grass step or corner
+to make a path. The piece keeps its shape and orientation; only its exposed
+top drops by one pixel. Each use costs one durability, except in creative mode.
+Flattening a grass piece also turns an ordinary grass block directly beneath
+it into a path. Both changes use that same durability point. Other supporting
+blocks stay as they are.
+Paths drop matching dirt pieces, even with Silk Touch. A solid block above a
+path turns it back into the matching dirt shape. Coarse dirt, podzol and
+mycelium are not converted. Grass Slabs still provides the full-width path slabs.
 
 Without Grass Slabs, three ordinary dirt blocks in a column make six dirt vertical slabs.
 Place them in any of the four directions; complementary halves combine

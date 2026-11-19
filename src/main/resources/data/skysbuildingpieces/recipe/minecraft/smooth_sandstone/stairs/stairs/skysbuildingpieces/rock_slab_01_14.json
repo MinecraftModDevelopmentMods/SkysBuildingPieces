@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/smooth_sandstone_stairs",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "key": {
+    "X": "minecraft:cut_sandstone_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:smooth_sandstone_stairs",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:smooth_sandstone_stairs"
+    }
+  ]
+}

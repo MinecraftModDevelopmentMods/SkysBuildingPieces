@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/mossy_cobblestone_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:mossy_cobblestone_slab",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.core.Direction;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
 
 /** Face-local centre/edge selection, independent of any other mod's placement handlers. */
@@ -8,47 +8,73 @@ public final class SlabPlacement {
     private static final double EDGE = .22f;
 
     /** The half of the destination block occupied by a slab. */
-    public static EnumFacing side(EnumFacing face, float x, float y, float z) {
-        if (centre(face, x, y, z)) return face.getOpposite();
-        if (face.getAxis() == EnumFacing.Axis.Y) {
-            if (x >= z) return x < 1 - (double) z ? EnumFacing.NORTH : EnumFacing.EAST;
-            return x >= 1 - (double) z ? EnumFacing.SOUTH : EnumFacing.WEST;
+    public static Direction side(Direction face, float hitX, float hitY, float hitZ) {
+        if (centre(face, hitX, hitY, hitZ)) {
+            return face.getOpposite();
         }
-        double right = right(face, x, z);
-        if (right >= y) return right < 1 - (double) y ? EnumFacing.DOWN : face.rotateY();
-        return right >= 1 - (double) y ? EnumFacing.UP : face.rotateYCCW();
+        if (face.getAxis() == Direction.Axis.Y) {
+            if (hitX >= hitZ) {
+                return hitX < 1 - (double) hitZ ? Direction.NORTH : Direction.EAST;
+            }
+
+            return hitX >= 1 - (double) hitZ ? Direction.SOUTH : Direction.WEST;
+        }
+
+        double right = right(face, hitX, hitZ);
+
+        if (right >= hitY) {
+            return right < 1 - (double) hitY ? Direction.DOWN : face.getClockWise();
+        }
+
+        return right >= 1 - (double) hitY ? Direction.UP : face.getCounterClockWise();
     }
 
     /** Explicit vertical-slab items stay vertical, including clicks near a side edge. */
-    public static EnumFacing verticalSide(EnumFacing face, float x, float y, float z) {
-        if (face.getAxis() == EnumFacing.Axis.Y) {
-            if (x >= z) return x < 1 - (double) z ? EnumFacing.NORTH : EnumFacing.EAST;
-            return x >= 1 - (double) z ? EnumFacing.SOUTH : EnumFacing.WEST;
+    public static Direction verticalSide(Direction face, float hitX, float hitY, float hitZ) {
+        if (face.getAxis() == Direction.Axis.Y) {
+            if (hitX >= hitZ) {
+                return hitX < 1 - (double) hitZ ? Direction.NORTH : Direction.EAST;
+            }
+
+            return hitX >= 1 - (double) hitZ ? Direction.SOUTH : Direction.WEST;
         }
-        if (centre(face, x, y, z)) return face.getOpposite();
-        return right(face, x, z) >= y ? face.rotateY() : face.rotateYCCW();
+        if (centre(face, hitX, hitY, hitZ)) {
+            return face.getOpposite();
+        }
+
+        return right(face, hitX, hitZ) >= hitY ? face.getClockWise() : face.getCounterClockWise();
     }
 
-    public static Shape shape(EnumFacing side) {
-        return side.getAxis() == EnumFacing.Axis.Y ? Shape.SLAB : Shape.VERTICAL_SLAB;
+    static Direction horizontalSide(Direction face, float hitY) {
+        return face == Direction.DOWN || face.getAxis().isHorizontal() && hitY > .5f ? Direction.UP : Direction.DOWN;
     }
 
-    public static int orientation(EnumFacing side) {
-        return side == EnumFacing.UP ? 0 : side == EnumFacing.DOWN ? 1 : side.getHorizontalIndex();
+    public static Shape shape(Direction side) {
+        return side.getAxis() == Direction.Axis.Y ? Shape.SLAB : Shape.VERTICAL_SLAB;
     }
 
-    private static boolean centre(EnumFacing face, float x, float y, float z) {
-        double right = right(face, x, z), up = face.getAxis() == EnumFacing.Axis.Y ? z : y;
-        return right >= EDGE && right <= 1 - EDGE && up >= EDGE && up <= 1 - EDGE;
+    public static int orientation(Direction side) {
+        return side == Direction.UP ? 0 : side == Direction.DOWN ? 1 : side.get2DDataValue();
     }
 
-    private static double right(EnumFacing face, float x, float z) {
+    private static boolean centre(Direction face, float hitX, float hitY, float hitZ) {
+        double right = right(face, hitX, hitZ);
+        double verticalHit = face.getAxis() == Direction.Axis.Y ? hitZ : hitY;
+
+        return right >= EDGE && right <= 1 - EDGE && verticalHit >= EDGE && verticalHit <= 1 - EDGE;
+    }
+
+    private static double right(Direction face, float hitX, float hitZ) {
         switch (face.getAxis()) {
-            case X: return face == EnumFacing.EAST ? z : 1 - (double) z;
-            case Y: return face == EnumFacing.UP ? 1 - (double) x : x;
-            default: return face == EnumFacing.SOUTH ? 1 - (double) x : x;
+            case X:
+                return face == Direction.EAST ? hitZ : 1 - (double) hitZ;
+            case Y:
+                return face == Direction.UP ? 1 - (double) hitX : hitX;
+            default:
+                return face == Direction.SOUTH ? 1 - (double) hitX : hitX;
         }
     }
 
-    private SlabPlacement() { }
+    private SlabPlacement() {
+    }
 }

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/sandstone_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:sandstone_vertical_step"
+  },
+  "result": {
+    "id": "minecraft:sandstone_slab",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:sandstone_vertical_step"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_podzol_horizontal_step",
+  "pattern": [
+    "X ",
+    " X"
+  ],
+  "key": {
+    "X": "minecraft:podzol"
+  },
+  "result": {
+    "id": "skysbuildingpieces:dirt_podzol_horizontal_step",
+    "count": 8
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:dirt_podzol_horizontal_step"
+    }
+  ]
+}

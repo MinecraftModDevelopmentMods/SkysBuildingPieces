@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/mossy_stone_brick_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:stonebrick_mossy_vertical_step"
+  },
+  "result": {
+    "id": "minecraft:mossy_stone_brick_slab",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stonebrick_mossy_vertical_step"
+    }
+  ]
+}

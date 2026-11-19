@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/brick_slab",
+  "pattern": [
+    "X",
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:bricks_horizontal_step"
+  },
+  "result": {
+    "id": "minecraft:brick_slab",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:bricks_horizontal_step"
+    }
+  ]
+}

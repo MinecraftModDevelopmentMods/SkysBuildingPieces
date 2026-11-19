@@ -1,0 +1,12 @@
+{
+  "source_archive": "building-pieces-bop-biomes-1.15.2.zip",
+  "source_archive_sha256": "6A09B1E83F3AE237BC3FA092799C33A28CCD316AC43A8F28BF395A1382C9FA86",
+  "source_chunk_sha256": "FBDF087B300AE3F9DAA6D55D46049E49051EBD931C52FCDF3734BEA234FDB4F5",
+  "source_minecraft": "1.15.2",
+  "source_data_version": 2230,
+  "source_ids": {
+    "52": "biomesoplenty:gravel_beach"
+  },
+  "cells": 1024,
+  "target": "minecraft:stony_shore"
+}

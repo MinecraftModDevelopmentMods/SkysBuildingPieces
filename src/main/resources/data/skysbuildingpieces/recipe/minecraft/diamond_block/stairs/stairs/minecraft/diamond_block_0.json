@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/diamond_block_stairs",
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "key": {
+    "X": "minecraft:diamond_block"
+  },
+  "result": {
+    "id": "skysbuildingpieces:diamond_block_stairs",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:diamond_block_stairs"
+    }
+  ]
+}

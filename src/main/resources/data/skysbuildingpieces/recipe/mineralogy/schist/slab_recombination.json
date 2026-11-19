@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/schist",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": "mineralogy:schist_slab"
+  },
+  "result": {
+    "id": "mineralogy:schist",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "mineralogy"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:schist"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "mineralogy:schist_slab"
+        }
+      ]
+    }
+  ]
+}

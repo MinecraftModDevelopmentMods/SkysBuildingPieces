@@ -1,0 +1,33 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_blue_slab",
+  "pattern": [
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:wool_blue_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_blue_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_blue_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:wool_blue_vertical_slab"
+        }
+      ]
+    }
+  ]
+}
