@@ -14,7 +14,7 @@ Pieces doesn't generate terrain.
 - Use the same slab item for horizontal and vertical placement. Click the centre
   of a face to place against it, or near an edge to place along that edge.
   Breaking a vertical slab returns the regular slab. To use ordinary slab
-  placement, open **Mods → Sky's Building Pieces → Config** and
+  placement, open **Mods â†’ Sky's Building Pieces â†’ Config** and
   turn off **Directional slab placement**.
 - Sneak while placing a step to turn it vertically. Steps are quarter-block
   pieces; corners are eighth-block pieces.
@@ -33,6 +33,10 @@ Use a shovel on an uncovered dirt or grass step or corner to turn it into a
 matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath
 it into a path, using the same shovel action.
+
+Snowy grass pieces and snow pieces give the grass beneath them a snowy
+appearance too. Removing the piece restores the normal grass texture. Snow
+pieces drop when broken by hand; using a shovel is quicker.
 
 Pieces support native waterlogging. Wet grass and path pieces turn into their
 matching dirt shapes, keeping the water and orientation. Drain them before
@@ -63,7 +67,7 @@ server.
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.2.0.120011 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.1.120011 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

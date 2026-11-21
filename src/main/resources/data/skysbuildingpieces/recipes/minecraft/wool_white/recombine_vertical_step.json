@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/wool_white",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_white_slab",
   "pattern": ["X", "X"],
   "key": {
     "X": {

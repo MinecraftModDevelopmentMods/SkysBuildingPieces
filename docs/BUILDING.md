@@ -35,6 +35,9 @@ Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
 Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each
 ordinary profile has its own game folder and leaves existing saves alone.
+Verified copies can be retained in `.gradle/qualification-dependencies` so
+cleaning a sibling build does not break the Eclipse profile. Retained jars
+still have to match the lock; they never enter the published mod.
 
 ## Runtime checks
 

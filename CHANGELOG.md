@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.10.120011
+
+- Snowy steps and corners also cover the grass beneath them, without leaving a floating snow layer.
+- Snow pieces can be recovered by hand. Shovels still break them faster.
+- Grass pieces spread above and below the old world-height limits, and turn back to dirt under solid cover or water.
+- Wooden pieces burn for their share of the full material's fuel time. Nonflammable woods stay nonflammable.
+- Keep different recipe results on separate recipe-book buttons, and remove duplicate rebuilding recipes.
+- Keep dirt vertical-slab crafting and rebuilding available when Grass Slabs isn't installed.
+
 ## 0.3.9.120011
 
 - Each material and shape now has its own block ID. Older saved pieces keep their shape and orientation when upgraded.
