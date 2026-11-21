@@ -1,0 +1,33 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/purpur_pillar_slab",
+  "pattern": [
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:purpur_pillar_vertical_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:purpur_pillar_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:purpur_pillar_slab"
+        },
+        {
+          "type": "neoforge:registered",
+          "registry": "minecraft:item",
+          "value": "skysbuildingpieces:purpur_pillar_vertical_slab"
+        }
+      ]
+    }
+  ]
+}

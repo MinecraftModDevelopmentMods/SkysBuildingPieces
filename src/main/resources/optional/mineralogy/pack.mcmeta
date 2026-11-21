@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "description": "Sky's Building Pieces: Mineralogy models",
+    "max_format": 101,
+    "min_format": [
+      101,
+      1
+    ]
+  }
+}

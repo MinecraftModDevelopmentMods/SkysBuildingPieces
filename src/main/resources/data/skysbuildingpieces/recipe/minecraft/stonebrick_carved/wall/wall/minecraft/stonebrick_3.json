@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_carved_wall",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": "minecraft:chiseled_stone_bricks"
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_carved_wall",
+    "count": 6
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:stonebrick_carved_wall"
+    }
+  ]
+}

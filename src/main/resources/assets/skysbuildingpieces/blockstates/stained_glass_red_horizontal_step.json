@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "orientation=top_north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_0"
+    },
+    "orientation=top_north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_0"
+    },
+    "orientation=top_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_1"
+    },
+    "orientation=top_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_1"
+    },
+    "orientation=top_south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_2"
+    },
+    "orientation=top_south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_2"
+    },
+    "orientation=top_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_3"
+    },
+    "orientation=top_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_3"
+    },
+    "orientation=bottom_north,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_4"
+    },
+    "orientation=bottom_north,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_4"
+    },
+    "orientation=bottom_east,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_5"
+    },
+    "orientation=bottom_east,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_5"
+    },
+    "orientation=bottom_south,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_6"
+    },
+    "orientation=bottom_south,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_6"
+    },
+    "orientation=bottom_west,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_7"
+    },
+    "orientation=bottom_west,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stained_glass_red_horizontal_step_7"
+    }
+  }
+}

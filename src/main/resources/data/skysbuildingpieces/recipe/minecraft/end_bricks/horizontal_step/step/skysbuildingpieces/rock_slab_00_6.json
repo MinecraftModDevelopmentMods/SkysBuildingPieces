@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/end_bricks_horizontal_step",
+  "pattern": [
+    "X ",
+    " X"
+  ],
+  "key": {
+    "X": "minecraft:end_stone_brick_slab"
+  },
+  "result": {
+    "id": "skysbuildingpieces:end_bricks_horizontal_step",
+    "count": 4
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:end_bricks_horizontal_step"
+    }
+  ]
+}

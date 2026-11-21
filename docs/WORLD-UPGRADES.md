@@ -1,11 +1,38 @@
 # Existing worlds
 
+The first load converts old shared palettes to individual block IDs. The
+material, orientation and water in each saved piece carry across.
+
+The separate Mineralogy piece add-on from the earlier local tests is no longer
+needed. Use Building Pieces with Mineralogy instead. Its test-save piece IDs
+are recovered automatically, including item stacks in chunks opened after the
+first upgrade save. Counts, metadata, names and other item data are retained.
+Do not load the old add-on jar alongside the new core.
+
 Test this beta on a disposable copy, never the only copy of a world.
 
 BuildingBricks 1.10.2-2.0.13 stores many pieces using generic block IDs and
 material tile data. Sky's Building Pieces resolves both the saved material
 and orientation before replacing a piece. It never guesses from an item's
 temporary material index.
+
+There is no supported BuildingBricks release for Minecraft 26.1.2. Recovery
+from an older save is automatic and does not require the replacement setting.
+The permanent Sky palette IDs and orientation values are unchanged. The first 26.1.2 load copies existing migration totals into Minecraft’s namespaced data folder, keeping the old file as a backup. The 1.14
+loader turns old numeric states into named states, preserving the material and
+orientation. Old pieces start dry. Wall connections, joined stairs, snow and
+path supports are refreshed through Minecraft's normal chunk post-processing.
+When Minecraft now has an equivalent piece, recovery uses that native block,
+keeping its material and orientation. The old Sky palette remains registered
+so its saved identity can still be read.
+
+Old palette inventory items are converted to their matching material items,
+keeping counts, names and custom data. A registry sidecar in the world's `data`
+folder preserves the original numeric snapshot for chunks opened later. It also
+keeps registrations added during later 1.12 saves, so newly added Sky pieces are
+not lost behind an older recovery snapshot. Conflicting block numbers stop the
+upgrade instead of being guessed. Keep that file with the world and its backups. Back up
+the whole world before upgrading, and check every other mod's missing content.
 
 With BuildingBricks installed, replacement is off by default. When explicitly
 enabled, supported vanilla pieces can be converted as chunks, containers,
@@ -21,6 +48,10 @@ The report is `serverconfig/skysbuildingpieces-migration-report.txt` inside
 the world folder. It lists completed conversions and unresolved material and
 shape pairs. Turning replacement off preserves previous conversions, counters
 and reports. It does not restore old pieces.
+
+Item totals count conversions, not the survival of another mod's container or
+entity. If that mod cannot load its old cabinets or entities, their contents can
+still be lost. Check the saved world as well as the migration report.
 
 The BOP add-on has separate progress and totals. It can process a chunk that
 was already visited by the vanilla core without repeating earlier conversions.
@@ -41,7 +72,7 @@ counting the earlier chunk visits again.
 This release is not a universal replacement for BuildingBricks. Removing it
 requires a complete audit of the particular world, matching material add-ons,
 and a tested backup. Uncovered materials, shapes and tools may still need it.
-Never confirm Forge's missing-content warning for an entry that still has saved
+Never confirm NeoForge's missing-content warning for an entry that still has saved
 blocks or items without a proven recovery path.
 
 Sky's Grass Slabs remains responsible for its own content. This mod does not

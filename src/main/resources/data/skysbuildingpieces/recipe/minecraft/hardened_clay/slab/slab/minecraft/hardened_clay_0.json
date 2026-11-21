@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/hardened_clay_slab",
+  "pattern": [
+    "XXX"
+  ],
+  "key": {
+    "X": "minecraft:terracotta"
+  },
+  "result": {
+    "id": "skysbuildingpieces:hardened_clay_slab",
+    "count": 6
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:hardened_clay_slab"
+    }
+  ]
+}

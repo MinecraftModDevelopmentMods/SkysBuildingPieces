@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/stone_bricks",
+  "pattern": [
+    "XX"
+  ],
+  "key": {
+    "X": "minecraft:stone_brick_slab"
+  },
+  "result": {
+    "id": "minecraft:stone_bricks",
+    "count": 1
+  }
+}

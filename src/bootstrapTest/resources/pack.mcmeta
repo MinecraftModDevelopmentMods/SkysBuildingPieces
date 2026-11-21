@@ -1,0 +1,10 @@
+{
+    "pack": {
+        "description": "Building Pieces runtime checks",
+        "max_format": 101,
+        "min_format": [
+            101,
+            1
+        ]
+    }
+}

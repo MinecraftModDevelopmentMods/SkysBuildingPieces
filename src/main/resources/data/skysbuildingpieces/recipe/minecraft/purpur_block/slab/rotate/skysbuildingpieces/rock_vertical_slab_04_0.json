@@ -1,0 +1,23 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/minecraft/purpur_slab",
+  "pattern": [
+    "X"
+  ],
+  "key": {
+    "X": "skysbuildingpieces:purpur_block_vertical_slab"
+  },
+  "result": {
+    "id": "minecraft:purpur_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:purpur_block_vertical_slab"
+    }
+  ]
+}

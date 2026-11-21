@@ -1,0 +1,274 @@
+{
+  "kind": "buildingbricks",
+  "minecraft_version": "1.10.2",
+  "source_version": "0.2.1.110021",
+  "source_mods": {
+    "BuildingBricks-1.10.2-2.0.13.jar": "B3F8FE664D9C38110D3511E389B352510C5851C08F1E43BE25E3AFB17E2EC18C",
+    "SkysBuildingPieces-0.2.1.110021.jar": "0BD4D19A7D629FD4823257FFB8D066C4E045AC79D5C47771FE07CAA052B0F77D",
+    "skysbuildingpieces-integration-test-reobf.jar": "81EE38F76766267E44E419D908FF93E836C4CA4B45BACF53B03067EDC816E873",
+    "SkysGrassSlabs-1.0.2.110021.jar": "8DBFD9A17FEE26E73C9D851F2DA850571864AFCF01CFD727C19D56424932279C"
+  },
+  "source_world_sha256": "8B98FCD6399279B111B0CCA561443B4DB2ED452856F08CB31D60A9F90FD9EF6D",
+  "chunks": 2,
+  "states": [
+    {
+      "x": 800,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 0,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 800, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 801,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 1,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 801, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 802,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 2,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 802, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 803,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 3,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 803, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 804,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 4,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 804, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 805,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 5,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 805, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 806,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 6,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 806, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 807,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 7,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 807, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 808,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 8,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 808, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 809,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 9,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 809, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 810,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 10,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 810, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 811,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 11,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 811, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 812,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 12,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 812, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 813,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 13,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 813, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 814,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 14,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 814, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 815,
+      "y": 70,
+      "z": 800,
+      "id": "buildingbricks:rock_step",
+      "meta": 15,
+      "material": "minecraft:stone",
+      "tile": "{material: \"minecraft:stone\", x: 815, y: 70, z: 800, id: \"tile.material\"}"
+    },
+    {
+      "x": 800,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:wood_vertical_slab",
+      "meta": 3,
+      "material": "minecraft:planks_oak",
+      "tile": "{material: \"minecraft:planks_oak\", x: 800, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 801,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:glass_slab",
+      "meta": 0,
+      "material": "minecraft:glass",
+      "tile": "{material: \"minecraft:glass\", x: 801, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 802,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:dirt_stairs",
+      "meta": 0,
+      "material": "minecraft:dirt",
+      "tile": "{material: \"minecraft:dirt\", x: 802, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 803,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:wood_corner",
+      "meta": 0,
+      "material": "minecraft:planks_spruce",
+      "tile": "{material: \"minecraft:planks_spruce\", x: 803, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 804,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:rock_wall",
+      "meta": 0,
+      "material": "minecraft:stonebrick",
+      "tile": "{material: \"minecraft:stonebrick\", x: 804, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 805,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:ice_pane",
+      "meta": 0,
+      "material": "minecraft:ice",
+      "tile": "{material: \"minecraft:ice\", x: 805, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 806,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:dirt_vertical_slab",
+      "meta": 0,
+      "material": "minecraft:dirt",
+      "tile": "{material: \"minecraft:dirt\", x: 806, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 807,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:dirt_vertical_slab",
+      "meta": 1,
+      "material": "minecraft:dirt",
+      "tile": "{material: \"minecraft:dirt\", x: 807, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 808,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:dirt_vertical_slab",
+      "meta": 2,
+      "material": "minecraft:dirt",
+      "tile": "{material: \"minecraft:dirt\", x: 808, y: 70, z: 801, id: \"tile.material\"}"
+    },
+    {
+      "x": 809,
+      "y": 70,
+      "z": 801,
+      "id": "buildingbricks:dirt_vertical_slab",
+      "meta": 3,
+      "material": "minecraft:dirt",
+      "tile": "{material: \"minecraft:dirt\", x: 809, y: 70, z: 801, id: \"tile.material\"}"
+    }
+  ],
+  "containers": [
+    {
+      "x": 800,
+      "y": 70,
+      "z": 802,
+      "items": [
+        "{Slot: 0b, id: \"buildingbricks:rock_step\", Count: 23b, tag: {material: \"minecraft:stone\", custom_label: \"NBT survives\"}, Damage: 0s}",
+        "{Slot: 1b, id: \"buildingbricks:wood_corner\", Count: 7b, tag: {material: \"minecraft:planks_oak\", custom_label: \"NBT survives\"}, Damage: 0s}"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "x": 804.0,
+      "y": 72.0,
+      "z": 804.0,
+      "item": "{id: \"buildingbricks:rock_step\", Count: 5b, tag: {material: \"minecraft:stone\", custom_label: \"NBT survives\"}, Damage: 0s}"
+    }
+  ],
+  "files": {
+    "level.dat": "A1FFBC7DA7B6EC708E4ADD504AE8097B691DFCD5CC66D2D6CDE7452D21BCEF0F",
+    "data/skysbuildingpieces_world_state.dat": "EBADD0B975E3353E3C0D233EC61950DC89A4C66F043BFE4E3501F391DE768B38",
+    "region/r.1.1.mca": "9D3A270ABE7E67147AE7414CEDC441953B6136D89AAC5CCBB9EC64C7B3314FC5"
+  },
+  "archive_sha256": "8D5BA8583465AEA76403475C71A3AA558DA6AB9AF4576C5C858B98330EF5ADB0"
+}

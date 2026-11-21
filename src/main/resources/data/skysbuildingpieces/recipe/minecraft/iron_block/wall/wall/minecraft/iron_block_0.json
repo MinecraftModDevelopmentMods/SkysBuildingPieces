@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/iron_block_wall",
+  "pattern": [
+    "XX",
+    "XX",
+    "XX"
+  ],
+  "key": {
+    "X": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "skysbuildingpieces:iron_block_wall",
+    "count": 6
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "skysbuildingpieces:iron_block_wall"
+    }
+  ]
+}

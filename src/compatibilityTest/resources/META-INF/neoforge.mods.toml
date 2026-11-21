@@ -1,0 +1,8 @@
+modLoader="javafml"
+loaderVersion="[3,)"
+license="LGPL-2.1-only"
+[[mods]]
+modId="buildingbricks"
+version="1.0"
+displayName="Legacy Piece Policy Fixture"
+description="Build-only policy checks. Not a playable BuildingBricks port."

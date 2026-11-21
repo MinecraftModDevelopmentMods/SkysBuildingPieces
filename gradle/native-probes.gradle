@@ -1,0 +1,45 @@
+// Keep runtime probes as separate jars. Ordinary runs see production output only.
+def probes = [
+        [task: 'integrationTestMod', sources: 'integrationTest', folder: 'integration-test-mod',
+         name: 'skysbuildingpieces-integration-test.jar'],
+        [task: 'nativeBootstrapProbe', sources: 'bootstrapTest', folder: 'native-bootstrap-probe',
+         name: 'building-pieces-native-checks.jar'],
+        [task: 'legacyPolicyFixture', sources: 'compatibilityTest', folder: 'legacy-policy-fixture',
+         name: 'legacy-piece-policy-fixture.jar'],
+        [task: 'neoForgeClientControl', sources: 'clientControl', folder: 'client-control',
+         name: 'building-pieces-client-control.jar'],
+        [task: 'neoForgeServerControl', sources: 'serverControl', folder: 'server-control',
+         name: 'building-pieces-server-control.jar'],
+        [task: 'optionalModControl', sources: 'optionalControl', folder: 'optional-control',
+         name: 'building-pieces-optional-control.jar']
+]
+
+probes.each { probe ->
+    def compile = tasks.register("compile${probe.task.capitalize()}", JavaCompile) {
+        group = 'verification'
+        dependsOn tasks.named('classes')
+        source fileTree("src/${probe.sources}/java")
+        if (probe.sources == 'bootstrapTest') {
+            source fileTree('src/integrationTest/java') {
+                exclude '**/RuntimeProbe.java', '**/CompatibilityChecks.java', '**/WorldAuditProbe.java'
+            }
+        }
+        classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
+        destinationDirectory = layout.buildDirectory.dir("${probe.folder}/classes")
+        options.compilerArgs.addAll(['-proc:none', '-Xmaxerrs', '200'])
+    }
+    tasks.register("${probe.task}Jar", Jar) {
+        group = 'verification'
+        dependsOn compile
+        archiveFileName = probe.name
+        destinationDirectory = layout.buildDirectory.dir(probe.folder)
+        from compile.flatMap { it.destinationDirectory }
+        from "src/${probe.sources}/resources"
+    }
+}
+
+tasks.register('preparePackagedRuntimeProbes') {
+    group = 'verification'
+    description = 'Builds the test-only jars used by the disposable client and server checks.'
+    dependsOn probes.collect { "${it.task}Jar" }
+}
