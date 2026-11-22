@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_mossy_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:mossy_stone_brick_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stonebrick_mossy_horizontal_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_mossy_horizontal_step"
+    }
+  ]
+}

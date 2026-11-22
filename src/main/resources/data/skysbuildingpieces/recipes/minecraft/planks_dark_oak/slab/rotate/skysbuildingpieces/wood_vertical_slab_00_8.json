@@ -1,0 +1,22 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/minecraft/dark_oak_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:planks_dark_oak_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "minecraft:dark_oak_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:planks_dark_oak_vertical_slab"
+    }
+  ]
+}

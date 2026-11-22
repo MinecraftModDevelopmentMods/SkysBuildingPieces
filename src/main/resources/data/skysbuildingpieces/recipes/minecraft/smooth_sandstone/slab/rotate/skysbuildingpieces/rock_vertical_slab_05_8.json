@@ -1,0 +1,22 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/minecraft/cut_sandstone_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:smooth_sandstone_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "minecraft:cut_sandstone_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:smooth_sandstone_vertical_slab"
+    }
+  ]
+}

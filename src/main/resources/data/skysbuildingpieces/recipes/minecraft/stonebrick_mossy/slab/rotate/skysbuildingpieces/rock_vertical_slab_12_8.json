@@ -1,0 +1,22 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/minecraft/mossy_stone_brick_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "minecraft:mossy_stone_brick_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_mossy_vertical_slab"
+    }
+  ]
+}

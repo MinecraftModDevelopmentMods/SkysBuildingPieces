@@ -1,11 +1,34 @@
 # Existing worlds
 
+The separate Mineralogy piece add-on from the earlier local tests is no longer
+needed. Use Building Pieces with Mineralogy instead. Its test-save piece IDs
+are recovered automatically, including item stacks in chunks opened after the
+first upgrade save. Counts, metadata, names and other item data are retained.
+Do not load the old add-on jar alongside the new core.
+
 Test this beta on a disposable copy, never the only copy of a world.
 
 BuildingBricks 1.10.2-2.0.13 stores many pieces using generic block IDs and
 material tile data. Sky's Building Pieces resolves both the saved material
 and orientation before replacing a piece. It never guesses from an item's
 temporary material index.
+
+There is no supported BuildingBricks release for Minecraft 1.20.1. Recovery
+from an older save is automatic and does not require the replacement setting.
+Each material and shape now has its own block ID. Saved pieces from older
+numeric and named worlds are converted as their chunks load. The conversion
+keeps the material, orientation and any saved water. Old numeric pieces start
+dry. Walls, stairs, snow and path supports still refresh as the chunk loads.
+Where Minecraft now has an equivalent piece, the save uses the native block.
+The old palette IDs are kept for reading older saves.
+
+Old palette inventory items are converted to their matching material items,
+keeping counts, names and custom data. A registry sidecar in the world's `data`
+folder preserves the original numeric snapshot for chunks opened later. It also
+keeps registrations added during later 1.12 saves, so newly added Sky pieces are
+not lost behind an older recovery snapshot. Conflicting block numbers stop the
+upgrade instead of being guessed. Keep that file with the world and its backups. Back up
+the whole world before upgrading, and check every other mod's missing content.
 
 With BuildingBricks installed, replacement is off by default. When explicitly
 enabled, supported vanilla pieces can be converted as chunks, containers,
@@ -21,6 +44,10 @@ The report is `serverconfig/skysbuildingpieces-migration-report.txt` inside
 the world folder. It lists completed conversions and unresolved material and
 shape pairs. Turning replacement off preserves previous conversions, counters
 and reports. It does not restore old pieces.
+
+Item totals count conversions, not the survival of another mod's container or
+entity. If that mod cannot load its old cabinets or entities, their contents can
+still be lost. Check the saved world as well as the migration report.
 
 The BOP add-on has separate progress and totals. It can process a chunk that
 was already visited by the vanilla core without repeating earlier conversions.

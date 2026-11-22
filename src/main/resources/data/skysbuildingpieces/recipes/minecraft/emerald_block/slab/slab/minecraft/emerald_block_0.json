@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/emerald_block_slab",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:emerald_block"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:emerald_block_slab",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:emerald_block_slab"
+    }
+  ]
+}

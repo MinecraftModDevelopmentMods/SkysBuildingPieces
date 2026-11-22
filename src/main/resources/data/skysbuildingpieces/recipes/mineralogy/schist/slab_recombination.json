@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/schist",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:schist_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:schist",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:schist"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:schist_slab"
+    }
+  ]
+}

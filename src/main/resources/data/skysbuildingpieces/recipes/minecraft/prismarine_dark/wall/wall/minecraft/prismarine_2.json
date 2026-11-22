@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_dark_wall",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:dark_prismarine"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:prismarine_dark_wall",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:prismarine_dark_wall"
+    }
+  ]
+}

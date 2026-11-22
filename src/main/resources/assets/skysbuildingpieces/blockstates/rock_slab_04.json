@@ -1,1 +1,100 @@
-{"variants":{"meta=0":{"model":"skysbuildingpieces:stone_slab_0"},"meta=1":{"model":"skysbuildingpieces:stone_slab_1"},"meta=2":{"model":"skysbuildingpieces:andesite_slab_0"},"meta=3":{"model":"skysbuildingpieces:andesite_slab_1"},"meta=4":{"model":"skysbuildingpieces:andesite_smooth_slab_0"},"meta=5":{"model":"skysbuildingpieces:andesite_smooth_slab_1"},"meta=6":{"model":"skysbuildingpieces:diorite_slab_0"},"meta=7":{"model":"skysbuildingpieces:diorite_slab_1"},"meta=8":{"model":"skysbuildingpieces:diorite_smooth_slab_0"},"meta=9":{"model":"skysbuildingpieces:diorite_smooth_slab_1"},"meta=10":{"model":"skysbuildingpieces:granite_slab_0"},"meta=11":{"model":"skysbuildingpieces:granite_slab_1"},"meta=12":{"model":"skysbuildingpieces:granite_smooth_slab_0"},"meta=13":{"model":"skysbuildingpieces:granite_smooth_slab_1"},"meta=14":{"model":"skysbuildingpieces:stonebrick_carved_slab_0"},"meta=15":{"model":"skysbuildingpieces:stonebrick_carved_slab_1"}}}
+{
+  "variants": {
+    "meta=0,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stone_slab_0"
+    },
+    "meta=0,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stone_slab_0"
+    },
+    "meta=1,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stone_slab_1"
+    },
+    "meta=1,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stone_slab_1"
+    },
+    "meta=2,waterlogged=false": {
+      "model": "skysbuildingpieces:block/andesite_slab_0"
+    },
+    "meta=2,waterlogged=true": {
+      "model": "skysbuildingpieces:block/andesite_slab_0"
+    },
+    "meta=3,waterlogged=false": {
+      "model": "skysbuildingpieces:block/andesite_slab_1"
+    },
+    "meta=3,waterlogged=true": {
+      "model": "skysbuildingpieces:block/andesite_slab_1"
+    },
+    "meta=4,waterlogged=false": {
+      "model": "skysbuildingpieces:block/andesite_smooth_slab_0"
+    },
+    "meta=4,waterlogged=true": {
+      "model": "skysbuildingpieces:block/andesite_smooth_slab_0"
+    },
+    "meta=5,waterlogged=false": {
+      "model": "skysbuildingpieces:block/andesite_smooth_slab_1"
+    },
+    "meta=5,waterlogged=true": {
+      "model": "skysbuildingpieces:block/andesite_smooth_slab_1"
+    },
+    "meta=6,waterlogged=false": {
+      "model": "skysbuildingpieces:block/diorite_slab_0"
+    },
+    "meta=6,waterlogged=true": {
+      "model": "skysbuildingpieces:block/diorite_slab_0"
+    },
+    "meta=7,waterlogged=false": {
+      "model": "skysbuildingpieces:block/diorite_slab_1"
+    },
+    "meta=7,waterlogged=true": {
+      "model": "skysbuildingpieces:block/diorite_slab_1"
+    },
+    "meta=8,waterlogged=false": {
+      "model": "skysbuildingpieces:block/diorite_smooth_slab_0"
+    },
+    "meta=8,waterlogged=true": {
+      "model": "skysbuildingpieces:block/diorite_smooth_slab_0"
+    },
+    "meta=9,waterlogged=false": {
+      "model": "skysbuildingpieces:block/diorite_smooth_slab_1"
+    },
+    "meta=9,waterlogged=true": {
+      "model": "skysbuildingpieces:block/diorite_smooth_slab_1"
+    },
+    "meta=10,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_slab_0"
+    },
+    "meta=10,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_slab_0"
+    },
+    "meta=11,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_slab_1"
+    },
+    "meta=11,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_slab_1"
+    },
+    "meta=12,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_smooth_slab_0"
+    },
+    "meta=12,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_smooth_slab_0"
+    },
+    "meta=13,waterlogged=false": {
+      "model": "skysbuildingpieces:block/granite_smooth_slab_1"
+    },
+    "meta=13,waterlogged=true": {
+      "model": "skysbuildingpieces:block/granite_smooth_slab_1"
+    },
+    "meta=14,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_slab_0"
+    },
+    "meta=14,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_slab_0"
+    },
+    "meta=15,waterlogged=false": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_slab_1"
+    },
+    "meta=15,waterlogged=true": {
+      "model": "skysbuildingpieces:block/stonebrick_carved_slab_1"
+    }
+  }
+}

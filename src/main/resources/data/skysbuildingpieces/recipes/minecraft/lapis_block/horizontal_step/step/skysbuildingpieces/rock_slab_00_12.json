@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/lapis_block_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:lapis_block_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:lapis_block_horizontal_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:lapis_block_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:lapis_block_slab"
+    }
+  ]
+}

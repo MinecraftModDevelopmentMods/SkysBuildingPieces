@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/netherrack_stairs",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:netherrack"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:netherrack_stairs",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:netherrack_stairs"
+    }
+  ]
+}

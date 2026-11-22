@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/coal_block_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:coal_block_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:coal_block_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:coal_block_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:coal_block_vertical_slab"
+    }
+  ]
+}

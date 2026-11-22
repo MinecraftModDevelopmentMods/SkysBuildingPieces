@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/iron_block_slab",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:iron_block_slab",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:iron_block_slab"
+    }
+  ]
+}

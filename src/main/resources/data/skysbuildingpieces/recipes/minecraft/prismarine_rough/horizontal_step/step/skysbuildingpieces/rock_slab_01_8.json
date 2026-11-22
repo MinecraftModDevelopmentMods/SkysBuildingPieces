@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_rough_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:prismarine_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:prismarine_rough_horizontal_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:prismarine_rough_horizontal_step"
+    }
+  ]
+}

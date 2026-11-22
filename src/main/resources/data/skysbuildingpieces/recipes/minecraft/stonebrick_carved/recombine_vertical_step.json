@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_carved_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_carved_vertical_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stonebrick_carved_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_carved_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stonebrick_carved_vertical_step"
+    }
+  ]
+}

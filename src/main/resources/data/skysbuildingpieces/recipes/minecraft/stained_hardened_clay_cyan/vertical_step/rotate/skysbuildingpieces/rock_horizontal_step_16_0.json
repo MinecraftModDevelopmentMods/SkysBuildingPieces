@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_cyan_vertical_step",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stained_hardened_clay_cyan_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_hardened_clay_cyan_vertical_step",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_cyan_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_cyan_vertical_step"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_orange_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_orange_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:wool_orange_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_orange_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_orange_horizontal_step"
+    }
+  ]
+}

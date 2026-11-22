@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/ice_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:ice_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:ice_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:ice_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:ice_step"
+    }
+  ]
+}

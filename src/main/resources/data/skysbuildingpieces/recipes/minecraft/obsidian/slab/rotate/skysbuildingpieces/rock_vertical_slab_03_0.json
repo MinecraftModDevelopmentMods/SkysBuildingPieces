@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/obsidian_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:obsidian_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:obsidian_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:obsidian_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:obsidian_vertical_slab"
+    }
+  ]
+}

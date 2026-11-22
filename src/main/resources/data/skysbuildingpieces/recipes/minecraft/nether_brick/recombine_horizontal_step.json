@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/nether_brick_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:nether_brick_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "minecraft:nether_brick_slab",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:nether_brick_horizontal_step"
+    }
+  ]
+}

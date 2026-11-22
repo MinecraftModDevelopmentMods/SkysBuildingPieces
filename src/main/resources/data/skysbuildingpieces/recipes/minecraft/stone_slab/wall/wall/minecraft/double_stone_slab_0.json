@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stone_slab_wall",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stone_slab_wall",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stone_slab_wall"
+    }
+  ]
+}

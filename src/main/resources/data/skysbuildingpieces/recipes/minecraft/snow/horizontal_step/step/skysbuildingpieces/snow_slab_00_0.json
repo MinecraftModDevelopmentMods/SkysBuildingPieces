@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/snow_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:snow_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:snow_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:snow_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:snow_step"
+    }
+  ]
+}

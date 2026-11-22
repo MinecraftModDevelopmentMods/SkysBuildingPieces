@@ -1,0 +1,20 @@
+// Unit tests need the same pre-initialization array patch as a Forge process.
+// This launcher is absent from production jars and ordinary development runs.
+def compileLauncher = tasks.register('compileNativeUnitLauncher', JavaCompile) {
+    source fileTree('src/testLauncher/java')
+    classpath = files()
+    destinationDirectory = layout.buildDirectory.dir('native-unit-launcher/classes')
+}
+def launcher = tasks.register('nativeUnitLauncherJar', Jar) {
+    dependsOn compileLauncher
+    archiveFileName = 'native-unit-launcher.jar'
+    destinationDirectory = layout.buildDirectory.dir('native-unit-launcher')
+    from compileLauncher.flatMap { it.destinationDirectory }
+    manifest.attributes('Premain-Class': 'zone.moddev.mc.skysbuildingpieces.testlaunch.NativeTestLauncher')
+}
+tasks.withType(Test).configureEach {
+    dependsOn launcher
+    doFirst {
+        jvmArgs '-javaagent:' + launcher.get().archiveFile.get().asFile.absolutePath
+    }
+}

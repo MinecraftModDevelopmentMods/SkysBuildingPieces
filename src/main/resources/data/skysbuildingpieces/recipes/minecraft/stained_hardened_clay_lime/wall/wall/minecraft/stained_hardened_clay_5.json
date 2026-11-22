@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_lime_wall",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:lime_terracotta"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_hardened_clay_lime_wall",
+    "count": 6
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_lime_wall"
+    }
+  ]
+}

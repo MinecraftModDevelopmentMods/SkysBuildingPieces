@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_lime_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_lime_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:wool_lime_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_lime_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:wool_lime_vertical_slab"
+    }
+  ]
+}

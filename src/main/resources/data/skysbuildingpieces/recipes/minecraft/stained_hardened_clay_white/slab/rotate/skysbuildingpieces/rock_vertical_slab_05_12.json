@@ -1,0 +1,26 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stained_hardened_clay_white_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stained_hardened_clay_white_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:stained_hardened_clay_white_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_white_slab"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:stained_hardened_clay_white_vertical_slab"
+    }
+  ]
+}

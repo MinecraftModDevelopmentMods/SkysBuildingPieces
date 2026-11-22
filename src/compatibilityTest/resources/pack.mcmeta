@@ -1,0 +1,8 @@
+{
+  "pack": {
+    "pack_format": 15,
+    "description": "Legacy piece policy checks",
+    "forge:resource_pack_format": 15,
+    "forge:data_pack_format": 15
+  }
+}

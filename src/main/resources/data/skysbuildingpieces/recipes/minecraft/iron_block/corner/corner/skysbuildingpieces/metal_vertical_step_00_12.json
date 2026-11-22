@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/iron_block_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:iron_block_vertical_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:iron_block_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:iron_block_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:iron_block_vertical_step"
+    }
+  ]
+}

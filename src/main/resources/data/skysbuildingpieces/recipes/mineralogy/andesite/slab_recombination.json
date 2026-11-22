@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/andesite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:andesite_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:andesite",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:andesite"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:andesite_slab"
+    }
+  ]
+}

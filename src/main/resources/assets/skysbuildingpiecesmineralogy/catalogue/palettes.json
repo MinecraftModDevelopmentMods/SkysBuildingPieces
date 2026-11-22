@@ -1,0 +1,363 @@
+[
+  {
+    "id": "rock_horizontal_step_00",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:amphibolite",
+      "mineralogy:andesite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_01",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:basalt",
+      "mineralogy:basaltic_glass"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_02",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:conglomerate",
+      "mineralogy:diabase"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_03",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:diorite",
+      "mineralogy:dolomite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_04",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:gabbro",
+      "mineralogy:gneiss"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_05",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:granite",
+      "mineralogy:hornfels"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_06",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:limestone",
+      "mineralogy:marble"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_07",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:novaculite",
+      "mineralogy:pegmatite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_08",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:peridotite",
+      "mineralogy:phyllite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_09",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:quartzite",
+      "mineralogy:rhyolite"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_10",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:rock_salt",
+      "mineralogy:schist"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_11",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:scoria",
+      "mineralogy:shale"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_12",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:siltstone",
+      "mineralogy:slate"
+    ]
+  },
+  {
+    "id": "rock_horizontal_step_13",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": [
+      "mineralogy:tuff"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_00",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:amphibolite",
+      "mineralogy:andesite",
+      "mineralogy:basalt",
+      "mineralogy:basaltic_glass"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_01",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:conglomerate",
+      "mineralogy:diabase",
+      "mineralogy:diorite",
+      "mineralogy:dolomite"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_02",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:gabbro",
+      "mineralogy:gneiss",
+      "mineralogy:granite",
+      "mineralogy:hornfels"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_03",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:limestone",
+      "mineralogy:marble",
+      "mineralogy:novaculite",
+      "mineralogy:pegmatite"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_04",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:peridotite",
+      "mineralogy:phyllite",
+      "mineralogy:quartzite",
+      "mineralogy:rhyolite"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_05",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:rock_salt",
+      "mineralogy:schist",
+      "mineralogy:scoria",
+      "mineralogy:shale"
+    ]
+  },
+  {
+    "id": "rock_vertical_step_06",
+    "group": "rock",
+    "shape": "vertical_step",
+    "states": 4,
+    "materials": [
+      "mineralogy:siltstone",
+      "mineralogy:slate",
+      "mineralogy:tuff"
+    ]
+  },
+  {
+    "id": "rock_corner_00",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:amphibolite",
+      "mineralogy:andesite"
+    ]
+  },
+  {
+    "id": "rock_corner_01",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:basalt",
+      "mineralogy:basaltic_glass"
+    ]
+  },
+  {
+    "id": "rock_corner_02",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:conglomerate",
+      "mineralogy:diabase"
+    ]
+  },
+  {
+    "id": "rock_corner_03",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:diorite",
+      "mineralogy:dolomite"
+    ]
+  },
+  {
+    "id": "rock_corner_04",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:gabbro",
+      "mineralogy:gneiss"
+    ]
+  },
+  {
+    "id": "rock_corner_05",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:granite",
+      "mineralogy:hornfels"
+    ]
+  },
+  {
+    "id": "rock_corner_06",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:limestone",
+      "mineralogy:marble"
+    ]
+  },
+  {
+    "id": "rock_corner_07",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:novaculite",
+      "mineralogy:pegmatite"
+    ]
+  },
+  {
+    "id": "rock_corner_08",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:peridotite",
+      "mineralogy:phyllite"
+    ]
+  },
+  {
+    "id": "rock_corner_09",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:quartzite",
+      "mineralogy:rhyolite"
+    ]
+  },
+  {
+    "id": "rock_corner_10",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:rock_salt",
+      "mineralogy:schist"
+    ]
+  },
+  {
+    "id": "rock_corner_11",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:scoria",
+      "mineralogy:shale"
+    ]
+  },
+  {
+    "id": "rock_corner_12",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:siltstone",
+      "mineralogy:slate"
+    ]
+  },
+  {
+    "id": "rock_corner_13",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": [
+      "mineralogy:tuff"
+    ]
+  }
+]

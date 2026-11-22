@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/chiseled_sandstone",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:chiseled_sandstone_slab"
+    }
+  },
+  "result": {
+    "item": "minecraft:chiseled_sandstone",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:chiseled_sandstone_slab"
+    }
+  ]
+}

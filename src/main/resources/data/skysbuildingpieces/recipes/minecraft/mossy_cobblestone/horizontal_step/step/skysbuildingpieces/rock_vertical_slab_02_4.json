@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/mossy_cobblestone_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mossy_cobblestone_vertical_slab"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mossy_cobblestone_horizontal_step"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:mossy_cobblestone_vertical_slab"
+    }
+  ]
+}

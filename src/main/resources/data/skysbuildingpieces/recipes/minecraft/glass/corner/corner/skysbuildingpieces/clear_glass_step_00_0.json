@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/glass_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:glass_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:glass_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:glass_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:glass_step"
+    }
+  ]
+}

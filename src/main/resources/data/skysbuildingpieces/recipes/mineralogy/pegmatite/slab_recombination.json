@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/pegmatite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:pegmatite_slab"
+    }
+  },
+  "result": {
+    "item": "mineralogy:pegmatite",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mineralogy"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:pegmatite"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "mineralogy:pegmatite_slab"
+    }
+  ]
+}

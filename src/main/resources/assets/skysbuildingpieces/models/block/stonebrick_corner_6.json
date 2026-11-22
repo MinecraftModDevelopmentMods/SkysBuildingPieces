@@ -1,1 +1,23 @@
-{"parent":"block/block","textures":{"top":"minecraft:blocks/stonebrick","side":"minecraft:blocks/stonebrick","bottom":"minecraft:blocks/stonebrick","particle":"minecraft:blocks/stonebrick"},"elements":[{"from":[8,0,8],"to":[16,8,16],"faces":{"down":{"uv":[8,8,16,16],"texture":"#bottom"},"up":{"uv":[8,8,16,16],"texture":"#top"},"north":{"uv":[8,8,16,16],"texture":"#side"},"south":{"uv":[8,8,16,16],"texture":"#side"},"west":{"uv":[8,8,16,16],"texture":"#side"},"east":{"uv":[8,8,16,16],"texture":"#side"}}}]}
+{
+  "parent": "block/block",
+  "textures": {
+    "top": "minecraft:block/stone_bricks",
+    "side": "minecraft:block/stone_bricks",
+    "bottom": "minecraft:block/stone_bricks",
+    "particle": "minecraft:block/stone_bricks"
+  },
+  "elements": [
+    {
+      "from": [8, 0, 8],
+      "to": [16, 8, 16],
+      "faces": {
+        "down": {"uv": [8, 8, 16, 16], "texture": "#bottom"},
+        "up": {"uv": [8, 8, 16, 16], "texture": "#top"},
+        "north": {"uv": [8, 8, 16, 16], "texture": "#side"},
+        "south": {"uv": [8, 8, 16, 16], "texture": "#side"},
+        "west": {"uv": [8, 8, 16, 16], "texture": "#side"},
+        "east": {"uv": [8, 8, 16, 16], "texture": "#side"}
+      }
+    }
+  ]
+}

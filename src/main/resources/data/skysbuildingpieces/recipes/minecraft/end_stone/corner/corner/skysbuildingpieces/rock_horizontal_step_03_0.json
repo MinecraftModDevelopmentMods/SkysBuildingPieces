@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/end_stone_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:end_stone_horizontal_step"
+    }
+  },
+  "result": {
+    "item": "skysbuildingpieces:end_stone_corner",
+    "count": 4
+  },
+  "conditions": [
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_stone_corner"
+    },
+    {
+      "type": "forge:item_exists",
+      "item": "skysbuildingpieces:end_stone_horizontal_step"
+    }
+  ]
+}

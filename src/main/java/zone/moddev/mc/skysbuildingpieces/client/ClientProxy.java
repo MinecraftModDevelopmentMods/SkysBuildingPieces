@@ -1,39 +1,74 @@
 package zone.moddev.mc.skysbuildingpieces.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.*;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.model.ModelLoader;
-import zone.moddev.mc.skysbuildingpieces.CommonProxy;
-import zone.moddev.mc.skysbuildingpieces.content.*;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.GrassColor;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import zone.moddev.mc.skysbuildingpieces.content.PieceBlock;
+import zone.moddev.mc.skysbuildingpieces.content.PieceItem;
+import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 
-public final class ClientProxy extends CommonProxy {
-    public void preInit() {
-        registerModels("skysbuildingpieces");
-        for(java.util.Map.Entry<String,Item> e:Pieces.RETIRED_TEMPLATES.entrySet())ModelLoader.setCustomModelResourceLocation(e.getValue(),0,new ModelResourceLocation("skysbuildingpieces:template_"+e.getKey(),"inventory"));
+/** Client listeners stay on the mod bus that posts model and colour events. */
+public final class ClientProxy {
+    private ClientProxy() {
     }
-    public void registerModels(String namespace) {
-        for(PieceBlock b:Pieces.BLOCKS.values()) {
-            if(!b.palette.namespace.equals(namespace))continue;
-            net.minecraft.client.renderer.block.statemap.StateMap.Builder map=new net.minecraft.client.renderer.block.statemap.StateMap.Builder();
-            if(b.palette.shape!=zone.moddev.mc.skysbuildingpieces.catalogue.Shape.WALL && b.palette.shape!=zone.moddev.mc.skysbuildingpieces.catalogue.Shape.PANE)map.ignore(PieceBlock.CONNECTIONS);
-            if(b.palette.shape!=zone.moddev.mc.skysbuildingpieces.catalogue.Shape.STAIRS)map.ignore(PieceBlock.STAIR_SHAPE);
-            if(!b.palette.group.equals("grass")&&!b.palette.group.equals("dirt"))map.ignore(net.minecraft.block.BlockGrass.SNOWY);
-            ModelLoader.setCustomStateMapper(b,map.build());
-        }
-        for(PieceBlock b:Pieces.BLOCKS.values())for(int slot=0;slot<b.palette.materials.size();slot++) {
-            if(!b.palette.namespace.equals(namespace))continue;
-            int meta=slot*b.palette.shape.states;
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(b),meta,new ModelResourceLocation(namespace+":"+new net.minecraft.util.ResourceLocation(b.palette.materials.get(slot)).getResourcePath()+"_"+b.palette.shape.name().toLowerCase(java.util.Locale.ROOT),"inventory"));
+
+    public static void register(FMLJavaModLoadingContext context) {
+        context.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(
+                        (minecraft, parent) -> new BuildingPiecesConfigScreen(parent)));
+        IEventBus modBus = context.getModEventBus();
+
+        modBus.addListener(ClientProxy::blockColors);
+        modBus.addListener(ClientProxy::itemColors);
+        modBus.addListener(ClientProxy::renderLayers);
+        modBus.addListener(new ContinuousGlassModel.BakeHandler()::bake);
+        modBus.addListener(SnowCoveredGrassModel::bake);
+    }
+
+    private static void renderLayers(FMLClientSetupEvent event) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
+            RenderType layer = RenderType.solid();
+            if (block.palette.group.equals("grass")) {
+                layer = RenderType.cutoutMipped();
+            } else if (block.palette.group.equals("clear_glass")) {
+                layer = RenderType.cutout();
+            } else if (block.palette.group.equals("stained_glass") || block.palette.group.equals("ice")) {
+                layer = RenderType.translucent();
+            }
+            ItemBlockRenderTypes.setRenderLayer(block, layer);
         }
     }
-    public void init() {
-        final BlockColors colors=Minecraft.getMinecraft().getBlockColors();
-        for(final PieceBlock b:Pieces.BLOCKS.values())if(b.palette.group.equals("grass")) {
-            colors.registerBlockColorHandler((state,world,pos,tint)->tint==0 ? colors.colorMultiplier(Blocks.GRASS.getDefaultState(),world,pos,0) : -1,b);
-            Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack,tint)->tint==0 ? 0x7CBD6B : -1,Item.getItemFromBlock(b));
+
+    private static void blockColors(RegisterColorHandlersEvent.Block event) {
+        for (PieceBlock block : Pieces.registeredBlocks()) {
+            if (block.palette.group.equals("grass")) {
+                event.getBlockColors().register(
+                        (state, world, position,
+                                tint) -> tint == 0 ? event.getBlockColors()
+                                        .getColor(Blocks.GRASS_BLOCK.defaultBlockState(), world, position, 0) : -1,
+                        block);
+            }
+        }
+    }
+
+    private static void itemColors(RegisterColorHandlersEvent.Item event) {
+        for (Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValues()) {
+            if (item instanceof PieceItem && ((PieceItem) item).piece.palette.group.equals("grass")) {
+                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1, item);
+            }
+        }
+        for (PieceBlock block : Pieces.registeredBlocks()) {
+            if (block.palette.group.equals("grass")) {
+                event.getItemColors().register((stack, tint) -> tint == 0 ? GrassColor.get(0.5D, 1.0D) : -1,
+                        block.asItem());
+            }
         }
     }
 }
