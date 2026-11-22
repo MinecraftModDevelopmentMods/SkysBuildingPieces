@@ -162,8 +162,7 @@ jobs:
         run: |
           set -euo pipefail
           dependency="$GITHUB_WORKSPACE/.gradle/qualification-sources/grass-slabs"
-          chmod +x "$dependency/gradlew"
-          "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace
+          bash "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace
           version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
           echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
           echo "ORG_GRADLE_PROJECT_grassSlabsDeobfJar=$dependency/build/libs-dev/SkysGrassSlabs-$version-deobf.jar" >> "$GITHUB_ENV"
