@@ -110,6 +110,9 @@ public final class RuntimeBootstrap {
                     && (phase.equals("fresh") || phase.equals("reload"))) {
                 GameplayChecks.horizontalSlabsOnly(world);
             } else {
+                FuelChecks.run();
+                StandaloneLifecycleChecks.run(world);
+                SurvivalDropChecks.run(world);
                 recipes = RecipeChecks.run(world);
                 stacks = legacyStacks();
                 rawPlayer();

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.10.120012 (unreleased)
+
+- Improve snow cover, exposed faces and survival drops.
+- Use each material’s actual fuel value.
+- Keep crafting results distinct and avoid duplicate recipes when Grass Slabs is installed.
+
 ## 0.3.9.120012
 
 - Each material and shape now has its own block ID. Older saved pieces keep their shape and orientation when upgraded.

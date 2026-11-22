@@ -34,6 +34,10 @@ matching path piece. Its footprint stays the same, with a one-pixel lower top.
 Flattening a grass piece also turns an ordinary grass block directly beneath
 it into a path, using the same shovel action.
 
+Snowy grass pieces and snow pieces give the grass beneath them a snowy
+appearance too. Removing the piece restores the normal grass texture. Snow
+pieces drop when broken by hand; using a shovel is quicker.
+
 Pieces support native waterlogging. Wet grass and path pieces turn into their
 matching dirt shapes, keeping the water and orientation. Drain them before
 using a shovel.
@@ -60,10 +64,14 @@ For **Minecraft 1.20.1**, use **NeoForge 47.1.106** and **Java 17**.
 No other mod is required. Put the main jar in `mods` on both the client and
 server.
 
+This early NeoForge build has no matching Mineralogy release. If your world
+uses Mineralogy, keep it on the supported Forge route rather than removing
+the mod to change loaders.
+
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.2.0.120012 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.1.120012 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)

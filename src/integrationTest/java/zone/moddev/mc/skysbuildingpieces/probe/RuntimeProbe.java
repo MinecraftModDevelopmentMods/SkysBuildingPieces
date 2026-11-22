@@ -111,6 +111,9 @@ public final class RuntimeProbe {
             } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
             } else {
+                FuelChecks.run();
+                StandaloneLifecycleChecks.run(world);
+                SurvivalDropChecks.run(world);
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
                 GameplayChecks.run(world);

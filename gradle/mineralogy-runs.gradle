@@ -13,6 +13,13 @@ def runtimeSources = ['mineralogy', 'orespawn'].collectEntries { mod ->
     [(mod): file(providers.gradleProperty(mod + 'RuntimeJar')
             .getOrElse((retainedJar.isFile() ? retainedJar : siblingJar).path))]
 }
+
+def runtimeOriginals = ['mineralogy', 'orespawn'].collectEntries { mod ->
+    File siblingJar = file(runtimeLock.getProperty(mod + '.path'))
+    File retainedJar = file('.gradle/qualification-dependencies/' + siblingJar.name)
+    [(mod): file(providers.gradleProperty(mod + 'MainJar')
+            .getOrElse((retainedJar.isFile() ? retainedJar : siblingJar).path))]
+}
 def extraMods = project.ext.mineralogyProfileAdditionalMods
 def gameDirectory = layout.projectDirectory.dir(
         providers.gradleProperty('mineralogyRunDirectory').getOrElse('run-mineralogy'))
@@ -30,7 +37,7 @@ ext.verifyNativeOptionalRuntime = tasks.register('verifyNativeOptionalRuntime') 
             throw new GradleException('No compatible Mineralogy and OreSpawn jars are pinned for this loader')
         }
         ['mineralogy', 'orespawn'].each { mod ->
-            [[file(runtimeLock.getProperty(mod + '.path')), runtimeLock.getProperty(mod + '.sha256')],
+            [[runtimeOriginals[mod], runtimeLock.getProperty(mod + '.sha256')],
              [runtimeSources[mod], runtimeLock.getProperty(mod + '.development.sha256')]].each { pair ->
                 File source = pair[0]
                 if (!source.isFile()) throw new GradleException('Missing optional reference jar: ' + source)

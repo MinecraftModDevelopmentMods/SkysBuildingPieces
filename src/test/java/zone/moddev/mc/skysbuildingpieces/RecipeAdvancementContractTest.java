@@ -16,6 +16,7 @@ class RecipeAdvancementContractTest {
     void everyNativeRecipeHasMatchingVisibleBookIngredientsAndConditionalUnlocks() throws Exception {
         Path root = Paths.get("src/main/resources/data/skysbuildingpieces");
         int checked = 0;
+        Map<String, String> bookResults = new java.util.HashMap<>();
 
         try (java.util.stream.Stream<Path> files = Files.walk(root.resolve("recipes"))) {
             for (Path path : (Iterable<Path>) files.filter(file -> file.toString().endsWith(".json"))::iterator) {
@@ -46,6 +47,12 @@ class RecipeAdvancementContractTest {
                 assertEquals(criteria.size(),
                         advancement.getAsJsonArray("requirements").get(0).getAsJsonArray().size());
                 assertTrue(recipe.getAsJsonObject("result").get("count").getAsInt() > 0);
+                String group = recipe.get("group").getAsString();
+                String result = recipe.getAsJsonObject("result").get("item").getAsString();
+                assertFalse(group.isBlank(), "Each result has a recipe-book button");
+                String previous = bookResults.putIfAbsent(group, result);
+                assertTrue(previous == null || previous.equals(result),
+                        "Different results must not cycle through one button: " + group);
 
                 for (Map.Entry<String, JsonElement> key : recipe.getAsJsonObject("key").entrySet()) {
                     assertFalse(key.getValue().getAsJsonObject().has("data"), "Flat item identity replaces metadata");

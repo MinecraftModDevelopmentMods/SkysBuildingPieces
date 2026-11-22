@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.ModList;
 
 /** Exercises real capture/write callbacks; native transformer orders are checked separately. */
 final class PersistenceOrderChecks {
@@ -29,21 +30,28 @@ final class PersistenceOrderChecks {
         }
         try {
             List<Class<?>> selected = new ArrayList<>();
-            for (String name : new String[] {"zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge",
-                    "zone.moddev.mc.skysgrassslabs.compat.LegacyWorldDataHook",
-                    "zone.moddev.mc.mineralogy.patching.LegacyWorldDataHook"}) {
+            List<String> hookNames = new ArrayList<>(List.of(
+                    "zone.moddev.mc.skysbuildingpieces.legacy.LegacyBridge",
+                    "zone.moddev.mc.skysgrassslabs.compat.LegacyWorldDataHook"));
+            // Early NeoForge has no matching Mineralogy build. Check its hook
+            // whenever it is installed, without inventing a third participant.
+            if (ModList.get().isLoaded("mineralogy")) {
+                hookNames.add("zone.moddev.mc.mineralogy.patching.LegacyWorldDataHook");
+            }
+            for (String name : hookNames) {
                 Class<?> owner = Class.forName(name);
                 owner.getMethod("captureLegacyLevelData", CompoundTag.class, LevelDirectory.class);
                 selected.add(owner);
             }
-            require(selected.size() == 3, "All three actual persistence hooks must be installed");
+            require(selected.size() == hookNames.size(), "Every installed persistence hook must be checked");
             selected.sort(Comparator.comparing(Class::getName));
             if (order.equals("reverse")) {
                 java.util.Collections.reverse(selected);
             }
             callbacks = List.copyOf(selected);
             org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PERSISTENCE_ORDER_SET "
-                    + order + " actual_hooks=3 mechanism=forge_level_hooks callback_order_only=true");
+                    + order + " actual_hooks=" + callbacks.size()
+                    + " mechanism=forge_level_hooks callback_order_only=true");
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException("Cannot arrange the native persistence callbacks", failure);
         }
@@ -83,13 +91,17 @@ final class PersistenceOrderChecks {
         CompoundTag blocks = expected.getCompound("Registries").getCompound("minecraft:blocks");
         require(!blocks.isEmpty(), "The source must contain a real numeric registry");
         for (String name : new String[] { "mineralogy", "skysgrassslabs" }) {
+            if (!ModList.get().isLoaded(name)) {
+                continue;
+            }
             CompoundTag sidecar = read(new File(directory, "data/" + name + "_legacy_registry.dat"));
             require(sidecar.getCompound("Blocks").equals(blocks), name + " lost its independent sidecar");
         }
         CompoundTag core = read(new File(directory, "data/skysbuildingpieces_legacy_registry.dat"));
         require(core.getCompound("FML").equals(expected), "Building Pieces lost its complete sidecar");
         org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_PERSISTENCE_ORDER_PASS "
-                + System.getProperty("skysbuildingpieces.persistenceOrder") + " actual_hooks=3 sidecars=3 ids="
+                + System.getProperty("skysbuildingpieces.persistenceOrder") + " actual_hooks="
+                + callbacks.size() + " sidecars=" + callbacks.size() + " ids="
                 + blocks.getList("ids", 10).size() + " complete_uppercase_snapshot=true");
     }
 
