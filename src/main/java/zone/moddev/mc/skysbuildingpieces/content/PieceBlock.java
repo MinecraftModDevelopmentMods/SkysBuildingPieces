@@ -1,5 +1,8 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.tags.BlockTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -282,7 +285,7 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos position, Player player) {
         BlockState full = Pieces.nativeState(definition(state), "full");
-        return full.canHarvestBlock(world, position, player);
+        return definition(state).type.equals("snow") || full.canHarvestBlock(world, position, player);
     }
 
     @Override
@@ -291,6 +294,9 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         float hardness = materialDestroySpeed(state, world, position);
         if (hardness == -1.0F) {
             return 0.0F;
+        }
+        if (definition(state).type.equals("snow")) {
+            return player.getDestroySpeed(full, position) / hardness / 30;
         }
         // The full block may handle tool tiers per state. Keep its mining rules
         // and scale only the hardness when this piece declares a different value.
@@ -451,15 +457,21 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
 
     public BlockState getActualState(BlockState state, BlockGetter world, BlockPos position) {
         if (state.hasProperty(SnowyDirtBlock.SNOWY)) {
-            boolean snowy = false;
+            boolean snowy = readState(world, position.above()).is(BlockTags.SNOW);
 
-            for (Direction side : new Direction[] { Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH,
-                    Direction.WEST }) {
-                Block neighbour = readState(world, position.relative(side)).getBlock();
-
-                snowy |= neighbour == Blocks.SNOW_BLOCK || neighbour == Blocks.SNOW;
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                BlockPos neighbourPos = position.relative(side);
+                BlockState neighbour = readState(world, neighbourPos);
+                snowy |= neighbour.is(BlockTags.SNOW) || neighbour.isCollisionShapeFullBlock(world, neighbourPos)
+                        && readState(world, neighbourPos.above()).is(BlockTags.SNOW);
             }
 
+            if (!snowy && world instanceof LevelReader reader) {
+                snowy = reader.getBiome(position).value().coldEnoughToSnow(position)
+                        && reader.getHeight(Heightmap.Types.MOTION_BLOCKING, position.getX(), position.getZ())
+                                <= position.getY() + 1
+                        && reader.getBrightness(LightLayer.BLOCK, position.above()) < 10;
+            }
             state = state.setValue(SnowyDirtBlock.SNOWY, snowy);
         }
         if (state.hasProperty(CONNECTIONS)) {
@@ -639,6 +651,11 @@ public final class PieceBlock extends Block implements BonemealableBlock, Simple
         if (actual != state) {
             world.setBlock(position, actual, 2);
         }
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerLevel world, BlockPos position, RandomSource random) {
+        tick(state, world, position, random);
     }
 
     @Override

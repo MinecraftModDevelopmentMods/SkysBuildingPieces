@@ -33,6 +33,9 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/DirtCoverageChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/CoverageContributor.java')
     source fileTree('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/legacy')
+    ['FuelChecks', 'StandaloneLifecycleChecks', 'SurvivalDropChecks', 'SnowCoverClientChecks'].each { helper ->
+        source file("src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/${helper}.java")
+    }
     classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
     destinationDirectory = bootstrapClasses
 }

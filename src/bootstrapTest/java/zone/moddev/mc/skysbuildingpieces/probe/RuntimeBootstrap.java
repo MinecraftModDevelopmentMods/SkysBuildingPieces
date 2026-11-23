@@ -142,6 +142,9 @@ public final class RuntimeBootstrap {
                         return;
                     }
                     recipes = current.finish();
+                    FuelChecks.run();
+                    StandaloneLifecycleChecks.run(world);
+                    SurvivalDropChecks.run(world);
                     stacks = legacyStacks();
                     rawPlayer();
                     NativeLegacyChecks.run(world);
@@ -348,7 +351,7 @@ public final class RuntimeBootstrap {
     }
 
     private static void rawPlayer() {
-        PieceBlock block = Pieces.playableBlocks().iterator().next();
+        PieceBlock block = Pieces.BLOCKS.values().iterator().next();
         int metadata = block.palette.shape.states - 1;
         CompoundTag source = new CompoundTag();
         ListTag inventory = new ListTag();
@@ -376,6 +379,7 @@ public final class RuntimeBootstrap {
         ItemStack actual = zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.read(saved);
         ItemStack expected = Pieces.legacyItem(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString(), metadata, 23);
 
+        require(expected != null, "The raw player fixture must use a historical metadata holder");
         require(actual.getItem() == expected.getItem() && actual.getCount() == 23,
                 "The real player data fixer must see the recovered flat item, not the metadata carrier");
         require(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.hasCustom(actual) && zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(actual).getString("Keep").equals("Unrelated custom data")

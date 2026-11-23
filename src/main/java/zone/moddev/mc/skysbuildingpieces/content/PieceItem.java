@@ -59,7 +59,22 @@ public final class PieceItem extends BlockItem {
 
     @Override
     public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-        return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
+        Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
+        if (!definition.type.equals("wood")) {
+            return 0;
+        }
+        ItemStack full = Pieces.stack(Pieces.nativeState(definition, "full"), 1);
+        if (full == null || full.isEmpty()) {
+            return 0;
+        }
+        int divisor = switch (piece.palette.shape) {
+            case SLAB, VERTICAL_SLAB -> 2;
+            case STEP, HORIZONTAL_STEP, VERTICAL_STEP -> 4;
+            case CORNER -> 8;
+            default -> 1;
+        };
+        // Ask Forge about the full material so nonflammable woods keep their native behaviour.
+        return Math.max(0, net.minecraftforge.common.ForgeHooks.getBurnTime(full, recipeType)) / divisor;
     }
 
     @Override
