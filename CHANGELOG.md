@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.10.120012 (unreleased)
+## 0.3.10.120012
 
 - Improve snow cover, exposed faces and survival drops.
 - Use each material’s actual fuel value.

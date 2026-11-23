@@ -5,9 +5,9 @@ with: slabs, steps, corners, stairs, walls and ice panes. Add narrow trims,
 fill awkward corners or build a glass wall without using full blocks everywhere.
 
 The mod uses vanilla materials and reuses existing Minecraft pieces where they
-already fit. When Mineralogy is installed, its natural rocks also get matching
-steps and corners automatically. No Mineralogy add-on is needed. Building
-Pieces doesn't generate terrain.
+already fit. Building Pieces doesn't generate terrain.
+The matching Forge build also supports Mineralogy's natural rocks without
+a separate add-on.
 
 ## Building with the pieces
 
