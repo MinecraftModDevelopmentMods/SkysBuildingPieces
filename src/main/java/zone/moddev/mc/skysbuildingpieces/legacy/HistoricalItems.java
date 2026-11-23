@@ -81,7 +81,9 @@ public final class HistoricalItems {
         collectNativeTargets(root, stacks, states, 0);
 
         for (CompoundTag stack : stacks) {
-            stack.putString("id", stack.getString(NATIVE_ITEM_ID));
+            String target = stack.getString(NATIVE_ITEM_ID);
+            // Grass was renamed after older contributors started preserving this identity.
+            stack.putString("id", target.equals("minecraft:grass") ? "minecraft:short_grass" : target);
             stack.remove(NATIVE_ITEM_ID);
         }
         for (CompoundTag state : states) {
@@ -103,7 +105,8 @@ public final class HistoricalItems {
                 // our recovery selected, leaving ordinary old vanilla items to their normal fixers.
                 String target = compound.getString(NATIVE_ITEM_ID);
                 if (!compound.contains(NATIVE_ITEM_ID, 8)
-                        || !(target.equals("minecraft:grass") || target.equals("minecraft:stone_slab")
+                        || !(target.equals("minecraft:grass") || target.equals("minecraft:short_grass")
+                                || target.equals("minecraft:stone_slab")
                                 || target.equals("minecraft:stone_stairs"))
                         || !compound.contains("id", 8)) {
                     throw new LegacyBridge.RecoveryAbort("Invalid pending native item recovery", null);

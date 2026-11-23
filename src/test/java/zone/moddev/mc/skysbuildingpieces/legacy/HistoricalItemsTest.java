@@ -93,6 +93,42 @@ final class HistoricalItemsTest {
         assertEquals(before, original);
     }
 
+    @Test
+    void selectedShortGrassSurvivesBothHistoricalAndCurrentSpellings() {
+        for (String selected : new String[] { "minecraft:grass", "minecraft:short_grass" }) {
+            CompoundTag item = stack("minecraft:fern");
+            item.putString(HistoricalItems.NATIVE_ITEM_ID, selected);
+            item.putByte("Slot", (byte) 7);
+            item.putByte("Count", (byte) 13);
+            CompoundTag expected = item.copy();
+            expected.putString("id", "minecraft:short_grass");
+            expected.remove(HistoricalItems.NATIVE_ITEM_ID);
+
+            HistoricalItems.restoreNativeTargets(item);
+
+            assertEquals(expected, item);
+            HistoricalItems.restoreNativeTargets(item);
+            assertEquals(expected, item, "Restoring a saved stack twice must be harmless");
+        }
+    }
+
+    @Test
+    void invalidSelectedItemStopsBeforeAnyNativeNamesAreRestored() {
+        CompoundTag root = new CompoundTag();
+        ListTag inventory = new ListTag();
+        CompoundTag valid = stack("minecraft:fern");
+        valid.putString(HistoricalItems.NATIVE_ITEM_ID, "minecraft:short_grass");
+        CompoundTag invalid = stack("minecraft:stone");
+        invalid.putString(HistoricalItems.NATIVE_ITEM_ID, "unknown:unsafe_target");
+        inventory.add(valid);
+        inventory.add(invalid);
+        root.put("Inventory", inventory);
+        CompoundTag before = root.copy();
+
+        assertThrows(LegacyBridge.RecoveryAbort.class, () -> HistoricalItems.restoreNativeTargets(root));
+        assertEquals(before, root);
+    }
+
     private static CompoundTag stack(String identifier) {
         CompoundTag result = new CompoundTag();
 

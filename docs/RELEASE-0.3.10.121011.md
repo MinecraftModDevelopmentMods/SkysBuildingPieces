@@ -4,3 +4,4 @@
 - Small snow pieces drop when broken by hand, and wooden pieces retain their proper fuel values.
 - Different crafting results have separate recipe-book buttons, with one owner for shared recipes.
 - Eclipse keeps the exact optional dependency jars used by its run profiles.
+- Recovered short grass items keep their contents when older worlds are upgraded.
