@@ -111,6 +111,9 @@ public final class RuntimeProbe {
             } else if (phase.startsWith("legacy-")) {
                 LegacyFixture.run(world, phase);
             } else {
+                FuelChecks.run();
+                StandaloneLifecycleChecks.run(world);
+                SurvivalDropChecks.run(world);
                 RecipeChecks.run(world);
                 NativeLegacyChecks.run(world);
                 GameplayChecks.run(world);
@@ -181,7 +184,7 @@ public final class RuntimeProbe {
 
         int number = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             int assigned = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < assigned; metadata++) {

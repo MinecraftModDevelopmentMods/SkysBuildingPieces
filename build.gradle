@@ -36,15 +36,15 @@ def mavenizerLicense = mavenizerToolsDirectory.file('LICENSE-MAVENIZER.txt')
 def mavenizerReadme = mavenizerToolsDirectory.file('README.md')
 def mavenizerFixtureChecksums = [
         (mavenizerCompatibilityJar.asFile):
-                '416DCA4797BC55826F0DDCF03FDC405F1990FC15C2133FA27A1F143BF7976177',
+                'F4DB44F64C98F6401ED3A856ECEBCC5E1C2126E7C02BD1237FAB38793B4AF275',
         (mavenizerRuleManifest.asFile):
-                '8945511DFF53B8F1A91EE44B14AF9EC7DB34C373617EA37A608C6958BFEEB22E',
+                '351746200B44A4B9656C9AD5888DA3371E69AA601880FECA048C0131223DCCAC',
         (mavenizerSourcePatch.asFile):
-                'D856190DEF5574716C5E4F4379912C451B1F5952B0B111576651A98EECF58544',
+                '0AC522C64FEBA87C14792364D86FE1487E064681C54629F747E7DC80E8A83650',
         (mavenizerLicense.asFile):
                 '20C17D8B8C48A600800DFD14F95D5CB9FF47066A9641DDEAB48DC54AEC96E331',
         (mavenizerReadme.asFile):
-                '177C1DDEDEF9704B9FDC8EA24B8DCDF4DDCC826DD0E253E7872A00DB2EA34518'
+                'C9091DBA5967D497A3D219832FA0EF0B2AF0F4D65157BF1193D0DFBF2D742EAD'
 ]
 
 // ForgeGradle invokes Mavenizer while configuring the project. Verify the
@@ -217,6 +217,9 @@ tasks.withType(JavaExec).configureEach { JavaExec runTask ->
 // use the same mappings and Java 17 runtime without exposing probe code to the
 // ordinary client or server classpath.
 def configureFromForgeRun = { JavaExec process, String runTaskName, boolean includeMain = true ->
+    if (!process.systemProperties.containsKey('log4j.configurationFile')) {
+        process.systemProperty 'log4j.configurationFile', file('src/bootstrapTest/native-log4j2.xml').toURI().toString()
+    }
     process.actions.clear()
     process.dependsOn {
         JavaExec run = tasks.getByName(runTaskName) as JavaExec
@@ -280,6 +283,11 @@ def configureFromForgeRun = { JavaExec process, String runTaskName, boolean incl
 
 repositories {
     minecraft.mavenizer(it)
+    maven {
+        name = 'NeoForge'
+        url = 'https://maven.neoforged.net/releases'
+        content { includeGroupAndSubgroups('net.neoforged') }
+    }
     maven fg.forgeMaven
     maven fg.minecraftLibsMaven
     exclusiveContent {
@@ -311,7 +319,7 @@ repositories {
 
 dependencies {
     implementation minecraft.dependency(
-            "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
+            "net.neoforged:forge:${project.minecraft_version}-${project.forge_version}")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
@@ -355,7 +363,7 @@ def integrationTestModJar = tasks.register('integrationTestModJar', Jar) {
     archiveFileName = 'skysbuildingpieces-integration-test.jar'
     destinationDirectory = layout.buildDirectory.dir('integration-test-mod')
     from integrationTestClasses
-    from 'src/integrationTest/resources'
+    from('src/integrationTest/resources') { exclude 'log4j2.xml' }
 }
 
 def packagedIntegrationTestModJar = renamer.classes(integrationTestModJar) {
@@ -424,6 +432,7 @@ def createIntegrationProcess = { String phase, Object dependency ->
             if (values.getProperty("${phase.toLowerCase(Locale.ROOT)}_complete") != 'true') {
                 throw new GradleException("${phase} integration did not complete: ${marker}")
             }
+            project.ext.auditNativeServerLogs(integrationRunDirectory.get().asFile, phase.toLowerCase(Locale.ROOT))
         }
     }
 }
@@ -471,6 +480,15 @@ tasks.named('check') {
 }
 
 tasks.named('processResources', ProcessResources) {
+    doFirst {
+        File expected = new File(layout.buildDirectory.get().asFile, 'resources/main').canonicalFile
+        File output = destinationDir.canonicalFile
+        if (output != expected || !output.toPath().startsWith(layout.buildDirectory.get().asFile.canonicalFile.toPath())) {
+            throw new GradleException('Resource processing must stay inside the generated resources directory')
+        }
+        // Copy tasks retain removed files. Rebuild this output so old recipes cannot survive a sync.
+        project.delete(output)
+    }
     filteringCharset = 'UTF-8'
     inputs.properties([
             version: project.version,
@@ -540,9 +558,9 @@ def releaseFiles = provider {
 tasks.register('verifyReleaseMetadata') {
     group = 'verification'
     doLast {
-        if (project.minecraft_version != '1.20.1' || project.forge_version != '47.4.10' ||
+        if (project.minecraft_version != '1.20.1' || project.forge_version != '47.1.106' ||
                 project.mapping_channel != 'official' || project.mapping_version != '1.20.1' ||
-                project.loader_name != 'forge' || project.loader_code != '1' ||
+                project.loader_name != 'neoforge' || project.loader_code != '2' ||
                 project.java_version != '17' || project.java_toolchain_version != '17.0.1+12' ||
                 project.mod_id != 'skysbuildingpieces') {
             throw new GradleException('Unexpected 1.20.1 release metadata')
@@ -568,6 +586,17 @@ tasks.register('verifyReleaseArtifacts') {
                 throw new GradleException("The jar's Java label does not match its production target")
             }
             Set<String> names = zip.entries().collect { it.name } as Set<String>
+            Set<String> expectedResources = fileTree('src/main/resources').matching {
+                include 'assets/**', 'data/**'
+            }.files.collect {
+                file('src/main/resources').toPath().relativize(it.toPath()).toString().replace('\\', '/')
+            } as Set<String>
+            Set<String> packagedResources = zip.entries().findAll {
+                !it.directory && (it.name.startsWith('assets/') || it.name.startsWith('data/'))
+            }.collect { it.name } as Set<String>
+            if (packagedResources != expectedResources) {
+                throw new GradleException("Packaged resources differ from source; extra=${packagedResources - expectedResources}, missing=${expectedResources - packagedResources}")
+            }
             ['META-INF/mods.toml', 'pack.mcmeta', 'META-INF/coremods.json',
              'META-INF/LICENSE', 'META-INF/LICENSE.spdx', 'META-INF/NOTICE',
              'zone/moddev/mc/skysbuildingpieces/SkysBuildingPieces.class', 'META-INF/BUILDINGBRICKS-MIT.txt'].each { required ->
@@ -595,7 +624,7 @@ tasks.register('verifyReleaseArtifacts') {
                     byte[] auditBytes = zip.getInputStream(entry).bytes
                     if (entry.name.endsWith('.class') &&
                             (((auditBytes[6] & 255) << 8) | (auditBytes[7] & 255)) != 61) {
-                        throw new GradleException("Non-Java-16 production class: ${entry.name}")
+                        throw new GradleException("Non-Java-17 production class: ${entry.name}")
                     }
                     String content = new String(zip.getInputStream(entry).bytes,
                             StandardCharsets.ISO_8859_1).toLowerCase(Locale.ROOT)
@@ -709,6 +738,15 @@ def prepareEclipseResources = tasks.register('prepareEclipseResources') {
     group = 'ide'
     dependsOn tasks.named('processResources')
     doLast {
+        File output = file('bin/main').canonicalFile
+        ['assets', 'data'].each { folder ->
+            File generated = new File(output, folder).canonicalFile
+            if (output != new File(projectDir, 'bin/main').canonicalFile ||
+                    generated.parentFile != output) {
+                throw new GradleException('Eclipse resources must stay inside bin/main')
+            }
+            project.delete(generated)
+        }
         project.copy {
             from(layout.buildDirectory.dir('resources/main'))
             into(layout.projectDirectory.dir('bin/main'))
@@ -796,6 +834,19 @@ tasks.register('verifyEclipseProductionClasspath') {
                 !text.contains("versionRange=\"${project.minecraft_version_range}\"")) {
             throw new GradleException('Eclipse output contains incorrect mods.toml')
         }
+        Set<String> sourceResources = fileTree('src/main/resources').matching {
+            include 'assets/**', 'data/**'
+        }.files.collect {
+            file('src/main/resources').toPath().relativize(it.toPath()).toString().replace('\\', '/')
+        } as Set<String>
+        Set<String> eclipseResources = fileTree('bin/main').matching {
+            include 'assets/**', 'data/**'
+        }.files.collect {
+            file('bin/main').toPath().relativize(it.toPath()).toString().replace('\\', '/')
+        } as Set<String>
+        if (sourceResources != eclipseResources) {
+            throw new GradleException('Eclipse contains missing or stale production resources')
+        }
         ['runClient.launch', 'runServer.launch', 'runTestClient.launch', 'runTestServer.launch'].each { name ->
             String contents = file(name).getText('UTF-8')
             if (contents.contains('${MC_VERSION}')) {
@@ -828,6 +879,13 @@ tasks.register('verifyEclipseProductionClasspath') {
 tasks.named('check') {
     dependsOn tasks.named('verifyReleaseMetadata')
 }
+
+tasks.register('verifyRecipeOwnership', Exec) {
+    group = 'verification'
+    commandLine providers.gradleProperty('pythonExecutable').getOrElse('python'),
+            '-m', 'unittest', 'discover', '-s', 'tools', '-p', 'test_recipe_ownership.py'
+}
+tasks.named('check') { dependsOn tasks.named('verifyRecipeOwnership') }
 
 // Optional native mods stay in a separate development folder and never enter the published jar.
 ext.configureMineralogyVerificationRun = configureFromForgeRun

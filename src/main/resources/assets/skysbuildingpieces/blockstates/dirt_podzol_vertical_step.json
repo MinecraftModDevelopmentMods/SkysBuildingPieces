@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "orientation=north_west,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_0_dry"
+    },
+    "orientation=north_west,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_0_dry"
+    },
+    "orientation=north_west,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_0_snow"
+    },
+    "orientation=north_west,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_0_snow"
+    },
+    "orientation=north_east,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_1_dry"
+    },
+    "orientation=north_east,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_1_dry"
+    },
+    "orientation=north_east,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_1_snow"
+    },
+    "orientation=north_east,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_1_snow"
+    },
+    "orientation=south_east,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_2_dry"
+    },
+    "orientation=south_east,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_2_dry"
+    },
+    "orientation=south_east,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_2_snow"
+    },
+    "orientation=south_east,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_2_snow"
+    },
+    "orientation=south_west,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_3_dry"
+    },
+    "orientation=south_west,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_3_dry"
+    },
+    "orientation=south_west,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_3_snow"
+    },
+    "orientation=south_west,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_vertical_step_3_snow"
+    }
+  }
+}

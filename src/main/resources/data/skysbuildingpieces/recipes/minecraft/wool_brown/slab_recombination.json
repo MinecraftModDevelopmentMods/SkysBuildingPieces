@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "skysbuildingpieces/wool_brown",
+  "category": "building",
+  "group": "skys/result/minecraft/brown_wool",
   "pattern": ["XX"],
   "key": {
     "X": {

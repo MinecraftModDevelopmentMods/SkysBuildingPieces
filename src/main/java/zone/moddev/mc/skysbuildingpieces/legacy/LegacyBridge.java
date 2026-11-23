@@ -360,6 +360,9 @@ public final class LegacyBridge {
     public static CompoundTag finalizeNbt(CompoundTag root, int targetVersion) {
         if (ready && root != null) {
             HistoricalItems.finish(root, targetVersion);
+            if (targetVersion >= net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion()) {
+                NamedPieceStates.flatten(root);
+            }
         }
 
         return root;
@@ -413,8 +416,7 @@ public final class LegacyBridge {
                         continue;
                     }
 
-                    BlockState original = NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), saved);
-                    BlockState target = Pieces.canonicalState(original);
+                    BlockState target = NamedPieceStates.resolve(block, saved);
                     CompoundTag converted = saved.copy();
                     CompoundTag nativeState = NbtUtils.writeBlockState(target);
 

@@ -68,12 +68,6 @@ def verify_native_libraries(directory, artifacts):
 def argument_file(java, directory, phase, arguments):
     # Java 17 argument files avoid Windows' command-line length limit. Quoting
     # each argument also preserves paths containing spaces.
-    source = Path(__file__).resolve().parent.parent / "src/bootstrapTest/native-log4j2.xml"
-    logging = directory / "native-log4j2.xml"
-    if logging.exists() and digest(logging) != digest(source):
-        raise ValueError("The packaged logging configuration changed between loads")
-    shutil.copyfile(source, logging)
-    arguments = ["-Dlog4j.configurationFile=" + logging.as_uri(), *arguments]
     target = directory / (phase + "-launch-arguments.txt")
     target.write_text("\n".join(json.dumps(str(value), ensure_ascii=False)
                                 for value in arguments) + "\n", encoding="utf-8")
@@ -84,10 +78,10 @@ def client_command(options, directory):
     runtime = options.runtime.resolve()
     base = json.loads((runtime / "versions/1.20.1/1.20.1.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.20.1-forge-47.4.10", "forge-47.4.10")]
+                for name in ("1.20.1-forge-47.1.106", "forge-47.1.106")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 47.4.10 profile")
+        raise ValueError("The installed client has no NeoForge 47.1.106 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
     if base["id"] != "1.20.1" or forge["inheritsFrom"] != "1.20.1":
         raise ValueError("This launcher requires the verified Forge 47 client metadata")
@@ -145,7 +139,7 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/minecraftforge/forge/1.20.1-47.4.10" / filename
+    source = runtime / "libraries/net/neoforged/forge/1.20.1-47.1.106" / filename
     arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
                  "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
     for argument in shlex.split(source.read_text(encoding="utf-8")):
@@ -186,8 +180,14 @@ def prepare(options, directory):
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
+    if options.directional_slabs_off:
+        configuration = directory / "config/skysbuildingpieces-common.toml"
+        configuration.parent.mkdir(exist_ok=True)
+        configuration.write_text("[gameplay]\ndirectionalSlabPlacement=false\n", encoding="utf-8")
     profile = {"persistence_order": options.persistence_order,
                "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
+    if options.directional_slabs_off:
+        profile["directional_slabs_off"] = True
     (directory / "qualification-options.json").write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
     if options.fixture:
         with zipfile.ZipFile(options.fixture) as archive:
@@ -224,6 +224,7 @@ def main():
         parser.add_argument("--" + option, type=Path, required=True)
     parser.add_argument("--mode", choices=("server", "client"), required=True)
     parser.add_argument("--phase", required=True)
+    parser.add_argument("--directional-slabs-off", action="store_true")
     parser.add_argument("--assets", type=Path)
     parser.add_argument("--natives", type=Path)
     parser.add_argument("--fixture", type=Path)
@@ -240,6 +241,8 @@ def main():
     else:
         profile = {"persistence_order": options.persistence_order,
                    "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
+        if options.directional_slabs_off:
+            profile["directional_slabs_off"] = True
         if json.loads((directory / "qualification-options.json").read_text(encoding="utf-8")) != profile:
             raise ValueError("Qualification options changed between loads")
         expected = json.loads((directory / "artifact-inputs.json").read_text(encoding="utf-8"))

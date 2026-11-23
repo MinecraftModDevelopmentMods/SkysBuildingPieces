@@ -8,12 +8,12 @@ def lock = new Properties()
 file('gradle/grass-slabs-release.properties').withInputStream { lock.load(it) }
 def configureVerification = project.ext.configureMineralogyVerificationRun
 if (lock.coordinate != "zone.moddev.mc.skysgrassslabs:SkysGrassSlabs:${lock.version}" ||
-        lock.kind != 'local-candidate' || !(lock.sha256 ==~ /[A-F0-9]{64}/) ||
+        !(lock.kind in ['local-candidate', 'release']) || !(lock.sha256 ==~ /[A-F0-9]{64}/) ||
         !(lock.getProperty('development.sha256') ==~ /[A-F0-9]{64}/)) {
-    throw new GradleException('The coordinated Grass Slabs dependency needs exact candidate checksums')
+    throw new GradleException('The coordinated Grass Slabs dependency needs exact main and development checksums')
 }
 
-def sibling = "../../SkysGrassSlabs1201/SkysGrassSlabs"
+def sibling = "../../SkysGrassSlabs1201NEO/SkysGrassSlabs"
 def pinnedJar = providers.provider {
     file(providers.gradleProperty('grassSlabsMainJar').getOrElse(
             "${sibling}/build/libs/SkysGrassSlabs-${lock.version}.jar"))
@@ -33,7 +33,7 @@ def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
             String actual = MessageDigest.getInstance('SHA-256').digest(Files.readAllBytes(source.toPath()))
                     .encodeHex().toString().toUpperCase(Locale.ROOT)
             if (actual != entry[1]) {
-                throw new GradleException('Grass Slabs does not match its pinned candidate checksum: ' + source.name)
+                throw new GradleException('Grass Slabs does not match its pinned checksum: ' + source.name)
             }
             new ZipFile(source).withCloseable { archive ->
                 def descriptor = archive.getEntry('META-INF/mods.toml')
@@ -41,7 +41,7 @@ def verifyRelease = tasks.register('verifyGrassSlabsRelease') {
                 String metadata = archive.getInputStream(descriptor).getText('UTF-8')
                 if (!(metadata =~ /(?m)^\s*modId\s*=\s*"skysgrassslabs"\s*$/) ||
                         !(metadata =~ /(?m)^\s*version\s*=\s*"${java.util.regex.Pattern.quote(lock.version)}"\s*$/)) {
-                    throw new GradleException('Grass Slabs has unexpected candidate metadata')
+                    throw new GradleException('Grass Slabs has unexpected metadata')
                 }
             }
         }
@@ -74,7 +74,6 @@ def prepareManual = tasks.register('prepareGrassSlabsDevelopmentRun') {
         description = "Runs a separate ${side.toLowerCase(Locale.ROOT)} with pinned Grass Slabs."
         dependsOn prepareManual
         workingDir manualDirectory
-        systemProperty 'log4j.configurationFile', file('gradle/development-log4j2.xml').toURI().toString()
         if (side == 'Server') args '--nogui'
         configureVerification(delegate, 'run' + side)
     }

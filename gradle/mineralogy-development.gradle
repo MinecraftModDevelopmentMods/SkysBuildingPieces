@@ -9,6 +9,9 @@ def sourceSets = project.extensions.getByName('sourceSets')
 def mappings = project.layout.buildDirectory.file('development-optional/srg-to-official.tsrg')
 def runtimeLock = new Properties()
 file('gradle/mineralogy-runtime.properties').withInputStream { runtimeLock.load(it) }
+if (!runtimeLock.getProperty('runtime.available', 'true').toBoolean()) {
+    throw new GradleException('No compatible Mineralogy and OreSpawn jars are pinned for this loader')
+}
 def dependencyCandidates = ['OreSpawn': 'orespawn', 'Mineralogy': 'mineralogy'].collectEntries { name, key ->
     [(name): [path: file(runtimeLock.getProperty(key + '.path')).path,
               sha256: runtimeLock.getProperty(key + '.sha256')]]

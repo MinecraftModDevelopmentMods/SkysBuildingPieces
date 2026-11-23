@@ -7,9 +7,9 @@ rebuild corners into steps and steps into Mineralogy's existing slabs.
 Disabled native slab types are not used by recipes or smoothing. The rock
 steps and corners remain craftable from full blocks.
 
-Find the pieces in the Sky's Building Pieces creative tab. It includes the
-vanilla pieces reused by the catalogue. Separate vertical slab items, old
-templates and recovery holders stay hidden.
+Find the mod's pieces in the Sky's Building Pieces creative tab. Vanilla
+pieces stay in their usual tabs. Separate vertical slab items, old templates
+and recovery holders stay hidden.
 
 All custom walls have lower connecting panels and raised posts.
 Straight runs do not need a post in every block; ends, corners, junctions and
@@ -95,7 +95,10 @@ change slab placement. Old vertical slab items follow these same rules when
 their regular slab exists.
 
 Supported vanilla slab items use these placement rules too. Matching add-ons
-can extend the same placement rules to their native slab items.
+can extend the same placement rules to their native slab items. Set
+`gameplay.directionalSlabPlacement=false` and restart if you prefer
+ordinary slab placement. Dedicated vertical pieces such as vertical dirt
+slabs still place vertically.
 Vertical slab items are hidden from creative inventory. Breaking, Silk Touch
 and pick-block return the regular slab, with the material's usual drop rules.
 

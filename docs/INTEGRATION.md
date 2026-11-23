@@ -17,7 +17,7 @@ west; corners use those directions for NW, NE, SE and SW respectively.
 
 Sky's Terrain Smoother uses this lookup without depending on palette internals.
 Building Pieces never generates terrain itself. It optionally joins Grass
-Slabs' grass-form integration, using 1.2.0.120011 or later on Minecraft 1.20.1.
+Slabs' grass-form integration, using 1.2.1.120012 or later on Minecraft 1.20.1.
 It works without either Grass Slabs or Terrain Smoother installed.
 
 Mineralogy is supported directly. Its presence adds 35 fixed rock-piece
@@ -25,15 +25,15 @@ palettes during construction; no add-on or compile-time Mineralogy
 dependency is required. The original rocks, textures and slabs remain owned
 by Mineralogy. Disabled native slabs are not used in recipes or smoothing.
 
-On Forge 47, call `registerBlocks(namespace, registry)` and
+On NeoForge 47.1, call `registerBlocks(namespace, registry)` and
 `registerItems(namespace, registry)` from the contributor's own mod-bus `RegisterEvent`
 listener, using `ForgeRegistries.BLOCKS` and `ForgeRegistries.ITEMS` for the matching registry key. Catalogue registration must finish before any block registry event;
 the first block registration freezes the catalogue. The helpers register only
 that contributor's namespace.
 
-The API returns native `BlockState` values. The permanent palette IDs and slots
-remain unchanged, while ordinary inventory items have one identity per material
-and shape. Use the public lookup rather than constructing inventory metadata.
+The API returns native `BlockState` values. Placed pieces and inventory items
+have their own IDs for each material and shape. Palette slots are kept for
+reading old saves. Use the public lookup to resolve the current block state.
 
 For a retired material, `replacement` can name another registered material.
 Keep its original ID and palette slots: saved pieces then use the replacement's

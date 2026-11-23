@@ -106,7 +106,13 @@ public final class RuntimeBootstrap {
                 zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
             } else if (phase.startsWith("forward")) {
                 NativeForwardChecks.run(world);
+            } else if (!zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig.directionalSlabPlacement()
+                    && (phase.equals("fresh") || phase.equals("reload"))) {
+                GameplayChecks.horizontalSlabsOnly(world);
             } else {
+                FuelChecks.run();
+                StandaloneLifecycleChecks.run(world);
+                SurvivalDropChecks.run(world);
                 recipes = RecipeChecks.run(world);
                 stacks = legacyStacks();
                 rawPlayer();
@@ -192,7 +198,7 @@ public final class RuntimeBootstrap {
 
         int number = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             int values = block.palette.materials.size() * block.palette.shape.states;
 
             for (int metadata = 0; metadata < values; metadata++) {

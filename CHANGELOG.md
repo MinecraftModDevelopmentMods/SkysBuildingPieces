@@ -1,8 +1,20 @@
 # Changelog
 
-## 0.3.8.120011
+## 0.3.10.120012
 
-- Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.20.1.
+- Improve snow cover, exposed faces and survival drops.
+- Use each material’s actual fuel value.
+- Keep crafting results distinct and avoid duplicate recipes when Grass Slabs is installed.
+
+## 0.3.9.120012
+
+- Each material and shape now has its own block ID. Older saved pieces keep their shape and orientation when upgraded.
+- The Building Pieces creative tab shows the mod's own pieces.
+- You can turn off directional slab placement from the mod's settings. It stays on by default.
+
+## 0.3.8.120012
+
+- Bring the building pieces, creative tab and continuous glass walls to NeoForge 1.20.1.
 - Preserve existing pieces, their recipes and supported world upgrades.
 - Keep Grass Slabs and Mineralogy integration optional.
 
