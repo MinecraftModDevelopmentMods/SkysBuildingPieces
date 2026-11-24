@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.3.11.120012
+
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.120012
 
 - Improve snow cover, exposed faces and survival drops.
-- Use each material’s actual fuel value.
+- Use each materialâ€™s actual fuel value.
 - Keep crafting results distinct and avoid duplicate recipes when Grass Slabs is installed.
 
 ## 0.3.9.120012

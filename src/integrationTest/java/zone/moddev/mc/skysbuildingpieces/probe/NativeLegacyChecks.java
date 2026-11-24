@@ -25,6 +25,7 @@ public final class NativeLegacyChecks {
     }
 
     public static void run(ServerLevel world) throws Exception {
+        LiveInventoryRecoveryChecks.run(world);
         zone.moddev.mc.skysbuildingpieces.probe.legacy.NativeStagingChecks.run(world);
         flattenedPieces();
 
