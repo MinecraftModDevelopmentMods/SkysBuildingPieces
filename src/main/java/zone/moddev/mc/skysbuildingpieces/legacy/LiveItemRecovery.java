@@ -10,9 +10,7 @@ final class LiveItemRecovery {
 
     static ItemStack convert(ItemStack original) {
         int storedCount = original.stackSize;
-        ItemStack inspection = original.copy();
-        inspection.stackSize = 1;
-        NBTTagCompound before = inspection.writeToNBT(new NBTTagCompound());
+        NBTTagCompound before = original.writeToNBT(new NBTTagCompound());
         // This integer exists only during recovery. Saved vanilla stacks retain
         // their usual byte Count, including stacks nested inside item NBT.
         before.setInteger("Count", storedCount);
