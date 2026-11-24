@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.11.120011
+
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.120011
 
 - Snowy steps and corners also cover the grass beneath them, without leaving a floating snow layer.
