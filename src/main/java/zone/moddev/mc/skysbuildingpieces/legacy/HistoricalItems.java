@@ -25,6 +25,10 @@ public final class HistoricalItems {
         RECOVERIES.register(module, relevant, recovery);
     }
 
+    static boolean hasContributors() {
+        return RECOVERIES.hasContributors();
+    }
+
     /** No copy or traversal is added to standalone runs without contributors. */
     static CompoundTag prepareCopy(CompoundTag root) {
         return RECOVERIES.prepareCopy(root);
