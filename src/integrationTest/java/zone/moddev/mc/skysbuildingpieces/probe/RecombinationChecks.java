@@ -160,9 +160,14 @@ public final class RecombinationChecks {
 
         PieceBlock other = Pieces.playableBlocks().stream()
                 .filter(candidate -> candidate != block && candidate.palette.shape == shape)
+                // A retired material can resolve to the very same item as a
+                // current one. This negative case needs two different items.
+                .filter(candidate -> !Pieces.stack(candidate.defaultBlockState(), 1).is(ingredient.getItem()))
                 .findFirst().orElseThrow();
-        mixed.setItem(2, Pieces.stack(other.defaultBlockState(), 1));
-        require(result(mixed, world).isEmpty(), "different materials do not recombine");
+        ItemStack otherMaterial = Pieces.stack(other.defaultBlockState(), 1);
+        mixed.setItem(2, otherMaterial);
+        require(result(mixed, world).isEmpty(),
+                "different materials do not recombine: " + ingredient + " / " + otherMaterial);
 
         PieceBlock carrier = Pieces.BLOCKS.values().stream()
                 .filter(candidate -> candidate.palette.shape == shape)

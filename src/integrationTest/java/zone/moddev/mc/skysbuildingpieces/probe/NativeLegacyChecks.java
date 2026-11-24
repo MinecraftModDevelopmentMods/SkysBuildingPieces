@@ -68,6 +68,7 @@ public final class NativeLegacyChecks {
 
             DirtCoverageChecks.run(world);
             storedInventories(world);
+            LiveInventoryRecoveryChecks.run(world);
 
             if (!installed) {
                 unknownContentStops();

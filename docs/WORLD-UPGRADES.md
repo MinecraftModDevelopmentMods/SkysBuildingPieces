@@ -58,6 +58,8 @@ Editable item handlers are updated as their containers load. Serialized
 item stacks are also recovered before the game reads them, preserving counts,
 enchantments and other custom data. Unopened loot containers are not opened
 to perform migration.
+Storage mods can hold more items in a slot than an ordinary inventory. Recovery
+keeps those larger counts and leaves unrelated stacks unchanged.
 Saved contents of sealed item containers are recovered without opening them.
 Their container identity, seal and unrelated custom data are retained.
 

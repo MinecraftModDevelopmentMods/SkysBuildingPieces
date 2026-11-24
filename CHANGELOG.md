@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.12.121012
+
+- Fix a crash when checking large item stacks in storage mods such as Sophisticated Storage.
+- Keep stored counts, names and custom data intact when recovering older building pieces, including pieces inside other items.
+
 ## 0.3.11.121012
 
 - Fix fuel checks for stone, soil and other non-wood pieces in recipe viewers. This also covers the BOP and Mineralogy pieces.

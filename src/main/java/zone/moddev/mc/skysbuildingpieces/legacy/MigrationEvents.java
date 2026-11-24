@@ -341,20 +341,6 @@ public final class MigrationEvents {
             return legacyStack;
         }
 
-        CompoundTag before = (CompoundTag) legacyStack.save(world.registryAccess());
-        // The current stack codec may omit count=1; this is a known stack, not an entity tag.
-        if (!before.contains("count")) {
-            before.putInt("count", legacyStack.getCount());
-        }
-        CompoundTag legacyTileData = before.copy();
-
-        LegacyBridge.prepareStack(legacyTileData);
-
-        if (legacyTileData.equals(before)) {
-            return legacyStack;
-        }
-
-        return ItemStack.parse(world.registryAccess(), legacyTileData).orElseThrow(() ->
-                new LegacyBridge.RecoveryAbort("Cannot decode recovered item " + legacyTileData.getString("id"), null));
+        return LiveItemRecovery.convert(legacyStack, world.registryAccess());
     }
 }
