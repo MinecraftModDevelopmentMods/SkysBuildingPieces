@@ -268,17 +268,7 @@ public final class MigrationEvents {
             return legacyStack;
         }
 
-        NBTTagCompound before = legacyStack.writeToNBT(new NBTTagCompound());
-        NBTTagCompound legacyTileData = before.copy();
+        return LiveItemRecovery.convert(legacyStack);
 
-        LegacyBridge.prepareStack(legacyTileData);
-
-        if (legacyTileData.equals(before)) {
-            return legacyStack;
-        }
-
-        ItemStack updated = ItemStack.loadItemStackFromNBT(legacyTileData);
-
-        return updated;
     }
 }
