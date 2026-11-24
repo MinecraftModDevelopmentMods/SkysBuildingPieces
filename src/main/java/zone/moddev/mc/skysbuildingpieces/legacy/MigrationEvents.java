@@ -382,22 +382,7 @@ public final class MigrationEvents {
             return legacyStack;
         }
 
-        var ops = world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
-        CompoundTag before = (CompoundTag) ItemStack.CODEC.encodeStart(ops, legacyStack).getOrThrow();
-        // The current stack codec may omit count=1; this is a known stack, not an entity tag.
-        if (!before.contains("count")) {
-            before.putInt("count", legacyStack.getCount());
-        }
-        CompoundTag legacyTileData = before.copy();
+        return LiveItemRecovery.convert(legacyStack, world.registryAccess(), account);
 
-        LegacyBridge.prepareStack(legacyTileData, account);
-
-        if (legacyTileData.equals(before)) {
-            return legacyStack;
-        }
-
-        return ItemStack.CODEC.parse(ops, legacyTileData).getOrThrow(message ->
-                new LegacyBridge.RecoveryAbort("Cannot decode recovered item "
-                        + legacyTileData.getStringOr("id", "") + ": " + message, null));
     }
 }
