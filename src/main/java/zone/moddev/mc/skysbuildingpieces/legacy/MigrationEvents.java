@@ -338,17 +338,7 @@ public final class MigrationEvents {
             return legacyStack;
         }
 
-        CompoundTag before = legacyStack.save(new CompoundTag());
-        CompoundTag legacyTileData = before.copy();
+        return LiveItemRecovery.convert(legacyStack);
 
-        LegacyBridge.prepareStack(legacyTileData);
-
-        if (legacyTileData.equals(before)) {
-            return legacyStack;
-        }
-
-        ItemStack updated = ItemStack.of(legacyTileData);
-
-        return updated;
     }
 }

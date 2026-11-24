@@ -470,6 +470,10 @@ public final class LegacyBridge {
         }
     }
 
+    static int stackCount(CompoundTag stack) {
+        return stack.contains("Count", 1) ? stack.getByte("Count") & 255 : stack.getInt("Count");
+    }
+
     public static void prepareStack(CompoundTag stack) {
         prepareStacks(stack);
     }
@@ -510,7 +514,7 @@ public final class LegacyBridge {
 
             if (worldDirectory != null && change.module != null) {
                 pendingItems.computeIfAbsent(change.module, key -> new java.util.concurrent.atomic.AtomicLong())
-                        .addAndGet(change.stack.getByte("Count") & 255);
+                        .addAndGet(stackCount(change.stack));
             }
         }
     }
