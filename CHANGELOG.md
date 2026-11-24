@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.11.2601021
+
+- Leave unrelated storage inventories alone during legacy recovery.
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.2601021
 
 Improves snowy pieces, crafting, wooden fuel, slab placement and inventory compatibility.
