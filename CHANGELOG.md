@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.11.2602001
+
+- Leave unrelated storage inventories alone during legacy recovery.
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.2602001
 
 - Improve snow on grass pieces and the grass beneath them.
