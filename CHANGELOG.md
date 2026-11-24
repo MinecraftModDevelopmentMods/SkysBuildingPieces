@@ -7,7 +7,7 @@
 ## 0.3.10.120012
 
 - Improve snow cover, exposed faces and survival drops.
-- Use each materialâ€™s actual fuel value.
+- Use each material’s actual fuel value.
 - Keep crafting results distinct and avoid duplicate recipes when Grass Slabs is installed.
 
 ## 0.3.9.120012
