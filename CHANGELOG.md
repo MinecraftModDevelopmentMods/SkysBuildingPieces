@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.10.110021
+
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.9.110021
 
 Grass steps and corners use the same snow appearance as grass slabs. Exposed grass beneath snowy pieces also gains a matching snowy side.
