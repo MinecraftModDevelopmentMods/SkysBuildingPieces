@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.11.2603001
+
+- Leave unrelated storage inventories alone during legacy recovery.
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.2603001
 
 - Let grass pieces spread and decay naturally, including beneath solid cover.
