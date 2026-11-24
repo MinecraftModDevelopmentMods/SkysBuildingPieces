@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.11.112021
+
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.112021
 
 - Stop snow layers hovering over bottom slabs, steps, corners and lowered paths.

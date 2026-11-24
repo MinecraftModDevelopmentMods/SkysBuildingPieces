@@ -111,6 +111,10 @@ public final class LegacyBridge {
         }
     }
 
+    static int stackCount(NBTTagCompound stack) {
+        return stack.hasKey("Count", 1) ? stack.getByte("Count") & 255 : stack.getInteger("Count");
+    }
+
     public static void prepareStack(NBTTagCompound stack) {
         if (ready) {
             zone.moddev.mc.skysbuildingpieces.compat.MineralogyCompat.prepareStacks(stack);
@@ -133,7 +137,7 @@ public final class LegacyBridge {
 
             if (worldDirectory != null) {
                 pendingItems.computeIfAbsent(change.module, key -> new java.util.concurrent.atomic.AtomicLong())
-                        .addAndGet(change.stack.getByte("Count") & 255);
+                        .addAndGet(stackCount(change.stack));
             }
         }
     }

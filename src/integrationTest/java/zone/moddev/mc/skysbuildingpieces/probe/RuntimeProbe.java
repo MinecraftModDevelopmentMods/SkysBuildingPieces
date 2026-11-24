@@ -356,6 +356,8 @@ public final class RuntimeProbe {
             LegacyBridge.prepareStack(crate);
             require(before.equals(crate), "nested recovery idempotence");
 
+            LiveInventoryRecoveryChecks.run(world);
+
             Properties props = new Properties();
             File marker = new File(world.getSaveHandler().getWorldDirectory(),
                     "skysbuildingpieces-integration.properties");
