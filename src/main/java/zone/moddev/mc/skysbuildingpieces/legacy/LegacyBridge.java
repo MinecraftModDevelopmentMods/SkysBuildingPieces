@@ -471,6 +471,15 @@ public final class LegacyBridge {
         prepareStacks(stack);
     }
 
+    static boolean mightRecoverItem(String registryId) {
+        PieceItem item = Pieces.pieceItem(registryId);
+        if (item != null) {
+            return Catalogue.INSTANCE.materials.get(item.material).replacement() != null;
+        }
+        return palette(registryId) != null || HistoricalFullBlocks.historical(registryId)
+                || LegacyMapping.owned(registryId) || LegacyPreflight.skyOwned(registryId);
+    }
+
     private static boolean prepareStacks(CompoundTag stack) {
         if (!ready) {
             return false;

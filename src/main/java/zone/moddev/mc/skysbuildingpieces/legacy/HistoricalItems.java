@@ -30,6 +30,10 @@ public final class HistoricalItems {
         return RECOVERIES.prepareCopy(root);
     }
 
+    static boolean hasContributors() {
+        return RECOVERIES.hasContributors();
+    }
+
     static void finish(CompoundTag root, int targetVersion) {
         // ChunkLoader first fixes old chunks to 1493, then to the current version. Keep selected names through that
         // intermediate tag, since the stone slab rename runs at 1802.
