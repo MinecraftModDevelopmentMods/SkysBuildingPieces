@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.11.2603002
+
+- Leave unrelated storage inventories alone during legacy recovery.
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
 ## 0.3.10.2603002
 
 - Snowy steps and corners cover the grass beneath them, and snow pieces can be dug by hand.
@@ -40,7 +45,7 @@
 - Keep existing pieces, recipes and supported world upgrades.
 - Grass Slabs and Mineralogy are still optional.
 
-## 0.3.8.120062 — Minecraft 1.20.6, NeoForge
+## 0.3.8.120062 â€” Minecraft 1.20.6, NeoForge
 
 - Bring the building pieces and recipes to NeoForge 1.20.6.
 - Keep the names and custom data on pieces when you rotate them in a crafting grid.
