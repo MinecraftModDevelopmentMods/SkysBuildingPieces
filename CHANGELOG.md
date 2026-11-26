@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.12.121011 (unreleased)
+
+- Add matching podzol slabs and recipes for cutting and recombining podzol pieces.
+
 ## 0.3.11.121011
 
 - Leave unrelated storage inventories alone during legacy recovery.

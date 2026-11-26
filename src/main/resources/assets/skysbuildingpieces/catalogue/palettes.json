@@ -2539,5 +2539,14 @@
     "materials": [
       "minecraft:grass_path"
     ]
+  },
+  {
+    "id": "dirt_slab_00",
+    "group": "dirt",
+    "shape": "slab",
+    "states": 2,
+    "materials": [
+      "minecraft:dirt_podzol"
+    ]
   }
 ]

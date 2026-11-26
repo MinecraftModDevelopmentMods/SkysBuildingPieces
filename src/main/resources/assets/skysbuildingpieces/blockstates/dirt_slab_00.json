@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "meta=0,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_0_dry"
+    },
+    "meta=0,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_0_dry"
+    },
+    "meta=0,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_0_snow"
+    },
+    "meta=0,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_0_snow"
+    },
+    "meta=1,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_1_dry"
+    },
+    "meta=1,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_1_dry"
+    },
+    "meta=1,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_1_snow"
+    },
+    "meta=1,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_podzol_slab_1_snow"
+    }
+  }
+}

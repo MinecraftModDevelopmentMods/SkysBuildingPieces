@@ -69,8 +69,8 @@ You can also add:
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)
   to use suitable pieces on newly generated slopes and cave floors.
 
-Building Pieces doesn't add wooden walls, horizontal soil slabs, turf or path
-slabs.
+Building Pieces includes horizontal podzol slabs. Grass Slabs supplies the
+separate horizontal dirt and grass slabs, paths and turf.
 
 ## Existing worlds
 

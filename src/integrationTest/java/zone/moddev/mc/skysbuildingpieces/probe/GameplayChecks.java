@@ -370,7 +370,12 @@ public final class GameplayChecks {
 
                                 // Exercise this registered Sky item directly. Drops and recipes may reuse a native
                                 // slab, whose placement belongs to BuildingBricks while that mod is installed.
-                                ItemStack stack = ownSlab(block, block.palette.materials.get(slot));
+                                String material = block.palette.materials.get(slot);
+                                if (material.equals("minecraft:dirt_podzol")) {
+                                    expected = face == Direction.DOWN || face.getAxis().isHorizontal() && hitY > .5f
+                                            ? Direction.UP : Direction.DOWN;
+                                }
+                                ItemStack stack = ownSlab(block, material);
 
                                 require(use(stack, player, world, anchor, InteractionHand.MAIN_HAND, face, hitX, hitY,
                                         hitZ) == InteractionResult.SUCCESS,

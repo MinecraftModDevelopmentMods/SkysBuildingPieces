@@ -30,14 +30,14 @@ class MineralogyCatalogueTest {
     void optionalCatalogueAddsExactlyThirtyFiveIdsWithoutChangingVanillaSlots() throws Exception {
         Catalogue catalogue = new Catalogue();
 
-        assertEquals(237, catalogue.palettes.size());
+        assertEquals(238, catalogue.palettes.size());
 
         Catalogue.Module rocks = register(catalogue);
 
         assertEquals(27, rocks.materials.size());
         assertEquals(35, rocks.palettes.size());
-        assertEquals(273, catalogue.palettes.size() + 1);
-        assertEquals(237, catalogue.modules.get("vanilla").palettes.size());
+        assertEquals(274, catalogue.palettes.size() + 1);
+        assertEquals(238, catalogue.modules.get("vanilla").palettes.size());
         assertEquals(14, rocks.palettes.stream().filter(p -> p.shape == Shape.HORIZONTAL_STEP).count());
         assertEquals(7, rocks.palettes.stream().filter(p -> p.shape == Shape.VERTICAL_STEP).count());
         assertEquals(14, rocks.palettes.stream().filter(p -> p.shape == Shape.CORNER).count());

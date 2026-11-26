@@ -104,6 +104,9 @@ public final class PieceItem extends BlockItem {
             return InteractionResult.FAIL;
         }
 
+        boolean directionalSlabs = BuildingPiecesConfig.directionalSlabPlacement()
+                && (shape == Shape.VERTICAL_SLAB
+                        || shape == Shape.SLAB && Pieces.state(materialId, Shape.VERTICAL_SLAB, 0) != null);
         float targetX = hitX;
         float targetY = hitY;
         float targetZ = hitZ;
@@ -112,7 +115,7 @@ public final class PieceItem extends BlockItem {
 
         // Vanilla slabs call a matching half replaceable. Join it before asking the placement context whether this cell
         // can accept a new block.
-        if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ)) {
+        if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ, directionalSlabs)) {
             return InteractionResult.SUCCESS;
         }
         if (!replaceable(world, position, player, hand, stack, face, hitX, hitY, hitZ)) {
@@ -123,7 +126,7 @@ public final class PieceItem extends BlockItem {
             targetZ -= face.getStepZ();
 
             if (combine(world, position, existingState, materialId, shape, player, stack, face, targetX, targetY,
-                    targetZ)) {
+                    targetZ, directionalSlabs)) {
                 return InteractionResult.SUCCESS;
             }
         }
@@ -138,7 +141,7 @@ public final class PieceItem extends BlockItem {
 
         switch (shape) {
             case SLAB:
-                Direction slabSide = BuildingPiecesConfig.directionalSlabPlacement()
+                Direction slabSide = directionalSlabs
                         ? SlabPlacement.side(face, hitX, hitY, hitZ) : SlabPlacement.horizontalSide(face, hitY);
                 placedShape = SlabPlacement.shape(slabSide);
                 orientation = SlabPlacement.orientation(slabSide);
@@ -203,7 +206,8 @@ public final class PieceItem extends BlockItem {
 
     /** Combine occupied cells only when their union is a supported shape of the same material. */
     private static boolean combine(Level world, BlockPos position, BlockState existingState, String material,
-            Shape shape, Player player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ) {
+            Shape shape, Player player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ,
+            boolean directionalSlabs) {
         if (!player.mayUseItemAt(position, face, stack) || shape == Shape.WALL || shape == Shape.PANE) {
             return false;
         }
@@ -240,7 +244,6 @@ public final class PieceItem extends BlockItem {
                 | (hitY + face.getStepY() * epsilon >= .5f ? 4 : 0);
         BlockState combinedState = null;
         boolean isSlab = shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB;
-        boolean directionalSlabs = isSlab && BuildingPiecesConfig.directionalSlabPlacement();
         if (isSlab && !directionalSlabs && Geometry.orientationFor(shape, existingCells) < 0) {
             return false;
         }

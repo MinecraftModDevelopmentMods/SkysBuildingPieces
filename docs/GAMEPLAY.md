@@ -42,11 +42,10 @@ also work mirrored. Each occupied slot consumes one item, not the whole stack.
 
 Walls use two columns so their recipe does not overlap glass panes or nether
 brick fences. Native cobblestone walls, slabs, stairs and glass panes keep
-their usual recipes. Only supported shapes are available; there are no wooden
-walls or horizontal soil slabs.
+their usual recipes. Wooden walls are outside this catalogue.
 
-There is no separate vertical slab recipe when a regular slab exists. The same
-item places either way. Old vertical slab items can be crafted back into regular
+Where a vertical slab is available, the same item places either way.
+Podzol slabs place horizontally. Old vertical slab items can be crafted back into regular
 slabs one for one, retaining custom item data.
 
 Two matching regular slabs side by side make their matching full block. This
@@ -63,7 +62,7 @@ still make four steps.
 
 Dirt and grass steps return the matching Grass Slabs item when that mod is
 installed. Without it, ordinary dirt steps return the existing dirt vertical
-slab. No new slabs are added for soil materials without a matching slab.
+slab. Two matching podzol steps make a podzol slab.
 
 For raw stone, snow, decorative sandstone and mossy/cracked/chiseled stone brick
 slabs, use two full blocks diagonally to make four slabs. Their full-block rows
@@ -75,7 +74,7 @@ stair patterns still produce vanilla's ordinary sandstone or stone brick stairs.
 
 Horizontal and vertical step items can also be rotated one for one. Either
 kind can be cut into corners. Soil steps use full dirt, coarse dirt, podzol,
-mycelium or grass blocks because their horizontal slabs are outside this mod.
+mycelium or grass blocks. Podzol steps can also be cut from podzol slabs.
 
 Use full smooth stone blocks for its missing building shapes. Its steps and
 corners follow the normal slab and step recipes. Native 1.14 slabs, stairs and
@@ -131,5 +130,5 @@ With Grass Slabs installed, its regular dirt slab can also be placed vertically
 and is returned when a dirt vertical slab is broken. Without Grass Slabs, the
 dirt-only vertical item and recipe remain available; it stays hidden in creative.
 
-Horizontal soil slabs, vertical grass or other soil slabs, turf, path slabs and
-wooden walls are outside this mod. No new terrain is generated.
+Use three podzol blocks in a row to make six horizontal podzol slabs.
+Two slabs side by side make one podzol block. No new terrain is generated.
