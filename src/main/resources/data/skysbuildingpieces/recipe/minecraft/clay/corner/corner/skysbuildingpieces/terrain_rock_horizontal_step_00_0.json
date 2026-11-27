@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/clay_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:clay_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:clay_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:clay_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:clay_horizontal_step"
+      }
+    ]
+  }
+}

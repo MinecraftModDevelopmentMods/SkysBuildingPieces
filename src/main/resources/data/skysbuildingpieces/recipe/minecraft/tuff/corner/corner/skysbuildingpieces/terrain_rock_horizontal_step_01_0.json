@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/tuff_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:tuff_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:tuff_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:tuff_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:tuff_horizontal_step"
+      }
+    ]
+  }
+}

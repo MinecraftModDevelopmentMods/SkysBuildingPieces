@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "orientation=top,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_dry"
+    },
+    "orientation=top,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_dry"
+    },
+    "orientation=top,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_snow"
+    },
+    "orientation=top,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_snow"
+    },
+    "orientation=bottom,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_dry"
+    },
+    "orientation=bottom,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_dry"
+    },
+    "orientation=bottom,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_snow"
+    },
+    "orientation=bottom,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_snow"
+    }
+  }
+}

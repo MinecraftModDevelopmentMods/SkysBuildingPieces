@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.13.121011 (unreleased)
+
+- Add matching pieces for more natural terrain, including mycelium, cave rocks, mud, rooted dirt and blue ice.
+
 ## 0.3.12.121011 (unreleased)
 
 - Add matching podzol slabs and recipes for cutting and recombining podzol pieces.

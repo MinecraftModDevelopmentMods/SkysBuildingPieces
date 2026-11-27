@@ -2548,5 +2548,96 @@
     "materials": [
       "minecraft:dirt_podzol"
     ]
+  },
+  {
+    "id": "terrain_dirt_slab_00",
+    "group": "dirt",
+    "shape": "slab",
+    "states": 2,
+    "materials": ["minecraft:dirt_mycelium", "minecraft:rooted_dirt", "minecraft:mud"]
+  },
+  {
+    "id": "terrain_dirt_horizontal_step_00",
+    "group": "dirt",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": ["minecraft:rooted_dirt", "minecraft:mud"]
+  },
+  {
+    "id": "terrain_dirt_corner_00",
+    "group": "dirt",
+    "shape": "corner",
+    "states": 8,
+    "materials": ["minecraft:rooted_dirt", "minecraft:mud"]
+  },
+  {
+    "id": "terrain_rock_slab_00",
+    "group": "rock",
+    "shape": "slab",
+    "states": 2,
+    "materials": ["minecraft:clay", "minecraft:deepslate", "minecraft:calcite", "minecraft:dripstone_block"]
+  },
+  {
+    "id": "terrain_rock_horizontal_step_00",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": ["minecraft:clay", "minecraft:deepslate"]
+  },
+  {
+    "id": "terrain_rock_horizontal_step_01",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": ["minecraft:tuff", "minecraft:calcite"]
+  },
+  {
+    "id": "terrain_rock_horizontal_step_02",
+    "group": "rock",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": ["minecraft:dripstone_block"]
+  },
+  {
+    "id": "terrain_rock_corner_00",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": ["minecraft:clay", "minecraft:deepslate"]
+  },
+  {
+    "id": "terrain_rock_corner_01",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": ["minecraft:tuff", "minecraft:calcite"]
+  },
+  {
+    "id": "terrain_rock_corner_02",
+    "group": "rock",
+    "shape": "corner",
+    "states": 8,
+    "materials": ["minecraft:dripstone_block"]
+  },
+  {
+    "id": "terrain_ice_slab_00",
+    "group": "ice",
+    "shape": "slab",
+    "states": 2,
+    "materials": ["minecraft:blue_ice"]
+  },
+  {
+    "id": "terrain_ice_horizontal_step_00",
+    "group": "ice",
+    "shape": "horizontal_step",
+    "states": 8,
+    "materials": ["minecraft:blue_ice"]
+  },
+  {
+    "id": "terrain_ice_corner_00",
+    "group": "ice",
+    "shape": "corner",
+    "states": 8,
+    "materials": ["minecraft:blue_ice"]
   }
 ]

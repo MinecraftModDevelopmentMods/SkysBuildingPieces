@@ -22,7 +22,7 @@ public final class Catalogue {
         Module core = registerModule("vanilla", "skysbuildingpieces", read(Catalogue.class, ROOT + "materials.json"),
                 read(Catalogue.class, ROOT + "palettes.json"), 255);
 
-        if (core.palettes.size() != 238 || core.palettes.size() + 1 > 256) {
+        if (core.palettes.size() != 251 || core.palettes.size() + 1 > 256) {
             throw new IllegalStateException("Core block budget exceeded");
         }
     }
@@ -119,7 +119,11 @@ public final class Catalogue {
             return true;
         }
         return switch (shape) {
-            case SLAB -> definition.id.equals("minecraft:dirt_podzol");
+            case SLAB -> switch (definition.id) {
+                case "minecraft:dirt_podzol", "minecraft:dirt_mycelium", "minecraft:rooted_dirt", "minecraft:mud",
+                        "minecraft:clay", "biomesoplenty:origin_grass_block" -> true;
+                default -> false;
+            };
             case VERTICAL_SLAB -> definition.id.equals("minecraft:dirt");
             default -> true;
         };

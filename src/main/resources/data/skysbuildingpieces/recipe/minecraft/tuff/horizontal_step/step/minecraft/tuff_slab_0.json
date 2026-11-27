@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/tuff_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:tuff_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:tuff_horizontal_step",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:tuff_horizontal_step"
+  }
+}

@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "绿色羊毛",
   "material.skysbuildingpieces.minecraft.wool_red": "红色羊毛",
   "material.skysbuildingpieces.minecraft.wool_black": "黑色羊毛",
-  "material.skysbuildingpieces.minecraft.grass_path": "土径"
+  "material.skysbuildingpieces.minecraft.grass_path": "土径",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "缠根泥土",
+  "material.skysbuildingpieces.minecraft.mud": "泥巴",
+  "material.skysbuildingpieces.minecraft.clay": "黏土",
+  "material.skysbuildingpieces.minecraft.deepslate": "深板岩",
+  "material.skysbuildingpieces.minecraft.tuff": "凝灰岩",
+  "material.skysbuildingpieces.minecraft.calcite": "方解石",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "滴水石块",
+  "material.skysbuildingpieces.minecraft.blue_ice": "蓝冰"
 }

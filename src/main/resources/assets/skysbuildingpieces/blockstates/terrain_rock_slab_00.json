@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "meta=0,waterlogged=false": {
+      "model": "skysbuildingpieces:block/clay_slab_0"
+    },
+    "meta=0,waterlogged=true": {
+      "model": "skysbuildingpieces:block/clay_slab_0"
+    },
+    "meta=1,waterlogged=false": {
+      "model": "skysbuildingpieces:block/clay_slab_1"
+    },
+    "meta=1,waterlogged=true": {
+      "model": "skysbuildingpieces:block/clay_slab_1"
+    },
+    "meta=2,waterlogged=false": {
+      "model": "skysbuildingpieces:block/deepslate_slab_0"
+    },
+    "meta=2,waterlogged=true": {
+      "model": "skysbuildingpieces:block/deepslate_slab_0"
+    },
+    "meta=3,waterlogged=false": {
+      "model": "skysbuildingpieces:block/deepslate_slab_1"
+    },
+    "meta=3,waterlogged=true": {
+      "model": "skysbuildingpieces:block/deepslate_slab_1"
+    },
+    "meta=4,waterlogged=false": {
+      "model": "skysbuildingpieces:block/calcite_slab_0"
+    },
+    "meta=4,waterlogged=true": {
+      "model": "skysbuildingpieces:block/calcite_slab_0"
+    },
+    "meta=5,waterlogged=false": {
+      "model": "skysbuildingpieces:block/calcite_slab_1"
+    },
+    "meta=5,waterlogged=true": {
+      "model": "skysbuildingpieces:block/calcite_slab_1"
+    },
+    "meta=6,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dripstone_block_slab_0"
+    },
+    "meta=6,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dripstone_block_slab_0"
+    },
+    "meta=7,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dripstone_block_slab_1"
+    },
+    "meta=7,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dripstone_block_slab_1"
+    }
+  }
+}

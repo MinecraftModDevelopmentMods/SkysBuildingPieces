@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "laine verte",
   "material.skysbuildingpieces.minecraft.wool_red": "laine rouge",
   "material.skysbuildingpieces.minecraft.wool_black": "laine noire",
-  "material.skysbuildingpieces.minecraft.grass_path": "Chemin"
+  "material.skysbuildingpieces.minecraft.grass_path": "Chemin",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Terre racineuse",
+  "material.skysbuildingpieces.minecraft.mud": "Bouette",
+  "material.skysbuildingpieces.minecraft.clay": "Glaise",
+  "material.skysbuildingpieces.minecraft.deepslate": "Profondoise",
+  "material.skysbuildingpieces.minecraft.tuff": "Tuf",
+  "material.skysbuildingpieces.minecraft.calcite": "Calcite",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Bloc de spéléothème",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Glace bleue"
 }

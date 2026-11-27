@@ -38,7 +38,7 @@ class CatalogueTest {
             sha.append(String.format("%02X", b));
         }
 
-        assertEquals("19297A706E6A40B1064B4B9572DF8ACDB88A53074D49A5D9F0023A8D65B6E09B", sha.toString());
+        assertEquals("A09F640DAE3316FD9F97F740E5B977B6691670F38FAE32FD81164977D3D7074D", sha.toString());
 
         com.google.gson.JsonArray all = new com.google.gson.JsonParser()
                 .parse(new String(bytes, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonArray();
@@ -75,9 +75,9 @@ class CatalogueTest {
     void permanentCatalogueAndBudget() {
         Catalogue catalogue = Catalogue.INSTANCE;
 
-        assertEquals(103, catalogue.materials.size());
-        assertEquals(238, catalogue.palettes.size());
-        assertEquals(239, catalogue.palettes.size() + 1);
+        assertEquals(111, catalogue.materials.size());
+        assertEquals(251, catalogue.palettes.size());
+        assertEquals(252, catalogue.palettes.size() + 1);
         assertTrue(catalogue.palettes.size() + 1 <= 256);
 
         Set<String> coverage = new HashSet<String>();

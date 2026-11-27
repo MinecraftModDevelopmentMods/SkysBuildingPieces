@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "Green Wool",
   "material.skysbuildingpieces.minecraft.wool_red": "Red Wool",
   "material.skysbuildingpieces.minecraft.wool_black": "Black Wool",
-  "material.skysbuildingpieces.minecraft.grass_path": "Path"
+  "material.skysbuildingpieces.minecraft.grass_path": "Path",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Rooted Dirt",
+  "material.skysbuildingpieces.minecraft.mud": "Mud",
+  "material.skysbuildingpieces.minecraft.clay": "Clay",
+  "material.skysbuildingpieces.minecraft.deepslate": "Deepslate",
+  "material.skysbuildingpieces.minecraft.tuff": "Tuff",
+  "material.skysbuildingpieces.minecraft.calcite": "Calcite",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Dripstone Block",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Blue Ice"
 }

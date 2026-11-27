@@ -371,7 +371,7 @@ public final class GameplayChecks {
                                 // Exercise this registered Sky item directly. Drops and recipes may reuse a native
                                 // slab, whose placement belongs to BuildingBricks while that mod is installed.
                                 String material = block.palette.materials.get(slot);
-                                if (material.equals("minecraft:dirt_podzol")) {
+                                if (Pieces.state(material, Shape.VERTICAL_SLAB, 0) == null) {
                                     expected = face == Direction.DOWN || face.getAxis().isHorizontal() && hitY > .5f
                                             ? Direction.UP : Direction.DOWN;
                                 }
@@ -383,7 +383,7 @@ public final class GameplayChecks {
                                 require(world.getBlockState(position)
                                         .equals(Pieces.state(block.palette.materials.get(slot), slabShape(expected),
                                                 slabOrientation(expected))),
-                                        "slab selects correct half " + face + " " + click);
+                                        "slab selects correct half " + material + " " + face + " " + click);
                                 require(stack.getCount() == 1 && world.getBlockState(anchor).getBlock() == Blocks.STONE,
                                         "one item consumed; supporting block intact");
                                 checked++;

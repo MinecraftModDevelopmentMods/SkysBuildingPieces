@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "초록색 양털",
   "material.skysbuildingpieces.minecraft.wool_red": "빨간색 양털",
   "material.skysbuildingpieces.minecraft.wool_black": "검은색 양털",
-  "material.skysbuildingpieces.minecraft.grass_path": "흙길"
+  "material.skysbuildingpieces.minecraft.grass_path": "흙길",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "뿌리내린 흙",
+  "material.skysbuildingpieces.minecraft.mud": "진흙",
+  "material.skysbuildingpieces.minecraft.clay": "점토",
+  "material.skysbuildingpieces.minecraft.deepslate": "심층암",
+  "material.skysbuildingpieces.minecraft.tuff": "응회암",
+  "material.skysbuildingpieces.minecraft.calcite": "방해석",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "점적석 블록",
+  "material.skysbuildingpieces.minecraft.blue_ice": "푸른얼음"
 }

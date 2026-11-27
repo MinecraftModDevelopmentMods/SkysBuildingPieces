@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "緑色の羊毛",
   "material.skysbuildingpieces.minecraft.wool_red": "赤色の羊毛",
   "material.skysbuildingpieces.minecraft.wool_black": "黒色の羊毛",
-  "material.skysbuildingpieces.minecraft.grass_path": "土の道"
+  "material.skysbuildingpieces.minecraft.grass_path": "土の道",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "根付いた土",
+  "material.skysbuildingpieces.minecraft.mud": "泥",
+  "material.skysbuildingpieces.minecraft.clay": "粘土",
+  "material.skysbuildingpieces.minecraft.deepslate": "深層岩",
+  "material.skysbuildingpieces.minecraft.tuff": "凝灰岩",
+  "material.skysbuildingpieces.minecraft.calcite": "方解石",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "鍾乳石ブロック",
+  "material.skysbuildingpieces.minecraft.blue_ice": "青氷"
 }

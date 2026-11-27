@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "grüner Wolle",
   "material.skysbuildingpieces.minecraft.wool_red": "roter Wolle",
   "material.skysbuildingpieces.minecraft.wool_black": "schwarzer Wolle",
-  "material.skysbuildingpieces.minecraft.grass_path": "Weg"
+  "material.skysbuildingpieces.minecraft.grass_path": "Weg",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Wurzelerde",
+  "material.skysbuildingpieces.minecraft.mud": "Schlamm",
+  "material.skysbuildingpieces.minecraft.clay": "Ton",
+  "material.skysbuildingpieces.minecraft.deepslate": "Tiefenschiefer",
+  "material.skysbuildingpieces.minecraft.tuff": "Tuffstein",
+  "material.skysbuildingpieces.minecraft.calcite": "Kalzit",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Tropfsteinblock",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Blaueis"
 }

@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "lã verde",
   "material.skysbuildingpieces.minecraft.wool_red": "lã vermelha",
   "material.skysbuildingpieces.minecraft.wool_black": "lã preta",
-  "material.skysbuildingpieces.minecraft.grass_path": "Caminho"
+  "material.skysbuildingpieces.minecraft.grass_path": "Caminho",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Terra Enraizada",
+  "material.skysbuildingpieces.minecraft.mud": "Barro",
+  "material.skysbuildingpieces.minecraft.clay": "Argila",
+  "material.skysbuildingpieces.minecraft.deepslate": "Ardósia",
+  "material.skysbuildingpieces.minecraft.tuff": "Tufo",
+  "material.skysbuildingpieces.minecraft.calcite": "Calcite",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Bloco de Espeleotema",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Gelo Azul"
 }

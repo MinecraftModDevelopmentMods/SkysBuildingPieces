@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "meta=0,waterlogged=false": {
+      "model": "skysbuildingpieces:block/blue_ice_slab_0"
+    },
+    "meta=0,waterlogged=true": {
+      "model": "skysbuildingpieces:block/blue_ice_slab_0"
+    },
+    "meta=1,waterlogged=false": {
+      "model": "skysbuildingpieces:block/blue_ice_slab_1"
+    },
+    "meta=1,waterlogged=true": {
+      "model": "skysbuildingpieces:block/blue_ice_slab_1"
+    }
+  }
+}

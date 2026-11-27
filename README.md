@@ -9,6 +9,10 @@ already fit. When Mineralogy is installed, its natural rocks also get matching
 steps and corners automatically. No Mineralogy add-on is needed. Building
 Pieces doesn't generate terrain.
 
+Mycelium, rooted dirt, mud, clay, deepslate, calcite, dripstone and blue ice
+have matching slabs, steps and corners. Tuff steps and corners work with
+Minecraft's own tuff slab.
+
 ## Building with the pieces
 
 - Use the same slab item for horizontal and vertical placement. Click the centre

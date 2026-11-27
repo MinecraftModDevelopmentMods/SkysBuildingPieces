@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/tuff",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:tuff_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:tuff",
+    "count": 1
+  }
+}

@@ -129,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "зелёной шерсти",
   "material.skysbuildingpieces.minecraft.wool_red": "красной шерсти",
   "material.skysbuildingpieces.minecraft.wool_black": "чёрной шерсти",
-  "material.skysbuildingpieces.minecraft.grass_path": "Тропа"
+  "material.skysbuildingpieces.minecraft.grass_path": "Тропа",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Корнистая земля",
+  "material.skysbuildingpieces.minecraft.mud": "Грязь",
+  "material.skysbuildingpieces.minecraft.clay": "Глина",
+  "material.skysbuildingpieces.minecraft.deepslate": "Глубинный сланец",
+  "material.skysbuildingpieces.minecraft.tuff": "Туф",
+  "material.skysbuildingpieces.minecraft.calcite": "Кальцит",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Натёчный камень",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Синий лёд"
 }

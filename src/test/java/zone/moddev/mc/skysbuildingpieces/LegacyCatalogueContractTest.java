@@ -38,12 +38,10 @@ class LegacyCatalogueContractTest {
                 assertNull(definitions.put(definition.get("id").getAsString(), definition));
             }
 
-            assertEquals(source.getValue().getAsJsonArray().size(), definitions.size());
-
             for (JsonElement entry : source.getValue().getAsJsonArray()) {
                 JsonObject original = entry.getAsJsonObject();
                 String id = original.get("id").getAsString();
-                JsonObject nativeDefinition = definitions.get(id);
+                JsonObject nativeDefinition = definitions.remove(id);
 
                 assertNotNull(nativeDefinition, id);
                 assertEquals(original.get("blocks"), nativeDefinition.get("legacy_blocks"), id);
@@ -54,6 +52,10 @@ class LegacyCatalogueContractTest {
                 }
 
                 checked++;
+            }
+            for (JsonObject current : definitions.values()) {
+                assertTrue(current.getAsJsonObject("legacy_blocks").entrySet().isEmpty(),
+                        "A new material must not claim an old identity: " + current.get("id"));
             }
         }
 
