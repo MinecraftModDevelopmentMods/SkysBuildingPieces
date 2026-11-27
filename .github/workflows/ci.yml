@@ -148,7 +148,7 @@ jobs:
       - name: Make the wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Read coordinated Grass Slabs source pin
+      - name: Read the Grass Slabs release pin
         id: grass
         shell: bash
         run: |
@@ -172,7 +172,10 @@ jobs:
           bash "$dependency/gradlew" -p "$dependency" assemble --no-daemon --stacktrace \
             -Dorg.gradle.java.installations.paths="$JAVA_HOME,$JAVA_HOME_8_X64,$JAVA_HOME_25_X64"
           version="$(sed -n 's/^version=//p' gradle/grass-slabs-release.properties)"
-          echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$dependency/build/libs/SkysGrassSlabs-$version.jar" >> "$GITHUB_ENV"
+          jar="$dependency/build/libs/SkysGrassSlabs-$version.jar"
+          [[ -f "$jar" ]]
+          echo "ORG_GRADLE_PROJECT_grassSlabsMainJar=$jar" >> "$GITHUB_ENV"
+          echo "ORG_GRADLE_PROJECT_grassSlabsDeobfJar=$jar" >> "$GITHUB_ENV"
 
       - name: Build, test, and audit release artifacts
         run: >-
