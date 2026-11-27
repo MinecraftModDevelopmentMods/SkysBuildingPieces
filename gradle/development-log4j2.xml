@@ -2,16 +2,24 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger]: %msg%n"/>
+      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger/%marker]: %msg%n"/>
     </Console>
-    <File name="DevelopmentLog" fileName="logs/latest.log" append="false">
-      <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger]: %msg%n"/>
-    </File>
+    <RollingRandomAccessFile name="Latest" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
+      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger/%marker]: %msg%n"/>
+      <Policies><OnStartupTriggeringPolicy/><SizeBasedTriggeringPolicy size="200 MB"/></Policies>
+    </RollingRandomAccessFile>
+    <RollingRandomAccessFile name="Debug" fileName="logs/debug.log" filePattern="logs/debug-%i.log.gz">
+      <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger/%marker]: %msg%n"/>
+      <Policies><OnStartupTriggeringPolicy/><SizeBasedTriggeringPolicy size="200 MB"/></Policies>
+    </RollingRandomAccessFile>
   </Appenders>
   <Loggers>
     <Root level="info">
       <AppenderRef ref="Console"/>
-      <AppenderRef ref="DevelopmentLog"/>
+      <AppenderRef ref="Latest"/>
+      <AppenderRef ref="Debug"/>
     </Root>
   </Loggers>
 </Configuration>

@@ -7,7 +7,6 @@ import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.server.level.ServerLevel;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
@@ -17,24 +16,48 @@ import zone.moddev.mc.skysbuildingpieces.content.Pieces;
 /** Checks rebuilding larger pieces against the complete installed recipe set. */
 public final class RecombinationChecks {
     public static void run(ServerLevel world) {
-        if (net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks")) {
-            return;
+        Audit audit = new Audit(world);
+        while (!audit.advance(4)) {
+            // Also used by dedicated integration fixtures.
+        }
+        audit.finish();
+    }
+
+    /** Walks the whole catalogue without doing all of its work in one server tick. */
+    static final class Audit {
+        private final ServerLevel world;
+        private final boolean legacyInstalled = net.minecraftforge.fml.ModList.get().isLoaded("buildingbricks");
+        private final java.util.Iterator<Catalogue.MaterialDef> remaining = Catalogue.INSTANCE.materials.values().iterator();
+        private int checks;
+
+        Audit(ServerLevel world) {
+            this.world = world;
         }
 
-        int checks = 0;
+        boolean advance(int limit) {
+            if (legacyInstalled) {
+                return true;
+            }
+            for (int checked = 0; checked < limit && remaining.hasNext(); checked++) {
+                Catalogue.MaterialDef material = remaining.next();
+                ItemStack step = Pieces.stack(Pieces.state(material.id, Shape.HORIZONTAL_STEP, 0), 1);
+                ItemStack slab = slab(material.id);
 
-        for (Catalogue.MaterialDef material : Catalogue.INSTANCE.materials.values()) {
-            ItemStack step = Pieces.stack(Pieces.state(material.id, Shape.HORIZONTAL_STEP, 0), 1);
-            ItemStack slab = slab(material.id);
-
-            checks += pair(world, material.id, Shape.CORNER, step);
-            checks += pair(world, material.id, Shape.HORIZONTAL_STEP, slab);
-            checks += pair(world, material.id, Shape.VERTICAL_STEP, slab);
+                checks += pair(world, material.id, Shape.CORNER, step);
+                checks += pair(world, material.id, Shape.HORIZONTAL_STEP, slab);
+                checks += pair(world, material.id, Shape.VERTICAL_STEP, slab);
+            }
+            return !remaining.hasNext();
         }
 
-        require(checks > 0, "the catalogue supplies recombination recipes");
-        org.apache.logging.log4j.LogManager.getLogger().info("BUILDING_PIECES_SMALL_RECOMBINATION_PASS cases=" + checks + " modules="
-                + Catalogue.INSTANCE.modules.size());
+        void finish() {
+            if (!legacyInstalled) {
+                require(!remaining.hasNext() && checks > 0, "the catalogue supplies recombination recipes");
+                org.apache.logging.log4j.LogManager.getLogger().info(
+                        "BUILDING_PIECES_SMALL_RECOMBINATION_PASS cases={} modules={}",
+                        checks, Catalogue.INSTANCE.modules.size());
+            }
+        }
     }
 
     private static ItemStack slab(String material) {
@@ -48,7 +71,7 @@ public final class RecombinationChecks {
                 : material.equals("minecraft:dirt") ? "dirt_slab" : null;
         Item external = grassSlab == null ? null
                 : net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .getValue(new net.minecraft.resources.ResourceLocation("skysgrassslabs:" + grassSlab));
+                        .getValue(net.minecraft.resources.ResourceLocation.parse("skysgrassslabs:" + grassSlab));
 
         if (external != null && external != net.minecraft.world.item.Items.AIR) {
             return new ItemStack(external);
@@ -81,26 +104,24 @@ public final class RecombinationChecks {
                         grid.setItem(upperSlot + size, lower);
 
                         String label = material + " " + shape + " orientation=" + orientation;
-                        ItemStack actual = result(grid, world);
-
-                        require(ItemStack.matches(expected, actual),
-                                "two vertically stacked pieces: " + label);
-
-                        for (net.minecraft.world.item.crafting.CraftingRecipe recipe : world.getRecipeManager()
-                                .getRecipesFor(RecipeType.CRAFTING, grid, world)) {
-                            if (recipe.matches(grid, world)) {
-                                require(ItemStack.matches(expected, recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)),
-                                        "no conflicting recipe for " + label);
-
-                                for (ItemStack remainder : recipe.getRemainingItems(grid)) {
-                                    require(remainder.isEmpty(), "both piece units are consumed");
-                                }
+                        var matching = world.getRecipeManager()
+                                .getRecipesFor(RecipeType.CRAFTING, grid.asCraftInput(), world);
+                        require(!matching.isEmpty(), "two vertically stacked pieces: " + label);
+                        for (var holder : matching) {
+                            var recipe = holder.value();
+                            ItemStack actual = recipe.assemble(grid.asCraftInput(), world.registryAccess());
+                            require(ItemStack.matches(expected, actual), "no conflicting recipe for " + label);
+                            for (ItemStack remainder : recipe.getRemainingItems(grid.asCraftInput())) {
+                                require(remainder.isEmpty(), "both piece units are consumed");
                             }
+                            actual.setCount(9);
+                            require(ItemStack.matches(expected, recipe.assemble(grid.asCraftInput(), world.registryAccess())),
+                                    "each crafting result is an independent one-item copy");
                         }
-
-                        actual.setCount(9);
-                        require(ItemStack.matches(expected, result(grid, world)),
-                                "each crafting result is an independent one-item copy");
+                        if (cases == 0) {
+                            require(ItemStack.matches(expected, result(grid, world)),
+                                    "ordinary crafting selects the expected result for " + label);
+                        }
                         require(upper.getCount() == 17 && lower.getCount() == 23,
                                 "recipe lookup leaves inputs untouched");
                         cases++;
@@ -109,24 +130,26 @@ public final class RecombinationChecks {
             }
         }
 
-        // A different slot in the same metadata palette must never become this material.
         CraftingContainer mixed = grid(2);
         ItemStack ingredient = Pieces.stack(source, 1);
-
         mixed.setItem(0, ingredient);
 
-        int otherMaterial = block.canonicalMeta(source) == 0 ? shape.states : 0;
+        PieceBlock other = Pieces.playableBlocks().stream()
+                .filter(candidate -> candidate != block && candidate.palette.shape == shape)
+                .findFirst().orElseThrow();
+        mixed.setItem(2, Pieces.stack(other.defaultBlockState(), 1));
+        require(result(mixed, world).isEmpty(), "different materials do not recombine");
 
-        if (otherMaterial / shape.states < block.palette.materials.size()) {
-            mixed.setItem(2, Pieces.stack(block.getStateFromMeta(otherMaterial), 1));
-            require(result(mixed, world).isEmpty(), "different materials in one palette do not recombine");
-        }
-
-        ItemStack invalidCarrier = new ItemStack(block);
+        PieceBlock carrier = Pieces.BLOCKS.values().stream()
+                .filter(candidate -> candidate.palette.shape == shape)
+                .findFirst().orElseThrow();
+        Item legacyItem = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                net.minecraft.resources.ResourceLocation.parse(carrier.palette.registryId()));
+        ItemStack invalidCarrier = new ItemStack(legacyItem);
         net.minecraft.nbt.CompoundTag invalid = new net.minecraft.nbt.CompoundTag();
 
         invalid.putInt("Damage", 16);
-        invalidCarrier.setTag(invalid);
+        zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(invalidCarrier, invalid);
         mixed.setItem(2, invalidCarrier);
         require(result(mixed, world).isEmpty(), "unconverted invalid palette carriers are rejected");
         mixed.setItem(2, ingredient.copy());
@@ -160,8 +183,8 @@ public final class RecombinationChecks {
     }
 
     private static ItemStack result(CraftingContainer grid, ServerLevel world) {
-        return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, world)
-                .map(recipe -> recipe.assemble(grid, net.minecraft.core.RegistryAccess.EMPTY)).orElse(ItemStack.EMPTY);
+        return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid.asCraftInput(), world)
+                .map(recipe -> recipe.value().assemble(grid.asCraftInput(), world.registryAccess())).orElse(ItemStack.EMPTY);
     }
 
     private static void require(boolean condition, String message) {

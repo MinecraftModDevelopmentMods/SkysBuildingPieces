@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_dark_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:prismarine_dark_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:prismarine_dark_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_dark_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_dark_vertical_step"
+      }
+    ]
+  }
+}

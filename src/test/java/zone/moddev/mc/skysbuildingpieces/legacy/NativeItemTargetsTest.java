@@ -16,7 +16,7 @@ class NativeItemTargetsTest {
 
         CompoundTag expected = item.copy();
 
-        expected.putString("id", "minecraft:grass");
+        expected.putString("id", "minecraft:short_grass");
         expected.remove(HistoricalItems.NATIVE_ITEM_ID);
         HistoricalItems.restoreNativeTargets(item);
         assertEquals(expected, item);

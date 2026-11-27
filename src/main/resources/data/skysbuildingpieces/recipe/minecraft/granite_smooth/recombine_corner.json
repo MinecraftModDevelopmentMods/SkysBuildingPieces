@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/granite_smooth_horizontal_step",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:granite_smooth_corner"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:granite_smooth_horizontal_step",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:granite_smooth_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:granite_smooth_horizontal_step"
+      }
+    ]
+  }
+}

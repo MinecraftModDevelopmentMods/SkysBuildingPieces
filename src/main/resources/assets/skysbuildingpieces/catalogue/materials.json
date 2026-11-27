@@ -2791,5 +2791,140 @@
       "side": "minecraft:blocks/grass_path_side",
       "bottom": "minecraft:blocks/dirt"
     }
+  },
+  {
+    "name": "Rooted Dirt",
+    "id": "minecraft:rooted_dirt",
+    "type": "dirt",
+    "textures": "minecraft:block/rooted_dirt",
+    "blocks": {
+      "full": {
+        "id": "minecraft:rooted_dirt"
+      }
+    },
+    "group": "dirt",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Mud",
+    "id": "minecraft:mud",
+    "type": "dirt",
+    "textures": "minecraft:block/mud",
+    "blocks": {
+      "full": {
+        "id": "minecraft:mud"
+      }
+    },
+    "group": "dirt",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Clay",
+    "id": "minecraft:clay",
+    "type": "dirt",
+    "textures": "minecraft:block/clay",
+    "blocks": {
+      "full": {
+        "id": "minecraft:clay"
+      }
+    },
+    "group": "rock",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Deepslate",
+    "id": "minecraft:deepslate",
+    "type": "rock",
+    "textures": {
+      "top": "minecraft:block/deepslate_top",
+      "side": "minecraft:block/deepslate",
+      "bottom": "minecraft:block/deepslate_top"
+    },
+    "blocks": {
+      "full": {
+        "id": "minecraft:deepslate"
+      }
+    },
+    "group": "rock",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Tuff",
+    "id": "minecraft:tuff",
+    "type": "rock",
+    "textures": "minecraft:block/tuff",
+    "blocks": {
+      "full": {
+        "id": "minecraft:tuff"
+      },
+      "slab": {
+        "id": "minecraft:tuff_slab"
+      }
+    },
+    "group": "rock",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Calcite",
+    "id": "minecraft:calcite",
+    "type": "rock",
+    "textures": "minecraft:block/calcite",
+    "blocks": {
+      "full": {
+        "id": "minecraft:calcite"
+      }
+    },
+    "group": "rock",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Dripstone Block",
+    "id": "minecraft:dripstone_block",
+    "type": "rock",
+    "textures": "minecraft:block/dripstone_block",
+    "blocks": {
+      "full": {
+        "id": "minecraft:dripstone_block"
+      }
+    },
+    "group": "rock",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
+  },
+  {
+    "name": "Blue Ice",
+    "id": "minecraft:blue_ice",
+    "type": "ice",
+    "textures": "minecraft:block/blue_ice",
+    "blocks": {
+      "full": {
+        "id": "minecraft:blue_ice"
+      }
+    },
+    "group": "ice",
+    "nativeProperties": true,
+    "flammability": 0,
+    "fireSpread": 0,
+    "legacy_blocks": {}
   }
 ]

@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_vertical_slab",
+  "pattern": ["X", "X", "X"],
+  "key": {
+    "X": {
+      "item": "minecraft:dirt"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:dirt_vertical_slab",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:item_exists",
+          "item": "skysgrassslabs:dirt_slab"
+        }
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_vertical_slab"
+      }
+    ]
+  }
+}

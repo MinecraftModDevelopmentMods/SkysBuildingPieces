@@ -12,10 +12,12 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 import zone.moddev.mc.skysbuildingpieces.SkysBuildingPieces;
 
-/** Recovery choices are read at startup; old Forge CFG files are kept intact. */
+/** Building and recovery settings shared by the client and server. */
 public final class BuildingPiecesConfig {
     private static final ForgeConfigSpec SPEC;
     private static final ForgeConfigSpec.BooleanValue FORCE_REPLACEMENT;
+    private static final ForgeConfigSpec.BooleanValue DIRECTIONAL_SLAB_PLACEMENT;
+    private static boolean directionalSlabPlacement = true;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -26,6 +28,12 @@ public final class BuildingPiecesConfig {
                         "Back up the world before enabling this. Requires restart.",
                         "Recovery is automatic when the original mod is absent.")
                 .worldRestart().define("forceReplaceBuildingBricksPieces", false);
+        builder.pop();
+        builder.push("gameplay");
+        DIRECTIONAL_SLAB_PLACEMENT = builder
+                .comment("Allow regular slabs to be placed vertically with face and edge clicks.",
+                        "Use the same setting on the client and server. Requires a restart.")
+                .worldRestart().define("directionalSlabPlacement", true);
         builder.pop();
         SPEC = builder.build();
     }
@@ -40,6 +48,24 @@ public final class BuildingPiecesConfig {
 
     public static boolean forceReplacement() {
         return FORCE_REPLACEMENT.get();
+    }
+
+    public static void activate() {
+        directionalSlabPlacement = configuredSlabPlacement();
+    }
+
+    public static boolean directionalSlabPlacement() {
+        return directionalSlabPlacement;
+    }
+
+    public static boolean configuredSlabPlacement() {
+        return !SPEC.isLoaded() || DIRECTIONAL_SLAB_PLACEMENT.get();
+    }
+
+    public static void saveForNextStart(boolean directionalSlabs, boolean replaceLegacy) {
+        DIRECTIONAL_SLAB_PLACEMENT.set(directionalSlabs);
+        FORCE_REPLACEMENT.set(replaceLegacy);
+        SPEC.save();
     }
 
     private static void migrateLegacyConfig() {

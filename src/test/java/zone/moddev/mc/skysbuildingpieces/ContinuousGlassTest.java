@@ -95,7 +95,7 @@ class ContinuousGlassTest {
     void bakedWrapperPreservesInventoryBordersAndQuadAttributesWithoutGraphics() {
         JsonObject part = new JsonParser().parse("{\"from\":[5,0,0],\"to\":[5,13,16]}").getAsJsonObject();
         int[] compact = quad(part, "west", 0);
-        int stride = DefaultVertexFormat.BLOCK.getIntegerSize();
+        int stride = DefaultVertexFormat.BLOCK.getVertexSize() / Integer.BYTES;
         int[] data = new int[stride * 4];
 
         for (int vertex = 0; vertex < 4; vertex++) {

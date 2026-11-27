@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/podzol",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:dirt_podzol_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:podzol",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:dirt_podzol_slab"
+  }
+}

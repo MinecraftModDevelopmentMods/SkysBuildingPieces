@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/rooted_dirt_slab",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:rooted_dirt"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:rooted_dirt_slab",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:rooted_dirt_slab"
+  }
+}

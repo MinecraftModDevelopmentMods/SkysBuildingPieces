@@ -73,7 +73,7 @@ class HistoricalBiomeSchemaTest {
         String hash = java.util.HexFormat.of().withUpperCase().formatHex(
                 MessageDigest.getInstance("SHA-256").digest(original));
         assertEquals("1140725D866D437EDEF10E36C898EE8EAAC67D1F4A928F56EE0B0DA8802F1BC4", hash);
-        CompoundTag source = NbtIo.readCompressed(fixture.toFile());
+        CompoundTag source = NbtIo.readCompressed(fixture, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
         byte[] columns = source.getCompound("Level").getByteArray("Biomes");
         if (mixed) {
             // Alternate real mod-biome columns with vanilla IDs whose names changed.
@@ -89,7 +89,8 @@ class HistoricalBiomeSchemaTest {
         Field active = HistoricalBiomes.class.getDeclaredField("active");
         active.setAccessible(true);
         Object previous = active.get(null);
-        try (ChunkStorage storage = new ChunkStorage(temporary, DataFixers.getDataFixer(), false)) {
+        try (ChunkStorage storage = new ChunkStorage(new net.minecraft.world.level.chunk.storage.RegionStorageInfo("test", Level.OVERWORLD, "chunk"),
+                temporary, DataFixers.getDataFixer(), false)) {
             CompoundTag control = storage.upgradeChunkTag(Level.OVERWORLD, () -> null,
                     source.copy(), Optional.empty());
             // This build-only alias stands in for an add-on's registered replacement.

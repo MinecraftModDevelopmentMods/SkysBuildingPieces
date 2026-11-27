@@ -9,17 +9,23 @@ already fit. When Mineralogy is installed, its natural rocks also get matching
 steps and corners automatically. No Mineralogy add-on is needed. Building
 Pieces doesn't generate terrain.
 
+Mycelium, rooted dirt, mud, clay, deepslate, calcite, dripstone and blue ice
+have matching slabs, steps and corners. Tuff steps and corners work with
+Minecraft's own tuff slab.
+
 ## Building with the pieces
 
 - Use the same slab item for horizontal and vertical placement. Click the centre
   of a face to place against it, or near an edge to place along that edge.
-  Breaking a vertical slab returns the regular slab.
+  Breaking a vertical slab returns the regular slab. To use ordinary slab
+  placement, open **Mods → Sky's Building Pieces → Config** and
+  turn off **Directional slab placement**.
 - Sneak while placing a step to turn it vertically. Steps are quarter-block
   pieces; corners are eighth-block pieces.
 - Matching pieces can join into supported larger shapes or a full block.
   Different materials don't combine.
-- Find the pieces, including the vanilla items the mod reuses, in the
-  **Sky's Building Pieces** creative tab.
+- Find the mod's pieces in the **Sky's Building Pieces** creative tab. Vanilla
+  pieces stay in their usual tabs.
 
 Walls have lower panels with posts at ends, corners and junctions. A torch or
 block above keeps a supporting post. Matching glass walls form a continuous
@@ -54,21 +60,21 @@ when Grass Slabs isn't installed.
 
 ## Installation and other Sky mods
 
-For **Minecraft 1.20.1**, use **Forge 47.4.10** and **Java 17**.
+For **Minecraft 1.21.1**, use **Forge 52.1.0** and **Java 21**.
 No other mod is required. Put the main jar in `mods` on both the client and
 server.
 
 You can also add:
 
 - [Sky's Grass Slabs](https://github.com/MinecraftModDevelopmentMods/SkysGrassSlabs)
-  version 1.2.0.120011 or later for horizontal dirt and grass slabs, paths and turf.
+  version 1.2.0.121011 or later for horizontal dirt and grass slabs, paths and turf.
 - [The Biomes O' Plenty add-on](https://github.com/MinecraftModDevelopmentMods/SkysBuildingPieces-BiomesOPlenty-Addon)
   for pieces made from BOP woods, stones and gem blocks.
 - [Sky's Terrain Smoother](https://github.com/MinecraftModDevelopmentMods/SkysTerrainSmoother)
   to use suitable pieces on newly generated slopes and cave floors.
 
-Building Pieces doesn't add wooden walls, horizontal soil slabs, turf or path
-slabs.
+Building Pieces includes horizontal podzol slabs. Grass Slabs supplies the
+separate horizontal dirt and grass slabs, paths and turf.
 
 ## Existing worlds
 

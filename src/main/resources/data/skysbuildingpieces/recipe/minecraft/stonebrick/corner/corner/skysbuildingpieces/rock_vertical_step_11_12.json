@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_vertical_step"
+      }
+    ]
+  }
+}

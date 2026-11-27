@@ -25,6 +25,12 @@ class PackagedNativesTest(unittest.TestCase):
             target.unlink()
             with self.assertRaisesRegex(ValueError, "is missing"):
                 verify_native_libraries(natives, [artifact])
+            flat = natives / Path(name).name
+            flat.write_bytes(b"native fixture")
+            verify_native_libraries(natives, [artifact])
+            flat.write_bytes(b"changed native fixture")
+            with self.assertRaisesRegex(ValueError, "checksum changed"):
+                verify_native_libraries(natives, [artifact])
 
     def test_missing_native_artifacts_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

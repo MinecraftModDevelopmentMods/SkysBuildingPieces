@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_red_slab",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:red_wool"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_red_slab",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_red_slab"
+  }
+}

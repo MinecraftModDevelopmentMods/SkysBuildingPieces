@@ -1,8 +1,8 @@
 # Building and running the mod
 
-This branch targets Minecraft 1.20.1 and Forge 47.4.10. Run the included Gradle
-wrapper with Java 17. Compilation and Minecraft use Java 17; the pinned production
-toolchain is Temurin 17.0.1+12. ForgeGradle uses Java 25 for its Mavenizer tool.
+This branch targets Minecraft 1.21.1 and Forge 52.1.0. Run the included Gradle
+wrapper with Java 21. Compilation and Minecraft use Java 21; the pinned production
+toolchain is Temurin 21.0.7+6. ForgeGradle uses Java 25 for its Mavenizer tool.
 The native log checks and resource helpers use Python 3.11 or later. Keep it on
 the command path, or pass `-PpythonExecutable=<python executable>` to Gradle.
 
@@ -21,16 +21,15 @@ launches. Ordinary client and server launches use processed production resources
 and exclude test classes.
 
 - `runClient` and `runServer` load Building Pieces on its own.
-- `runGrassSlabsClient` and `runGrassSlabsServer` add the coordinated Grass Slabs
-  candidate recorded in `gradle/grass-slabs-release.properties`.
+- `runGrassSlabsClient` and `runGrassSlabsServer` add the released Grass Slabs
+  build recorded in `gradle/grass-slabs-release.properties`.
 - `runMineralogyClient` and `runMineralogyServer` add the optional Mineralogy and
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
-The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs1201/SkysGrassSlabs` checkout,
-or pass `-PgrassSlabsMainJar=<jar>` and `-PgrassSlabsDeobfJar=<jar>`. Both jars must
-match their pinned hashes. CI builds the pinned commit before testing the optional
-integration; it can run after that commit is available in the upstream repository.
+Use the pinned Grass Slabs release. Build its commit in the sibling
+`SkysGrassSlabs1211/SkysGrassSlabs` checkout or point
+`-PgrassSlabsMainJar=<jar>` at the downloaded jar. Both must match
+the pinned hash. CI builds that commit before testing the optional integration.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
 Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each
@@ -65,9 +64,8 @@ identities; the server checks discovery from both inventory and crafting inputs.
 For the optional Mineralogy profiles, first run:
 
 ```text
-gradlew prepareOfficialMineralogyDevelopment -PgenerateOptionalDevelopment=true
+gradlew prepareMineralogyDevelopmentRun
 ```
 
-This makes separate mapped development jars from the two checksum-locked
-production jars. Their native access rules are preserved. Ordinary builds
-and launches remain independent of those optional mods.
+This checks the two pinned jars and copies them into the separate Mineralogy
+run folder. The same jars work in development and in the game.

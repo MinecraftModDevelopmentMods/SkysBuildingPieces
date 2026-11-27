@@ -56,6 +56,9 @@ def verify_native_libraries(directory, artifacts):
                 if not member.lower().endswith(".dll"):
                     continue
                 target = (directory / member).resolve()
+                if not target.is_file():
+                    # Some launchers flatten the extracted native library paths.
+                    target = (directory / Path(member).name).resolve()
                 if not target.is_relative_to(directory.resolve()) or not target.is_file():
                     raise ValueError("Client native library is missing: " + member)
                 if hashlib.sha256(target.read_bytes()).digest() != hashlib.sha256(archive.read(member)).digest():
@@ -66,7 +69,7 @@ def verify_native_libraries(directory, artifacts):
 
 
 def argument_file(java, directory, phase, arguments):
-    # Java 17 argument files avoid Windows' command-line length limit. Quoting
+    # Java argument files avoid Windows' command-line length limit. Quoting
     # each argument also preserves paths containing spaces.
     source = Path(__file__).resolve().parent.parent / "src/bootstrapTest/native-log4j2.xml"
     logging = directory / "native-log4j2.xml"
@@ -82,15 +85,15 @@ def argument_file(java, directory, phase, arguments):
 
 def client_command(options, directory):
     runtime = options.runtime.resolve()
-    base = json.loads((runtime / "versions/1.20.1/1.20.1.json").read_text(encoding="utf-8"))
+    base = json.loads((runtime / "versions/1.21.1/1.21.1.json").read_text(encoding="utf-8"))
     profiles = [runtime / "versions" / name / (name + ".json")
-                for name in ("1.20.1-forge-47.4.10", "forge-47.4.10")]
+                for name in ("1.21.1-forge-52.1.0", "forge-52.1.0")]
     profile = next((path for path in profiles if path.is_file()), None)
     if profile is None:
-        raise ValueError("The installed client has no Forge 47.4.10 profile")
+        raise ValueError("The installed client has no Forge 52.1.0 profile")
     forge = json.loads(profile.read_text(encoding="utf-8"))
-    if base["id"] != "1.20.1" or forge["inheritsFrom"] != "1.20.1":
-        raise ValueError("This launcher requires the verified Forge 47 client metadata")
+    if base["id"] != "1.21.1" or forge["inheritsFrom"] != "1.21.1":
+        raise ValueError("This launcher requires the verified Forge 52 client metadata")
     libraries = {}
     for layer in (base, forge):
         for library in layer["libraries"]:
@@ -106,10 +109,13 @@ def client_command(options, directory):
         path = runtime / "libraries" / artifact["path"]
         if digest(path, "sha1") != artifact["sha1"].upper():
             raise ValueError("Client library checksum changed: " + library["name"])
+        classifier = library["name"].split(":")[-1]
+        if classifier in {"natives-windows-arm64", "natives-windows-x86"}:
+            continue
         classpath.append(path)
-        if library["name"].split(":")[-1] == "natives-windows":
+        if classifier == "natives-windows":
             native_artifacts.append(path)
-    client = runtime / "versions/1.20.1/1.20.1.jar"
+    client = runtime / "versions/1.21.1/1.21.1.jar"
     if digest(client, "sha1") != base["downloads"]["client"]["sha1"].upper():
         raise ValueError("Official client checksum changed")
     classpath.append(client)
@@ -117,7 +123,7 @@ def client_command(options, directory):
     index = assets / "indexes" / (base["assetIndex"]["id"] + ".json")
     if digest(index, "sha1") != base["assetIndex"]["sha1"].upper():
         raise ValueError("The official client asset index is missing or damaged")
-    natives = (options.natives or runtime.parent / (runtime.name + "-natives")).resolve()
+    natives = (options.natives or runtime / "natives" / forge["id"]).resolve()
     verify_native_libraries(natives, native_artifacts)
     substitutions = {
         "library_directory": (runtime / "libraries").as_posix(),
@@ -135,7 +141,7 @@ def client_command(options, directory):
         arguments.append(argument)
     arguments.extend(("-cp", os.pathsep.join(str(path) for path in classpath), forge["mainClass"]))
     arguments.extend(forge["arguments"]["game"])
-    arguments.extend(("--username", "BuildingPiecesChecks", "--version", forge["id"],
+    arguments.extend(("--username", "PiecesChecks", "--version", forge["id"],
                       "--gameDir", str(directory), "--assetsDir", str(assets),
                       "--assetIndex", base["assetIndex"]["id"], "--uuid", "1" * 32,
                       "--accessToken", "0", "--userType", "legacy", "--versionType", "release"))
@@ -145,15 +151,23 @@ def client_command(options, directory):
 def server_command(options, directory):
     runtime = options.runtime.resolve()
     filename = "win_args.txt" if os.name == "nt" else "unix_args.txt"
-    source = runtime / "libraries/net/minecraftforge/forge/1.20.1-47.4.10" / filename
-    arguments = ["-Xmx3g", "-Djava.net.preferIPv4Stack=true",
-                 "-Dskysbuildingpieces.bootstrapPhase=" + options.phase]
-    for argument in shlex.split(source.read_text(encoding="utf-8")):
-        argument = argument.replace("libraries/", (runtime / "libraries").as_posix() + "/")
-        argument = argument.replace("-DlibraryDirectory=libraries",
-                                    "-DlibraryDirectory=" + (runtime / "libraries").as_posix())
-        arguments.append(argument)
-    arguments.append("--nogui")
+    libraries = runtime / "libraries"
+    source = libraries / "net/minecraftforge/forge/1.21.1-52.1.0" / filename
+    launch = shlex.split(source.read_text(encoding="utf-8"))
+    shim = runtime / "forge-1.21.1-52.1.0-shim.jar"
+    if len(launch) != 3 or launch[-2:] != ["-jar", shim.name] or not shim.is_file():
+        raise ValueError("Expected the official Forge 52 server shim")
+    local_libraries = directory / "libraries"
+    if not local_libraries.exists():
+        if os.name == "nt":
+            subprocess.run(["cmd", "/d", "/c", "mklink", "/j", str(local_libraries), str(libraries)],
+                           check=True, capture_output=True)
+        else:
+            local_libraries.symlink_to(libraries, target_is_directory=True)
+    if local_libraries.resolve() != libraries.resolve():
+        raise ValueError("The disposable server is not using the selected Forge installation")
+    arguments = ["-Xmx3g", "-Dskysbuildingpieces.bootstrapPhase=" + options.phase,
+                 launch[0], "-jar", str(shim), "nogui"]
     return argument_file(options.java, directory, options.phase, arguments)
 
 
@@ -186,8 +200,14 @@ def prepare(options, directory):
         configuration = directory / "config/mineralogy-common.toml"
         configuration.parent.mkdir(exist_ok=True)
         configuration.write_text("[options]\nGENERATE_ROCKSLAB=false\n", encoding="utf-8")
+    if options.directional_slabs_off:
+        configuration = directory / "config/skysbuildingpieces-common.toml"
+        configuration.parent.mkdir(exist_ok=True)
+        configuration.write_text("[gameplay]\ndirectionalSlabPlacement=false\n", encoding="utf-8")
     profile = {"persistence_order": options.persistence_order,
                "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
+    if options.directional_slabs_off:
+        profile["directional_slabs_off"] = True
     (directory / "qualification-options.json").write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
     if options.fixture:
         with zipfile.ZipFile(options.fixture) as archive:
@@ -200,6 +220,9 @@ def prepare(options, directory):
         biomes = options.fixture.with_suffix(".biomes.json")
         if biomes.is_file():
             shutil.copyfile(biomes, directory / "forward-biomes.json")
+        renamed_blocks = options.fixture.with_suffix(".forge50-grass-rename.json")
+        if renamed_blocks.is_file():
+            shutil.copyfile(renamed_blocks, directory / "forward-block-renames.json")
         shutil.copyfile(directory / "world/level.dat", directory / "source-level.dat")
 
 
@@ -224,6 +247,7 @@ def main():
         parser.add_argument("--" + option, type=Path, required=True)
     parser.add_argument("--mode", choices=("server", "client"), required=True)
     parser.add_argument("--phase", required=True)
+    parser.add_argument("--directional-slabs-off", action="store_true")
     parser.add_argument("--assets", type=Path)
     parser.add_argument("--natives", type=Path)
     parser.add_argument("--fixture", type=Path)
@@ -240,6 +264,8 @@ def main():
     else:
         profile = {"persistence_order": options.persistence_order,
                    "mineralogy_slabs_disabled": options.mineralogy_slabs_disabled}
+        if options.directional_slabs_off:
+            profile["directional_slabs_off"] = True
         if json.loads((directory / "qualification-options.json").read_text(encoding="utf-8")) != profile:
             raise ValueError("Qualification options changed between loads")
         expected = json.loads((directory / "artifact-inputs.json").read_text(encoding="utf-8"))

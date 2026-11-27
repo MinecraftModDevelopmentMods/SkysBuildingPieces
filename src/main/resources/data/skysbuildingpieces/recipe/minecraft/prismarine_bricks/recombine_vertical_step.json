@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_bricks_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:prismarine_bricks_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:prismarine_bricks_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_vertical_step"
+      }
+    ]
+  }
+}

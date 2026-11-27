@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/netherrack_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:netherrack_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:netherrack_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_slab"
+      }
+    ]
+  }
+}

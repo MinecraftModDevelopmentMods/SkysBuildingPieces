@@ -1,0 +1,39 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:rooted_dirt_corner"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/rooted_dirt/recombine_corner"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/rooted_dirt/recombine_corner"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:rooted_dirt_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:rooted_dirt_horizontal_step"
+      }
+    ]
+  }
+}

@@ -63,6 +63,7 @@ public final class ClientProbe extends ProbeProxy {
             if (startedWorld && ClientStatus.complete && minecraft.level != null && minecraft.getConnection() != null
                     && !minecraft.getConnection().getRecipeManager().getRecipes().isEmpty()) {
                 RecipePreviewModels.check(minecraft);
+                SnowCoverClientChecks.run(minecraft);
                 colours(minecraft);
                 net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(minecraft.level.enabledFeatures(),
                         true, minecraft.level.registryAccess());
@@ -83,6 +84,7 @@ public final class ClientProbe extends ProbeProxy {
         try {
             org.lwjgl.glfw.GLFW.glfwHideWindow(minecraft.getWindow().getWindow());
 
+            ConfigScreenChecks.run(minecraft);
             var availableCreative = PiecesTab.entries();
 
             for (net.minecraft.world.item.Item retired : Pieces.RETIRED_TEMPLATES.values()) {
@@ -131,8 +133,8 @@ public final class ClientProbe extends ProbeProxy {
                     throw new AssertionError("Retired template in mod tab");
                 }
             }
-            if (!entries.contains("minecraft:oak_slab")) {
-                throw new AssertionError("Reused oak slab missing from mod tab");
+            if (entries.stream().anyMatch(key -> key.startsWith("minecraft:"))) {
+                throw new AssertionError("Vanilla content appears in the Building Pieces tab");
             }
             if (entries.contains("skysbuildingpieces:legacy_piece_holder")) {
                 throw new AssertionError("Recovery holder in mod tab");
@@ -148,7 +150,7 @@ public final class ClientProbe extends ProbeProxy {
 
             int checked = 0;
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.registeredBlocks()) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     BakedModel model = minecraft.getBlockRenderer().getBlockModel(state);
 
@@ -174,7 +176,7 @@ public final class ClientProbe extends ProbeProxy {
             for (String name : new String[] { "stone_formations", "jelled_poison", "legacy_bop_stone_formations",
                     "legacy_bop_jelled_poison", "legacy_bop_tree_moss" }) {
                 net.minecraft.world.level.block.Block block = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                        .getValue(new net.minecraft.resources.ResourceLocation("skysbuildingpiecesbop:" + name));
+                        .getValue(net.minecraft.resources.ResourceLocation.parse("skysbuildingpiecesbop:" + name));
 
                 if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
                     continue;
@@ -201,7 +203,7 @@ public final class ClientProbe extends ProbeProxy {
                     "skysbuildingpiecesbop:retired_rocks", "skysbuildingpiecesbop:legacy_bop_stone",
                     "skysbuildingpiecesbop:legacy_bop_crag_rock" }) {
                 net.minecraft.world.level.block.Block block = net.minecraftforge.registries.ForgeRegistries.BLOCKS
-                        .getValue(new net.minecraft.resources.ResourceLocation(name));
+                        .getValue(net.minecraft.resources.ResourceLocation.parse(name));
 
                 if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
                     continue;
@@ -240,7 +242,7 @@ public final class ClientProbe extends ProbeProxy {
                 startedWorld = true;
                 worldStarted = System.nanoTime();
                 if (new File(minecraft.gameDirectory, "saves/building-pieces-world/level.dat").isFile()) {
-                    minecraft.createWorldOpenFlows().loadLevel(new net.minecraft.client.gui.screens.TitleScreen(), "building-pieces-world");
+                    minecraft.createWorldOpenFlows().openWorld("building-pieces-world", () -> minecraft.setScreen(new net.minecraft.client.gui.screens.TitleScreen()));
                 } else {
                     net.minecraft.world.level.LevelSettings settings = new net.minecraft.world.level.LevelSettings(
                             "Building Pieces Test", net.minecraft.world.level.GameType.CREATIVE, false,
@@ -248,7 +250,7 @@ public final class ClientProbe extends ProbeProxy {
                             net.minecraft.world.level.WorldDataConfiguration.DEFAULT);
                     minecraft.createWorldOpenFlows().createFreshLevel("building-pieces-world", settings,
                             new net.minecraft.world.level.levelgen.WorldOptions(4815162342L, false, false),
-                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions);
+                            net.minecraft.world.level.levelgen.presets.WorldPresets::createNormalWorldDimensions, minecraft.screen);
                 }
             }
         } catch (Throwable failure) {
@@ -300,7 +302,7 @@ public final class ClientProbe extends ProbeProxy {
         int inventory = net.minecraft.world.level.GrassColor.get(.5, 1);
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (!block.palette.group.equals("grass")) {
                 continue;
             }

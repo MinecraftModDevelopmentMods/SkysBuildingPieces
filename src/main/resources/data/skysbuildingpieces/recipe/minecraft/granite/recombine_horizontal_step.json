@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/granite_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:granite_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "minecraft:granite_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:granite_horizontal_step"
+  }
+}

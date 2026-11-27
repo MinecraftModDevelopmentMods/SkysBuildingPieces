@@ -16,8 +16,9 @@ class RecipeAdvancementContractTest {
     void everyNativeRecipeHasMatchingVisibleBookIngredientsAndConditionalUnlocks() throws Exception {
         Path root = Paths.get("src/main/resources/data/skysbuildingpieces");
         int checked = 0;
+        Map<String, String> bookResults = new java.util.HashMap<>();
 
-        try (java.util.stream.Stream<Path> files = Files.walk(root.resolve("recipes"))) {
+        try (java.util.stream.Stream<Path> files = Files.walk(root.resolve("recipe"))) {
             for (Path path : (Iterable<Path>) files.filter(file -> file.toString().endsWith(".json"))::iterator) {
                 JsonObject recipe = read(path);
 
@@ -25,13 +26,13 @@ class RecipeAdvancementContractTest {
                     continue;
                 }
 
-                String relative = root.resolve("recipes").relativize(path).toString().replace('\\', '/');
+                String relative = root.resolve("recipe").relativize(path).toString().replace('\\', '/');
                 String id = "skysbuildingpieces:" + relative.substring(0, relative.length() - 5);
-                JsonObject advancement = read(root.resolve("advancements/recipes").resolve(relative));
+                JsonObject advancement = read(root.resolve("advancement/recipes").resolve(relative));
 
                 assertFalse(advancement.has("parent"), "Large recipe catalogues have independent hidden unlocks");
                 assertEquals(id, advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString());
-                assertEquals(recipe.get("conditions"), advancement.get("conditions"));
+                assertEquals(recipe.get("forge:condition"), advancement.get("forge:condition"));
 
                 JsonObject criteria = advancement.getAsJsonObject("criteria");
 
@@ -46,6 +47,12 @@ class RecipeAdvancementContractTest {
                 assertEquals(criteria.size(),
                         advancement.getAsJsonArray("requirements").get(0).getAsJsonArray().size());
                 assertTrue(recipe.getAsJsonObject("result").get("count").getAsInt() > 0);
+                String group = recipe.get("group").getAsString();
+                String result = recipe.getAsJsonObject("result").get("id").getAsString();
+                assertFalse(group.isBlank(), "Each result has a recipe-book button");
+                String previous = bookResults.putIfAbsent(group, result);
+                assertTrue(previous == null || previous.equals(result),
+                        "Different results must not cycle through one button: " + group);
 
                 for (Map.Entry<String, JsonElement> key : recipe.getAsJsonObject("key").entrySet()) {
                     assertFalse(key.getValue().getAsJsonObject().has("data"), "Flat item identity replaces metadata");

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/dark_oak_planks",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:dark_oak_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:dark_oak_planks",
+    "count": 1
+  }
+}

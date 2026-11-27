@@ -28,7 +28,7 @@ final class SourceLevelData {
 
         if (Files.isRegularFile(level)) {
             try (InputStream input = Files.newInputStream(level)) {
-                CompoundTag root = NbtIo.readCompressed(input);
+                CompoundTag root = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
                 captured.putInt("DataVersion", root.getCompound("Data").getInt("DataVersion"));
                 CompoundTag registries = root.getCompound("fml").getCompound("Registries");
                 CompoundTag biomes = registries.getCompound("minecraft:worldgen/biome");

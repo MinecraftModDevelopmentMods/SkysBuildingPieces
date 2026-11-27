@@ -1,0 +1,29 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_cyan_horizontal_step",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_cyan_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_cyan_horizontal_step",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_cyan_horizontal_step"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_cyan_vertical_step"
+      }
+    ]
+  }
+}

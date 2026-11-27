@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/chiseled_sandstone_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:chiseled_sandstone_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:chiseled_sandstone_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:chiseled_sandstone_horizontal_step"
+      }
+    ]
+  }
+}

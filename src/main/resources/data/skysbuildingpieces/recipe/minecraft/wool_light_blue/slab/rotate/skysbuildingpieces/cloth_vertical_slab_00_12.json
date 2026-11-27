@@ -1,0 +1,29 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_light_blue_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_light_blue_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_light_blue_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_light_blue_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_light_blue_vertical_slab"
+      }
+    ]
+  }
+}

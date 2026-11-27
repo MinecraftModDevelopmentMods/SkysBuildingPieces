@@ -25,7 +25,6 @@ import net.minecraft.core.*;
 import net.minecraft.resources.*;
 import net.minecraft.core.*;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import zone.moddev.mc.skysbuildingpieces.catalogue.*;
 import zone.moddev.mc.skysbuildingpieces.content.*;
 
@@ -47,6 +46,35 @@ public final class GameplayChecks {
         world.setChunkForced(FIXTURE_POSITION.getX() >> 4, FIXTURE_POSITION.getZ() >> 4, false);
     }
 
+    static void horizontalSlabsOnly(ServerLevel world) {
+        ServerPlayer player = NativeProbeItems.player(world);
+        player.getAbilities().instabuild = false;
+        BlockPos support = FIXTURE_POSITION;
+        BlockPos placed = support.east();
+        world.setBlock(support, Blocks.STONE.defaultBlockState(), 3);
+        for (ItemStack slabs : List.of(new ItemStack(net.minecraft.world.item.Items.OAK_SLAB, 2),
+                Pieces.stack(Pieces.state("minecraft:glass", Shape.SLAB, 1), 2))) {
+            world.removeBlock(placed, false);
+            require(use(slabs, player, world, support, InteractionHand.MAIN_HAND,
+                    Direction.EAST, 1, .25f, .5f).consumesAction(), "Horizontal slab placement failed");
+            BlockState state = world.getBlockState(placed);
+            require(state.is(Blocks.OAK_SLAB)
+                    ? state.getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                            == net.minecraft.world.level.block.state.properties.SlabType.BOTTOM
+                    : state.getBlock() instanceof PieceBlock piece && piece.palette.shape == Shape.SLAB
+                            && piece.orientation(state) == 1,
+                    "Slab placement still chooses a vertical face with the setting off: " + state);
+            require(slabs.getCount() == 1, "Placing a slab should consume one item");
+            require(use(slabs, player, world, placed, InteractionHand.MAIN_HAND,
+                    Direction.UP, .5f, .5f, .5f).consumesAction(), "Matching horizontal slabs did not join");
+            require(slabs.isEmpty() && (state.is(Blocks.OAK_SLAB)
+                    ? world.getBlockState(placed).getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                            == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE
+                    : world.getBlockState(placed).is(Blocks.GLASS)), "Horizontal slab join changed the full block");
+        }
+        System.out.println("BUILDING_PIECES_DIRECTIONAL_SLABS_OFF_PASS");
+    }
+
     private static InteractionResult use(ItemStack stack, ServerPlayer player, ServerLevel world, BlockPos pos,
             InteractionHand hand, Direction face, float hitX, float hitY, float hitZ) {
         player.setItemInHand(hand, stack);
@@ -55,7 +83,7 @@ public final class GameplayChecks {
     }
 
     public static void run(ServerLevel world) {
-        ServerPlayer player = FakePlayerFactory.getMinecraft(world);
+        ServerPlayer player = NativeProbeItems.player(world);
 
         player.getAbilities().instabuild = false;
 
@@ -84,7 +112,7 @@ public final class GameplayChecks {
 
         int placed = 0;
 
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
+        for (PieceBlock pieceBlock : Pieces.playableBlocks()) {
             ItemStack item = Pieces.stack(pieceBlock.getStateFromMeta(0), 2);
 
             world.removeBlock(position, false);
@@ -218,7 +246,7 @@ public final class GameplayChecks {
                 BlockState grass = Pieces.state("minecraft:grass", shape, orientation);
 
                 world.setBlock(position, grass, 2);
-                grass.getBlock().tick(grass, world, position, net.minecraft.util.RandomSource.create(0));
+                grass.tick(world, position, net.minecraft.util.RandomSource.create(0));
                 require(world.getBlockState(position).equals(Pieces.state("minecraft:dirt", shape, orientation)),
                         "covered grass decay preserves geometry: " + shape + " / " + orientation + " became "
                                 + world.getBlockState(position));
@@ -298,7 +326,7 @@ public final class GameplayChecks {
 
         // Real BlockItem calls against a solid neighbour: centre plus four edges, all six faces, every custom
         // horizontal slab material and both sneak modes.
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.SLAB) {
                 for (int slot = 0; slot < block.palette.materials.size(); slot++) {
                     for (Direction face : Direction.values()) {
@@ -342,7 +370,12 @@ public final class GameplayChecks {
 
                                 // Exercise this registered Sky item directly. Drops and recipes may reuse a native
                                 // slab, whose placement belongs to BuildingBricks while that mod is installed.
-                                ItemStack stack = ownSlab(block, block.palette.materials.get(slot));
+                                String material = block.palette.materials.get(slot);
+                                if (Pieces.state(material, Shape.VERTICAL_SLAB, 0) == null) {
+                                    expected = face == Direction.DOWN || face.getAxis().isHorizontal() && hitY > .5f
+                                            ? Direction.UP : Direction.DOWN;
+                                }
+                                ItemStack stack = ownSlab(block, material);
 
                                 require(use(stack, player, world, anchor, InteractionHand.MAIN_HAND, face, hitX, hitY,
                                         hitZ) == InteractionResult.SUCCESS,
@@ -350,7 +383,7 @@ public final class GameplayChecks {
                                 require(world.getBlockState(position)
                                         .equals(Pieces.state(block.palette.materials.get(slot), slabShape(expected),
                                                 slabOrientation(expected))),
-                                        "slab selects correct half " + face + " " + click);
+                                        "slab selects correct half " + material + " " + face + " " + click);
                                 require(stack.getCount() == 1 && world.getBlockState(anchor).getBlock() == Blocks.STONE,
                                         "one item consumed; supporting block intact");
                                 checked++;
@@ -463,13 +496,19 @@ public final class GameplayChecks {
             for (Item tool : new Item[] {Items.WOODEN_PICKAXE, Items.STONE_PICKAXE,
                     Items.IRON_PICKAXE, Items.DIAMOND_PICKAXE, Items.IRON_AXE, Items.IRON_SHOVEL}) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(tool));
-                require(piece.canHarvestBlock(world, position, player) == full.canHarvestBlock(world, position, player),
+                boolean snowPiece = piece.getBlock() instanceof PieceBlock block
+                        && block.definition(piece).type.equals("snow");
+                require(piece.canHarvestBlock(world, position, player)
+                                == (snowPiece || full.canHarvestBlock(world, position, player)),
                         "Material harvest requirements changed: " + piece + " with " + tool);
                 float pieceHardness = piece.getDestroySpeed(world, position);
                 float fullHardness = full.getDestroySpeed(world, position);
                 float expected = full.getDestroyProgress(player, world, position);
                 if (pieceHardness >= 0 && fullHardness > 0) {
                     expected = expected * fullHardness / pieceHardness;
+                }
+                if (snowPiece) {
+                    expected = player.getDestroySpeed(full, position) / pieceHardness / 30;
                 }
                 float actual = piece.getDestroyProgress(player, world, position);
                 require(Float.compare(actual, expected) == 0 || Math.abs(actual - expected) < 0.00001F,
@@ -481,7 +520,7 @@ public final class GameplayChecks {
     }
 
     private static void materialPhysics(ServerLevel world, BlockPos position, ServerPlayer player) {
-        for (PieceBlock pieceBlock : Pieces.BLOCKS.values()) {
+        for (PieceBlock pieceBlock : Pieces.playableBlocks()) {
             for (int slot = 0; slot < pieceBlock.palette.materials.size(); slot++) {
                 for (int orientation = 0; orientation < pieceBlock.palette.shape.states; orientation++) {
                     BlockState state = pieceBlock
@@ -511,7 +550,9 @@ public final class GameplayChecks {
 
                     ItemStack silkTool = new ItemStack(Items.DIAMOND_PICKAXE);
 
-                    silkTool.enchant(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, 1);
+                    silkTool.enchant(world.registryAccess()
+                            .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                            .getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH), 1);
 
                     BlockState silkState = materialDefinition.type.equals("path")
                             ? Pieces.state("minecraft:dirt", pieceBlock.palette.shape, orientation)
@@ -534,7 +575,7 @@ public final class GameplayChecks {
                                 "material drop and metadata");
                     }
                     if (materialDefinition.soil()) {
-                        for (Block plant : new Block[] { Blocks.GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
+                        for (Block plant : new Block[] { Blocks.SHORT_GRASS, Blocks.OAK_SAPLING, Blocks.RED_MUSHROOM }) {
                             BlockState full = Pieces.nativeState(materialDefinition, "full");
                             boolean nativeSupport = full.getBlock().canSustainPlant(full, world, position, Direction.UP,
                                     (net.minecraftforge.common.IPlantable) plant);
@@ -563,7 +604,7 @@ public final class GameplayChecks {
             }
 
             Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                    .getValue(new ResourceLocation("skysgrassslabs:dirt_slab"));
+                    .getValue(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
 
             if (material.equals("minecraft:dirt") && dirt != null && dirt != Items.AIR) {
                 return new ItemStack(dirt, 1);
@@ -583,7 +624,7 @@ public final class GameplayChecks {
     private static void nativeSlabs(ServerLevel world, BlockPos position, ServerPlayer player) {
         int checked = 0;
 
-        for (PieceBlock block : Pieces.BLOCKS.values()) {
+        for (PieceBlock block : Pieces.playableBlocks()) {
             if (block.palette.shape == Shape.VERTICAL_SLAB) {
                 NonNullList<ItemStack> creative = NonNullList.create();
 
@@ -596,7 +637,7 @@ public final class GameplayChecks {
         }
 
         Item dirt = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                .getValue(new ResourceLocation("skysgrassslabs:dirt_slab"));
+                .getValue(ResourceLocation.parse("skysgrassslabs:dirt_slab"));
 
         if (dirt != null && dirt != Items.AIR) {
             for (Direction occupied : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
@@ -629,12 +670,16 @@ public final class GameplayChecks {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(veto);
 
         try {
-            require(use(oak, player, world, position.below(), InteractionHand.MAIN_HAND, Direction.UP, .1f, 1,
-                    .5f) != InteractionResult.SUCCESS && veto.seen && world.isEmptyBlock(position) && oak.getCount() == 2,
+            InteractionResult result = use(oak, player, world, position.below(), InteractionHand.MAIN_HAND,
+                    Direction.UP, .1f, 1, .5f);
+            // Forge 50 restores the hand with a copy of the original stack.
+            require(result == InteractionResult.FAIL && veto.seen && world.isEmptyBlock(position)
+                            && ItemStack.matches(player.getMainHandItem(), new ItemStack(Blocks.OAK_SLAB, 2)),
                     "Forge placement protection rolls back the exact native slab placement");
         } finally {
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);
         }
+        oak = player.getMainHandItem();
 
         clearAround(world, position);
         world.setBlock(position, Blocks.OAK_TRAPDOOR.defaultBlockState(), 2);
@@ -689,7 +734,7 @@ public final class GameplayChecks {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 
                     tag.putString("custom_label", "Preserved slab");
-                    stack.setTag(tag);
+                    zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.setCustom(stack, tag);
                     player.setItemInHand(hand, stack);
                     InteractionResult placement = use(stack, player, world, anchor, hand, face, hitX,
                             face == Direction.UP ? 1 : 0, hitZ);
@@ -698,7 +743,7 @@ public final class GameplayChecks {
                     require(world.getBlockState(position)
                             .equals(Pieces.state(material.id, slabShape(occupied), slabOrientation(occupied))),
                             "native slab selects six orientations " + material.id);
-                    require(stack.getCount() == 2 && tag.equals(stack.getTag()),
+                    require(stack.getCount() == 2 && tag.equals(zone.moddev.mc.skysbuildingpieces.probe.NativeProbeItems.custom(stack)),
                             "native hook consumes once and preserves NBT");
                     require(use(stack, player, world, position, hand, occupied.getOpposite(), .5f, .5f,
                             .5f).consumesAction(),

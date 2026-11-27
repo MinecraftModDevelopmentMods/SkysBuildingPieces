@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_pink_slab",
+  "pattern": ["XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:pink_wool"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_pink_slab",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_pink_slab"
+  }
+}

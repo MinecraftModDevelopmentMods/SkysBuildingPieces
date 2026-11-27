@@ -8,7 +8,21 @@ import re
 
 def validate_registry_proofs(root, profile):
     """Keep registry notices tied to this fixture and its complete native audit."""
-    for key in ("static_biome_contract", "retired_poi_contract", "forge47_unused_registry_contract"):
+    block_proof = profile.get("native_block_rename_contract")
+    if block_proof is not None:
+        path = Path(root) / block_proof["path"]
+        data = json.loads(path.read_text(encoding="utf-8"))
+        positions = data["positions"]
+        if (hashlib.sha256(path.read_bytes()).hexdigest().upper() != block_proof["sha256"]
+                or data["source_world_sha256"] != profile["sha256"]
+                or data["source"] != block_proof["source"]
+                or data["target"] != block_proof["target"]
+                or data["source"] not in profile["mappings"]["minecraft:block"]
+                or data["checked_positions"] != block_proof["checked_positions"]
+                or len({tuple(position) for position in positions}) != data["checked_positions"]):
+            raise ValueError("The saved block rename does not match the fixture")
+    for key in ("static_biome_contract", "retired_poi_contract",
+                "forge47_unused_registry_contract", "forge50_unused_registry_contract"):
         receipt = profile.get(key)
         if receipt is None:
             continue
@@ -24,7 +38,7 @@ def validate_registry_proofs(root, profile):
                     or proof["native_renamed_cells"] != biomes["renamed_cells"]
                     or proof["snapshot_entries"] != profile["mappings"]["minecraft:worldgen/biome"]):
                 raise ValueError("The static biome snapshot lacks its complete conversion proof")
-        elif key == "forge47_unused_registry_contract":
+        elif key in {"forge47_unused_registry_contract", "forge50_unused_registry_contract"}:
             entries = proof["snapshot_entries"]
             names = {name for registry in entries.values() for name in registry}
             if (not names or proof["inspected_nbt_values"] <= 0
@@ -32,7 +46,7 @@ def validate_registry_proofs(root, profile):
                     or proof["saved_uses"] != dict.fromkeys(names, 0)
                     or any(profile["mappings"].get(registry, {}).get(name) != numeric_id
                            for registry, values in entries.items() for name, numeric_id in values.items())):
-                raise ValueError("The additional Forge 47 entries are not proven unused")
+                raise ValueError("The additional Forge registry entries are not proven unused")
         elif (proof["inspected_nbt_values"] <= 0
                 or proof["saved_uses"] != {"minecraft:nitwit": 0, "minecraft:unemployed": 0}
                 or proof["snapshot_entries"] != {"minecraft:point_of_interest_type":
@@ -70,10 +84,30 @@ def profile_for(directory):
                 or profile["saved_uses"] != proof["renamed_cells"]):
             raise ValueError("The native biome contract does not match this source fixture")
     validate_registry_proofs(root, profile)
+    receipt = profile.get("forge52_registry_contract")
+    if receipt is not None:
+        path = root / receipt["path"]
+        raw = path.read_bytes()
+        proof = json.loads(raw)
+        if (hashlib.sha256(raw).hexdigest().upper() != receipt["sha256"]
+                or proof["source_world_sha256"] != profile["sha256"]
+                or proof["inspected_nbt_records"] <= 0
+                or not proof["snapshot_entries"]):
+            raise ValueError("The Forge 52 registry proof does not match this fixture")
+        # Forge 52 drops a different set of static snapshot entries. Its
+        # exact set has its own proof; older proofs still cover native data fixes.
+        profile = {**profile, "mappings": proof["snapshot_entries"]}
     return profile
 
 
 def audit_biome_proof(text, profile):
+    block_proof = profile.get("native_block_rename_contract") if profile else None
+    if block_proof is not None:
+        marker = ("BUILDING_PIECES_NATIVE_BLOCK_RENAME_PASS source=" + block_proof["source"]
+                  + " target=" + block_proof["target"] + " positions="
+                  + str(block_proof["checked_positions"]))
+        if not any(line.endswith(marker) for line in text.splitlines()):
+            raise ValueError("The complete native block rename was not verified")
     proof = profile.get("native_biome_contract") if profile else None
     if proof is None:
         return
@@ -92,7 +126,7 @@ def audit_text(text, profile=None):
         for row in body.splitlines():
             if not row.strip():
                 continue
-            entry = re.fullmatch(r"\s*(minecraft:[a-z_.]+): (\d+)", row)
+            entry = re.fullmatch(r"\s*(minecraft:[a-z0-9_./-]+): (\d+)", row)
             if not entry or entry[1] in entries:
                 raise ValueError("Malformed or repeated registry entry: " + row)
             entries[entry[1]] = int(entry[2])

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_cracked_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stonebrick_cracked_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_cracked_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_cracked_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:stonebrick_cracked_vertical_step"
+      }
+    ]
+  }
+}

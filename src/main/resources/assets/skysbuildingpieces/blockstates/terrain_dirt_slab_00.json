@@ -1,0 +1,76 @@
+{
+  "variants": {
+    "meta=0,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_0_dry"
+    },
+    "meta=0,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_0_dry"
+    },
+    "meta=0,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_0_snow"
+    },
+    "meta=0,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_0_snow"
+    },
+    "meta=1,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_1_dry"
+    },
+    "meta=1,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_1_dry"
+    },
+    "meta=1,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_1_snow"
+    },
+    "meta=1,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/dirt_mycelium_slab_1_snow"
+    },
+    "meta=2,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_dry"
+    },
+    "meta=2,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_dry"
+    },
+    "meta=2,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_snow"
+    },
+    "meta=2,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_0_snow"
+    },
+    "meta=3,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_dry"
+    },
+    "meta=3,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_dry"
+    },
+    "meta=3,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_snow"
+    },
+    "meta=3,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/rooted_dirt_slab_1_snow"
+    },
+    "meta=4,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/mud_slab_0_dry"
+    },
+    "meta=4,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/mud_slab_0_dry"
+    },
+    "meta=4,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/mud_slab_0_snow"
+    },
+    "meta=4,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/mud_slab_0_snow"
+    },
+    "meta=5,snowy=false,waterlogged=false": {
+      "model": "skysbuildingpieces:block/mud_slab_1_dry"
+    },
+    "meta=5,snowy=false,waterlogged=true": {
+      "model": "skysbuildingpieces:block/mud_slab_1_dry"
+    },
+    "meta=5,snowy=true,waterlogged=false": {
+      "model": "skysbuildingpieces:block/mud_slab_1_snow"
+    },
+    "meta=5,snowy=true,waterlogged=true": {
+      "model": "skysbuildingpieces:block/mud_slab_1_snow"
+    }
+  }
+}

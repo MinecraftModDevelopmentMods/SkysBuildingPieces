@@ -22,7 +22,7 @@ public final class Catalogue {
         Module core = registerModule("vanilla", "skysbuildingpieces", read(Catalogue.class, ROOT + "materials.json"),
                 read(Catalogue.class, ROOT + "palettes.json"), 255);
 
-        if (core.palettes.size() != 237 || core.palettes.size() + 1 > 256) {
+        if (core.palettes.size() != 251 || core.palettes.size() + 1 > 256) {
             throw new IllegalStateException("Core block budget exceeded");
         }
     }
@@ -115,8 +115,18 @@ public final class Catalogue {
     }
 
     public static boolean supportsShape(MaterialDef definition, Shape shape) {
-        return !definition.soil() || !(shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB)
-                || shape == Shape.VERTICAL_SLAB && definition.id.equals("minecraft:dirt");
+        if (!definition.soil()) {
+            return true;
+        }
+        return switch (shape) {
+            case SLAB -> switch (definition.id) {
+                case "minecraft:dirt_podzol", "minecraft:dirt_mycelium", "minecraft:rooted_dirt", "minecraft:mud",
+                        "minecraft:clay", "biomesoplenty:origin_grass_block" -> true;
+                default -> false;
+            };
+            case VERTICAL_SLAB -> definition.id.equals("minecraft:dirt");
+            default -> true;
+        };
     }
 
     public String moduleFor(String material) {
@@ -297,6 +307,20 @@ public final class Catalogue {
 
         public String registryId() {
             return namespace + ":" + id;
+        }
+
+        private Palette(Palette source, String id, String material) {
+            module = source.module;
+            namespace = source.namespace;
+            this.id = id;
+            group = source.group;
+            shape = source.shape;
+            materials = List.of(material);
+        }
+
+        /** Carry the catalogue's shape and material rules into a single registered block. */
+        public Palette forMaterial(String id, String material) {
+            return new Palette(this, id, material);
         }
 
         /** The material slot is permanent; orientation occupies the values within that slot. */

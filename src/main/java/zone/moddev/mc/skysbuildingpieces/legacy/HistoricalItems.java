@@ -25,6 +25,10 @@ public final class HistoricalItems {
         RECOVERIES.register(module, relevant, recovery);
     }
 
+    static boolean hasContributors() {
+        return RECOVERIES.hasContributors();
+    }
+
     /** No copy or traversal is added to standalone runs without contributors. */
     static CompoundTag prepareCopy(CompoundTag root) {
         return RECOVERIES.prepareCopy(root);
@@ -41,7 +45,28 @@ public final class HistoricalItems {
         }
     }
 
+    static boolean isStack(CompoundTag tag) {
+        return tag.contains("id", 8) && (tag.contains("Count", 99)
+                || tag.contains("count", 99) || tag.contains("components", 10));
+    }
+
+    static int stackCount(CompoundTag stack) {
+        if (stack.contains("count", 99)) {
+            return stack.getInt("count");
+        }
+        return stack.contains("Count", 99) ? stack.getByte("Count") & 255 : 1;
+    }
+
+    static CompoundTag customData(CompoundTag stack) {
+        CompoundTag components = stack.getCompound("components");
+        return components.contains("minecraft:custom_data", 10)
+                ? components.getCompound("minecraft:custom_data") : stack.getCompound("tag");
+    }
+
     static void preserveNativeItem(CompoundTag stack) {
+        if (!stack.contains("Count", 99)) {
+            return;
+        }
         String name = stack.getString("id");
         if (name.equals("minecraft:stone_slab") || name.equals("minecraft:stone_stairs")) {
             stack.putString(NATIVE_ITEM_ID, name);
@@ -60,7 +85,9 @@ public final class HistoricalItems {
         collectNativeTargets(root, stacks, states, 0);
 
         for (CompoundTag stack : stacks) {
-            stack.putString("id", stack.getString(NATIVE_ITEM_ID));
+            String target = stack.getString(NATIVE_ITEM_ID);
+            // Grass was renamed after older contributors started preserving this identity.
+            stack.putString("id", target.equals("minecraft:grass") ? "minecraft:short_grass" : target);
             stack.remove(NATIVE_ITEM_ID);
         }
         for (CompoundTag state : states) {
@@ -82,10 +109,10 @@ public final class HistoricalItems {
                 // our recovery selected, leaving ordinary old vanilla items to their normal fixers.
                 String target = compound.getString(NATIVE_ITEM_ID);
                 if (!compound.contains(NATIVE_ITEM_ID, 8)
-                        || !(target.equals("minecraft:grass") || target.equals("minecraft:stone_slab")
+                        || !(target.equals("minecraft:grass") || target.equals("minecraft:short_grass")
+                                || target.equals("minecraft:stone_slab")
                                 || target.equals("minecraft:stone_stairs"))
-                        || !compound.contains("id", 8)
-                        || !compound.contains("Count", 99)) {
+                        || !compound.contains("id", 8)) {
                     throw new LegacyBridge.RecoveryAbort("Invalid pending native item recovery", null);
                 }
 

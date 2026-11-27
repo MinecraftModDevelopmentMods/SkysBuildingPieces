@@ -1,0 +1,29 @@
+{
+  "type": "skysbuildingpieces:cutting",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/netherrack_slab",
+  "pattern": ["X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:netherrack_vertical_slab"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:netherrack_slab",
+    "count": 1
+  },
+  "preserve_tag": true,
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:netherrack_vertical_slab"
+      }
+    ]
+  }
+}

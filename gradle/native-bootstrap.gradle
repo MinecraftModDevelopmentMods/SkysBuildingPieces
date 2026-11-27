@@ -13,6 +13,7 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     dependsOn tasks.named('classes')
     source fileTree('src/bootstrapTest/java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PersistenceRegistrationChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeProbeItems.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/GameplayChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PathChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/SharedGrassChecks.java')
@@ -20,17 +21,22 @@ def compileBootstrap = tasks.register('compileNativeBootstrapProbe', JavaCompile
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeBookChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/PresentationChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientProbe.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ConfigScreenChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ClientStatus.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/ProbeProxy.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipePreviewModels.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/MineralogyChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/RecipeChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeLegacyChecks.java')
+    source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/LiveInventoryRecoveryChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/NativeBiomeChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/WaterloggingChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/DirtCoverageChecks.java')
     source file('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/CoverageContributor.java')
     source fileTree('src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/legacy')
+    ['FuelChecks', 'StandaloneLifecycleChecks', 'SurvivalDropChecks', 'SnowCoverClientChecks'].each { helper ->
+        source file("src/integrationTest/java/zone/moddev/mc/skysbuildingpieces/probe/${helper}.java")
+    }
     classpath = files(sourceSets.main.output, sourceSets.main.runtimeClasspath)
     destinationDirectory = bootstrapClasses
 }
@@ -42,12 +48,7 @@ def bootstrapJar = tasks.register('nativeBootstrapProbeJar', Jar) {
     from 'src/bootstrapTest/resources'
 }
 
-def packagedBootstrap = renamer.classes(bootstrapJar) {
-    map.from minecraft.dependency.toSrgFile
-    libraries.from tasks.named('jar', Jar).flatMap { it.archiveFile }
-    libraries.from sourceSets.main.compileClasspath
-    output = layout.buildDirectory.file('native-bootstrap-probe/building-pieces-native-checks-reobf.jar')
-}
+def packagedBootstrap = bootstrapJar
 tasks.register('preparePackagedNativeProbe') { dependsOn packagedBootstrap }
 def bootstrapRunName = providers.gradleProperty('nativeBootstrapRunName')
         .getOrElse('native-bootstrap-test-run')

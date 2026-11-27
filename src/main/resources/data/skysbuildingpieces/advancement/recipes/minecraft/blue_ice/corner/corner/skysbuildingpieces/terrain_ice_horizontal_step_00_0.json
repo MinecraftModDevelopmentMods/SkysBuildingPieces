@@ -1,0 +1,39 @@
+{
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["skysbuildingpieces:blue_ice_horizontal_step"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "skysbuildingpieces:minecraft/blue_ice/corner/corner/skysbuildingpieces/terrain_ice_horizontal_step_00_0"
+      }
+    }
+  },
+  "requirements": [
+    ["has_ingredient", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["skysbuildingpieces:minecraft/blue_ice/corner/corner/skysbuildingpieces/terrain_ice_horizontal_step_00_0"]
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:blue_ice_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:blue_ice_horizontal_step"
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/phyllite_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:mineralogy_phyllite_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "mineralogy:phyllite_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:phyllite_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:mineralogy_phyllite_horizontal_step"
+      }
+    ]
+  }
+}

@@ -1,15 +1,16 @@
 package zone.moddev.mc.skysbuildingpieces.content;
 
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraftforge.registries.ForgeRegistries;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
@@ -21,14 +22,14 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     public static final SimpleCraftingRecipeSerializer<LegacyPieceRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(
             LegacyPieceRecipe::new);
 
-    public LegacyPieceRecipe(ResourceLocation id, CraftingBookCategory category) {
-        super(id, category);
+    public LegacyPieceRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
-    private ItemStack result(CraftingContainer inventory) {
+    private ItemStack result(CraftingInput inventory) {
         ItemStack source = ItemStack.EMPTY;
 
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+        for (int slot = 0; slot < inventory.size(); slot++) {
             ItemStack stack = inventory.getItem(slot);
 
             if (!stack.isEmpty()) {
@@ -50,11 +51,12 @@ public final class LegacyPieceRecipe extends CustomRecipe {
         } else {
             String identity = ForgeRegistries.ITEMS.getKey(source.getItem()).toString();
 
-            if (!LegacyMapping.owned(identity) || !source.hasTag()) {
+            CustomData data = source.get(DataComponents.CUSTOM_DATA);
+            if (!LegacyMapping.owned(identity) || data == null) {
                 return ItemStack.EMPTY;
             }
 
-            String material = LegacyMapping.material(source.getTag().getString("material"));
+            String material = LegacyMapping.material(data.copyTag().getString("material"));
             Shape shape = LegacyMapping.shape(identity, 0);
 
             if (shape == null || !Catalogue.INSTANCE.materials.containsKey(material)
@@ -71,20 +73,18 @@ public final class LegacyPieceRecipe extends CustomRecipe {
         if (output == null) {
             return ItemStack.EMPTY;
         }
-        if (source.hasTag()) {
-            output.setTag(source.getTag().copy());
-        }
+        output.applyComponents(source.getComponentsPatch());
 
         return output;
     }
 
     @Override
-    public boolean matches(CraftingContainer inventory, Level world) {
+    public boolean matches(CraftingInput inventory, Level world) {
         return !result(inventory).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inventory, RegistryAccess registries) {
+    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registries) {
         return result(inventory);
     }
 
@@ -99,7 +99,7 @@ public final class LegacyPieceRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inventory) {
-        return NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inventory) {
+        return NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
     }
 }

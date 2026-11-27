@@ -1,4 +1,15 @@
 {
+  "skysbuildingpieces.configuration.title": "Ajustes de %s",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Ajustes comunes",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Ajustes comunes",
+  "skysbuildingpieces.configuration.gameplay": "Jugabilidad",
+  "skysbuildingpieces.configuration.gameplay.button": "Jugabilidad",
+  "skysbuildingpieces.configuration.compat": "Compatibilidad",
+  "skysbuildingpieces.configuration.compat.button": "Compatibilidad",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Colocación direccional de losas",
+  "skysbuildingpieces.configuration.directionalSlabPlacement.tooltip": "Permite colocar losas normales en vertical haciendo clic en caras y bordes. Reinicia tras cambiar esta opción.",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Reemplazar piezas antiguas",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces.tooltip": "Sustituye las piezas antiguas compatibles si está instalado el mod original. Haz antes una copia de tu mundo.",
   "pieces.skysbuildingpieces.slab": "Losa de %s",
   "pieces.skysbuildingpieces.vertical_slab": "Losa vertical de %s",
   "pieces.skysbuildingpieces.horizontal_step": "Cuarto de bloque de %s",
@@ -118,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "lana verde",
   "material.skysbuildingpieces.minecraft.wool_red": "lana roja",
   "material.skysbuildingpieces.minecraft.wool_black": "lana negra",
-  "material.skysbuildingpieces.minecraft.grass_path": "Camino"
+  "material.skysbuildingpieces.minecraft.grass_path": "Camino",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Tierra enraizada",
+  "material.skysbuildingpieces.minecraft.mud": "Lodo",
+  "material.skysbuildingpieces.minecraft.clay": "Arcilla",
+  "material.skysbuildingpieces.minecraft.deepslate": "Pizarra profunda",
+  "material.skysbuildingpieces.minecraft.tuff": "Toba",
+  "material.skysbuildingpieces.minecraft.calcite": "Calcita",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Caliza",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Hielo azul"
 }

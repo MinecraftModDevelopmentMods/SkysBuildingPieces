@@ -26,7 +26,7 @@ public final class LegacyTestScope implements AutoCloseable {
         this.world = world;
         LegacyBridge.report(world);
         totals = PiecesWorldState.get(world);
-        originalTotals = totals.save(new CompoundTag());
+        originalTotals = totals.save(new CompoundTag(), world.registryAccess());
 
         Map<Integer, String> ids = (Map<Integer, String>) field("savedIds").get(null);
 

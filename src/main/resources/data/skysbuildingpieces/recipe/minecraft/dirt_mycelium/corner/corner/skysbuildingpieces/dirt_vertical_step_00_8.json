@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/dirt_mycelium_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:dirt_mycelium_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:dirt_mycelium_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_mycelium_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:dirt_mycelium_vertical_step"
+      }
+    ]
+  }
+}

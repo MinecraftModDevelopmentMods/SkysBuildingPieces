@@ -22,9 +22,10 @@ public final class PersistenceRegistrationChecks {
     }
 
     private static void beforeQueuedWork(FMLCommonSetupEvent event) {
-        require(count(CORE) == 0 && count(GRASS) == 0,
-                "Sky persistence hooks must wait until parallel setup has finished");
-        LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_BEFORE_PASS sky_hooks=0");
+        require(count(CORE) == 0, "Building Pieces must wait until parallel setup has finished");
+        require(count(GRASS) == (ModList.get().isLoaded("skysgrassslabs") ? 1 : 0),
+                "Grass Slabs installs its server listener during construction on Forge 50");
+        LogManager.getLogger().info("SKY_PERSISTENCE_SETUP_BEFORE_PASS core=0 grass={}", count(GRASS));
     }
 
     private static void afterQueuedWork(FMLLoadCompleteEvent event) {
@@ -48,7 +49,8 @@ public final class PersistenceRegistrationChecks {
         try {
             Class<?> owner = Class.forName(prefix.substring(0, prefix.length() - 1));
             if (prefix.equals(MINERALOGY)) {
-                var capture = owner.getMethod("captureLegacyLevelData", net.minecraft.nbt.CompoundTag.class,
+                var capture = owner.getMethod("captureLegacyLevelData",
+                        net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess.class,
                         net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory.class);
                 var fallback = owner.getMethod("onServerAboutToStart",
                         net.minecraftforge.event.server.ServerAboutToStartEvent.class);

@@ -63,13 +63,25 @@ public final class LegacyBridge {
         }
     }
 
-    /** Capture the untouched registry and biome source before an early level save. */
-    /** Capture the legacy snapshot before Forge processes its modern level data. */
-    public static void captureLegacyLevelData(CompoundTag root,
+    /** Capture the untouched registry and biome source before Forge reads the level. */
+    public static void captureLegacyLevelData(
+            net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess access,
             net.minecraft.world.level.storage.LevelStorageSource.LevelDirectory directory) {
-        if (directory != null) {
-            captureLegacyLevelData(root, directory.path());
+        if (access == null || directory == null) {
+            return;
         }
+        CompoundTag raw;
+        try {
+            raw = access.getDataTagRaw(false);
+        } catch (IOException primaryFailure) {
+            try {
+                raw = access.getDataTagRaw(true);
+            } catch (IOException fallbackFailure) {
+                primaryFailure.addSuppressed(fallbackFailure);
+                throw new RecoveryAbort("Cannot read the original level data for piece recovery", primaryFailure);
+            }
+        }
+        captureLegacyLevelData(raw, directory.path());
     }
 
     public static synchronized void captureLegacyLevelData(CompoundTag root, Path directory) {
@@ -117,7 +129,7 @@ public final class LegacyBridge {
         try {
             if (sidecar.isFile()) {
                 try (InputStream input = new FileInputStream(sidecar)) {
-                    previous = NbtIo.readCompressed(input);
+                    previous = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
                 }
 
                 registrySnapshot = previous.contains("FML", 10) ? previous.getCompound("FML").copy() : previous.copy();
@@ -125,7 +137,7 @@ public final class LegacyBridge {
 
                 if (laterRegistrySnapshot.isEmpty() && level.isFile()) {
                     try (InputStream input = new FileInputStream(level)) {
-                        CompoundTag current = NbtIo.readCompressed(input);
+                        CompoundTag current = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
 
                         if (current.getCompound("Data").getInt("DataVersion") <= 1343) {
                             laterRegistrySnapshot = current.getCompound("FML").copy();
@@ -141,7 +153,7 @@ public final class LegacyBridge {
                 }
             } else if (level.isFile()) {
                 try (InputStream input = new FileInputStream(level)) {
-                    registrySnapshot = NbtIo.readCompressed(input).getCompound("FML").copy();
+                    registrySnapshot = NbtIo.readCompressed(input, net.minecraft.nbt.NbtAccounter.unlimitedHeap()).getCompound("FML").copy();
                 }
             }
 
@@ -360,6 +372,9 @@ public final class LegacyBridge {
     public static CompoundTag finalizeNbt(CompoundTag root, int targetVersion) {
         if (ready && root != null) {
             HistoricalItems.finish(root, targetVersion);
+            if (targetVersion >= net.minecraft.SharedConstants.getCurrentVersion().getDataVersion().getVersion()) {
+                NamedPieceStates.flatten(root);
+            }
         }
 
         return root;
@@ -413,8 +428,7 @@ public final class LegacyBridge {
                         continue;
                     }
 
-                    BlockState original = NbtUtils.readBlockState(net.minecraft.core.registries.BuiltInRegistries.BLOCK.asLookup(), saved);
-                    BlockState target = Pieces.canonicalState(original);
+                    BlockState target = NamedPieceStates.resolve(block, saved);
                     CompoundTag converted = saved.copy();
                     CompoundTag nativeState = NbtUtils.writeBlockState(target);
 
@@ -468,6 +482,15 @@ public final class LegacyBridge {
         }
     }
 
+    static boolean mightRecoverItem(String registryId) {
+        PieceItem item = Pieces.pieceItem(registryId);
+        if (item != null) {
+            return Catalogue.INSTANCE.materials.get(item.material).replacement() != null;
+        }
+        return palette(registryId) != null || HistoricalFullBlocks.historical(registryId)
+                || LegacyMapping.owned(registryId) || LegacyPreflight.skyOwned(registryId);
+    }
+
     public static void prepareStack(CompoundTag stack) {
         prepareStacks(stack);
     }
@@ -508,13 +531,13 @@ public final class LegacyBridge {
 
             if (worldDirectory != null && change.module != null) {
                 pendingItems.computeIfAbsent(change.module, key -> new java.util.concurrent.atomic.AtomicLong())
-                        .addAndGet(change.stack.getByte("Count") & 255);
+                        .addAndGet(HistoricalItems.stackCount(change.stack));
             }
         }
     }
 
     private static void collectStack(CompoundTag stack, List<StackChange> changes) {
-        if (stack.contains("id", 8) && stack.contains("Count", 99)) {
+        if (HistoricalItems.isStack(stack)) {
             collectIdentity(stack, changes);
         }
 
@@ -529,7 +552,7 @@ public final class LegacyBridge {
         if (value instanceof CompoundTag) {
             CompoundTag compound = (CompoundTag) value;
 
-            if (compound.contains("id", 8) && compound.contains("Count", 99)) {
+            if (HistoricalItems.isStack(compound)) {
                 collectStack(compound, changes);
                 return;
             }
@@ -582,7 +605,7 @@ public final class LegacyBridge {
         }
         if (LegacyPreflight.skyOwned(registry) && !HistoricalFullBlocks.historical(registry)
                 && !net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .containsKey(new net.minecraft.resources.ResourceLocation(registry))) {
+                        .containsKey(net.minecraft.resources.ResourceLocation.parse(registry))) {
             throw new RecoveryAbort("Cannot recover " + registry + ". Restore its Sky add-on before loading.", null);
         }
 
@@ -590,7 +613,7 @@ public final class LegacyBridge {
         // convert or count them again.
         if (HistoricalFullBlocks.historical(registry) && !stack.contains("Damage", 99)
                 && !HistoricalFullBlocks.recoveryHolder(registry) && net.minecraftforge.registries.ForgeRegistries.ITEMS
-                        .containsKey(new net.minecraft.resources.ResourceLocation(registry))) {
+                        .containsKey(net.minecraft.resources.ResourceLocation.parse(registry))) {
             return;
         }
 
@@ -610,7 +633,7 @@ public final class LegacyBridge {
             return;
         }
 
-        CompoundTag tag = stack.getCompound("tag");
+        CompoundTag tag = HistoricalItems.customData(stack);
         String material = LegacyMapping.material(tag.getString("material"));
         // Item damage is a dynamic material index, never a placement orientation.
         Shape shape = LegacyMapping.shape(registry, 0);

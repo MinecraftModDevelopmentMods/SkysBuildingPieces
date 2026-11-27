@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/light_blue_wool",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_light_blue_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:light_blue_wool",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:wool_light_blue_slab"
+  }
+}

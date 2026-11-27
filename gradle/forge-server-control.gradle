@@ -12,11 +12,7 @@ def controlJar = tasks.register('forgeServerControlJar', Jar) {
     from controlClasses
     from 'src/serverControl/resources'
 }
-def packagedControl = renamer.classes(controlJar) {
-    map.from minecraft.dependency.toSrgFile
-    libraries.from sourceSets.main.compileClasspath
-    output = layout.buildDirectory.file('forge-server-control/forge-server-control-reobf.jar')
-}
+def packagedControl = controlJar
 tasks.register('preparePackagedServerControl') { dependsOn packagedControl }
 
 tasks.register('verifyNativeServerLogPolicy', Exec) {

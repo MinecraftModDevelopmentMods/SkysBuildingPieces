@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/glass_stairs",
+  "pattern": ["X  ", "XX ", "XXX"],
+  "key": {
+    "X": {
+      "item": "minecraft:glass"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:glass_stairs",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:glass_stairs"
+  }
+}

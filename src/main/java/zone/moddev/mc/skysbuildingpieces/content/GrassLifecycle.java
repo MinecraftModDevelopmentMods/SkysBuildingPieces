@@ -8,6 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.lighting.LightEngine;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.ModList;
@@ -29,7 +32,7 @@ public final class GrassLifecycle {
             Method register = api.getMethod("registerGrassForm", BlockState.class, BlockState.class);
             Set<BlockState> registered = new HashSet<>();
 
-            for (PieceBlock block : Pieces.BLOCKS.values()) {
+            for (PieceBlock block : Pieces.playableBlocks()) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     if (!grass(state) || !block.definition(state).id.equals("minecraft:grass")) {
                         continue;
@@ -48,7 +51,7 @@ public final class GrassLifecycle {
             sharedDirt = api.getMethod("tickDirt", Level.class, BlockPos.class, BlockState.class, RandomSource.class);
         } catch (ReflectiveOperationException failure) {
             throw new IllegalStateException(
-                    "Install Sky's Grass Slabs 1.2.0.117011 or later for grass-piece integration", failure);
+                    "Grass-piece integration needs a matching current version of Sky's Grass Slabs", failure);
         }
     }
 
@@ -158,13 +161,20 @@ public final class GrassLifecycle {
 
     private static boolean canRemainGrass(Level world, BlockPos position) {
         BlockPos above = position.above();
-
-        return world.getMaxLocalRawBrightness(above) >= 4
-                || world.getBlockState(above).getLightBlock(world, above) < world.getMaxLightLevel();
+        BlockState cover = world.getBlockState(above);
+        if (cover.is(Blocks.SNOW) && cover.getValue(SnowLayerBlock.LAYERS) == 1) {
+            return true;
+        }
+        if (cover.getFluidState().getAmount() == 8) {
+            return false;
+        }
+        // Bright light cannot keep covered or submerged grass alive.
+        return LightEngine.getLightBlockInto(world, Blocks.AIR.defaultBlockState(), position,
+                cover, above, Direction.UP, cover.getLightBlock(world, above)) < world.getMaxLightLevel();
     }
 
     private static boolean viableTarget(Level world, BlockPos position) {
-        if (position.getY() < 0 || position.getY() >= 256 || !world.isLoaded(position)) {
+        if (world.isOutsideBuildHeight(position) || !world.isLoaded(position)) {
             return false;
         }
 

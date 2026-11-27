@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/quartzite",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:quartzite_slab"
+    }
+  },
+  "result": {
+    "id": "mineralogy:quartzite",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:quartzite"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:quartzite_slab"
+      }
+    ]
+  }
+}

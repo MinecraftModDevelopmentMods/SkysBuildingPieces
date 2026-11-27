@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/prismarine_bricks_corner",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:prismarine_bricks_horizontal_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:prismarine_bricks_corner",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_corner"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:prismarine_bricks_horizontal_step"
+      }
+    ]
+  }
+}

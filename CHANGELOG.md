@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.3.13.121011 (unreleased)
+
+- Add matching pieces for more natural terrain, including mycelium, cave rocks, mud, rooted dirt and blue ice.
+
+## 0.3.12.121011 (unreleased)
+
+- Add matching podzol slabs and recipes for cutting and recombining podzol pieces.
+
+## 0.3.11.121011
+
+- Leave unrelated storage inventories alone during legacy recovery.
+- Preserve full item counts and custom data when recovering older pieces from large storage stacks.
+
+## 0.3.10.121011 (unreleased)
+
+- Grass steps and corners keep their grass edges, support colours and snow cover.
+- Small snow pieces drop when broken by hand, and wooden pieces retain their proper fuel values.
+- Different crafting results have separate recipe-book buttons, with one owner for shared recipes.
+- Eclipse keeps the exact optional dependency jars used by its run profiles.
+- Recovered short grass items keep their contents when older worlds are upgraded.
+
+## 0.3.9.121011
+
+- Each material and shape now has its own block ID. Older saved pieces keep their shape and orientation when upgraded.
+- The Building Pieces creative tab shows the mod's own pieces.
+- You can turn off directional slab placement from the mod's settings. It stays on by default.
+
+## 0.3.8.121011
+
+- Bring Building Pieces to Minecraft 1.21.1 on Forge.
+- Keep existing pieces, recipes and supported world upgrades.
+- Grass Slabs and Mineralogy are still optional.
+
+## 0.3.8.120061
+
+- Bring the building pieces and recipes to Minecraft 1.20.6.
+- Keep custom names and other item data when rotating or recovering pieces.
+- Keep Grass Slabs and Mineralogy optional.
+
 ## 0.3.8.120011
 
 - Bring the building pieces, creative tab and continuous glass walls to Minecraft 1.20.1.

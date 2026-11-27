@@ -1,4 +1,15 @@
 {
+  "skysbuildingpieces.configuration.title": "Настройки %s",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Общие настройки",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Общие настройки",
+  "skysbuildingpieces.configuration.gameplay": "Игровой процесс",
+  "skysbuildingpieces.configuration.gameplay.button": "Игровой процесс",
+  "skysbuildingpieces.configuration.compat": "Совместимость",
+  "skysbuildingpieces.configuration.compat.button": "Совместимость",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Установка плит с выбором направления",
+  "skysbuildingpieces.configuration.directionalSlabPlacement.tooltip": "Позволяет ставить обычные плиты вертикально, нажимая на грани и края. После изменения перезапустите игру.",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Заменять старые детали",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces.tooltip": "Заменяет поддерживаемые старые детали, если установлен исходный мод. Сначала сделайте резервную копию мира.",
   "pieces.skysbuildingpieces.slab": "Плита из %s",
   "pieces.skysbuildingpieces.vertical_slab": "Вертикальная плита из %s",
   "pieces.skysbuildingpieces.horizontal_step": "Четверть блока из %s",
@@ -118,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "зелёной шерсти",
   "material.skysbuildingpieces.minecraft.wool_red": "красной шерсти",
   "material.skysbuildingpieces.minecraft.wool_black": "чёрной шерсти",
-  "material.skysbuildingpieces.minecraft.grass_path": "Тропа"
+  "material.skysbuildingpieces.minecraft.grass_path": "Тропа",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Корнистая земля",
+  "material.skysbuildingpieces.minecraft.mud": "Грязь",
+  "material.skysbuildingpieces.minecraft.clay": "Глина",
+  "material.skysbuildingpieces.minecraft.deepslate": "Глубинный сланец",
+  "material.skysbuildingpieces.minecraft.tuff": "Туф",
+  "material.skysbuildingpieces.minecraft.calcite": "Кальцит",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Натёчный камень",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Синий лёд"
 }

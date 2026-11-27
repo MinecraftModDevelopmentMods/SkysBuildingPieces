@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/rooted_dirt_horizontal_step",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:rooted_dirt"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:rooted_dirt_horizontal_step",
+    "count": 8
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:rooted_dirt_horizontal_step"
+  }
+}

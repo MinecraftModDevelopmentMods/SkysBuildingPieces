@@ -12,14 +12,13 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContinuousGlassBakeTest {
     @Test
     void onlyWallBlockVariantsAreWrappedAndAliasesStayShared() {
-        Map<ResourceLocation, BakedModel> registry = new LinkedHashMap<ResourceLocation, BakedModel>();
+        Map<ModelResourceLocation, BakedModel> registry = new LinkedHashMap<ModelResourceLocation, BakedModel>();
         BakedModel base = new EmptyModel();
         BakedModel missing = new EmptyModel();
 
@@ -56,7 +55,7 @@ class ContinuousGlassBakeTest {
     void aResourceReloadUsesTheNewBaseModel() {
         ModelResourceLocation key = key("clear_glass_wall_00", "connections=10,meta=0,up=false");
         Set<String> targets = Collections.singleton("skysbuildingpieces:clear_glass_wall_00");
-        Map<ResourceLocation, BakedModel> registry = new LinkedHashMap<ResourceLocation, BakedModel>();
+        Map<ModelResourceLocation, BakedModel> registry = new LinkedHashMap<ModelResourceLocation, BakedModel>();
 
         registry.put(key, new EmptyModel());
         ContinuousGlassModel.install(registry, null, targets);
@@ -70,7 +69,7 @@ class ContinuousGlassBakeTest {
     }
 
     private static ModelResourceLocation key(String block, String variant) {
-        return new ModelResourceLocation(new net.minecraft.resources.ResourceLocation("skysbuildingpieces:" + block), variant);
+        return new ModelResourceLocation(net.minecraft.resources.ResourceLocation.parse("skysbuildingpieces:" + block), variant);
     }
 
     private static final class EmptyModel implements BakedModel {

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/purpur_pillar_slab",
+  "pattern": ["X ", " X"],
+  "key": {
+    "X": {
+      "item": "minecraft:purpur_pillar"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:purpur_pillar_slab",
+    "count": 4
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:purpur_pillar_slab"
+  }
+}

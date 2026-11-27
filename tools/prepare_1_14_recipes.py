@@ -1,4 +1,4 @@
-"""Generate Forge 31 recipes from permanent material and shape catalogues.
+"""Generate Forge 52 recipes from permanent material and shape catalogues.
 
 The catalogue keeps source-world identities; recipes use the flattened item IDs.
 Optional inputs and matching advancements share the same Forge conditions.
@@ -28,6 +28,10 @@ def exists(item):
     return {'type': 'forge:item_exists', 'item': item}
 
 
+def all_conditions(conditions):
+    return conditions[0] if len(conditions) == 1 else {'type': 'forge:and', 'values': conditions}
+
+
 def canonical_pattern(rows):
     occupied = [(column, row) for row, line in enumerate(rows)
                 for column, symbol in enumerate(line) if symbol != ' ']
@@ -49,8 +53,9 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
             tag = value['tag']
             if tag in visited:
                 raise ValueError('Circular native ingredient tag: ' + tag)
+            entries = [entry if isinstance(entry, str) else entry['id'] for entry in tags.get(tag, [])]
             return any(accepts({'tag': entry[1:]} if entry.startswith('#') else {'item': entry},
-                               visited | {tag}) for entry in tags.get(tag, []))
+                               visited | {tag}) for entry in entries)
         return False
     pattern, width = canonical_pattern(rows)
     reflected = tuple(sorted((width - column, row) for column, row in pattern))
@@ -59,7 +64,7 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
             inputs = recipe['ingredients']
             if len(inputs) == len(pattern) and all(accepts(value) for value in inputs):
                 result = recipe['result']
-                if (result['item'], result.get('count', 1)) != output:
+                if (result.get('id', result.get('item')), result.get('count', 1)) != output:
                     return True
             continue
         if recipe.get('type') != 'minecraft:crafting_shaped':
@@ -70,7 +75,7 @@ def native_conflict(rows, ingredient, output, native_recipes, tags):
         inputs = list(recipe['key'].values())
         if all(accepts(value) for value in inputs):
             result = recipe['result']
-            if (result['item'], result.get('count', 1)) != output:
+            if (result.get('id', result.get('item')), result.get('count', 1)) != output:
                 return True
     return False
 
@@ -134,13 +139,13 @@ def prepare(resources, native_recipes=(), tags=None):
                     conditions.append(exists(identity))
             body = {'type': 'skysbuildingpieces:cutting' if preserve else 'minecraft:crafting_shaped',
                     'category': 'building',
-                    'group': 'skysbuildingpieces/' + path.split('/')[-2],
+                    'group': 'skys/result/' + output.replace(':', '/'),
                     'pattern': rows, 'key': {'X': {'item': ingredient}},
-                    'result': {'item': output, 'count': count}}
+                    'result': {'id': output, 'count': count}}
             if preserve:
                 body['preserve_tag'] = True
             if conditions:
-                body['conditions'] = conditions
+                body['forge:condition'] = all_conditions(conditions)
             if path in recipes:
                 if recipes[path] != body:
                     raise ValueError('Conflicting generated recipe ID: ' + path)
@@ -155,7 +160,7 @@ def prepare(resources, native_recipes=(), tags=None):
                 'requirements': [['has_ingredient', 'has_the_recipe']],
                 'rewards': {'recipes': ['skysbuildingpieces:' + path]}}
             if conditions:
-                advancement['conditions'] = copy.deepcopy(conditions)
+                advancement['forge:condition'] = copy.deepcopy(all_conditions(conditions))
             advancements['recipes/' + path] = advancement
 
         for material in materials:
@@ -166,6 +171,8 @@ def prepare(resources, native_recipes=(), tags=None):
                 add(base + '/recombine_corner', ['X', 'X'], piece(material, 'corner'),
                     piece(material, 'horizontal_step'), 1)
                 for shape in ('horizontal_step', 'vertical_step'):
+                    if shape == 'vertical_step' and piece(material, shape) == piece(material, 'horizontal_step'):
+                        continue
                     add(base + '/recombine_' + shape, ['X', 'X'], piece(material, shape),
                         piece(material, 'slab'), 1)
                 continue
@@ -236,11 +243,16 @@ def prepare(resources, native_recipes=(), tags=None):
                     cut(shape, shape, full)
             if slab is not None and vertical is not None:
                 cut('slab', 'rotate', vertical)
-            if slab is not None and not half_input:
+            if slab is not None and not half_input and not slab.startswith('skysgrassslabs:'):
                 add(base + '/slab_recombination', ['XX'], slab, full, 1)
+            if identity == 'minecraft:dirt' and slab is not None and vertical is not None:
+                add(base + '/vertical_slab_recombination_without_grass_slabs', ['XX'], vertical, full, 1,
+                    [{'type': 'forge:not', 'value': exists(slab)}])
             if corner is not None and step is not None:
                 add(base + '/recombine_corner', ['X', 'X'], corner, step, 1)
             for shape, source in [('horizontal_step', step), ('vertical_step', upright_step)]:
+                if shape == 'vertical_step' and source == step:
+                    continue
                 output = slab if slab is not None else vertical
                 add(base + '/recombine_' + shape, ['X', 'X'], source, output, 1)
                 # Ordinary dirt still has its vertical slab when Grass Slabs is absent.
@@ -263,13 +275,14 @@ def main():
     for path in args.native_jar:
         with ZipFile(path) as archive:
             for name in archive.namelist():
-                if name.startswith('data/') and '/recipes/' in name and name.endswith('.json'):
+                if name.startswith('data/') and '/recipe/' in name and name.endswith('.json'):
                     native.append(json.loads(archive.read(name)))
-                if name.startswith('data/') and '/tags/items/' in name and name.endswith('.json'):
+                if name.startswith('data/') and '/tags/item/' in name and name.endswith('.json'):
                     namespace = name.split('/')[1]
-                    identifier = namespace + ':' + name.split('/tags/items/', 1)[1][:-5]
+                    identifier = namespace + ':' + name.split('/tags/item/', 1)[1][:-5]
                     data = json.loads(archive.read(name))
-                    values = data['values']
+                    # Forge tags can mark entries optional with an object containing an id.
+                    values = [entry if isinstance(entry, str) else entry['id'] for entry in data['values']]
                     if data.get('replace', False):
                         tags[identifier] = values
                     else:
@@ -278,7 +291,7 @@ def main():
     changed = 0
     manifest = args.resources.parent / 'recipe-book/native-1.14-generated.json'
     expected = sorted(folder + '/' + identifier + '.json'
-                      for folder, values in [('recipes', recipes), ('advancements', advancements)]
+                      for folder, values in [('recipe', recipes), ('advancement', advancements)]
                       for identifier in values)
     prior = json.loads(manifest.read_text(encoding='utf-8')) if manifest.is_file() else []
     # Only remove paths owned by this generator's previous manifest.
@@ -288,7 +301,7 @@ def main():
             changed += 1
             if args.write:
                 path.unlink()
-    for folder, values in [('recipes', recipes), ('advancements', advancements)]:
+    for folder, values in [('recipe', recipes), ('advancement', advancements)]:
         for identifier, data in values.items():
             path = args.resources / 'data/skysbuildingpieces' / folder / (identifier + '.json')
             text = format_json(data) + '\n'

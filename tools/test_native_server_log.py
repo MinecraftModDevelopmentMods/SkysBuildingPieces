@@ -84,6 +84,16 @@ class NativeRegistryNoticeTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.check(compact + "[time] [main/ERROR]: An unrelated failure", self.profile)
 
+    def test_numeric_resource_names_still_require_an_exact_saved_id(self):
+        profile = {"mappings": {"minecraft:painting_variant": {"minecraft:aztec2": 3}}}
+        log = ("[time] [main/ERROR]: Unidentified mapping from registry minecraft:painting_variant\n"
+               "\tminecraft:aztec2: 3\n\n"
+               "[time] [main/ERROR]: There are unidentified mappings in this world - "
+               "we are going to attempt to process anyway\n")
+        self.assertEqual(len(self.check(log, profile)), 2)
+        with self.assertRaises(ValueError):
+            self.check(log.replace("minecraft:aztec2: 3", "minecraft:aztec2: 4"), profile)
+
     def test_every_notice_boundary_is_enforced(self):
         candidates = [
             (self.valid, None),
@@ -121,15 +131,18 @@ class NativeBiomeProofTest(unittest.TestCase):
                                   ("retired_poi_contract", "source_world_sha256", "wrong")):
             with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
                 candidate = copy.deepcopy(profile)
-                for receipt_key in ("retired_poi_contract", "static_biome_contract"):
+                for receipt_key in ("retired_poi_contract", "static_biome_contract",
+                                    "native_block_rename_contract", "forge50_unused_registry_contract"):
+                    if receipt_key not in profile:
+                        continue
                     original = root / profile[receipt_key]["path"]
                     proof = json.loads(original.read_text(encoding="utf-8"))
                     if receipt_key == key:
                         proof[field] = value
                     target = Path(directory) / (receipt_key + ".json")
                     target.write_text(json.dumps(proof), encoding="utf-8")
-                    candidate[receipt_key] = {"path": target.name,
-                        "sha256": hashlib.sha256(target.read_bytes()).hexdigest().upper()}
+                    candidate[receipt_key].update(path=target.name,
+                        sha256=hashlib.sha256(target.read_bytes()).hexdigest().upper())
                 with self.assertRaises(ValueError):
                     validate_registry_proofs(directory, candidate)
 

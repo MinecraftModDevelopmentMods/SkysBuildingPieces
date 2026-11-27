@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/mineralogy/limestone",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "mineralogy:limestone_slab"
+    }
+  },
+  "result": {
+    "id": "mineralogy:limestone",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:mod_loaded",
+        "modid": "mineralogy"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:limestone"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "mineralogy:limestone_slab"
+      }
+    ]
+  }
+}

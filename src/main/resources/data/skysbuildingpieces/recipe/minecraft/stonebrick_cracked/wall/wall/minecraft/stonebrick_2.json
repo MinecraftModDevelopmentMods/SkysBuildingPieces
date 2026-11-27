@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/stonebrick_cracked_wall",
+  "pattern": ["XX", "XX", "XX"],
+  "key": {
+    "X": {
+      "item": "minecraft:cracked_stone_bricks"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:stonebrick_cracked_wall",
+    "count": 6
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stonebrick_cracked_wall"
+  }
+}

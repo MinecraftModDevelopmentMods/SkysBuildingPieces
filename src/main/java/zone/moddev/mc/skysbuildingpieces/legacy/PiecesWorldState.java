@@ -93,7 +93,7 @@ public final class PiecesWorldState extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
+    public CompoundTag save(CompoundTag compoundTag, net.minecraft.core.HolderLookup.Provider registries) {
         compoundTag.merge(retained);
         compoundTag.putInt("schema_version", 1);
         compoundTag.putLong("vanilla_blocks", blocks);
@@ -133,8 +133,10 @@ public final class PiecesWorldState extends SavedData {
             throw new IllegalStateException("Building-pieces migration state requires a server world");
         }
 
+        // This is our own schema. The vanilla map fixer rewrites old saved-data envelopes.
         return ((net.minecraft.server.level.ServerLevel) world).getDataStorage()
-                .computeIfAbsent(PiecesWorldState::fromTag, PiecesWorldState::new, NAME);
+                .computeIfAbsent(new SavedData.Factory<>(PiecesWorldState::new,
+                        (tag, registries) -> fromTag(tag), null), NAME);
     }
 
     private static PiecesWorldState fromTag(CompoundTag tag) {

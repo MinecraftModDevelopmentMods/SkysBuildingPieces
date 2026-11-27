@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/diamond_block",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:diamond_block_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:diamond_block",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:diamond_block_slab"
+  }
+}

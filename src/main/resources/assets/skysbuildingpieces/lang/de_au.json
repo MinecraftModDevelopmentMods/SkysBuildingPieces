@@ -1,4 +1,15 @@
 {
+  "skysbuildingpieces.configuration.title": "%s-Einstellungen",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml": "Allgemeine Einstellungen",
+  "skysbuildingpieces.configuration.section.skysbuildingpieces.common.toml.title": "Allgemeine Einstellungen",
+  "skysbuildingpieces.configuration.gameplay": "Spielregeln",
+  "skysbuildingpieces.configuration.gameplay.button": "Spielregeln",
+  "skysbuildingpieces.configuration.compat": "Kompatibilität",
+  "skysbuildingpieces.configuration.compat.button": "Kompatibilität",
+  "skysbuildingpieces.configuration.directionalSlabPlacement": "Richtungsabhängige Stufenplatzierung",
+  "skysbuildingpieces.configuration.directionalSlabPlacement.tooltip": "Erlaubt das senkrechte Platzieren von Stufen per Klick auf Flächen und Kanten. Änderung erfordert einen Neustart.",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces": "Alte Bauteile ersetzen",
+  "skysbuildingpieces.configuration.forceReplaceBuildingBricksPieces.tooltip": "Ersetzt unterstützte alte Bauteile, wenn ihre ursprüngliche Mod installiert ist. Sichere vorher deine Welt.",
   "pieces.skysbuildingpieces.slab": "Stufe aus %s",
   "pieces.skysbuildingpieces.vertical_slab": "Senkrechte Stufe aus %s",
   "pieces.skysbuildingpieces.horizontal_step": "Viertelblock aus %s",
@@ -118,5 +129,13 @@
   "material.skysbuildingpieces.minecraft.wool_green": "grüner Wolle",
   "material.skysbuildingpieces.minecraft.wool_red": "roter Wolle",
   "material.skysbuildingpieces.minecraft.wool_black": "schwarzer Wolle",
-  "material.skysbuildingpieces.minecraft.grass_path": "Weg"
+  "material.skysbuildingpieces.minecraft.grass_path": "Weg",
+  "material.skysbuildingpieces.minecraft.rooted_dirt": "Wurzelerde",
+  "material.skysbuildingpieces.minecraft.mud": "Schlamm",
+  "material.skysbuildingpieces.minecraft.clay": "Ton",
+  "material.skysbuildingpieces.minecraft.deepslate": "Tiefenschiefer",
+  "material.skysbuildingpieces.minecraft.tuff": "Tuffstein",
+  "material.skysbuildingpieces.minecraft.calcite": "Kalzit",
+  "material.skysbuildingpieces.minecraft.dripstone_block": "Tropfsteinblock",
+  "material.skysbuildingpieces.minecraft.blue_ice": "Blaueis"
 }

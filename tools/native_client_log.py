@@ -1,4 +1,4 @@
-"""Check Forge 47 completion, native settings and unexpected errors."""
+"""Check Forge launch completion, native settings and unexpected errors."""
 
 import argparse
 import gzip
@@ -117,4 +117,4 @@ if __name__ == "__main__":
     options = parser.parse_args()
     result = (audit_server(options.directory, options.phase) if options.server else
               audit(options.directory, options.phase, options.control))
-    print("FORGE47_NATIVE_CLIENT_AUDIT_PASS", json.dumps(result, sort_keys=True))
+    print("NATIVE_FORGE_LOG_AUDIT_PASS", json.dumps(result, sort_keys=True))

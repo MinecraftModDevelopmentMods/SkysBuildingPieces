@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.InteractionResult;
@@ -21,20 +22,17 @@ import net.minecraft.world.level.Level;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Catalogue;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Geometry;
 import zone.moddev.mc.skysbuildingpieces.catalogue.Shape;
+import zone.moddev.mc.skysbuildingpieces.config.BuildingPiecesConfig;
 
-/** One material per inventory item; placement still uses the fixed block palette. */
-public final class PieceItem extends Item {
+/** One material and shape per inventory item. */
+public final class PieceItem extends BlockItem {
     public final PieceBlock piece;
     public final String material;
 
     public PieceItem(PieceBlock block, String material) {
-        super(properties(block, material));
+        super(block, new Item.Properties());
         this.piece = block;
         this.material = material;
-    }
-
-    private static Item.Properties properties(PieceBlock block, String material) {
-        return new Item.Properties();
     }
 
     boolean visibleInCreativeTab() {
@@ -61,7 +59,22 @@ public final class PieceItem extends Item {
 
     @Override
     public int getBurnTime(ItemStack stack, net.minecraft.world.item.crafting.RecipeType<?> recipeType) {
-        return Catalogue.INSTANCE.materials.get(material).type.equals("wood") ? 300 : -1;
+        Catalogue.MaterialDef definition = Catalogue.INSTANCE.materials.get(material);
+        if (!definition.type.equals("wood")) {
+            return 0;
+        }
+        ItemStack full = Pieces.stack(Pieces.nativeState(definition, "full"), 1);
+        if (full == null || full.isEmpty()) {
+            return 0;
+        }
+        int divisor = switch (piece.palette.shape) {
+            case SLAB, VERTICAL_SLAB -> 2;
+            case STEP, HORIZONTAL_STEP, VERTICAL_STEP -> 4;
+            case CORNER -> 8;
+            default -> 1;
+        };
+        // Ask Forge about the full material so nonflammable woods keep their native behaviour.
+        return Math.max(0, net.minecraftforge.common.ForgeHooks.getBurnTime(full, recipeType)) / divisor;
     }
 
     @Override
@@ -91,6 +104,9 @@ public final class PieceItem extends Item {
             return InteractionResult.FAIL;
         }
 
+        boolean directionalSlabs = BuildingPiecesConfig.directionalSlabPlacement()
+                && (shape == Shape.VERTICAL_SLAB
+                        || shape == Shape.SLAB && Pieces.state(materialId, Shape.VERTICAL_SLAB, 0) != null);
         float targetX = hitX;
         float targetY = hitY;
         float targetZ = hitZ;
@@ -99,7 +115,7 @@ public final class PieceItem extends Item {
 
         // Vanilla slabs call a matching half replaceable. Join it before asking the placement context whether this cell
         // can accept a new block.
-        if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ)) {
+        if (combine(world, position, existingState, materialId, shape, player, stack, face, hitX, hitY, hitZ, directionalSlabs)) {
             return InteractionResult.SUCCESS;
         }
         if (!replaceable(world, position, player, hand, stack, face, hitX, hitY, hitZ)) {
@@ -110,7 +126,7 @@ public final class PieceItem extends Item {
             targetZ -= face.getStepZ();
 
             if (combine(world, position, existingState, materialId, shape, player, stack, face, targetX, targetY,
-                    targetZ)) {
+                    targetZ, directionalSlabs)) {
                 return InteractionResult.SUCCESS;
             }
         }
@@ -125,7 +141,8 @@ public final class PieceItem extends Item {
 
         switch (shape) {
             case SLAB:
-                Direction slabSide = SlabPlacement.side(face, hitX, hitY, hitZ);
+                Direction slabSide = directionalSlabs
+                        ? SlabPlacement.side(face, hitX, hitY, hitZ) : SlabPlacement.horizontalSide(face, hitY);
                 placedShape = SlabPlacement.shape(slabSide);
                 orientation = SlabPlacement.orientation(slabSide);
                 break;
@@ -189,7 +206,8 @@ public final class PieceItem extends Item {
 
     /** Combine occupied cells only when their union is a supported shape of the same material. */
     private static boolean combine(Level world, BlockPos position, BlockState existingState, String material,
-            Shape shape, Player player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ) {
+            Shape shape, Player player, ItemStack stack, Direction face, float hitX, float hitY, float hitZ,
+            boolean directionalSlabs) {
         if (!player.mayUseItemAt(position, face, stack) || shape == Shape.WALL || shape == Shape.PANE) {
             return false;
         }
@@ -226,14 +244,24 @@ public final class PieceItem extends Item {
                 | (hitY + face.getStepY() * epsilon >= .5f ? 4 : 0);
         BlockState combinedState = null;
         boolean isSlab = shape == Shape.SLAB || shape == Shape.VERTICAL_SLAB;
-        Shape[] additions = isSlab ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
+        if (isSlab && !directionalSlabs && Geometry.orientationFor(shape, existingCells) < 0) {
+            return false;
+        }
+        boolean horizontalJoin = shape == Shape.SLAB && !directionalSlabs;
+        if (horizontalJoin
+                && (existingCells == 15 ? face == Direction.DOWN || face.getAxis().isHorizontal() && hitY <= .5f
+                        : face == Direction.UP || face.getAxis().isHorizontal() && hitY > .5f)) {
+            return false;
+        }
+        Shape[] additions = directionalSlabs ? new Shape[] { Shape.SLAB, Shape.VERTICAL_SLAB } : new Shape[] { shape };
 
         search:
         for (Shape addition : additions) {
             for (int orientation = 0; orientation < addition.states; orientation++) {
                 int addedCells = Geometry.mask(addition, orientation);
 
-                if ((addedCells & 1 << clickedCell) == 0 || (addedCells & existingCells) != 0) {
+                if ((!horizontalJoin && (addedCells & 1 << clickedCell) == 0)
+                        || (addedCells & existingCells) != 0) {
                     continue;
                 }
 

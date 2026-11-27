@@ -1,0 +1,64 @@
+{
+  "source_world_sha256": "910789BEF774D2D2B20CDCBEEB08D6E0296D7C2B714267B8EA4CCB49F1DF6324",
+  "snapshot_entries": {
+    "minecraft:block": {
+      "minecraft:grass": 95
+    },
+    "minecraft:item": {
+      "minecraft:grass": 89,
+      "minecraft:scute": 571
+    },
+    "minecraft:painting_variant": {
+      "minecraft:alban": 2,
+      "minecraft:aztec": 1,
+      "minecraft:aztec2": 3,
+      "minecraft:bomb": 4,
+      "minecraft:burning_skull": 23,
+      "minecraft:bust": 15,
+      "minecraft:courbet": 8,
+      "minecraft:creebet": 11,
+      "minecraft:donkey_kong": 29,
+      "minecraft:earth": 25,
+      "minecraft:fighters": 20,
+      "minecraft:fire": 28,
+      "minecraft:graham": 13,
+      "minecraft:kebab": 0,
+      "minecraft:match": 14,
+      "minecraft:pigscene": 22,
+      "minecraft:plant": 5,
+      "minecraft:pointer": 21,
+      "minecraft:pool": 7,
+      "minecraft:sea": 9,
+      "minecraft:skeleton": 24,
+      "minecraft:skull_and_roses": 18,
+      "minecraft:stage": 16,
+      "minecraft:sunset": 10,
+      "minecraft:void": 17,
+      "minecraft:wanderer": 12,
+      "minecraft:wasteland": 6,
+      "minecraft:water": 27,
+      "minecraft:wind": 26,
+      "minecraft:wither": 19
+    },
+    "minecraft:potion": {
+      "minecraft:empty": 0
+    }
+  },
+  "inspected_nbt_records": 3457,
+  "typed_uses": {
+    "minecraft:grass": {
+      "kind": "vanilla_block_rename",
+      "positions": 6182
+    },
+    "minecraft:skeleton": {
+      "kind": "spawner_entity_not_painting",
+      "before": 5,
+      "after": 7
+    },
+    "minecraft:water": {
+      "kind": "block_or_fluid_not_painting",
+      "before": 1636,
+      "after": 3402
+    }
+  }
+}

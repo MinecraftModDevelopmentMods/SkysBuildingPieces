@@ -65,7 +65,7 @@ public final class CoverageContributor {
                 coverage.putInt("vanilla", 1);
                 level.put("skysbuildingpieces_coverage", coverage);
                 MinecraftForge.EVENT_BUS
-                        .post(new ChunkDataEvent.Load(chunk, root, net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                        .post(new ChunkDataEvent.Load(chunk, root, net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
 
                 if (contributor.visits != previousVisits + 1) {
                     throw new AssertionError("Core coverage must not skip a later add-on");
@@ -85,7 +85,7 @@ public final class CoverageContributor {
                 }
 
                 MinecraftForge.EVENT_BUS.post(new ChunkDataEvent.Load(chunk, saved,
-                        net.minecraft.world.level.chunk.ChunkStatus.ChunkType.LEVELCHUNK));
+                        net.minecraft.world.level.chunk.status.ChunkType.LEVELCHUNK));
 
                 if (contributor.visits != previousVisits + 1) {
                     throw new AssertionError("Later add-on coverage must be reload idempotent");

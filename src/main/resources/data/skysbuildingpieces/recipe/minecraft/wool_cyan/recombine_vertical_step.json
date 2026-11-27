@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/skysbuildingpieces/wool_cyan_slab",
+  "pattern": ["X", "X"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:wool_cyan_vertical_step"
+    }
+  },
+  "result": {
+    "id": "skysbuildingpieces:wool_cyan_slab",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_cyan_slab"
+      },
+      {
+        "type": "forge:item_exists",
+        "item": "skysbuildingpieces:wool_cyan_vertical_step"
+      }
+    ]
+  }
+}

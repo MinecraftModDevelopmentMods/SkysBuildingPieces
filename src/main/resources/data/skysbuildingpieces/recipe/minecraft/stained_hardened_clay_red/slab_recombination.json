@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "skys/result/minecraft/red_terracotta",
+  "pattern": ["XX"],
+  "key": {
+    "X": {
+      "item": "skysbuildingpieces:stained_hardened_clay_red_slab"
+    }
+  },
+  "result": {
+    "id": "minecraft:red_terracotta",
+    "count": 1
+  },
+  "forge:condition": {
+    "type": "forge:item_exists",
+    "item": "skysbuildingpieces:stained_hardened_clay_red_slab"
+  }
+}
