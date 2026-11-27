@@ -21,15 +21,15 @@ launches. Ordinary client and server launches use processed production resources
 and exclude test classes.
 
 - `runClient` and `runServer` load Building Pieces on its own.
-- `runGrassSlabsClient` and `runGrassSlabsServer` add the coordinated Grass Slabs
-  candidate recorded in `gradle/grass-slabs-release.properties`.
+- `runGrassSlabsClient` and `runGrassSlabsServer` add the released Grass Slabs
+  build recorded in `gradle/grass-slabs-release.properties`.
 - `runMineralogyClient` and `runMineralogyServer` add the optional Mineralogy and
   OreSpawn jars recorded in `gradle/mineralogy-runtime.properties`.
 
-The Grass Slabs pin currently names a source candidate, not a public release.
-Build that exact commit in the sibling `SkysGrassSlabs1211/SkysGrassSlabs` checkout,
-or pass `-PgrassSlabsMainJar=<jar>`. The jar must match its pinned hash. CI builds the pinned commit before testing the optional
-integration; it can run after that commit is available in the upstream repository.
+Use the pinned Grass Slabs release. Build its commit in the sibling
+`SkysGrassSlabs1211/SkysGrassSlabs` checkout or point
+`-PgrassSlabsMainJar=<jar>` at the downloaded jar. Both must match
+the pinned hash. CI builds that commit before testing the optional integration.
 Building Pieces does not bundle any Grass Slabs classes or require it to play.
 
 Optional Mineralogy/OreSpawn jars also need their exact recorded hashes. Each
